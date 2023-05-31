@@ -52,6 +52,9 @@ namespace KingdomMapMod.TwoCrowns
         private List<DebugInfo> debugInfoList = new();
         private List<MarkInfo> minimapMarkList = new();
         private StatsInfo statsInfo = new();
+        private float exploredLeft = 0;
+        private float exploredRight = 0;
+        private bool showFullMap = false;
 
         public PluginBase()
         {
@@ -78,7 +81,8 @@ namespace KingdomMapMod.TwoCrowns
 
         private void Start()
         {
-
+            log.LogMessage("Start.");
+            Game.add_OnGameStart((Action)OnGameStart);
         }
 
         private void Update()
@@ -91,6 +95,11 @@ namespace KingdomMapMod.TwoCrowns
             if (Input.GetKeyDown(KeyCode.End))
             {
                 enableDebugInfo = !enableDebugInfo;
+            }
+
+            if (Input.GetKeyDown(KeyCode.F))
+            {
+                showFullMap = !showFullMap;
             }
 
             if (Input.GetKeyDown(KeyCode.Insert))
@@ -184,6 +193,12 @@ namespace KingdomMapMod.TwoCrowns
                 DrawDebugInfo();
         }
 
+        public void OnGameStart()
+        {
+            log.LogMessage("OnGameStart.");
+            exploredLeft = exploredRight = 0;
+        }
+
         private void UpdateCamera()
         {
             if (!player)
@@ -232,6 +247,12 @@ namespace KingdomMapMod.TwoCrowns
             foreach (var rider in riderList)
             {
                 poiList.Add(new MarkInfo(rider.transform.position, Color.green, Strings.You));
+                float l = rider.transform.position.x - 12;
+                float r = rider.transform.position.x + 12;
+                if (l < exploredLeft)
+                    exploredLeft = l;
+                if (r > exploredRight)
+                    exploredRight = r;
             }
 
             var castleList = GameObject.FindObjectsOfType<Castle>();
@@ -301,7 +322,6 @@ namespace KingdomMapMod.TwoCrowns
                 poiList.Add(new MarkInfo(obj.transform.position, col, info));
             }
             
-            // GameLayer
             var cabinList = GameObject.FindObjectsOfType<Cabin>();
             foreach (var obj in cabinList)
             {
@@ -386,6 +406,18 @@ namespace KingdomMapMod.TwoCrowns
             if (mine)
                 poiList.Add(new MarkInfo(mine.transform.position, Color.red, Strings.Mine));
 
+            // explored area
+
+            foreach (var poi in poiList)
+            {
+                if (showFullMap)
+                    poi.visible = true;
+                else if(poi.vec.x > exploredLeft && poi.vec.x < exploredRight)
+                    poi.visible = true;
+                else
+                    poi.visible = false;
+            }
+
             // Calc screen pos
 
             if (poiList.Count == 0)
@@ -429,6 +461,9 @@ namespace KingdomMapMod.TwoCrowns
 
             foreach (var markInfo in minimapMarkList)
             {
+                if (!markInfo.visible)
+                    continue;
+
                 SpotMarkGUIStyle.normal.textColor = markInfo.color;
                 GUI.Label(markInfo.pos, markInfo.info, SpotMarkGUIStyle);
                 if (markInfo.count != 0)
@@ -480,7 +515,7 @@ namespace KingdomMapMod.TwoCrowns
                 Vector3 uiPos = new Vector3(screenPos.x, Screen.height - screenPos.y, 0);
                 if (uiPos.x > 0 && uiPos.x < Screen.width && uiPos.y > 0 && uiPos.y < Screen.height)
                 {
-                    debugInfoList.Add(new DebugInfo(new Rect(uiPos.x, uiPos.y, 100, 100), obj.name));
+                    debugInfoList.Add(new DebugInfo(new Rect(uiPos.x, uiPos.y, 100, 100), obj.transform.position, obj.name));
                     //  + " (" + obj.transform.position.ToString() + ")(" + uiPos.ToString() + ")"
                     log.LogInfo(obj.name);
                 }
@@ -493,6 +528,9 @@ namespace KingdomMapMod.TwoCrowns
             foreach (var obj in debugInfoList)
             {
                 GUI.Label(obj.pos, obj.info, SpotMarkGUIStyle);
+                // var vecPos = obj.pos;
+                // vecPos.y += 20;
+                // GUI.Label(vecPos, obj.vec.x.ToString(), SpotMarkGUIStyle);
             }
 
             // var dog = GameObject.FindObjectOfType<Dog>();
@@ -550,6 +588,7 @@ namespace KingdomMapMod.TwoCrowns
         public Color color;
         public string info;
         public int count;
+        public bool visible;
 
         public MarkInfo(Vector3 vec, Rect pos, Color color, string info)
         {
@@ -580,11 +619,13 @@ namespace KingdomMapMod.TwoCrowns
     public class DebugInfo
     {
         public Rect pos;
+        public Vector3 vec;
         public string info;
 
-        public DebugInfo(Rect pos, string info)
+        public DebugInfo(Rect pos, Vector3 vec, string info)
         {
             this.pos = pos;
+            this.vec = vec;
             this.info = info;
         }
     }
