@@ -5,16 +5,18 @@ A map mod for the game "Kingdom Two Crowns".
 ## Features
 
 1. Add a map floating layer on the top of the screen, and mark important objects in the game on it, including castles, slums, docks, cliffs, etc.
-2. Displays some useful stats, including the number of idle villagers, workers, archers, farmers and farmland.
-3. Display some useful debugging information to facilitate making game plugins.
-4. Dump all game objects to JSON file.
+2. By default, only the markers in the area you have explored are displayed, of course you can also show the full map immediately by pressing the `F` key.
+3. Displays some useful stats, including the number of idle villagers, workers, archers, farmers and farmland.
+4. Display some useful debugging information to facilitate making game plugins.
+5. Dump all game objects to JSON file.
 
 ## Hotkeys
 
 1. `Home` Display the map overlay
 2. `End` Display debug information
 3. `Insert` Test some interesting features
-4. `X` Dump game objects to JSON file
+4. `F` Show the full map
+5. `X` Dump game objects to JSON file
 
 ## Install
 
