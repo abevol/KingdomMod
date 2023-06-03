@@ -273,9 +273,27 @@ namespace KingdomMapMod.TwoCrowns
                 poiList.Add(new MarkInfo(obj.transform.position, Color.white, obj.isGems ? Strings.GemChest : Strings.Chest, obj.coins));
             }
 
+            var wallList = GameObject.FindObjectsOfType<Wall>();
+            foreach (var obj in wallList)
+            {
+                poiList.Add(new MarkInfo(obj.transform.position, Color.green, Strings.Wall, 0, true));
+            }
+
+            var wallWreckList = GameObject.FindGameObjectsWithTag("WallWreck");
+            foreach (var obj in wallWreckList)
+            {
+                poiList.Add(new MarkInfo(obj.transform.position, Color.red, Strings.WallWreck, 0, true));
+            }
+
             var dogSpawn = GameObject.FindObjectOfType<DogSpawn>();
             if (dogSpawn != null && !dogSpawn._dogFreed)
                 poiList.Add(new MarkInfo(dogSpawn.transform.position, Color.green, Strings.DogSpawn));
+
+            var farmhouseList = GameObject.FindObjectsOfType<Farmhouse>();
+            foreach (var obj in farmhouseList)
+            {
+                poiList.Add(new MarkInfo(obj.transform.position, Color.green, Strings.Farmhouse));
+            }
 
             var steedSpawnList = GameObject.FindObjectsOfType<SteedSpawn>();
             foreach (var obj in steedSpawnList)
@@ -379,7 +397,7 @@ namespace KingdomMapMod.TwoCrowns
             var timeStatue = GameObject.FindObjectOfType<TimeStatue>();
             if (timeStatue)
                 poiList.Add(new MarkInfo(timeStatue.transform.position, Color.red, Strings.StatueTime));
-            
+
             // var upgradeList = GameObject.FindObjectsOfType<PayableUpgrade>();
             // foreach (var obj in upgradeList)
             // {
@@ -387,6 +405,10 @@ namespace KingdomMapMod.TwoCrowns
             //     Color col = obj.CanPay(player) ? Color.red : Color.green;
             //     poiList.Add(new MarkInfo(obj.transform.position, col, info));
             // }
+
+            var wharf = GameObject.FindObjectOfType<Wharf>();
+            if (wharf)
+                poiList.Add(new MarkInfo(wharf.transform.position, Color.green, Strings.Boat));
 
             var wreck = GameObject.FindObjectOfType<WreckPlaceholder>();
             if (wreck)
@@ -442,6 +464,8 @@ namespace KingdomMapMod.TwoCrowns
                 poi.pos = new Rect(poiPosX + 6, 20, 120, 30);
                 if (poi.info == Strings.You)
                     poi.pos.y = 50;
+                if (poi.isWall)
+                    poi.pos.y = 8;
             }
             
             minimapMarkList = poiList;
@@ -589,6 +613,7 @@ namespace KingdomMapMod.TwoCrowns
         public string info;
         public int count;
         public bool visible;
+        public bool isWall;
 
         public MarkInfo(Vector3 vec, Rect pos, Color color, string info)
         {
@@ -598,12 +623,13 @@ namespace KingdomMapMod.TwoCrowns
             this.info = info;
         }
 
-        public MarkInfo(Vector3 vec, Color color, string info, int count = 0)
+        public MarkInfo(Vector3 vec, Color color, string info, int count = 0, bool isWall = false)
         {
             this.vec = vec;
             this.color = color;
             this.info = info;
             this.count = count;
+            this.isWall = isWall;
         }
     }
 

@@ -264,4 +264,16 @@
   <data name="Farmlands" xml:space="preserve">
     <value>Farmlands</value>
   </data>
+  <data name="Farmhouse" xml:space="preserve">
+    <value>Farmhouse</value>
+  </data>
+  <data name="Boat" xml:space="preserve">
+    <value>Boat</value>
+  </data>
+  <data name="Wall" xml:space="preserve">
+    <value>۩</value>
+  </data>
+  <data name="WallWreck" xml:space="preserve">
+    <value>۩</value>
+  </data>
 </root>

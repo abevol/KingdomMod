@@ -106,6 +106,15 @@ namespace KingdomMapMod.TwoCrowns {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Boat.
+        /// </summary>
+        internal static string Boat {
+            get {
+                return ResourceManager.GetString("Boat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Campfire.
         /// </summary>
         internal static string Campfire {
@@ -192,6 +201,15 @@ namespace KingdomMapMod.TwoCrowns {
         internal static string Farmer {
             get {
                 return ResourceManager.GetString("Farmer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Farmhouse.
+        /// </summary>
+        internal static string Farmhouse {
+            get {
+                return ResourceManager.GetString("Farmhouse", resourceCulture);
             }
         }
         
@@ -453,6 +471,24 @@ namespace KingdomMapMod.TwoCrowns {
         internal static string Unicorn {
             get {
                 return ResourceManager.GetString("Unicorn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ۩.
+        /// </summary>
+        internal static string Wall {
+            get {
+                return ResourceManager.GetString("Wall", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ۩.
+        /// </summary>
+        internal static string WallWreck {
+            get {
+                return ResourceManager.GetString("WallWreck", resourceCulture);
             }
         }
         
