@@ -385,6 +385,15 @@ namespace KingdomMapMod.TwoCrowns {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ≈.
+        /// </summary>
+        internal static string River {
+            get {
+                return ResourceManager.GetString("River", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Sleipnir.
         /// </summary>
         internal static string Sleipnir {
@@ -480,6 +489,15 @@ namespace KingdomMapMod.TwoCrowns {
         internal static string Wall {
             get {
                 return ResourceManager.GetString("Wall", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string WallFoundation {
+            get {
+                return ResourceManager.GetString("WallFoundation", resourceCulture);
             }
         }
         

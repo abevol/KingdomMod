@@ -276,4 +276,10 @@
   <data name="WallWreck" xml:space="preserve">
     <value>۩</value>
   </data>
+  <data name="WallFoundation" xml:space="preserve">
+    <value />
+  </data>
+  <data name="River" xml:space="preserve">
+    <value>≈</value>
+  </data>
 </root>

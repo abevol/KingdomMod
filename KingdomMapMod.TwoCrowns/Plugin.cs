@@ -216,8 +216,6 @@ namespace KingdomMapMod.TwoCrowns
             minimapMarkList.Clear();
             List<MarkInfo> poiList = new List<MarkInfo>();
 
-            // var cliff = GameObject.Find("Cliff Stones Back(Clone)");
-            // poiList.Add(new MarkInfo(cliff.transform.position, Color.white, "悬崖"));
             var dock = GameObject.FindObjectOfType<Beach>();
             if (dock != null)
                 poiList.Add(new MarkInfo(dock.transform.position, Color.white, Strings.Dock));
@@ -283,6 +281,18 @@ namespace KingdomMapMod.TwoCrowns
             foreach (var obj in wallWreckList)
             {
                 poiList.Add(new MarkInfo(obj.transform.position, Color.red, Strings.WallWreck, 0, true));
+            }
+
+            var wallFoundation = GameObject.FindGameObjectsWithTag("WallFoundation");
+            foreach (var obj in wallFoundation)
+            {
+                poiList.Add(new MarkInfo(obj.transform.position, Color.gray, Strings.WallFoundation, 0, true));
+            }
+
+            var riverList = GameObject.FindObjectsOfType<River>();
+            foreach (var obj in riverList)
+            {
+                poiList.Add(new MarkInfo(obj.transform.position, new Color(0.46f, 0.84f, 0.92f), Strings.River, 0, true));
             }
 
             var dogSpawn = GameObject.FindObjectOfType<DogSpawn>();
@@ -413,12 +423,6 @@ namespace KingdomMapMod.TwoCrowns
             var wreck = GameObject.FindObjectOfType<WreckPlaceholder>();
             if (wreck)
                 poiList.Add(new MarkInfo(wreck.transform.position, Color.red, Strings.Wreck));
-
-            // var riverList = GameObject.FindObjectsOfType<River>();
-            // foreach (var obj in riverList)
-            // {
-            //     poiList.Add(new MarkInfo(obj.transform.position, "河流"));
-            // }
             
             var quarry = GameObject.Find("Quarry_undeveloped(Clone)");
             if (quarry)
