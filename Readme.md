@@ -1,6 +1,6 @@
 # KingdomMapMod
 
-A simple map mod for the game "Kingdom Two Crowns". It marks points of interest, along with some extra details. There's also the demographics feature, which tells you how many of each type there are.
+A map mod for the game "Kingdom Two Crowns". It marks points of interest, along with some extra details. There's also the demographics feature, which tells you how many of each type there are.
 
 ## Features
 
