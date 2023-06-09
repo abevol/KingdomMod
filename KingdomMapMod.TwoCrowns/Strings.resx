@@ -127,7 +127,7 @@
     <value>Portal</value>
   </data>
   <data name="BeggarCamp" xml:space="preserve">
-    <value>BeggarCamp</value>
+    <value>Beggars</value>
   </data>
   <data name="You" xml:space="preserve">
     <value>You</value>
@@ -277,9 +277,24 @@
     <value>۩</value>
   </data>
   <data name="WallFoundation" xml:space="preserve">
-    <value />
+    <value>∧</value>
   </data>
   <data name="River" xml:space="preserve">
     <value>≈</value>
+  </data>
+  <data name="Pikeman" xml:space="preserve">
+    <value>Pikeman</value>
+  </data>
+  <data name="Land" xml:space="preserve">
+    <value>Land</value>
+  </data>
+  <data name="Knight" xml:space="preserve">
+    <value>Knight</value>
+  </data>
+  <data name="Time" xml:space="preserve">
+    <value>Time</value>
+  </data>
+  <data name="BerryBush" xml:space="preserve">
+    <value>♣</value>
   </data>
 </root>

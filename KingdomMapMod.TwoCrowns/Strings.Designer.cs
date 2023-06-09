@@ -88,11 +88,20 @@ namespace KingdomMapMod.TwoCrowns {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to BeggarCamp.
+        ///   Looks up a localized string similar to Beggars.
         /// </summary>
         internal static string BeggarCamp {
             get {
                 return ResourceManager.GetString("BeggarCamp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ♣.
+        /// </summary>
+        internal static string BerryBush {
+            get {
+                return ResourceManager.GetString("BerryBush", resourceCulture);
             }
         }
         
@@ -331,6 +340,24 @@ namespace KingdomMapMod.TwoCrowns {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Knight.
+        /// </summary>
+        internal static string Knight {
+            get {
+                return ResourceManager.GetString("Knight", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Land.
+        /// </summary>
+        internal static string Land {
+            get {
+                return ResourceManager.GetString("Land", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Lizard.
         /// </summary>
         internal static string Lizard {
@@ -354,6 +381,15 @@ namespace KingdomMapMod.TwoCrowns {
         internal static string Peasant {
             get {
                 return ResourceManager.GetString("Peasant", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pikeman.
+        /// </summary>
+        internal static string Pikeman {
+            get {
+                return ResourceManager.GetString("Pikeman", resourceCulture);
             }
         }
         
@@ -466,6 +502,15 @@ namespace KingdomMapMod.TwoCrowns {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Time.
+        /// </summary>
+        internal static string Time {
+            get {
+                return ResourceManager.GetString("Time", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Trap.
         /// </summary>
         internal static string Trap {
@@ -493,7 +538,7 @@ namespace KingdomMapMod.TwoCrowns {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to ∧.
         /// </summary>
         internal static string WallFoundation {
             get {

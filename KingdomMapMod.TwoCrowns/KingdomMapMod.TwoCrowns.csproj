@@ -34,6 +34,10 @@
       <HintPath>libs\interop\Il2Cppmscorlib.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Il2CppSystem.Core">
+      <HintPath>libs\interop\Il2CppSystem.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="UnityEngine">
       <HintPath>libs\interop\UnityEngine.dll</HintPath>
       <Private>False</Private>

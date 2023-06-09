@@ -282,4 +282,19 @@
   <data name="River" xml:space="preserve">
     <value>≈</value>
   </data>
+  <data name="Pikeman" xml:space="preserve">
+    <value>矛兵</value>
+  </data>
+  <data name="Land" xml:space="preserve">
+    <value>岛屿</value>
+  </data>
+  <data name="Knight" xml:space="preserve">
+    <value>骑士</value>
+  </data>
+  <data name="Time" xml:space="preserve">
+    <value>时间</value>
+  </data>
+  <data name="BerryBush" xml:space="preserve">
+    <value>♣</value>
+  </data>
 </root>

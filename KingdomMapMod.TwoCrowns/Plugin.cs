@@ -2,7 +2,6 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Threading;
 using BepInEx;
 using BepInEx.Logging;
 using BepInEx.Unity.IL2CPP;
@@ -20,11 +19,7 @@ namespace KingdomMapMod.TwoCrowns
             {
                 // debug localization
 
-                // string myCulture = "zh-CN";
-                // Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo(myCulture);
-                // Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo(myCulture);
-                // CultureInfo.DefaultThreadCurrentCulture = CultureInfo.GetCultureInfo(myCulture);
-                // CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo(myCulture);
+                // string myCulture = "en-US";
                 // Strings.Culture = CultureInfo.GetCultureInfo(myCulture);
 
                 Log.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded!");
@@ -42,15 +37,13 @@ namespace KingdomMapMod.TwoCrowns
     public class PluginBase : MonoBehaviour
     {
         private static ManualLogSource log;
-        private static readonly GUIStyle SpotMarkGUIStyle = new();
-        private Player player;
-        private Camera worldCam;
-        private Camera screenCam;
+        private static readonly GUIStyle guiStyle = new();
         private int tick = 0;
         private bool enableDebugInfo = false;
         private bool enableMinimap = true;
         private List<DebugInfo> debugInfoList = new();
         private List<MarkInfo> minimapMarkList = new();
+        private List<LineInfo> drawLineList = new();
         private StatsInfo statsInfo = new();
         private float exploredLeft = 0;
         private float exploredRight = 0;
@@ -60,9 +53,9 @@ namespace KingdomMapMod.TwoCrowns
         {
             try
             {
-                SpotMarkGUIStyle.alignment = TextAnchor.UpperLeft;
-                SpotMarkGUIStyle.normal.textColor = Color.white;
-                SpotMarkGUIStyle.fontSize = 12;
+                guiStyle.alignment = TextAnchor.UpperLeft;
+                guiStyle.normal.textColor = Color.white;
+                guiStyle.fontSize = 12;
             }
             catch (Exception exception)
             {
@@ -89,11 +82,13 @@ namespace KingdomMapMod.TwoCrowns
         {
             if (Input.GetKeyDown(KeyCode.Home))
             {
+                log.LogMessage("Home key pressed.");
                 enableMinimap = !enableMinimap;
             }
 
             if (Input.GetKeyDown(KeyCode.End))
             {
+                log.LogMessage("End key pressed.");
                 enableDebugInfo = !enableDebugInfo;
             }
 
@@ -104,7 +99,7 @@ namespace KingdomMapMod.TwoCrowns
 
             if (Input.GetKeyDown(KeyCode.Insert))
             {
-                log.LogMessage("Insert pressed.");
+                log.LogMessage("Insert key pressed.");
 
                 var cursorSystem = GameObject.FindObjectOfType<CursorSystem>();
                 if (cursorSystem)
@@ -169,7 +164,7 @@ namespace KingdomMapMod.TwoCrowns
 
             if (tick == 0)
             {
-                UpdateCamera();
+                if (!IsPlaying()) return;
 
                 UpdateStatsInfo();
 
@@ -182,8 +177,17 @@ namespace KingdomMapMod.TwoCrowns
             }
         }
 
+        private bool IsPlaying()
+        {
+            if (!Managers._Inst) return false;
+            if (!Managers._Inst.game) return false;
+            return Managers._Inst.game.playingOrInMenuWithClient;
+        }
+
         private void OnGUI()
         {
+            if (!IsPlaying()) return;
+
             DrawStatsInfo();
 
             if (enableMinimap)
@@ -199,22 +203,15 @@ namespace KingdomMapMod.TwoCrowns
             exploredLeft = exploredRight = 0;
         }
 
-        private void UpdateCamera()
-        {
-            if (!player)
-                player = GameObject.FindObjectOfType<Player>();
-            if (!worldCam)
-                worldCam = GameObject.Find("MainCamera")?.GetComponent<Camera>();
-            if (!screenCam)
-                screenCam = GameObject.Find("Screen Camera")?.GetComponent<Camera>();
-        }
-
         private void UpdateMinimapMarkList()
         {
-            if (!worldCam) return;
+            var kingdom = Managers.Inst.kingdom;
+            if (kingdom == null) return;
 
             minimapMarkList.Clear();
-            List<MarkInfo> poiList = new List<MarkInfo>();
+            var poiList = new List<MarkInfo>();
+            var leftWalls = new List<WallPoint>();
+            var rightWalls = new List<WallPoint>();
 
             var dock = GameObject.FindObjectOfType<Beach>();
             if (dock != null)
@@ -224,7 +221,7 @@ namespace KingdomMapMod.TwoCrowns
             foreach (var obj in portalList)
             {
                 if (obj.type == Portal.Type.Regular)
-                    poiList.Add(new MarkInfo(obj.transform.position, Color.white, Strings.Portal));
+                    poiList.Add(new MarkInfo(obj.transform.position, new Color(0.62f, 0.0f, 1.0f), Strings.Portal));
                 else if (obj.type == Portal.Type.Cliff)
                     poiList.Add(new MarkInfo(obj.transform.position, Color.white, Strings.Cliff));
             }
@@ -257,6 +254,8 @@ namespace KingdomMapMod.TwoCrowns
             foreach (var obj in castleList)
             {
                 poiList.Add(new MarkInfo(obj.transform.position, Color.white, Strings.Castle));
+                leftWalls.Add(new WallPoint(obj.transform.position, Color.green));
+                rightWalls.Add(new WallPoint(obj.transform.position, Color.green));
             }
             
             var campfireList = GameObject.FindObjectsOfType<Campfire>();
@@ -271,16 +270,33 @@ namespace KingdomMapMod.TwoCrowns
                 poiList.Add(new MarkInfo(obj.transform.position, Color.white, obj.isGems ? Strings.GemChest : Strings.Chest, obj.coins));
             }
 
-            var wallList = GameObject.FindObjectsOfType<Wall>();
-            foreach (var obj in wallList)
+            foreach (var obj in kingdom._walls)
             {
                 poiList.Add(new MarkInfo(obj.transform.position, Color.green, Strings.Wall, 0, true));
+                if (kingdom.GetBorderSideForPosition(obj.transform.position.x) == Side.Left)
+                    leftWalls.Add(new WallPoint(obj.transform.position, Color.green));
+                else
+                    rightWalls.Add(new WallPoint(obj.transform.position, Color.green));
             }
 
-            var wallWreckList = GameObject.FindGameObjectsWithTag("WallWreck");
+            var wallWreckList = GameObject.FindGameObjectsWithTag(Tags.WallWreck);
             foreach (var obj in wallWreckList)
             {
                 poiList.Add(new MarkInfo(obj.transform.position, Color.red, Strings.WallWreck, 0, true));
+                if (kingdom.GetBorderSideForPosition(obj.transform.position.x) == Side.Left)
+                    leftWalls.Add(new WallPoint(obj.transform.position, Color.red));
+                else
+                    rightWalls.Add(new WallPoint(obj.transform.position, Color.red));
+            }
+
+            var scaffoldingWallList = GameObject.FindGameObjectsWithTag(Tags.ScaffoldingWall);
+            foreach (var obj in scaffoldingWallList)
+            {
+                poiList.Add(new MarkInfo(obj.transform.position, Color.blue, Strings.Wall, 0, true));
+                if (kingdom.GetBorderSideForPosition(obj.transform.position.x) == Side.Left)
+                    leftWalls.Add(new WallPoint(obj.transform.position, Color.blue));
+                else
+                    rightWalls.Add(new WallPoint(obj.transform.position, Color.blue));
             }
 
             var wallFoundation = GameObject.FindGameObjectsWithTag("WallFoundation");
@@ -293,6 +309,11 @@ namespace KingdomMapMod.TwoCrowns
             foreach (var obj in riverList)
             {
                 poiList.Add(new MarkInfo(obj.transform.position, new Color(0.46f, 0.84f, 0.92f), Strings.River, 0, true));
+            }
+
+            foreach (var obj in Managers.Inst.world._berryBushes)
+            {
+                poiList.Add(new MarkInfo(obj.transform.position, obj.paid ? Color.green : Color.red, Strings.BerryBush, 0, true));
             }
 
             var dogSpawn = GameObject.FindObjectOfType<DogSpawn>();
@@ -346,32 +367,22 @@ namespace KingdomMapMod.TwoCrowns
                     info = steedTypeDict[steed.steedType];
                 }
 
-                Color col = obj.CanPay(player) ? Color.red : Color.green;
+                Color col = obj._hasSpawned ? Color.green : Color.red;
                 poiList.Add(new MarkInfo(obj.transform.position, col, info));
             }
             
             var cabinList = GameObject.FindObjectsOfType<Cabin>();
             foreach (var obj in cabinList)
             {
-                var info = "";
-                switch (obj.hermitType)
+                var info = obj.hermitType switch
                 {
-                    case Hermit.HermitType.Baker:
-                        info = Strings.HermitBaker;
-                        break;
-                    case Hermit.HermitType.Ballista:
-                        info = Strings.HermitBallista;
-                        break;
-                    case Hermit.HermitType.Horn:
-                        info = Strings.HermitHorn;
-                        break;
-                    case Hermit.HermitType.Horse:
-                        info = Strings.HermitHorse;
-                        break;
-                    case Hermit.HermitType.Knight:
-                        info = Strings.HermitKnight;
-                        break;
-                }
+                    Hermit.HermitType.Baker => Strings.HermitBaker,
+                    Hermit.HermitType.Ballista => Strings.HermitBallista,
+                    Hermit.HermitType.Horn => Strings.HermitHorn,
+                    Hermit.HermitType.Horse => Strings.HermitHorse,
+                    Hermit.HermitType.Knight => Strings.HermitKnight,
+                    _ => ""
+                };
 
                 Color col = obj.canPay ? Color.red : Color.green;
                 poiList.Add(new MarkInfo(obj.transform.position, col, info));
@@ -380,25 +391,15 @@ namespace KingdomMapMod.TwoCrowns
             var statueList = GameObject.FindObjectsOfType<Statue>();
             foreach (var obj in statueList)
             {
-                var info = "";
-                switch (obj.deity)
+                var info = obj.deity switch
                 {
-                    case Statue.Deity.Archer:
-                        info = Strings.StatueArcher;
-                        break;
-                    case Statue.Deity.Worker:
-                        info = Strings.StatueWorker;
-                        break;
-                    case Statue.Deity.Knight:
-                        info = Strings.StatueKnight;
-                        break;
-                    case Statue.Deity.Farmer:
-                        info = Strings.StatueFarmer;
-                        break;
-                    case Statue.Deity.Time:
-                        info = Strings.StatueTime;
-                        break;
-                }
+                    Statue.Deity.Archer => Strings.StatueArcher,
+                    Statue.Deity.Worker => Strings.StatueWorker,
+                    Statue.Deity.Knight => Strings.StatueKnight,
+                    Statue.Deity.Farmer => Strings.StatueFarmer,
+                    Statue.Deity.Time => Strings.StatueTime,
+                    _ => ""
+                };
 
                 Color col = obj.deityStatus == Statue.DeityStatus.Activated ? Color.green : Color.red;
                 poiList.Add(new MarkInfo(obj.transform.position, col, info));
@@ -407,14 +408,6 @@ namespace KingdomMapMod.TwoCrowns
             var timeStatue = GameObject.FindObjectOfType<TimeStatue>();
             if (timeStatue)
                 poiList.Add(new MarkInfo(timeStatue.transform.position, Color.red, Strings.StatueTime));
-
-            // var upgradeList = GameObject.FindObjectsOfType<PayableUpgrade>();
-            // foreach (var obj in upgradeList)
-            // {
-            //     var info = obj.IsLocked(player).ToString();
-            //     Color col = obj.CanPay(player) ? Color.red : Color.green;
-            //     poiList.Add(new MarkInfo(obj.transform.position, col, info));
-            // }
 
             var wharf = GameObject.FindObjectOfType<Wharf>();
             if (wharf)
@@ -434,11 +427,16 @@ namespace KingdomMapMod.TwoCrowns
 
             // explored area
 
+            float wallLeft = Managers.Inst.kingdom.GetBorderSide(Side.Left);
+            float wallRight = Managers.Inst.kingdom.GetBorderSide(Side.Right);
+
             foreach (var poi in poiList)
             {
                 if (showFullMap)
                     poi.visible = true;
-                else if(poi.vec.x > exploredLeft && poi.vec.x < exploredRight)
+                else if(poi.vec.x >= exploredLeft && poi.vec.x <= exploredRight)
+                    poi.visible = true;
+                else if (poi.vec.x >= wallLeft && poi.vec.x <= wallRight)
                     poi.visible = true;
                 else
                     poi.visible = false;
@@ -464,8 +462,8 @@ namespace KingdomMapMod.TwoCrowns
 
             foreach (var poi in poiList)
             {
-                var poiPosX = (poi.vec.x - startPos) * scale;
-                poi.pos = new Rect(poiPosX + 6, 20, 120, 30);
+                var poiPosX = (poi.vec.x - startPos) * scale + 6;
+                poi.pos = new Rect(poiPosX, 20, 120, 30);
                 if (poi.info == Strings.You)
                     poi.pos.y = 50;
                 if (poi.isWall)
@@ -473,6 +471,47 @@ namespace KingdomMapMod.TwoCrowns
             }
             
             minimapMarkList = poiList;
+
+            // Make wall lines
+
+            var lineList = new List<LineInfo>();
+            if (leftWalls.Count > 1)
+            {
+                leftWalls.Sort((a, b) => b.pos.x.CompareTo(a.pos.x));
+                var beginPoint = leftWalls[0];
+                for (int i = 1; i < leftWalls.Count; i++)
+                {
+                    var endPoint = leftWalls[i];
+                    var info = new LineInfo
+                    {
+                        lineStart = new Vector2((beginPoint.pos.x - startPos) * scale + 6, 6),
+                        lineEnd = new Vector2((endPoint.pos.x - startPos) * scale + 6, 6),
+                        color = endPoint.color
+                    };
+                    lineList.Add(info);
+                    beginPoint = endPoint;
+                }
+            }
+
+            if (rightWalls.Count > 1)
+            {
+                rightWalls.Sort((a, b) => a.pos.x.CompareTo(b.pos.x));
+                var beginPoint = rightWalls[0];
+                for (int i = 1; i < rightWalls.Count; i++)
+                {
+                    var endPoint = rightWalls[i];
+                    var info = new LineInfo
+                    {
+                        lineStart = new Vector2((beginPoint.pos.x - startPos) * scale + 6, 6),
+                        lineEnd = new Vector2((endPoint.pos.x - startPos) * scale + 6, 6),
+                        color = endPoint.color
+                    };
+                    lineList.Add(info);
+                    beginPoint = endPoint;
+                }
+            }
+
+            drawLineList = lineList;
         }
 
         private void DrawMinimapWindow(int winId)
@@ -487,24 +526,39 @@ namespace KingdomMapMod.TwoCrowns
             Rect boxRect = new Rect(5, 5, Screen.width - 10, 150);
             GUI.Box(boxRect, "");
 
+            foreach (var line in drawLineList)
+            {
+                GuiHelper.DrawLine(line.lineStart, line.lineEnd, line.color);
+            }
+
             foreach (var markInfo in minimapMarkList)
             {
                 if (!markInfo.visible)
                     continue;
 
-                SpotMarkGUIStyle.normal.textColor = markInfo.color;
-                GUI.Label(markInfo.pos, markInfo.info, SpotMarkGUIStyle);
+                guiStyle.normal.textColor = markInfo.color;
+                GUI.Label(markInfo.pos, markInfo.info, guiStyle);
                 if (markInfo.count != 0)
                 {
                     Rect pos = markInfo.pos;
                     pos.y = pos.y + 20;
-                    GUI.Label(pos, markInfo.count.ToString(), SpotMarkGUIStyle);
+                    GUI.Label(pos, markInfo.count.ToString(), guiStyle);
                 }
+
+                // draw self vec.x
+
+                // if (markInfo.pos.y == 50.0f)
+                // {
+                //     Rect pos = markInfo.pos;
+                //     pos.y = pos.y + 20;
+                //     GUI.Label(pos, markInfo.vec.x.ToString(), SpotMarkGUIStyle);
+                // }
             }
         }
 
         private void UpdateDebugInfo()
         {
+            var worldCam = Managers.Inst.game._mainCameraComponent;
             if (!worldCam) return;
 
             debugInfoList.Clear();
@@ -552,10 +606,10 @@ namespace KingdomMapMod.TwoCrowns
 
         private void DrawDebugInfo()
         {
-            SpotMarkGUIStyle.normal.textColor = Color.white;
+            guiStyle.normal.textColor = Color.white;
             foreach (var obj in debugInfoList)
             {
-                GUI.Label(obj.pos, obj.info, SpotMarkGUIStyle);
+                GUI.Label(obj.pos, obj.info, guiStyle);
                 // var vecPos = obj.pos;
                 // vecPos.y += 20;
                 // GUI.Label(vecPos, obj.vec.x.ToString(), SpotMarkGUIStyle);
@@ -596,17 +650,44 @@ namespace KingdomMapMod.TwoCrowns
 
         private void DrawStatsInfo()
         {
-            SpotMarkGUIStyle.normal.textColor = Color.white;
+            guiStyle.normal.textColor = Color.white;
 
-            Rect boxRect = new Rect(5, 160, 150, 120);
+            Rect boxRect = new Rect(5, 160, 150, 186);
             GUI.Box(boxRect, "");
 
-            GUI.Label(new Rect(14, 166 + 20 * 0, 120, 24), Strings.Peasant + ": " + statsInfo.PeasantCount, SpotMarkGUIStyle);
-            GUI.Label(new Rect(14, 166 + 20 * 1, 120, 24), Strings.Worker + ": " + statsInfo.WorkerCount, SpotMarkGUIStyle);
-            GUI.Label(new Rect(14, 166 + 20 * 2, 120, 24), Strings.Archer + ": " + statsInfo.ArcherCount, SpotMarkGUIStyle);
-            GUI.Label(new Rect(14, 166 + 20 * 3, 120, 24), Strings.Farmer + ": " + statsInfo.FarmerCount, SpotMarkGUIStyle);
-            GUI.Label(new Rect(14, 166 + 20 * 4, 120, 24), Strings.Farmlands + ": " + statsInfo.MaxFarmlands, SpotMarkGUIStyle);
+            GUI.Label(new Rect(14, 166 + 20 * 0, 120, 24), Strings.Peasant + ": " + statsInfo.PeasantCount, guiStyle);
+            GUI.Label(new Rect(14, 166 + 20 * 1, 120, 24), Strings.Worker + ": " + statsInfo.WorkerCount, guiStyle);
+            GUI.Label(new Rect(14, 166 + 20 * 2, 120, 24), Strings.Archer + ": " + statsInfo.ArcherCount, guiStyle);
+            GUI.Label(new Rect(14, 166 + 20 * 3, 120, 24), Strings.Pikeman + ": " + Managers.Inst.kingdom.Pikemen.Count, guiStyle);
+            GUI.Label(new Rect(14, 166 + 20 * 4, 120, 24), Strings.Knight + ": " + Managers.Inst.kingdom.knights.Count, guiStyle);
+            GUI.Label(new Rect(14, 166 + 20 * 5, 120, 24), Strings.Farmer + ": " + statsInfo.FarmerCount, guiStyle);
+            GUI.Label(new Rect(14, 166 + 20 * 6, 120, 24), Strings.Farmlands + ": " + statsInfo.MaxFarmlands, guiStyle);
+            GUI.Label(new Rect(14, 166 + 20 * 7, 120, 24), Strings.Land + ": " + (Managers.Inst.game.currentLand + 1), guiStyle);
+
+            float currentTime = Managers.Inst.director.currentTime;
+            var currentHour = Math.Truncate(currentTime);
+            var currentMints = Math.Truncate((currentTime - currentHour) * 60);
+            GUI.Label(new Rect(14, 166 + 20 * 8, 120, 24),  $"{Strings.Time}: {currentHour:00.}:{currentMints:00.}", guiStyle);
         }
+    }
+
+    public class WallPoint
+    {
+        public Vector3 pos;
+        public Color color;
+
+        public WallPoint(Vector3 pos, Color color)
+        {
+            this.pos = pos;
+            this.color = color;
+        }
+    }
+
+    public class LineInfo
+    {
+        public Vector2 lineStart;
+        public Vector2 lineEnd;
+        public Color color;
     }
 
     public class MarkInfo
