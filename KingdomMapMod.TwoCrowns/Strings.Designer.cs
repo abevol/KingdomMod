@@ -142,6 +142,15 @@ namespace KingdomMapMod.TwoCrowns {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ♜.
+        /// </summary>
+        internal static string CastleSign {
+            get {
+                return ResourceManager.GetString("CastleSign", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to CatCart.
         /// </summary>
         internal static string CatCart {
@@ -165,6 +174,15 @@ namespace KingdomMapMod.TwoCrowns {
         internal static string Cliff {
             get {
                 return ResourceManager.GetString("Cliff", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string Coins {
+            get {
+                return ResourceManager.GetString("Coins", resourceCulture);
             }
         }
         
@@ -237,6 +255,15 @@ namespace KingdomMapMod.TwoCrowns {
         internal static string GemChest {
             get {
                 return ResourceManager.GetString("GemChest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Gems.
+        /// </summary>
+        internal static string Gems {
+            get {
+                return ResourceManager.GetString("Gems", resourceCulture);
             }
         }
         

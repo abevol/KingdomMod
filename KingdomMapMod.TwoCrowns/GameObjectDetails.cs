@@ -18,6 +18,7 @@ namespace KingdomMapMod.TwoCrowns
         public string parent = "";
         public bool enabled = false;
         public int layer = -1;
+        public int prefabID = -1;
         public string position = "";
         public string localPosition = "";
         public List<string> components = new List<string>();
@@ -45,6 +46,10 @@ namespace KingdomMapMod.TwoCrowns
             this.layer = rootObject.layer;
             this.position = rootObject.transform.position.ToString();
             this.localPosition = rootObject.transform.localPosition.ToString();
+
+            var prefabIdComp = rootObject.GetComponent<PrefabID>();
+            if (prefabIdComp != null)
+                this.prefabID = prefabIdComp.prefabID;
 
             var tmpComps = rootObject.GetComponents<Component>();
             foreach(var comp in tmpComps)
@@ -128,6 +133,7 @@ namespace KingdomMapMod.TwoCrowns
             xml += "<parent name=\"" + obj.parent + "\" />\r\n";
             xml += "<enabled value=\"" + obj.enabled.ToString() + "\" />\r\n";
             xml += "<layer value=\"" + obj.layer.ToString() + "\" />\r\n";
+            xml += "<prefabID value=\"" + obj.prefabID.ToString() + "\" />\r\n";
             xml += "<position value=\"" + obj.position + "\" />\r\n";
             xml += "<localPosition value=\"" + obj.localPosition + "\" />\r\n";
 
@@ -174,10 +180,16 @@ namespace KingdomMapMod.TwoCrowns
             string json = "{";
 
             json += "\"name\":\"" + obj.name + "\",";
-            json += "\"tag\":\"" + obj.tag + "\",";
+            if (obj.tag != "")
+                json += "\"tag\":\"" + obj.tag + "\",";
+
             json += "\"parent\":\"" + obj.parent + "\",";
-            json += "\"enabled\":" + obj.enabled.ToString().ToLower() + ",";
+            if (obj.enabled == false)
+                json += "\"enabled\":" + obj.enabled.ToString().ToLower() + ",";
             json += "\"layer\":" + obj.layer.ToString() + ",";
+            if (obj.prefabID != -1)
+                json += "\"prefabID\":" + obj.prefabID.ToString() + ",";
+
             json += "\"position\":\"" + obj.position + "\",";
             json += "\"localPosition\":\"" + obj.localPosition + "\",";
 

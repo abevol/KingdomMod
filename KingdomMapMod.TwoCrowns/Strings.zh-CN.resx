@@ -297,4 +297,13 @@
   <data name="BerryBush" xml:space="preserve">
     <value>♣</value>
   </data>
+  <data name="CastleSign" xml:space="preserve">
+    <value>♜</value>
+  </data>
+  <data name="Gems" xml:space="preserve">
+    <value>宝石</value>
+  </data>
+  <data name="Coins" xml:space="preserve">
+    <value>金币</value>
+  </data>
 </root>

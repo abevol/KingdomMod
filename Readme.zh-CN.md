@@ -27,3 +27,7 @@
 
 1. 下载 [BepInEx-Unity.IL2CPP-win-x86-6.0.0-be.668](https://builds.bepinex.dev/projects/bepinex_be/668/BepInEx-Unity.IL2CPP-win-x86-6.0.0-be.668%2B46e297f.zip)，将所有文件解压至游戏根目录，确保 `BepInEx` 文件夹和 `winhttp.dll` 等文件与游戏主程序 `KingdomTwoCrowns.exe` 处在同一目录。
 2. 从 [Releases](https://github.com/abevol/KingdomMapMod/releases) 下载 KingdomMapMod 压缩包文件，将所有文件解压至 `Kingdom Two Crowns\BepInEx\plugins` 目录。
+
+## 预览
+
+![预览](https://github.com/abevol/KingdomMapMod/blob/master/preview.png)

@@ -27,3 +27,7 @@ A map mod for the game "Kingdom Two Crowns". It marks points of interest, along 
 
 1. Download [BepInEx-Unity.IL2CPP-win-x86-6.0.0-be.668](https://builds.bepinex.dev/projects/bepinex_be/668/BepInEx-Unity.IL2CPP-win-x86-6.0.0-be.668%2B46e297f.zip)，unzip all the files to the root directory of the game, and ensure that the `BepInEx` folder and `winhttp.dll` file are in the same directory as the main game program `KingdomTwoCrowns.exe`.
 2. Download the KingdomMapMod zip file from [Releases](https://github.com/abevol/KingdomMapMod/releases), and unzip all the files to the `Kingdom Two Crowns\BepInEx\plugins` directory.
+
+## Preview
+
+![Preview](https://github.com/abevol/KingdomMapMod/blob/master/preview.png)

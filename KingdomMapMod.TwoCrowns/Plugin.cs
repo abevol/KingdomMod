@@ -118,18 +118,21 @@ namespace KingdomMapMod.TwoCrowns
                 InterfaceOverlay.DebugDisable = false;
 
                 // DebugTools.Inst.OpenButtonPressed();
-                // DebugTools._Inst.SetState(DebugTools.State.Open);
-                var debugTools = GameObject.Find("DebugTools");
-                if (debugTools)
-                {
-                    debugTools.SetActive(true);
-                    // var component = debugTools.GetComponent<DebugTools>();
-                    // if (component)
-                    // {
-                    //     component.SetState(DebugTools.State.Open);
-                    //     Plugin.Logger.LogInfo("DebugTools SetState Open");
-                    // }
-                }
+                //
+                // var debugTools = GameObject.Find("DebugTools");
+                // if (debugTools)
+                // {
+                //     var iDebugTools = new IDebugTools(debugTools.Pointer);
+                //     iDebugTools.OpenButtonPressed();
+                //
+                //     // debugTools.SetState(DebugTools.State.Open);
+                //     // var component = debugTools.GetComponent<DebugTools>();
+                //     // if (component)
+                //     // {
+                //     //     component.SetState(DebugTools.State.Open);
+                //     //     Plugin.Logger.LogInfo("DebugTools SetState Open");
+                //     // }
+                // }
 
                 var teleportPanel = GameObject.Find("Teleport Panel");
                 if (teleportPanel)
@@ -158,6 +161,31 @@ namespace KingdomMapMod.TwoCrowns
                 Application.OpenURL("file:///" + path.Replace("\\", "/"));
             }
 
+            if (Input.GetKeyDown(KeyCode.P))
+            {
+                log.LogMessage($"Dump Prefabs:");
+
+                var prefabs = GameObject.FindObjectsOfType<PrefabID>();
+                foreach (var prefab in prefabs)
+                {
+                    log.LogMessage($"PrefabID:{prefab.prefabID}, name: {prefab.name}");
+                }
+            }
+            
+            if (Input.GetKeyDown(KeyCode.F5))
+            {
+                log.LogMessage($"Try to reload game.");
+
+                Managers.Inst.game.Reload();
+            }
+
+            if (Input.GetKeyDown(KeyCode.F8))
+            {
+                log.LogMessage($"Try to save game.");
+
+                Managers.Inst.game.TriggerSave();
+            }
+
             tick = tick + 1;
             if (tick > 60)
                 tick = 0;
@@ -166,10 +194,11 @@ namespace KingdomMapMod.TwoCrowns
             {
                 if (!IsPlaying()) return;
 
-                UpdateStatsInfo();
-
                 if (enableMinimap)
+                {
                     UpdateMinimapMarkList();
+                    UpdateStatsInfo();
+                }
 
                 if (enableDebugInfo)
                     UpdateDebugInfo();
@@ -188,10 +217,12 @@ namespace KingdomMapMod.TwoCrowns
         {
             if (!IsPlaying()) return;
 
-            DrawStatsInfo();
-
             if (enableMinimap)
+            {
                 DrawMinimap();
+                DrawStatsInfo();
+                DrawExtraInfo();
+            }
 
             if (enableDebugInfo)
                 DrawDebugInfo();
@@ -207,27 +238,30 @@ namespace KingdomMapMod.TwoCrowns
         {
             var kingdom = Managers.Inst.kingdom;
             if (kingdom == null) return;
+            var payables = Managers.Inst.payables;
+            if (payables == null) return;
 
             minimapMarkList.Clear();
             var poiList = new List<MarkInfo>();
             var leftWalls = new List<WallPoint>();
             var rightWalls = new List<WallPoint>();
 
-            var dock = GameObject.FindObjectOfType<Beach>();
-            if (dock != null)
-                poiList.Add(new MarkInfo(dock.transform.position, Color.white, Strings.Dock));
-
-            var portalList = GameObject.FindObjectsOfType<Portal>();
-            foreach (var obj in portalList)
+            Portal dock = null;
+            foreach (var obj in kingdom.AllPortals)
             {
                 if (obj.type == Portal.Type.Regular)
                     poiList.Add(new MarkInfo(obj.transform.position, new Color(0.62f, 0.0f, 1.0f), Strings.Portal));
                 else if (obj.type == Portal.Type.Cliff)
-                    poiList.Add(new MarkInfo(obj.transform.position, Color.white, Strings.Cliff));
+                    poiList.Add(new MarkInfo(obj.transform.position, obj.state == Portal.State.Destroyed ? Color.white : Color.red, Strings.Cliff));
+                else if (obj.type == Portal.Type.Dock)
+                    dock = obj;
             }
 
-            var beggarCampList = GameObject.FindObjectsOfType<BeggarCamp>();
-            foreach (var beggarCamp in beggarCampList)
+            var beach = GameObject.FindObjectOfType<Beach>();
+            if (beach != null)
+                poiList.Add(new MarkInfo(beach.transform.position, (dock && (dock.state != Portal.State.Destroyed)) ? Color.red : Color.white, Strings.Dock));
+
+            foreach (var beggarCamp in kingdom.BeggarCamps)
             {
                 int count = 0;
                 foreach (var beggar in beggarCamp._beggars)
@@ -238,30 +272,31 @@ namespace KingdomMapMod.TwoCrowns
                 poiList.Add(new MarkInfo(beggarCamp.transform.position, Color.white, Strings.BeggarCamp, count));
             }
 
-            var riderList = GameObject.FindObjectsOfType<Rider>();
-            foreach (var rider in riderList)
+            var mover = kingdom.playerOne.mover;
+            if (mover != null)
             {
-                poiList.Add(new MarkInfo(rider.transform.position, Color.green, Strings.You));
-                float l = rider.transform.position.x - 12;
-                float r = rider.transform.position.x + 12;
+                poiList.Add(new MarkInfo(mover.transform.position, Color.green, Strings.You));
+                float l = mover.transform.position.x - 12;
+                float r = mover.transform.position.x + 12;
                 if (l < exploredLeft)
                     exploredLeft = l;
                 if (r > exploredRight)
                     exploredRight = r;
             }
 
-            var castleList = GameObject.FindObjectsOfType<Castle>();
-            foreach (var obj in castleList)
+            var castle = kingdom.castle;
+            if (castle != null)
             {
-                poiList.Add(new MarkInfo(obj.transform.position, Color.white, Strings.Castle));
-                leftWalls.Add(new WallPoint(obj.transform.position, Color.green));
-                rightWalls.Add(new WallPoint(obj.transform.position, Color.green));
+                poiList.Add(new MarkInfo(castle.transform.position, Color.green, Strings.Castle));
+                poiList.Add(new MarkInfo(castle.transform.position, Color.green, Strings.CastleSign, 0, true));
+                leftWalls.Add(new WallPoint(castle.transform.position, Color.green));
+                rightWalls.Add(new WallPoint(castle.transform.position, Color.green));
             }
             
-            var campfireList = GameObject.FindObjectsOfType<Campfire>();
-            foreach (var obj in campfireList)
+            var campfire = kingdom.campfire;
+            if (campfire !=  null)
             {
-                poiList.Add(new MarkInfo(obj.transform.position, Color.white, Strings.Campfire));
+                poiList.Add(new MarkInfo(campfire.transform.position, Color.white, Strings.Campfire));
             }
 
             var chestList = GameObject.FindObjectsOfType<Chest>();
@@ -289,17 +324,17 @@ namespace KingdomMapMod.TwoCrowns
                     rightWalls.Add(new WallPoint(obj.transform.position, Color.red));
             }
 
-            var scaffoldingWallList = GameObject.FindGameObjectsWithTag(Tags.ScaffoldingWall);
-            foreach (var obj in scaffoldingWallList)
-            {
-                poiList.Add(new MarkInfo(obj.transform.position, Color.blue, Strings.Wall, 0, true));
-                if (kingdom.GetBorderSideForPosition(obj.transform.position.x) == Side.Left)
-                    leftWalls.Add(new WallPoint(obj.transform.position, Color.blue));
-                else
-                    rightWalls.Add(new WallPoint(obj.transform.position, Color.blue));
-            }
+            // var scaffoldingWallList = GameObject.FindGameObjectsWithTag(Tags.ScaffoldingWall);
+            // foreach (var obj in scaffoldingWallList)
+            // {
+            //     poiList.Add(new MarkInfo(obj.transform.position, Color.blue, Strings.Wall, 0, true));
+            //     if (kingdom.GetBorderSideForPosition(obj.transform.position.x) == Side.Left)
+            //         leftWalls.Add(new WallPoint(obj.transform.position, Color.blue));
+            //     else
+            //         rightWalls.Add(new WallPoint(obj.transform.position, Color.blue));
+            // }
 
-            var wallFoundation = GameObject.FindGameObjectsWithTag("WallFoundation");
+            var wallFoundation = GameObject.FindGameObjectsWithTag(Tags.WallFoundation);
             foreach (var obj in wallFoundation)
             {
                 poiList.Add(new MarkInfo(obj.transform.position, Color.gray, Strings.WallFoundation, 0, true));
@@ -320,14 +355,14 @@ namespace KingdomMapMod.TwoCrowns
             if (dogSpawn != null && !dogSpawn._dogFreed)
                 poiList.Add(new MarkInfo(dogSpawn.transform.position, Color.green, Strings.DogSpawn));
 
-            var farmhouseList = GameObject.FindObjectsOfType<Farmhouse>();
-            foreach (var obj in farmhouseList)
+            // var farmhouseList = GameObject.FindObjectsOfType<Farmhouse>();
+            foreach (var obj in kingdom._farmHouses)
             {
                 poiList.Add(new MarkInfo(obj.transform.position, Color.green, Strings.Farmhouse));
             }
 
-            var steedSpawnList = GameObject.FindObjectsOfType<SteedSpawn>();
-            foreach (var obj in steedSpawnList)
+            // var steedSpawnList = GameObject.FindObjectsOfType<SteedSpawn>();
+            foreach (var obj in kingdom.steedSpawns)
             {
                 var steedTypeDict = new Dictionary<Steed.SteedType, string>
                     {
@@ -367,8 +402,8 @@ namespace KingdomMapMod.TwoCrowns
                     info = steedTypeDict[steed.steedType];
                 }
 
-                Color col = obj._hasSpawned ? Color.green : Color.red;
-                poiList.Add(new MarkInfo(obj.transform.position, col, info));
+                if (!obj._hasSpawned)
+                    poiList.Add(new MarkInfo(obj.transform.position, Color.red, info, obj.price));
             }
             
             var cabinList = GameObject.FindObjectsOfType<Cabin>();
@@ -385,7 +420,7 @@ namespace KingdomMapMod.TwoCrowns
                 };
 
                 Color col = obj.canPay ? Color.red : Color.green;
-                poiList.Add(new MarkInfo(obj.transform.position, col, info));
+                poiList.Add(new MarkInfo(obj.transform.position, col, info, obj.canPay ? obj.price : 0));
             }
 
             var statueList = GameObject.FindObjectsOfType<Statue>();
@@ -402,29 +437,99 @@ namespace KingdomMapMod.TwoCrowns
                 };
 
                 Color col = obj.deityStatus == Statue.DeityStatus.Activated ? Color.green : Color.red;
-                poiList.Add(new MarkInfo(obj.transform.position, col, info));
+                poiList.Add(new MarkInfo(obj.transform.position, col, info,
+                    obj.deityStatus == Statue.DeityStatus.Activated ? 0 : obj.price));
             }
 
-            var timeStatue = GameObject.FindObjectOfType<TimeStatue>();
+            var timeStatue = kingdom.timeStatue;
             if (timeStatue)
                 poiList.Add(new MarkInfo(timeStatue.transform.position, Color.red, Strings.StatueTime));
 
-            var wharf = GameObject.FindObjectOfType<Wharf>();
+            var wharf = kingdom.wharf;
             if (wharf)
                 poiList.Add(new MarkInfo(wharf.transform.position, Color.green, Strings.Boat));
+            else
+            {
+                var wreck = kingdom.wreckPlaceholder;
+                if (wreck)
+                    poiList.Add(new MarkInfo(wreck.transform.position, Color.red, Strings.Wreck));
+            }
 
-            var wreck = GameObject.FindObjectOfType<WreckPlaceholder>();
-            if (wreck)
-                poiList.Add(new MarkInfo(wreck.transform.position, Color.red, Strings.Wreck));
+            // var quarry = GameObject.Find("Quarry_undeveloped(Clone)");
+
+            foreach (var obj in payables.AllPayables)
+            {
+                if (obj == null) continue;
+                var go = obj.gameObject;
+                if (go == null) continue;
+                var prefab = go.GetComponent<PrefabID>();
+                if (prefab == null) continue;
+
+                if (prefab.prefabID == PrefabIDs.QuarryUndeveloped)
+                {
+                    poiList.Add(new MarkInfo(go.transform.position, Color.red, Strings.Quarry, obj.price));
+                }
+                else if (prefab.prefabID == PrefabIDs.MineUndeveloped)
+                {
+                    poiList.Add(new MarkInfo(go.transform.position, Color.red, Strings.Mine, obj.price));
+                }
+            }
             
-            var quarry = GameObject.Find("Quarry_undeveloped(Clone)");
-            if (quarry)
-                poiList.Add(new MarkInfo(quarry.transform.position, Color.red, Strings.Quarry));
+            foreach (var obj in payables._allBlockers)
+            {
+                if (obj == null) continue;
+                var go = obj.gameObject;
+                if (go == null) continue;
+                var prefab = go.GetComponent<PrefabID>();
+                if (prefab == null) continue;
 
-            var mine = GameObject.Find("Mine_undeveloped(Clone)");
-            if (mine)
-                poiList.Add(new MarkInfo(mine.transform.position, Color.red, Strings.Mine));
+                if (prefab.prefabID == PrefabIDs.Quarry)
+                {
+                    poiList.Add(new MarkInfo(go.transform.position, Color.green, Strings.Quarry));
+                }
+                else if (prefab.prefabID == PrefabIDs.Mine)
+                {
+                    poiList.Add(new MarkInfo(go.transform.position, Color.green, Strings.Mine));
+                }
+            }
 
+            foreach (var blocker in payables._allBlockers)
+            {
+                if (blocker == null) continue;
+                var scaffolding = blocker.GetComponent<Scaffolding>();
+                if (scaffolding == null) continue;
+                var go = scaffolding.building;
+                if (go == null) continue;
+
+                var wall = go.GetComponent<Wall>();
+                if (wall)
+                {
+                    poiList.Add(new MarkInfo(go.transform.position, Color.blue, Strings.Wall, 0, true));
+                    if (kingdom.GetBorderSideForPosition(go.transform.position.x) == Side.Left)
+                        leftWalls.Add(new WallPoint(go.transform.position, Color.blue));
+                    else
+                        rightWalls.Add(new WallPoint(go.transform.position, Color.blue));
+                }
+
+                var prefab = go.GetComponent<PrefabID>();
+                if (prefab == null) continue;
+                if (prefab.prefabID == PrefabIDs.Quarry)
+                {
+                    poiList.Add(new MarkInfo(go.transform.position, Color.blue, Strings.Quarry));
+                }
+                else if (prefab.prefabID == PrefabIDs.Mine)
+                {
+                    poiList.Add(new MarkInfo(go.transform.position, Color.blue, Strings.Mine));
+                }
+            }
+
+            // var mine = GameObject.Find("Mine_undeveloped(Clone)");
+            // if (mine)
+            // {
+            //     poiList.Add(new MarkInfo(mine.transform.position, Color.red, Strings.Mine));
+            //     log.LogMessage($"mine prefabID: {mine.GetComponent<PrefabID>().prefabID}");
+            // }
+            
             // explored area
 
             float wallLeft = Managers.Inst.kingdom.GetBorderSide(Side.Left);
@@ -463,9 +568,9 @@ namespace KingdomMapMod.TwoCrowns
             foreach (var poi in poiList)
             {
                 var poiPosX = (poi.vec.x - startPos) * scale + 6;
-                poi.pos = new Rect(poiPosX, 20, 120, 30);
+                poi.pos = new Rect(poiPosX, 24, 120, 20);
                 if (poi.info == Strings.You)
-                    poi.pos.y = 50;
+                    poi.pos.y = 54;
                 if (poi.isWall)
                     poi.pos.y = 8;
             }
@@ -541,7 +646,7 @@ namespace KingdomMapMod.TwoCrowns
                 if (markInfo.count != 0)
                 {
                     Rect pos = markInfo.pos;
-                    pos.y = pos.y + 20;
+                    pos.y = pos.y + 16;
                     GUI.Label(pos, markInfo.count.ToString(), guiStyle);
                 }
 
@@ -652,22 +757,38 @@ namespace KingdomMapMod.TwoCrowns
         {
             guiStyle.normal.textColor = Color.white;
 
-            Rect boxRect = new Rect(5, 160, 150, 186);
+            Rect boxRect = new Rect(5, 160, 100, 146);
             GUI.Box(boxRect, "");
 
-            GUI.Label(new Rect(14, 166 + 20 * 0, 120, 24), Strings.Peasant + ": " + statsInfo.PeasantCount, guiStyle);
-            GUI.Label(new Rect(14, 166 + 20 * 1, 120, 24), Strings.Worker + ": " + statsInfo.WorkerCount, guiStyle);
-            GUI.Label(new Rect(14, 166 + 20 * 2, 120, 24), Strings.Archer + ": " + statsInfo.ArcherCount, guiStyle);
-            GUI.Label(new Rect(14, 166 + 20 * 3, 120, 24), Strings.Pikeman + ": " + Managers.Inst.kingdom.Pikemen.Count, guiStyle);
-            GUI.Label(new Rect(14, 166 + 20 * 4, 120, 24), Strings.Knight + ": " + Managers.Inst.kingdom.knights.Count, guiStyle);
-            GUI.Label(new Rect(14, 166 + 20 * 5, 120, 24), Strings.Farmer + ": " + statsInfo.FarmerCount, guiStyle);
-            GUI.Label(new Rect(14, 166 + 20 * 6, 120, 24), Strings.Farmlands + ": " + statsInfo.MaxFarmlands, guiStyle);
-            GUI.Label(new Rect(14, 166 + 20 * 7, 120, 24), Strings.Land + ": " + (Managers.Inst.game.currentLand + 1), guiStyle);
+            GUI.Label(new Rect(14, 166 + 20 * 0, 120, 20), Strings.Peasant + ": " + statsInfo.PeasantCount, guiStyle);
+            GUI.Label(new Rect(14, 166 + 20 * 1, 120, 20), Strings.Worker + ": " + statsInfo.WorkerCount, guiStyle);
+            GUI.Label(new Rect(14, 166 + 20 * 2, 120, 20), Strings.Archer + ": " + statsInfo.ArcherCount, guiStyle);
+            GUI.Label(new Rect(14, 166 + 20 * 3, 120, 20), Strings.Pikeman + ": " + Managers.Inst.kingdom.Pikemen.Count, guiStyle);
+            GUI.Label(new Rect(14, 166 + 20 * 4, 120, 20), Strings.Knight + ": " + Managers.Inst.kingdom.knights.Count, guiStyle);
+            GUI.Label(new Rect(14, 166 + 20 * 5, 120, 20), Strings.Farmer + ": " + statsInfo.FarmerCount, guiStyle);
+            GUI.Label(new Rect(14, 166 + 20 * 6, 120, 20), Strings.Farmlands + ": " + statsInfo.MaxFarmlands, guiStyle);
+        }
+
+        private void DrawExtraInfo()
+        {
+            guiStyle.normal.textColor = Color.white;
+
+            var left = Screen.width / 2 - 20;
+            var top = 136;
+
+            GUI.Label(new Rect(14, top, 60, 20),  Strings.Land + ": " + (Managers.Inst.game.currentLand + 1), guiStyle);
 
             float currentTime = Managers.Inst.director.currentTime;
             var currentHour = Math.Truncate(currentTime);
             var currentMints = Math.Truncate((currentTime - currentHour) * 60);
-            GUI.Label(new Rect(14, 166 + 20 * 8, 120, 24),  $"{Strings.Time}: {currentHour:00.}:{currentMints:00.}", guiStyle);
+            GUI.Label(new Rect(left, top + 22, 40, 20), $"{currentHour:00.}:{currentMints:00.}", guiStyle);
+
+            var player = Managers.Inst.kingdom.playerOne;
+            if (player != null)
+            {
+                GUI.Label(new Rect(Screen.width - 126, top + 22, 60, 20), Strings.Gems + ": " + player.gems, guiStyle);
+                GUI.Label(new Rect(Screen.width - 66, top + 22, 60, 20), Strings.Coins + ": " + player.coins, guiStyle);
+            }
         }
     }
 
@@ -739,5 +860,13 @@ namespace KingdomMapMod.TwoCrowns
             this.vec = vec;
             this.info = info;
         }
+    }
+
+    public static class PrefabIDs
+    {
+        public static int QuarryUndeveloped = 21;
+        public static int Quarry = 22;
+        public static int MineUndeveloped = 49;
+        public static int Mine = 50;
     }
 }
