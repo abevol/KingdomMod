@@ -22,6 +22,9 @@ A map mod for the game "Kingdom Two Crowns". It marks points of interest, along 
 3. `Insert` Test some interesting features
 4. `F` Show the full map
 5. `X` Dump game objects to JSON file
+6. `P` Dump Prefabs to console
+7. `F5` Reload saved game (without exiting game)
+8. `F8` Save game (without exiting game)
 
 ## Install
 
@@ -30,4 +33,4 @@ A map mod for the game "Kingdom Two Crowns". It marks points of interest, along 
 
 ## Preview
 
-![Preview](https://github.com/abevol/KingdomMapMod/blob/master/preview.png)
+![Preview](https://github.com/abevol/KingdomMapMod/blob/master/preview.png?raw=true)

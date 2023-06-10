@@ -22,6 +22,9 @@
 3. `Insert` 测试一些有趣的功能
 4. `F` 显示完整地图
 5. `X` 转储游戏对象到 JSON 文件
+6. `P` 转储预设件到控制台
+7. `F5` 重新加载已保存的游戏 (不用退出游戏)
+8. `F8` 保存游戏 (不用退出游戏)
 
 ## 安装
 
@@ -30,4 +33,4 @@
 
 ## 预览
 
-![预览](https://github.com/abevol/KingdomMapMod/blob/master/preview.png)
+![预览](https://github.com/abevol/KingdomMapMod/blob/master/preview.png?raw=true)
