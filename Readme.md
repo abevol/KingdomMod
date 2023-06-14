@@ -1,6 +1,6 @@
 # KingdomMapMod
 
-A map mod for the game "Kingdom Two Crowns". It marks points of interest, along with some extra details. There's also the demographics feature, which tells you how many of each type there are.
+A map mod for the game "[Kingdom Two Crowns](https://store.steampowered.com/app/701160/)". It marks points of interest, along with some extra details. There's also the demographics feature, which tells you how many of each type there are.
 
 ## Supported languages
 
@@ -12,8 +12,9 @@ A map mod for the game "Kingdom Two Crowns". It marks points of interest, along 
 1. Add a map floating layer on the top of the screen, and marks points of interest in the game on it, including castles, slums, docks, cliffs, etc.
 2. By default, only the markers in the area you have explored are displayed, of course you can also show the full map immediately by pressing the `F` key.
 3. Displays some useful stats, including the number of idle villagers, workers, archers, farmers and farmland.
-4. Display some useful debugging information to facilitate making game plugins.
-5. Dump all game objects to JSON file.
+4. Display additional useful information, such as current time, current island, number of gems and coins, etc.
+5. Some shortcut features, such as quick save or reload the game without exiting the game.
+6. Some debugging features are convenient for making mod.
 
 ## Hotkeys
 
