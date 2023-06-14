@@ -1,11 +1,11 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
 using System.Globalization;
 using BepInEx;
 using BepInEx.Logging;
 using BepInEx.Unity.IL2CPP;
 using UnityEngine;
+using File = System.IO.File;
 
 namespace KingdomMapMod.TwoCrowns
 {
@@ -76,6 +76,8 @@ namespace KingdomMapMod.TwoCrowns
         {
             log.LogMessage("Start.");
             Game.add_OnGameStart((Action)OnGameStart);
+
+            GlobalSaveData.add_OnCurrentCampaignSwitch((Action)OnCurrentCampaignSwitch);
         }
 
         private void Update()
@@ -171,7 +173,13 @@ namespace KingdomMapMod.TwoCrowns
                     log.LogMessage($"PrefabID:{prefab.prefabID}, name: {prefab.name}");
                 }
             }
-            
+
+            if (Input.GetKeyDown(KeyCode.F4))
+            {
+                log.LogMessage($"Try to reset last day.");
+
+            }
+
             if (Input.GetKeyDown(KeyCode.F5))
             {
                 log.LogMessage($"Try to reload game.");
@@ -231,7 +239,15 @@ namespace KingdomMapMod.TwoCrowns
         public void OnGameStart()
         {
             log.LogMessage("OnGameStart.");
+            log.LogMessage($"GlobalSaveDataFilename: {PlayfabManager.Inst.GlobalSaveDataFilename}");
+
             exploredLeft = exploredRight = 0;
+        }
+
+        public void OnCurrentCampaignSwitch()
+        {
+            log.LogMessage($"OnCurrentCampaignSwitch: {GlobalSaveData.loaded.currentCampaign}");
+
         }
 
         private void UpdateMinimapMarkList()
@@ -252,14 +268,14 @@ namespace KingdomMapMod.TwoCrowns
                 if (obj.type == Portal.Type.Regular)
                     poiList.Add(new MarkInfo(obj.transform.position, new Color(0.62f, 0.0f, 1.0f), Strings.Portal));
                 else if (obj.type == Portal.Type.Cliff)
-                    poiList.Add(new MarkInfo(obj.transform.position, obj.state == Portal.State.Destroyed ? Color.white : Color.red, Strings.Cliff));
+                    poiList.Add(new MarkInfo(obj.transform.position, obj.state == Portal.State.Destroyed ? Color.green : Color.red, Strings.Cliff));
                 else if (obj.type == Portal.Type.Dock)
                     dock = obj;
             }
 
             var beach = GameObject.FindObjectOfType<Beach>();
             if (beach != null)
-                poiList.Add(new MarkInfo(beach.transform.position, (dock && (dock.state != Portal.State.Destroyed)) ? Color.red : Color.white, Strings.Dock));
+                poiList.Add(new MarkInfo(beach.transform.position, (dock && (dock.state != Portal.State.Destroyed)) ? Color.red : Color.green, Strings.Dock));
 
             foreach (var beggarCamp in kingdom.BeggarCamps)
             {
@@ -353,7 +369,7 @@ namespace KingdomMapMod.TwoCrowns
 
             var dogSpawn = GameObject.FindObjectOfType<DogSpawn>();
             if (dogSpawn != null && !dogSpawn._dogFreed)
-                poiList.Add(new MarkInfo(dogSpawn.transform.position, Color.green, Strings.DogSpawn));
+                poiList.Add(new MarkInfo(dogSpawn.transform.position, Color.red, Strings.DogSpawn));
 
             // var farmhouseList = GameObject.FindObjectsOfType<Farmhouse>();
             foreach (var obj in kingdom._farmHouses)
@@ -419,8 +435,8 @@ namespace KingdomMapMod.TwoCrowns
                     _ => ""
                 };
 
-                Color col = obj.canPay ? Color.red : Color.green;
-                poiList.Add(new MarkInfo(obj.transform.position, col, info, obj.canPay ? obj.price : 0));
+                if (obj.canPay)
+                    poiList.Add(new MarkInfo(obj.transform.position, Color.red, info, obj.price));
             }
 
             var statueList = GameObject.FindObjectsOfType<Statue>();
@@ -436,9 +452,8 @@ namespace KingdomMapMod.TwoCrowns
                     _ => ""
                 };
 
-                Color col = obj.deityStatus == Statue.DeityStatus.Activated ? Color.green : Color.red;
-                poiList.Add(new MarkInfo(obj.transform.position, col, info,
-                    obj.deityStatus == Statue.DeityStatus.Activated ? 0 : obj.price));
+                if (obj.deityStatus != Statue.DeityStatus.Activated)
+                    poiList.Add(new MarkInfo(obj.transform.position, Color.red, info, obj.price));
             }
 
             var timeStatue = kingdom.timeStatue;
