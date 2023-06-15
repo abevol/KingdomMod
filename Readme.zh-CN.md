@@ -27,6 +27,19 @@
 7. `F5` 重新加载已保存的游戏 (不用退出游戏): 体验电影蝴蝶效应的乐趣，直到有一天，你把F5错按成了F8(> <)
 8. `F8` 保存游戏 (不用退出游戏)
 
+## 符号与颜色
+
+| 符号或颜色 | 涵义 |
+|----|----|
+|`♜`|城堡|
+|`۩`|城墙|
+|`∧`|地基|
+|`≈`|河流|
+|`♣`|浆果丛|
+|$\color{red}{红色}$|未解锁，未攻陷，已损坏|
+|$\color{blue}{蓝色}$|建造中|
+|$\color{green}{绿色}$|已解锁, 安全的|
+
 ## 安装
 
 1. 下载 [BepInEx-Unity.IL2CPP-win-x86-6.0.0-be.668](https://builds.bepinex.dev/projects/bepinex_be/668/BepInEx-Unity.IL2CPP-win-x86-6.0.0-be.668%2B46e297f.zip)，将所有文件解压至游戏根目录，确保 `BepInEx` 文件夹和 `winhttp.dll` 等文件与游戏主程序 `KingdomTwoCrowns.exe` 处在同一目录。

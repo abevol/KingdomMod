@@ -27,6 +27,19 @@ A map mod for the game "[Kingdom Two Crowns](https://store.steampowered.com/app/
 7. `F5` Reload saved game (without exiting game)
 8. `F8` Save game (without exiting game)
 
+## Signs and Colors
+
+| Signs or Colors | Meanings |
+|----|----|
+|`♜`|Castle|
+|`۩`|Wall|
+|`∧`|Wall Foundation|
+|`≈`|River|
+|`♣`|Berry Bush|
+|$\color{red}{Red}$|Not unlocked, not captured, wrecked|
+|$\color{blue}{Blue}$|Building|
+|$\color{green}{Green}$|Unlocked, safe|
+
 ## Install
 
 1. Download [BepInEx-Unity.IL2CPP-win-x86-6.0.0-be.668](https://builds.bepinex.dev/projects/bepinex_be/668/BepInEx-Unity.IL2CPP-win-x86-6.0.0-be.668%2B46e297f.zip)，unzip all the files to the root directory of the game, and ensure that the `BepInEx` folder and `winhttp.dll` file are in the same directory as the main game program `KingdomTwoCrowns.exe`.
