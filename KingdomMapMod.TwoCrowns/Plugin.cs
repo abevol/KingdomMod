@@ -460,9 +460,10 @@ namespace KingdomMapMod.TwoCrowns
             if (timeStatue)
                 poiList.Add(new MarkInfo(timeStatue.transform.position, Color.red, Strings.StatueTime));
 
-            var wharf = kingdom.wharf;
-            if (wharf)
-                poiList.Add(new MarkInfo(wharf.transform.position, Color.green, Strings.Boat));
+            // var wharf = kingdom.wharf;
+            var boat = kingdom.boat;
+            if (boat)
+                poiList.Add(new MarkInfo(boat.transform.position, Color.green, Strings.Boat));
             else
             {
                 var wreck = kingdom.wreckPlaceholder;
