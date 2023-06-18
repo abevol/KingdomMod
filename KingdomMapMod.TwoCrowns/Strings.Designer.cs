@@ -61,6 +61,15 @@ namespace KingdomMapMod.TwoCrowns {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Alfred.
+        /// </summary>
+        internal static string Alfred {
+            get {
+                return ResourceManager.GetString("Alfred", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Archer.
         /// </summary>
         internal static string Archer {
@@ -120,6 +129,15 @@ namespace KingdomMapMod.TwoCrowns {
         internal static string Bloodstained {
             get {
                 return ResourceManager.GetString("Bloodstained", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BoarSpawn.
+        /// </summary>
+        internal static string BoarSpawn {
+            get {
+                return ResourceManager.GetString("BoarSpawn", resourceCulture);
             }
         }
         
@@ -205,6 +223,15 @@ namespace KingdomMapMod.TwoCrowns {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string Deer {
+            get {
+                return ResourceManager.GetString("Deer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Horse.
         /// </summary>
         internal static string DefaultSteed {
@@ -255,6 +282,15 @@ namespace KingdomMapMod.TwoCrowns {
         internal static string Farmlands {
             get {
                 return ResourceManager.GetString("Farmlands", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Gebel.
+        /// </summary>
+        internal static string Gebel {
+            get {
+                return ResourceManager.GetString("Gebel", resourceCulture);
             }
         }
         
@@ -340,6 +376,15 @@ namespace KingdomMapMod.TwoCrowns {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Hooded.
+        /// </summary>
+        internal static string Hooded {
+            get {
+                return ResourceManager.GetString("Hooded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to HorseBurst.
         /// </summary>
         internal static string HorseBurst {
@@ -372,6 +417,15 @@ namespace KingdomMapMod.TwoCrowns {
         internal static string Kelpie {
             get {
                 return ResourceManager.GetString("Kelpie", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to King.
+        /// </summary>
+        internal static string King {
+            get {
+                return ResourceManager.GetString("King", resourceCulture);
             }
         }
         
@@ -412,6 +466,15 @@ namespace KingdomMapMod.TwoCrowns {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Miriam.
+        /// </summary>
+        internal static string Miriam {
+            get {
+                return ResourceManager.GetString("Miriam", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Peasant.
         /// </summary>
         internal static string Peasant {
@@ -439,11 +502,38 @@ namespace KingdomMapMod.TwoCrowns {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Prince.
+        /// </summary>
+        internal static string Prince {
+            get {
+                return ResourceManager.GetString("Prince", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Princess.
+        /// </summary>
+        internal static string Princess {
+            get {
+                return ResourceManager.GetString("Princess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Quarry.
         /// </summary>
         internal static string Quarry {
             get {
                 return ResourceManager.GetString("Quarry", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Queen.
+        /// </summary>
+        internal static string Queen {
+            get {
+                return ResourceManager.GetString("Queen", resourceCulture);
             }
         }
         
@@ -633,6 +723,15 @@ namespace KingdomMapMod.TwoCrowns {
         internal static string You {
             get {
                 return ResourceManager.GetString("You", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Zangetsu.
+        /// </summary>
+        internal static string Zangetsu {
+            get {
+                return ResourceManager.GetString("Zangetsu", resourceCulture);
             }
         }
     }

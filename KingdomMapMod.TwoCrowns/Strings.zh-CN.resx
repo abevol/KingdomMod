@@ -309,4 +309,37 @@
   <data name="Beggar" xml:space="preserve">
     <value>贫民</value>
   </data>
+  <data name="King" xml:space="preserve">
+    <value>国王</value>
+  </data>
+  <data name="Queen" xml:space="preserve">
+    <value>王后</value>
+  </data>
+  <data name="Prince" xml:space="preserve">
+    <value>王子</value>
+  </data>
+  <data name="Princess" xml:space="preserve">
+    <value>公主</value>
+  </data>
+  <data name="Hooded" xml:space="preserve">
+    <value>头冠</value>
+  </data>
+  <data name="Zangetsu" xml:space="preserve">
+    <value>斩月</value>
+  </data>
+  <data name="Alfred" xml:space="preserve">
+    <value>阿尔佛雷德</value>
+  </data>
+  <data name="Gebel" xml:space="preserve">
+    <value>格贝尔</value>
+  </data>
+  <data name="Miriam" xml:space="preserve">
+    <value>米里亚姆</value>
+  </data>
+  <data name="BoarSpawn" xml:space="preserve">
+    <value>野猪窝</value>
+  </data>
+  <data name="Deer" xml:space="preserve">
+    <value>鹿</value>
+  </data>
 </root>

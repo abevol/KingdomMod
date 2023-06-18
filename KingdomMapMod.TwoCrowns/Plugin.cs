@@ -252,6 +252,8 @@ namespace KingdomMapMod.TwoCrowns
 
         private void UpdateMinimapMarkList()
         {
+            var world = Managers.Inst.world;
+            if (world == null) return;
             var kingdom = Managers.Inst.kingdom;
             if (kingdom == null) return;
             var payables = Managers.Inst.payables;
@@ -268,7 +270,7 @@ namespace KingdomMapMod.TwoCrowns
                 if (obj.type == Portal.Type.Regular)
                     poiList.Add(new MarkInfo(obj.transform.position, new Color(0.62f, 0.0f, 1.0f), Strings.Portal));
                 else if (obj.type == Portal.Type.Cliff)
-                    poiList.Add(new MarkInfo(obj.transform.position, obj.state == Portal.State.Destroyed ? Color.green : Color.red, Strings.Cliff));
+                    poiList.Add(new MarkInfo(obj.transform.position, obj.state switch{ Portal.State.Destroyed => Color.green, Portal.State.Rebuilding => Color.blue, _=> Color.red}, Strings.Cliff));
                 else if (obj.type == Portal.Type.Dock)
                     dock = obj;
             }
@@ -308,6 +310,16 @@ namespace KingdomMapMod.TwoCrowns
                     exploredLeft = l;
                 if (r > exploredRight)
                     exploredRight = r;
+            }
+
+            var steedType = kingdom.playerOne.steed.steedType;
+            if (steedType == Steed.SteedType.Stag)
+            {
+                var deers = GameObject.FindObjectsOfType<Deer>();
+                foreach (var deer in deers)
+                {
+                    poiList.Add(new MarkInfo(deer.transform.position, deer._fsm.current == 5 ? Color.green : Color.red, Strings.Deer, 0, MarkRow.Movable));
+                }
             }
 
             var castle = kingdom.castle;
@@ -380,6 +392,12 @@ namespace KingdomMapMod.TwoCrowns
             var dogSpawn = GameObject.FindObjectOfType<DogSpawn>();
             if (dogSpawn != null && !dogSpawn._dogFreed)
                 poiList.Add(new MarkInfo(dogSpawn.transform.position, Color.red, Strings.DogSpawn));
+
+            var boarSpawn = world.boarSpawnGroup;
+            if (boarSpawn != null)
+            {
+                poiList.Add(new MarkInfo(boarSpawn.transform.position, Color.red, Strings.BoarSpawn, boarSpawn._spawnedBoar ? 1 : 0));
+            }
 
             // var farmhouseList = GameObject.FindObjectsOfType<Farmhouse>();
             foreach (var obj in kingdom._farmHouses)
@@ -499,8 +517,40 @@ namespace KingdomMapMod.TwoCrowns
                 {
                     poiList.Add(new MarkInfo(go.transform.position, Color.red, Strings.Mine, obj.price));
                 }
+                else
+                {
+                    var unlockNewRulerStatue = go.GetComponent<UnlockNewRulerStatue>();
+                    if (unlockNewRulerStatue != null)
+                    {
+                        var color = unlockNewRulerStatue.status switch
+                        {
+                            UnlockNewRulerStatue.Status.Locked => Color.red,
+                            UnlockNewRulerStatue.Status.WaitingForArcher => Color.blue,
+                            _ => Color.green
+                        };
+                        if (color != Color.green)
+                        {
+                            var markName = unlockNewRulerStatue.rulerToUnlock switch
+                            {
+                                Player.Model.None => "",
+                                Player.Model.King => Strings.King,
+                                Player.Model.Queen => Strings.Queen,
+                                Player.Model.Prince => Strings.Prince,
+                                Player.Model.Princess => Strings.Princess,
+                                Player.Model.Hooded => Strings.Hooded,
+                                Player.Model.Zangetsu => Strings.Zangetsu,
+                                Player.Model.Alfred => Strings.Alfred,
+                                Player.Model.Gebel => Strings.Gebel,
+                                Player.Model.Miriam => Strings.Miriam,
+                                Player.Model.Total => "",
+                                _ => ""
+                            };
+                            poiList.Add(new MarkInfo(go.transform.position, color, markName, obj.price));
+                        }
+                    }
+                }
             }
-            
+
             foreach (var obj in payables._allBlockers)
             {
                 if (obj == null) continue;
@@ -808,6 +858,13 @@ namespace KingdomMapMod.TwoCrowns
             GUI.Label(new Rect(14, 166 + 20 * 4, 120, 20), $"{Strings.Knight}: {Managers.Inst.kingdom.knights.Count} ({GetKnightCount(true)})", guiStyle);
             GUI.Label(new Rect(14, 166 + 20 * 5, 120, 20), Strings.Farmer + ": " + statsInfo.FarmerCount, guiStyle);
             GUI.Label(new Rect(14, 166 + 20 * 6, 120, 20), Strings.Farmlands + ": " + statsInfo.MaxFarmlands, guiStyle);
+
+#if DEBUG
+            var spawnBoarTime = Managers.Inst.world?.boarSpawnGroup?.spawnBoarTime;
+            GUI.Label(new Rect(14, 166 + 20 * 7, 120, 20), "spawnBoarTime" + ": " + spawnBoarTime, guiStyle);
+            var steedType = Managers.Inst.kingdom.playerOne.steed.steedType;
+            GUI.Label(new Rect(14, 166 + 20 * 8, 120, 20), "steedType" + ": " + steedType, guiStyle);
+#endif   
         }
 
         private void DrawExtraInfo()

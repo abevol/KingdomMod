@@ -309,4 +309,37 @@
   <data name="Beggar" xml:space="preserve">
     <value>Beggar</value>
   </data>
+  <data name="King" xml:space="preserve">
+    <value>King</value>
+  </data>
+  <data name="Queen" xml:space="preserve">
+    <value>Queen</value>
+  </data>
+  <data name="Prince" xml:space="preserve">
+    <value>Prince</value>
+  </data>
+  <data name="Princess" xml:space="preserve">
+    <value>Princess</value>
+  </data>
+  <data name="Hooded" xml:space="preserve">
+    <value>Hooded</value>
+  </data>
+  <data name="Zangetsu" xml:space="preserve">
+    <value>Zangetsu</value>
+  </data>
+  <data name="Alfred" xml:space="preserve">
+    <value>Alfred</value>
+  </data>
+  <data name="Gebel" xml:space="preserve">
+    <value>Gebel</value>
+  </data>
+  <data name="Miriam" xml:space="preserve">
+    <value>Miriam</value>
+  </data>
+  <data name="BoarSpawn" xml:space="preserve">
+    <value>BoarSpawn</value>
+  </data>
+  <data name="Deer" xml:space="preserve">
+    <value>Deer</value>
+  </data>
 </root>
