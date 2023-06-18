@@ -37,7 +37,7 @@ A map mod for the game "[Kingdom Two Crowns](https://store.steampowered.com/app/
 |`≈`|River|
 |`♣`|Berry Bush|
 |$\color{red}{Red}$|Not unlocked, not captured, wrecked|
-|$\color{blue}{Blue}$|Building|
+|$\color{blue}{Blue}$|Under construction|
 |$\color{green}{Green}$|Unlocked, safe|
 
 ## Install
