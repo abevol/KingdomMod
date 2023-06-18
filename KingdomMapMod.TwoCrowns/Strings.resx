@@ -306,4 +306,7 @@
   <data name="Coins" xml:space="preserve">
     <value>Coins</value>
   </data>
+  <data name="Beggar" xml:space="preserve">
+    <value>Beggar</value>
+  </data>
 </root>

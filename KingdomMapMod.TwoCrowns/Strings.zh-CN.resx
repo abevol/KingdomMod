@@ -306,4 +306,7 @@
   <data name="Coins" xml:space="preserve">
     <value>金币</value>
   </data>
+  <data name="Beggar" xml:space="preserve">
+    <value>贫民</value>
+  </data>
 </root>

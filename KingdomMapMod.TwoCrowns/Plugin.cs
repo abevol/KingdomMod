@@ -288,10 +288,20 @@ namespace KingdomMapMod.TwoCrowns
                 poiList.Add(new MarkInfo(beggarCamp.transform.position, Color.white, Strings.BeggarCamp, count));
             }
 
+            foreach (var beggar in kingdom.beggars)
+            {
+                if (beggar == null) continue;
+
+                if (beggar.hasFoundBaker)
+                {
+                    poiList.Add(new MarkInfo(beggar.transform.position, Color.red, Strings.Beggar, 0, MarkRow.Movable));
+                }
+            }
+
             var mover = kingdom.playerOne.mover;
             if (mover != null)
             {
-                poiList.Add(new MarkInfo(mover.transform.position, Color.green, Strings.You));
+                poiList.Add(new MarkInfo(mover.transform.position, Color.green, Strings.You, 0, MarkRow.Movable));
                 float l = mover.transform.position.x - 12;
                 float r = mover.transform.position.x + 12;
                 if (l < exploredLeft)
@@ -304,7 +314,7 @@ namespace KingdomMapMod.TwoCrowns
             if (castle != null)
             {
                 poiList.Add(new MarkInfo(castle.transform.position, Color.green, Strings.Castle));
-                poiList.Add(new MarkInfo(castle.transform.position, Color.green, Strings.CastleSign, 0, true));
+                poiList.Add(new MarkInfo(castle.transform.position, Color.green, Strings.CastleSign, 0, MarkRow.Sign));
                 leftWalls.Add(new WallPoint(castle.transform.position, Color.green));
                 rightWalls.Add(new WallPoint(castle.transform.position, Color.green));
             }
@@ -323,7 +333,7 @@ namespace KingdomMapMod.TwoCrowns
 
             foreach (var obj in kingdom._walls)
             {
-                poiList.Add(new MarkInfo(obj.transform.position, Color.green, Strings.Wall, 0, true));
+                poiList.Add(new MarkInfo(obj.transform.position, Color.green, Strings.Wall, 0, MarkRow.Sign));
                 if (kingdom.GetBorderSideForPosition(obj.transform.position.x) == Side.Left)
                     leftWalls.Add(new WallPoint(obj.transform.position, Color.green));
                 else
@@ -333,7 +343,7 @@ namespace KingdomMapMod.TwoCrowns
             var wallWreckList = GameObject.FindGameObjectsWithTag(Tags.WallWreck);
             foreach (var obj in wallWreckList)
             {
-                poiList.Add(new MarkInfo(obj.transform.position, Color.red, Strings.WallWreck, 0, true));
+                poiList.Add(new MarkInfo(obj.transform.position, Color.red, Strings.WallWreck, 0, MarkRow.Sign));
                 if (kingdom.GetBorderSideForPosition(obj.transform.position.x) == Side.Left)
                     leftWalls.Add(new WallPoint(obj.transform.position, Color.red));
                 else
@@ -353,18 +363,18 @@ namespace KingdomMapMod.TwoCrowns
             var wallFoundation = GameObject.FindGameObjectsWithTag(Tags.WallFoundation);
             foreach (var obj in wallFoundation)
             {
-                poiList.Add(new MarkInfo(obj.transform.position, Color.gray, Strings.WallFoundation, 0, true));
+                poiList.Add(new MarkInfo(obj.transform.position, Color.gray, Strings.WallFoundation, 0, MarkRow.Sign));
             }
 
             var riverList = GameObject.FindObjectsOfType<River>();
             foreach (var obj in riverList)
             {
-                poiList.Add(new MarkInfo(obj.transform.position, new Color(0.46f, 0.84f, 0.92f), Strings.River, 0, true));
+                poiList.Add(new MarkInfo(obj.transform.position, new Color(0.46f, 0.84f, 0.92f), Strings.River, 0, MarkRow.Sign));
             }
 
             foreach (var obj in Managers.Inst.world._berryBushes)
             {
-                poiList.Add(new MarkInfo(obj.transform.position, obj.paid ? Color.green : Color.red, Strings.BerryBush, 0, true));
+                poiList.Add(new MarkInfo(obj.transform.position, obj.paid ? Color.green : Color.red, Strings.BerryBush, 0, MarkRow.Sign));
             }
 
             var dogSpawn = GameObject.FindObjectOfType<DogSpawn>();
@@ -520,7 +530,7 @@ namespace KingdomMapMod.TwoCrowns
                 var wall = go.GetComponent<Wall>();
                 if (wall)
                 {
-                    poiList.Add(new MarkInfo(go.transform.position, Color.blue, Strings.Wall, 0, true));
+                    poiList.Add(new MarkInfo(go.transform.position, Color.blue, Strings.Wall, 0, MarkRow.Sign));
                     if (kingdom.GetBorderSideForPosition(go.transform.position.x) == Side.Left)
                         leftWalls.Add(new WallPoint(go.transform.position, Color.blue));
                     else
@@ -584,11 +594,15 @@ namespace KingdomMapMod.TwoCrowns
             foreach (var poi in poiList)
             {
                 var poiPosX = (poi.vec.x - startPos) * scale + 6;
-                poi.pos = new Rect(poiPosX, 24, 120, 20);
-                if (poi.info == Strings.You)
-                    poi.pos.y = 54;
-                if (poi.isWall)
-                    poi.pos.y = 8;
+                var poiPosY = poi.row switch
+                {
+                    MarkRow.Sign => 8,
+                    MarkRow.Settled => 24,
+                    MarkRow.Numeric => 40,
+                    MarkRow.Movable => 54,
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+                poi.pos = new Rect(poiPosX, poiPosY, 120, 20);
             }
             
             minimapMarkList = poiList;
@@ -769,6 +783,17 @@ namespace KingdomMapMod.TwoCrowns
             statsInfo.MaxFarmlands = maxFarmlands;
         }
 
+        private int GetKnightCount(bool needsArmor)
+        {
+            var knightCount = 0;
+            foreach (var knight in Managers.Inst.kingdom._knights)
+            {
+                if (knight._needsArmor == needsArmor)
+                    knightCount++;
+            }
+            return knightCount;
+        }
+
         private void DrawStatsInfo()
         {
             guiStyle.normal.textColor = Color.white;
@@ -780,7 +805,7 @@ namespace KingdomMapMod.TwoCrowns
             GUI.Label(new Rect(14, 166 + 20 * 1, 120, 20), Strings.Worker + ": " + statsInfo.WorkerCount, guiStyle);
             GUI.Label(new Rect(14, 166 + 20 * 2, 120, 20), Strings.Archer + ": " + statsInfo.ArcherCount, guiStyle);
             GUI.Label(new Rect(14, 166 + 20 * 3, 120, 20), Strings.Pikeman + ": " + Managers.Inst.kingdom.Pikemen.Count, guiStyle);
-            GUI.Label(new Rect(14, 166 + 20 * 4, 120, 20), Strings.Knight + ": " + Managers.Inst.kingdom.knights.Count, guiStyle);
+            GUI.Label(new Rect(14, 166 + 20 * 4, 120, 20), $"{Strings.Knight}: {Managers.Inst.kingdom.knights.Count} ({GetKnightCount(true)})", guiStyle);
             GUI.Label(new Rect(14, 166 + 20 * 5, 120, 20), Strings.Farmer + ": " + statsInfo.FarmerCount, guiStyle);
             GUI.Label(new Rect(14, 166 + 20 * 6, 120, 20), Strings.Farmlands + ": " + statsInfo.MaxFarmlands, guiStyle);
         }
@@ -827,15 +852,23 @@ namespace KingdomMapMod.TwoCrowns
         public Color color;
     }
 
+    public enum MarkRow
+    {
+        Sign = -1,
+        Settled = 0,
+        Numeric = 1,
+        Movable = 2
+    }
+
     public class MarkInfo
     {
         public Vector3 vec;
         public Rect pos;
         public Color color;
         public string info;
+        public MarkRow row;
         public int count;
         public bool visible;
-        public bool isWall;
 
         public MarkInfo(Vector3 vec, Rect pos, Color color, string info)
         {
@@ -845,13 +878,13 @@ namespace KingdomMapMod.TwoCrowns
             this.info = info;
         }
 
-        public MarkInfo(Vector3 vec, Color color, string info, int count = 0, bool isWall = false)
+        public MarkInfo(Vector3 vec, Color color, string info, int count = 0, MarkRow row = MarkRow.Settled)
         {
             this.vec = vec;
             this.color = color;
             this.info = info;
+            this.row = row;
             this.count = count;
-            this.isWall = isWall;
         }
     }
 

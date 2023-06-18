@@ -88,6 +88,15 @@ namespace KingdomMapMod.TwoCrowns {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Beggar.
+        /// </summary>
+        internal static string Beggar {
+            get {
+                return ResourceManager.GetString("Beggar", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Beggars.
         /// </summary>
         internal static string BeggarCamp {
@@ -178,7 +187,7 @@ namespace KingdomMapMod.TwoCrowns {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Coins.
         /// </summary>
         internal static string Coins {
             get {
