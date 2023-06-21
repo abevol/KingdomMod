@@ -18,14 +18,15 @@ A map mod for the game "[Kingdom Two Crowns](https://store.steampowered.com/app/
 
 ## Hotkeys
 
-1. `Home` Display the map overlay
-2. `End` Display debug information
-3. `Insert` Test some interesting features
-4. `F` Show the full map
-5. `X` Dump game objects to JSON file
-6. `P` Dump Prefabs to console
-7. `F5` Reload saved game (without exiting game)
-8. `F8` Save game (without exiting game)
+1. `M` Display the map overlay
+2. `N` Display the stamina bar
+3. `End` Display debug information
+4. `Insert` Test some interesting features
+5. `F` Show the full map
+6. `X` Dump game objects to JSON file
+7. `P` Dump Prefabs to console
+8. `F5` Reload saved game (without exiting game)
+9. `F8` Save game (without exiting game)
 
 ## Signs and Colors
 
@@ -33,7 +34,7 @@ A map mod for the game "[Kingdom Two Crowns](https://store.steampowered.com/app/
 |----|----|
 |`♜`|Castle|
 |`۩`|Wall|
-|`∧`|Wall Foundation|
+|`∧`|Dirt mound|
 |`≈`|River|
 |`♣`|Berry Bush|
 |$\color{red}{Red}$|Not unlocked, not captured, wrecked|
