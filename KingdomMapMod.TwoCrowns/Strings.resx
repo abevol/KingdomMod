@@ -342,4 +342,19 @@
   <data name="Deer" xml:space="preserve">
     <value>Deer</value>
   </data>
+  <data name="MerchantSpawner" xml:space="preserve">
+    <value>Merchant</value>
+  </data>
+  <data name="Bomb" xml:space="preserve">
+    <value>Bomb</value>
+  </data>
+  <data name="Enemy" xml:space="preserve">
+    <value>Enemy</value>
+  </data>
+  <data name="ShopForge" xml:space="preserve">
+    <value>Smithy</value>
+  </data>
+  <data name="Boss" xml:space="preserve">
+    <value>Boss</value>
+  </data>
 </root>

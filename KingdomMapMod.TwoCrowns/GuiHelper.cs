@@ -37,10 +37,12 @@ namespace KingdomMapMod.TwoCrowns
         /// <param name="thickness">The thickness of the line</param>
         public static void DrawLine(Vector2 lineStart, Vector2 lineEnd, Color color, uint thickness)
         {
-            if (_coloredLineTexture == null || _coloredLineColor != color)
+            if (_coloredLineTexture == null)
+                _coloredLineTexture = new Texture2D(1, 1);
+
+            if (_coloredLineColor != color)
             {
                 _coloredLineColor = color;
-                _coloredLineTexture = new Texture2D(1, 1);
                 _coloredLineTexture.SetPixel(0, 0, _coloredLineColor);
                 _coloredLineTexture.wrapMode = TextureWrapMode.Repeat;
                 _coloredLineTexture.Apply();

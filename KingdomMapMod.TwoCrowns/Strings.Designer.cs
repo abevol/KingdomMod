@@ -151,6 +151,24 @@ namespace KingdomMapMod.TwoCrowns {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Bomb.
+        /// </summary>
+        internal static string Bomb {
+            get {
+                return ResourceManager.GetString("Bomb", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string Boss {
+            get {
+                return ResourceManager.GetString("Boss", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Campfire.
         /// </summary>
         internal static string Campfire {
@@ -223,7 +241,7 @@ namespace KingdomMapMod.TwoCrowns {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Deer.
         /// </summary>
         internal static string Deer {
             get {
@@ -255,6 +273,15 @@ namespace KingdomMapMod.TwoCrowns {
         internal static string DogSpawn {
             get {
                 return ResourceManager.GetString("DogSpawn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enemy.
+        /// </summary>
+        internal static string Enemy {
+            get {
+                return ResourceManager.GetString("Enemy", resourceCulture);
             }
         }
         
@@ -457,6 +484,15 @@ namespace KingdomMapMod.TwoCrowns {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Merchant.
+        /// </summary>
+        internal static string MerchantSpawner {
+            get {
+                return ResourceManager.GetString("MerchantSpawner", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Mine.
         /// </summary>
         internal static string Mine {
@@ -552,6 +588,15 @@ namespace KingdomMapMod.TwoCrowns {
         internal static string River {
             get {
                 return ResourceManager.GetString("River", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Smithy.
+        /// </summary>
+        internal static string ShopForge {
+            get {
+                return ResourceManager.GetString("ShopForge", resourceCulture);
             }
         }
         

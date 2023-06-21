@@ -342,4 +342,19 @@
   <data name="Deer" xml:space="preserve">
     <value>鹿</value>
   </data>
+  <data name="MerchantSpawner" xml:space="preserve">
+    <value>商舍</value>
+  </data>
+  <data name="Bomb" xml:space="preserve">
+    <value>炸弹</value>
+  </data>
+  <data name="Enemy" xml:space="preserve">
+    <value>敌人</value>
+  </data>
+  <data name="ShopForge" xml:space="preserve">
+    <value>铁匠铺</value>
+  </data>
+  <data name="Boss" xml:space="preserve">
+    <value>巨魔</value>
+  </data>
 </root>
