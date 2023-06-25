@@ -78,8 +78,12 @@ namespace KingdomMapMod.TwoCrowns
         {
             log.LogMessage("Start.");
             Game.add_OnGameStart((Action)OnGameStart);
-
+            
             GlobalSaveData.add_OnCurrentCampaignSwitch((Action)OnCurrentCampaignSwitch);
+
+            log.LogMessage($"CoinBag.OverflowLimit: {CoinBag.OverflowLimit}");
+            CoinBag.OverflowLimit = 1000;
+            log.LogMessage($"CoinBag.OverflowLimit: {CoinBag.OverflowLimit}");
         }
 
         private void Update()
@@ -169,11 +173,38 @@ namespace KingdomMapMod.TwoCrowns
             {
                 log.LogMessage($"Dump Prefabs:");
 
-                var prefabs = GameObject.FindObjectsOfType<PrefabID>();
-                foreach (var prefab in prefabs)
+                var prefabList = GameObject.FindObjectsOfType<PrefabID>();
+                foreach (var prefab in prefabList)
                 {
                     log.LogMessage($"PrefabID:{prefab.prefabID}, name: {prefab.name}");
                 }
+
+                var prefabs = Managers.Inst.prefabs;
+                if (prefabs != null)
+                {
+                    var dumpStr = "\npublic enum PrefabIDs\n{\n";
+                    foreach (var prefab in prefabs.prefabMasterCopies)
+                    {
+                        var prefabName = prefab.name.Replace(' ', '_');
+                        dumpStr = dumpStr + "    " + prefabName + " = " + prefab.prefabID + ",\n";
+                    }
+
+                    dumpStr = dumpStr + "}\n";
+                    log.LogMessage(dumpStr);
+                }
+            }
+
+            if (Input.GetKeyDown(KeyCode.L))
+            {
+                log.LogMessage($"Dump LevelBlocks:");
+
+                var levelBlocks = Managers.Inst.level.GetLevelBlocks();
+                log.LogMessage($"LevelBlocks: {levelBlocks.Count}");
+                foreach (var levelBlock in levelBlocks)
+                {
+                    log.LogMessage($"groups: {levelBlock.groupOne}, {levelBlock.groupTwo}, {levelBlock.groupThree}");
+                }
+                
             }
 
             if (Input.GetKeyDown(KeyCode.F4))
@@ -194,6 +225,110 @@ namespace KingdomMapMod.TwoCrowns
                 log.LogMessage($"Try to save game.");
 
                 Managers.Inst.game.TriggerSave();
+            }
+
+            if (Input.GetKeyDown(KeyCode.Delete))
+            {
+                var player = Managers.Inst.kingdom.playerOne;
+                if (player != null)
+                {
+                    var payable = player.selectedPayable;
+                    if (payable != null)
+                    {
+                        log.LogMessage($"Try to destroy the game object: {payable.GetGO.name}");
+                        Destroy(payable.GetGO);
+                    }
+                }
+            }
+
+            if (Input.GetKeyDown(KeyCode.F1))
+            {
+                var kingdom = Managers.Inst.kingdom;
+                if (kingdom != null)
+                {
+                    log.LogMessage($"Try to add Peasant.");
+
+                    var prefab = Resources.Load<Peasant>("Prefabs/Characters/Peasant").gameObject;
+                    Vector3 vector = kingdom.playerOne.transform.TransformPoint(new Vector3(1f, 1f, 0.01f));
+                    var lastSpawned = Pool.SpawnOrInstantiateGO(prefab, vector, Quaternion.identity, null);
+                    lastSpawned.transform.SetParent(GameObject.FindGameObjectWithTag("GameLayer").transform);
+                }
+            }
+
+            if (Input.GetKeyDown(KeyCode.F2))
+            {
+                var kingdom = Managers.Inst.kingdom;
+                if (kingdom != null)
+                {
+                    log.LogMessage($"Try to add Griffin.");
+
+                    var prefab = Resources.Load<Steed>("Prefabs/Steeds/Griffin P1");
+                    prefab.price = 1;
+                    Vector3 vector = kingdom.playerOne.transform.TransformPoint(new Vector3(1f, 1f, 0.01f));
+                    var lastSpawned = Pool.SpawnOrInstantiateGO(prefab.gameObject, vector, Quaternion.identity, null);
+                    lastSpawned.transform.SetParent(GameObject.FindGameObjectWithTag("GameLayer").transform);
+                }
+            }
+
+            if (Input.GetKeyDown(KeyCode.F3))
+            {
+                var kingdom = Managers.Inst.kingdom;
+                if (kingdom != null)
+                {
+                    log.LogMessage($"Try to add Wall0.");
+
+                    // var prefab = Resources.Load<Wall>("prefabs/buildings and interactive/wall0");
+                    Vector3 vector = new Vector3(kingdom.playerOne.transform.position.x, 0.0f, 0.1f);
+
+                    Wall wall = Instantiate<Wall>(Managers.Inst.holder.wallPrefabs[0]);
+                    wall.transform.SetParent(GameObject.FindGameObjectWithTag("GameLayer").transform);
+                    wall.transform.position = vector;
+
+                    // var lastSpawned = Pool.SpawnOrInstantiateGO(prefab.gameObject, vector, Quaternion.identity, GameObject.FindGameObjectWithTag("GameLayer").transform);
+                    // lastSpawned.transform.SetParent(GameObject.FindGameObjectWithTag("GameLayer").transform);
+                }
+            }
+
+            if (Input.GetKeyDown(KeyCode.F4))
+            {
+                var kingdom = Managers.Inst.kingdom;
+                if (kingdom != null)
+                {
+                    log.LogMessage($"Try to add Tower0.");
+
+                    var prefab = Resources.Load<Tower>("prefabs/buildings and interactive/tower0");
+                    Vector3 vector = new Vector3(kingdom.playerOne.transform.position.x, 0.0f, 1.6f);
+                    var lastSpawned = Pool.SpawnOrInstantiateGO(prefab.gameObject, vector, Quaternion.identity, GameObject.FindGameObjectWithTag("GameLayer").transform);
+                    // lastSpawned.transform.SetParent(GameObject.FindGameObjectWithTag("GameLayer").transform);
+                }
+            }
+
+            if (Input.GetKeyDown(KeyCode.R))
+            {
+                var player = Managers.Inst.kingdom.playerOne;
+                player.TeleportFlash();
+                player.coinLaunchSound.Play(player.transform.position, 1);
+
+                GameObject gameObject = Pool.SpawnGO(Resources.Load<Boulder>("Prefabs/Objects/Boulder").gameObject, Vector3.zero, Quaternion.identity);
+                var compCacher = Managers.Inst.compCacher;
+                compCacher.GetCachedComponent<Boulder>(gameObject)._launchedByEnemies = false;
+                compCacher.GetCachedComponent<Boulder>(gameObject).maxHitCitizens = 1000;
+                compCacher.GetCachedComponent<Boulder>(gameObject).StuckProbability = 0f;
+                compCacher.GetCachedComponent<Boulder>(gameObject).hitDamage = 300;
+                compCacher.GetCachedComponent<SpriteRendererFX>(gameObject).FadeIn(0.5f);
+                gameObject.transform.parent = player.transform.parent;
+                gameObject.transform.localPosition = Vector3.zero;
+                gameObject.transform.localRotation = Quaternion.identity;
+                compCacher.GetCachedComponent<Boulder>(gameObject).SetFake();
+                gameObject.transform.SetParent(player.transform.parent, true);
+                gameObject.transform.localScale = new Vector3(3f, 3f, 3f);
+                gameObject.transform.position = player.transform.position;
+                gameObject.transform.rotation = Quaternion.LookRotation(player.transform.forward);
+
+                Vector2 vector6 = new Vector2((int)player.mover.GetDirection(), 0.2f);
+                Vector2 vector7 = vector6.normalized * 14f;
+                compCacher.GetCachedComponent<Boulder>(gameObject).Launch(vector7, player.gameObject);
+                Pool.Despawn(gameObject, 5f);
             }
 
             tick = tick + 1;
@@ -241,9 +376,401 @@ namespace KingdomMapMod.TwoCrowns
         public void OnGameStart()
         {
             log.LogMessage("OnGameStart.");
-            log.LogMessage($"GlobalSaveDataFilename: {PlayfabManager.Inst.GlobalSaveDataFilename}");
 
             exploredLeft = exploredRight = 0;
+
+            AdjustCosts();
+        }
+
+        public Pool GetPoolByPrefabId(PrefabIDs prefabId)
+        {
+            log.LogMessage($"Pool.poolsByPrefab.Count: {Pool.poolsByPrefab.Count}");
+            foreach (var poolPair in Pool.poolsByPrefab)
+            {
+                var pool = poolPair.value;
+                if (pool == null) continue;
+                var prefab = poolPair.key;
+                if (prefab == null) continue;
+                log.LogMessage($"Found prefab {prefab.name}");
+                var prefabIdComp = prefab.GetComponent<PrefabID>();
+                if (prefabIdComp == null) continue;
+                log.LogMessage($"[GetPoolByPrefabId] 3");
+                if (prefabIdComp.prefabID == (int)prefabId)
+                {
+                    log.LogMessage($"Found Pool for prefab {prefab.name}");
+                    return pool;
+                }
+            }
+            return null;
+        }
+
+        public void AdjustCosts()
+        {
+            var prefabs = Managers.Inst.prefabs;
+            if (prefabs != null)
+            {
+                log.LogMessage("Handle prefabs start.");
+
+                var prefabIds = new List<PrefabIDs>
+                {
+                    PrefabIDs.Citizen_House,
+                    PrefabIDs.Workshop,
+                    PrefabIDs.Tower_Baker,
+                    PrefabIDs.Tower5,
+                    PrefabIDs.Tower4,
+                    PrefabIDs.Tower3,
+                    PrefabIDs.Tower2,
+                    PrefabIDs.Tower1,
+                    PrefabIDs.Tower0
+                };
+                foreach (var prefabId in prefabIds)
+                {
+                    if (prefabId == PrefabIDs.MerchantHouse) continue;
+                    var go = prefabs.GetPrefabById((int)prefabId);
+                    if (go == null) continue;
+                    var prefab = go.GetComponent<PrefabID>();
+                    if (prefab == null) continue;
+
+                    switch ((PrefabIDs)prefab.prefabID)
+                    {
+                        case PrefabIDs.Citizen_House:
+                            {
+                                var payable = go.GetComponent<CitizenHousePayable>();
+                                if (payable != null)
+                                {
+                                    log.LogMessage($"Change {go.name} price from {payable.price} to 3");
+                                    payable.price = 3;
+                                }
+                                break;
+                            }
+                        case PrefabIDs.Workshop:
+                            {
+                                var payableWorkshop = go.GetComponent<PayableWorkshop>();
+                                if (payableWorkshop != null)
+                                {
+                                    var payable = payableWorkshop.barrelCounterpart;
+                                    if (payable != null)
+                                    {
+                                        log.LogMessage($"Change {go.name} price from {payable.price} to 3");
+                                        payable.price = 3;
+                                    }
+                                }
+                                break;
+                            }
+                        case PrefabIDs.Tower_Baker:
+                            {
+                                var payable = go.GetComponent<PayableShop>();
+                                if (payable != null)
+                                {
+                                    log.LogMessage($"Change {go.name} price from {payable.price} to 2");
+                                    payable.price = 2;
+                                }
+                                break;
+                            }
+                        case PrefabIDs.Tower5:
+                            {
+                                var payable = go.GetComponent<PayableUpgrade>();
+                                if (payable != null)
+                                {
+                                    log.LogMessage($"Change {go.name} price from {payable.price} to 10");
+                                    payable.price = 10;
+                                }
+
+                                var workable = go.GetComponent<WorkableBuilding>();
+                                if (workable != null)
+                                {
+                                    log.LogMessage($"Change {go.name} buildPoints from {workable.buildPoints} to 100");
+                                    workable.buildPoints = 100;
+                                }
+
+                                var pool = GetPoolByPrefabId(PrefabIDs.Tower5);
+                                if (pool != null)
+                                {
+                                    pool.prefab.gameObject.GetComponent<PayableUpgrade>().price = 10;
+                                    pool.prefab.gameObject.GetComponent<WorkableBuilding>().buildPoints = 100;
+                                }
+                                break;
+                            }
+                        case PrefabIDs.Tower4:
+                            {
+                                var payable = go.GetComponent<PayableUpgrade>();
+                                if (payable != null)
+                                {
+                                    log.LogMessage($"Change {go.name} price from {payable.price} to 8");
+                                    payable.price = 8;
+                                }
+
+                                var workable = go.GetComponent<WorkableBuilding>();
+                                if (workable != null)
+                                {
+                                    log.LogMessage($"Change {go.name} buildPoints from {workable.buildPoints} to 70");
+                                    workable.buildPoints = 70;
+                                }
+
+                                var pool = GetPoolByPrefabId(PrefabIDs.Tower4);
+                                if (pool != null)
+                                {
+                                    pool.prefab.gameObject.GetComponent<PayableUpgrade>().price = 8;
+                                    pool.prefab.gameObject.GetComponent<WorkableBuilding>().buildPoints = 70;
+                                }
+                                break;
+                            }
+                        case PrefabIDs.Tower3:
+                            {
+                                var payable = go.GetComponent<PayableUpgrade>();
+                                if (payable != null)
+                                {
+                                    log.LogMessage($"Change {go.name} price from {payable.price} to 8");
+                                    // payable.price = 6;
+                                    payable.price = 8;
+                                    payable.nextPrefab = prefabs.GetPrefabById((int)PrefabIDs.Tower5);
+                                }
+
+                                var workable = go.GetComponent<WorkableBuilding>();
+                                if (workable != null)
+                                {
+                                    log.LogMessage($"Change {go.name} buildPoints from {workable.buildPoints} to 50");
+                                    workable.buildPoints = 50;
+                                }
+
+                                var pool = GetPoolByPrefabId(PrefabIDs.Tower3);
+                                if (pool != null)
+                                {
+                                    pool.prefab.gameObject.GetComponent<PayableUpgrade>().price = 8;
+                                    pool.prefab.gameObject.GetComponent<WorkableBuilding>().buildPoints = 50;
+                                }
+                                break;
+                            }
+                        case PrefabIDs.Tower2:
+                            {
+                                var payable = go.GetComponent<PayableUpgrade>();
+                                if (payable != null)
+                                {
+                                    log.LogMessage($"Change {go.name} price from {payable.price} to 5");
+                                    payable.price = 5;
+                                }
+
+                                var workable = go.GetComponent<WorkableBuilding>();
+                                if (workable != null)
+                                {
+                                    log.LogMessage($"Change {go.name} buildPoints from {workable.buildPoints} to 30");
+                                    workable.buildPoints = 30;
+                                }
+
+                                var pool = GetPoolByPrefabId(PrefabIDs.Tower2);
+                                if (pool != null)
+                                {
+                                    pool.prefab.gameObject.GetComponent<PayableUpgrade>().price = 5;
+                                    pool.prefab.gameObject.GetComponent<WorkableBuilding>().buildPoints = 30;
+                                }
+                                // Instantiate(new GuardSlot().gameObject, go.transform);
+                                break;
+                            }
+                        case PrefabIDs.Tower1:
+                            {
+                                var payable = go.GetComponent<PayableUpgrade>();
+                                if (payable != null)
+                                {
+                                    log.LogMessage($"Change {go.name} price from {payable.price} to 4");
+                                    payable.price = 4;
+                                }
+
+                                var workable = go.GetComponent<WorkableBuilding>();
+                                if (workable != null)
+                                {
+                                    log.LogMessage($"Change {go.name} buildPoints from {workable.buildPoints} to 20");
+                                    workable.buildPoints = 20;
+                                }
+
+                                var pool = GetPoolByPrefabId(PrefabIDs.Tower2);
+                                if (pool != null)
+                                {
+                                    pool.prefab.gameObject.GetComponent<PayableUpgrade>().price = 4;
+                                    pool.prefab.gameObject.GetComponent<WorkableBuilding>().buildPoints = 20;
+                                }
+                                break;
+                            }
+                        case PrefabIDs.Tower0:
+                            {
+                                var payable = go.GetComponent<PayableUpgrade>();
+                                if (payable != null)
+                                {
+                                    log.LogMessage($"Change {go.name} price from {payable.price} to 3");
+                                    payable.price = 3;
+                                    payable.nextPrefab = prefabs.GetPrefabById((int)PrefabIDs.Tower2);
+                                }
+
+                                var workable = go.GetComponent<WorkableBuilding>();
+                                if (workable != null)
+                                {
+                                    log.LogMessage($"Change {go.name} buildPoints from {workable.buildPoints} to 10");
+                                    workable.buildPoints = 10;
+                                }
+
+                                var pool = GetPoolByPrefabId(PrefabIDs.Tower2);
+                                if (pool != null)
+                                {
+                                    pool.prefab.gameObject.GetComponent<PayableUpgrade>().price = 2;
+                                    pool.prefab.gameObject.GetComponent<WorkableBuilding>().buildPoints = 10;
+                                }
+                                break;
+                            }
+                    }
+                }
+
+                log.LogMessage("Handle prefabs end.");
+            }
+
+            var payables = Managers.Inst.payables;
+            if (payables != null)
+            {
+                foreach (var obj in payables.AllPayables)
+                {
+                    if (obj == null) continue;
+                    var go = obj.gameObject;
+                    if (go == null) continue;
+                    var prefab = go.GetComponent<PrefabID>();
+                    if (prefab == null) continue;
+
+                    if (prefab.prefabID == (int)PrefabIDs.Citizen_House)
+                    {
+                        var citizenHousePayable = go.GetComponent<CitizenHousePayable>();
+                        if (citizenHousePayable != null)
+                        {
+                            log.LogMessage($"Change {prefab.name} price from {citizenHousePayable.price} to 3");
+                            citizenHousePayable.price = 3;
+                        }
+                    }
+                    else if (prefab.prefabID == (int)PrefabIDs.Workshop)
+                    {
+                        var payableWorkshop = go.GetComponent<PayableWorkshop>();
+                        if (payableWorkshop != null)
+                        {
+                            var payableWorkshopBarrel = payableWorkshop.barrelCounterpart;
+                            if (payableWorkshopBarrel != null)
+                            {
+                                log.LogMessage($"Change {prefab.name} price from {payableWorkshopBarrel.price} to 3");
+                                payableWorkshopBarrel.price = 3;
+                            }
+                        }
+                    }
+                    else if (prefab.prefabID == (int)PrefabIDs.Tower_Baker)
+                    {
+                        var payableShop = go.GetComponent<PayableShop>();
+                        if (payableShop != null)
+                        {
+                            log.LogMessage($"Change {prefab.name} price from {payableShop.price} to 2");
+                            payableShop.price = 2;
+                        }
+                    }
+                    else if (prefab.prefabID == (int)PrefabIDs.Tower0)
+                    {
+                        var payableUpgrade = go.GetComponent<PayableUpgrade>();
+                        if (payableUpgrade != null)
+                        {
+                            log.LogMessage($"Change {prefab.name} price from {payableUpgrade.price} to 2");
+                            payableUpgrade.price = 2;
+                            // var nextPrefab = prefabs.GetPrefabById((int)PrefabIDs.Tower2);
+                            // nextPrefab.gameObject.GetComponent<PayableUpgrade>().price = 5;
+                            // nextPrefab.gameObject.GetComponent<WorkableBuilding>().buildPoints = 30;
+                            // payableUpgrade.nextPrefab = nextPrefab;
+                            payableUpgrade.SetNextPrefab((int)PrefabIDs.Tower2);
+                        }
+
+                        var workable = go.GetComponent<WorkableBuilding>();
+                        if (workable != null)
+                        {
+                            log.LogMessage($"Change {go.name} buildPoints from {workable.buildPoints} to 10");
+                            workable.buildPoints = 10;
+                        }
+                    }
+                    else if (prefab.prefabID == (int)PrefabIDs.Tower1)
+                    {
+                        var payableUpgrade = go.GetComponent<PayableUpgrade>();
+                        if (payableUpgrade != null)
+                        {
+                            log.LogMessage($"Change {prefab.name} price from {payableUpgrade.price} to 4");
+                            payableUpgrade.price = 4;
+                        }
+
+                        var workable = go.GetComponent<WorkableBuilding>();
+                        if (workable != null)
+                        {
+                            log.LogMessage($"Change {go.name} buildPoints from {workable.buildPoints} to 20");
+                            workable.buildPoints = 20;
+                        }
+                    }
+                    else if (prefab.prefabID == (int)PrefabIDs.Tower2)
+                    {
+                        var payableUpgrade = go.GetComponent<PayableUpgrade>();
+                        if (payableUpgrade != null)
+                        {
+                            log.LogMessage($"Change {prefab.name} price from {payableUpgrade.price} to 5");
+                            payableUpgrade.price = 5;
+                        }
+
+                        var workable = go.GetComponent<WorkableBuilding>();
+                        if (workable != null)
+                        {
+                            log.LogMessage($"Change {go.name} buildPoints from {workable.buildPoints} to 30");
+                            workable.buildPoints = 30;
+                        }
+
+                        // Instantiate(new GuardSlot(), go.transform);
+                    }
+                    else if (prefab.prefabID == (int)PrefabIDs.Tower3)
+                    {
+                        var payableUpgrade = go.GetComponent<PayableUpgrade>();
+                        if (payableUpgrade != null)
+                        {
+                            log.LogMessage($"Change {prefab.name} price from {payableUpgrade.price} to 6");
+                            // payableUpgrade.price = 6;
+                            payableUpgrade.price = 8;
+                            payableUpgrade.nextPrefab = prefabs.GetPrefabById((int)PrefabIDs.Tower5);
+                        }
+
+                        var workable = go.GetComponent<WorkableBuilding>();
+                        if (workable != null)
+                        {
+                            log.LogMessage($"Change {go.name} buildPoints from {workable.buildPoints} to 50");
+                            workable.buildPoints = 50;
+                        }
+                    }
+                    else if (prefab.prefabID == (int)PrefabIDs.Tower4)
+                    {
+                        var payableUpgrade = go.GetComponent<PayableUpgrade>();
+                        if (payableUpgrade != null)
+                        {
+                            log.LogMessage($"Change {prefab.name} price from {payableUpgrade.price} to 8");
+                            payableUpgrade.price = 8;
+                        }
+
+                        var workable = go.GetComponent<WorkableBuilding>();
+                        if (workable != null)
+                        {
+                            log.LogMessage($"Change {go.name} buildPoints from {workable.buildPoints} to 70");
+                            workable.buildPoints = 70;
+                        }
+                    }
+                    else if (prefab.prefabID == (int)PrefabIDs.Tower5)
+                    {
+                        var payableUpgrade = go.GetComponent<PayableUpgrade>();
+                        if (payableUpgrade != null)
+                        {
+                            log.LogMessage($"Change {prefab.name} price from {payableUpgrade.price} to 10");
+                            payableUpgrade.price = 10;
+                        }
+
+                        var workable = go.GetComponent<WorkableBuilding>();
+                        if (workable != null)
+                        {
+                            log.LogMessage($"Change {go.name} buildPoints from {workable.buildPoints} to 100");
+                            workable.buildPoints = 100;
+                        }
+                    }
+                }
+            }
+
         }
 
         public void OnCurrentCampaignSwitch()
@@ -317,8 +844,15 @@ namespace KingdomMapMod.TwoCrowns
             var steed = kingdom.playerOne.steed;
             if (steed != null)
             {
+                var deerHunters = new List<Steed.SteedType>
+                {
+                    Steed.SteedType.Stag, 
+                    Steed.SteedType.P1Wolf, 
+                    Steed.SteedType.Reindeer, 
+                    Steed.SteedType.Reindeer_Norselands
+                };
                 var steedType = steed.steedType;
-                if (steedType is Steed.SteedType.Stag or Steed.SteedType.P1Wolf)
+                if (deerHunters.Contains(steedType))
                 {
                     var deers = GameObject.FindObjectsOfType<Deer>();
                     foreach (var deer in deers)
@@ -362,7 +896,7 @@ namespace KingdomMapMod.TwoCrowns
                     {
                         leftBosses.Sort((a, b) => b.CompareTo(a));
                         poiList.Add(new MarkInfo(leftBosses[0], Color.red, Strings.Boss, leftBosses.Count, MarkRow.Movable));
-                        if (leftEnemies[0] - leftBosses[0] < 8)
+                        if (leftEnemies[0] - leftBosses[0] < 6)
                             drawEnemies = false;
                     }
 
@@ -379,7 +913,7 @@ namespace KingdomMapMod.TwoCrowns
                     {
                         rightBosses.Sort((a, b) => a.CompareTo(b));
                         poiList.Add(new MarkInfo(rightBosses[0], Color.red, Strings.Boss, rightBosses.Count, MarkRow.Movable));
-                        if (rightBosses[0] - rightEnemies[0] < 8)
+                        if (rightBosses[0] - rightEnemies[0] < 6)
                             drawEnemies = false;
                     }
 
@@ -425,6 +959,16 @@ namespace KingdomMapMod.TwoCrowns
                 poiList.Add(new MarkInfo(shopForge.transform.position.x, Color.white, Strings.ShopForge));
             }
 
+            var citizenHouses = GameObject.FindGameObjectsWithTag(Tags.CitizenHouse);
+            foreach (var obj in citizenHouses)
+            {
+                var citizenHouse = obj.GetComponent<CitizenHousePayable>();
+                if (citizenHouse != null)
+                {
+                    poiList.Add(new MarkInfo(obj.transform.position.x, Color.white, Strings.CitizenHouse, citizenHouse._numberOfAvaliableCitizens));
+                }
+            }
+
             var wallWreckList = GameObject.FindGameObjectsWithTag(Tags.WallWreck);
             foreach (var obj in wallWreckList)
             {
@@ -452,6 +996,13 @@ namespace KingdomMapMod.TwoCrowns
                 poiList.Add(new MarkInfo(obj.transform.position.x, obj.paid ? Color.green : Color.red, Strings.BerryBush, 0, MarkRow.Sign));
             }
 
+            var payableGemChest = GameObject.FindObjectOfType<PayableGemChest>();
+            if (payableGemChest != null)
+            {
+                var gemsCount = payableGemChest.infiniteGems ? payableGemChest.guardRef.price : payableGemChest.gemsStored;
+                poiList.Add(new MarkInfo(payableGemChest.transform.position.x, Color.white, Strings.GemMerchant, gemsCount));
+            }
+
             var dogSpawn = GameObject.FindObjectOfType<DogSpawn>();
             if (dogSpawn != null && !dogSpawn._dogFreed)
                 poiList.Add(new MarkInfo(dogSpawn.transform.position.x, Color.red, Strings.DogSpawn));
@@ -463,10 +1014,13 @@ namespace KingdomMapMod.TwoCrowns
             }
 
             var caveHelper = Managers.Inst.caveHelper;
-            var bomb = caveHelper.Getbomb(caveHelper.CurrentlyBombingPortal.side);
-            if (bomb != null)
+            if (caveHelper != null && caveHelper.CurrentlyBombingPortal != null)
             {
-                poiList.Add(new MarkInfo(bomb.transform.position.x, Color.green, Strings.Bomb, 0, MarkRow.Movable));
+                var bomb = caveHelper.Getbomb(caveHelper.CurrentlyBombingPortal.side);
+                if (bomb != null)
+                {
+                    poiList.Add(new MarkInfo(bomb.transform.position.x, Color.green, Strings.Bomb, 0, MarkRow.Movable));
+                }
             }
 
             foreach (var obj in kingdom._farmHouses)
@@ -474,9 +1028,7 @@ namespace KingdomMapMod.TwoCrowns
                 poiList.Add(new MarkInfo(obj.transform.position.x, Color.green, Strings.Farmhouse));
             }
 
-            foreach (var obj in kingdom.steedSpawns)
-            {
-                var steedTypeDict = new Dictionary<Steed.SteedType, string>
+            var steedNames = new Dictionary<Steed.SteedType, string>
                     {
                         { Steed.SteedType.Bear,                  Strings.Bear },
                         { Steed.SteedType.P1Griffin,             Strings.Griffin },
@@ -508,10 +1060,19 @@ namespace KingdomMapMod.TwoCrowns
                         { Steed.SteedType.P2Kelpie,              Strings.Kelpie },
                         { Steed.SteedType.P2Reindeer_Norselands, Strings.Reindeer },
                     };
+
+            foreach (var obj in kingdom.spawnedSteeds)
+            {
+                if (obj.CurrentMode != Steed.Mode.Player)
+                    poiList.Add(new MarkInfo(obj.transform.position.x, Color.blue, steedNames[obj.steedType], obj.price));
+            }
+
+            foreach (var obj in kingdom.steedSpawns)
+            {
                 var info = "";
                 foreach (var steedTmp in obj.steedPool)
                 {
-                    info = steedTypeDict[steedTmp.steedType];
+                    info = steedNames[steedTmp.steedType];
                 }
 
                 if (!obj._hasSpawned)
@@ -567,8 +1128,6 @@ namespace KingdomMapMod.TwoCrowns
                     poiList.Add(new MarkInfo(wreck.transform.position.x, Color.red, Strings.Wreck));
             }
 
-            // var quarry = GameObject.Find("Quarry_undeveloped(Clone)");
-
             foreach (var obj in payables.AllPayables)
             {
                 if (obj == null) continue;
@@ -577,11 +1136,11 @@ namespace KingdomMapMod.TwoCrowns
                 var prefab = go.GetComponent<PrefabID>();
                 if (prefab == null) continue;
 
-                if (prefab.prefabID == PrefabIDs.QuarryUndeveloped)
+                if (prefab.prefabID == (int)PrefabIDs.Quarry_undeveloped)
                 {
                     poiList.Add(new MarkInfo(go.transform.position.x, Color.red, Strings.Quarry, obj.price));
                 }
-                else if (prefab.prefabID == PrefabIDs.MineUndeveloped)
+                else if (prefab.prefabID == (int)PrefabIDs.Mine_undeveloped)
                 {
                     poiList.Add(new MarkInfo(go.transform.position.x, Color.red, Strings.Mine, obj.price));
                 }
@@ -627,17 +1186,33 @@ namespace KingdomMapMod.TwoCrowns
                 var prefab = go.GetComponent<PrefabID>();
                 if (prefab == null) continue;
 
-                if (prefab.prefabID == PrefabIDs.Quarry)
+                if (prefab.prefabID == (int)PrefabIDs.Quarry)
                 {
                     poiList.Add(new MarkInfo(go.transform.position.x, Color.green, Strings.Quarry));
                 }
-                else if (prefab.prefabID == PrefabIDs.Mine)
+                else if (prefab.prefabID == (int)PrefabIDs.Mine)
                 {
                     poiList.Add(new MarkInfo(go.transform.position.x, Color.green, Strings.Mine));
                 }
-                else if (prefab.prefabID == PrefabIDs.MerchantSpawner)
+                else if (prefab.prefabID == (int)PrefabIDs.MerchantHouse)
                 {
-                    poiList.Add(new MarkInfo(go.transform.position.x, Color.green, Strings.MerchantSpawner));
+                    poiList.Add(new MarkInfo(go.transform.position.x, Color.white, Strings.MerchantSpawner));
+                }
+                else
+                {
+                    var thorPuzzleController = go.GetComponent<ThorPuzzleController>();
+                    if (thorPuzzleController != null)
+                    {
+                        var color = thorPuzzleController.State == 0 ? Color.red : Color.green;
+                        poiList.Add(new MarkInfo(thorPuzzleController.transform.position.x, color, Strings.ThorPuzzleStatue));
+                    }
+
+                    var helPuzzleController = go.GetComponent<HelPuzzleController>();
+                    if (helPuzzleController != null)
+                    {
+                        var color = helPuzzleController.State == 0 ? Color.red : Color.green;
+                        poiList.Add(new MarkInfo(helPuzzleController.transform.position.x, color, Strings.HelPuzzleStatue));
+                    }
                 }
             }
 
@@ -661,11 +1236,11 @@ namespace KingdomMapMod.TwoCrowns
 
                 var prefab = go.GetComponent<PrefabID>();
                 if (prefab == null) continue;
-                if (prefab.prefabID == PrefabIDs.Quarry)
+                if (prefab.prefabID == (int)PrefabIDs.Quarry)
                 {
                     poiList.Add(new MarkInfo(go.transform.position.x, Color.blue, Strings.Quarry));
                 }
-                else if (prefab.prefabID == PrefabIDs.Mine)
+                else if (prefab.prefabID == (int)PrefabIDs.Mine)
                 {
                     poiList.Add(new MarkInfo(go.transform.position.x, Color.blue, Strings.Mine));
                 }
@@ -769,6 +1344,83 @@ namespace KingdomMapMod.TwoCrowns
             }
 
             drawLineList = lineList;
+        }
+
+        public Payable GetPayableWithPrefabID(PrefabIDs prefabID)
+        {
+            var payables = Managers.Inst.payables;
+            if (!payables) return null;
+
+            foreach (var obj in payables.AllPayables)
+            {
+                if (obj == null) continue;
+                var go = obj.gameObject;
+                if (go == null) continue;
+                var prefab = go.GetComponent<PrefabID>();
+                if (prefab == null) continue;
+                if (prefab.prefabID == (int)prefabID)
+                    return obj;
+            }
+
+            return null;
+        }
+
+        public List<Payable> GetPayablesWithPrefabID(PrefabIDs prefabID)
+        {
+            var result = new List<Payable>();
+            var payables = Managers.Inst.payables;
+            if (!payables) return result;
+
+            foreach (var obj in payables.AllPayables)
+            {
+                if (obj == null) continue;
+                var go = obj.gameObject;
+                if (go == null) continue;
+                var prefab = go.GetComponent<PrefabID>();
+                if (prefab == null) continue;
+                if (prefab.prefabID == (int)prefabID)
+                {
+                    result.Add(obj);
+                }
+            }
+            return result;
+        }
+
+        public Payable GetPayableWithComponent<T>()
+        {
+            var payables = Managers.Inst.payables;
+            if (!payables) return null;
+
+            foreach (var obj in payables.AllPayables)
+            {
+                if (obj == null) continue;
+                var go = obj.gameObject;
+                if (go == null) continue;
+                var comp = go.GetComponent<T>();
+                if (comp != null)
+                    return obj;
+            }
+
+            return null;
+        }
+
+        public List<Payable> GetPayablesWithComponent<T>()
+        {
+            var result = new List<Payable>();
+            var payables = Managers.Inst.payables;
+            if (!payables) return result;
+
+            foreach (var obj in payables.AllPayables)
+            {
+                if (obj == null) continue;
+                var go = obj.gameObject;
+                if (go == null) continue;
+                var comp = go.GetComponent<T>();
+                if (comp != null)
+                    result.Add(obj);
+            }
+
+            return result;
         }
 
         private void DrawMinimapWindow(int winId)
@@ -933,8 +1585,8 @@ namespace KingdomMapMod.TwoCrowns
             GUI.Label(new Rect(14, 166 + 20 * 6, 120, 20), Strings.Farmlands + ": " + statsInfo.MaxFarmlands, guiStyle);
 
 #if DEBUG
-            var spawnBoarTime = Managers.Inst.world?.boarSpawnGroup?.spawnBoarTime;
-            GUI.Label(new Rect(14, 166 + 20 * 7, 120, 20), "spawnBoarTime" + ": " + spawnBoarTime, guiStyle);
+            var player = Managers.Inst.kingdom.playerOne;
+            GUI.Label(new Rect(14, 166 + 20 * 7, 120, 20), "forward" + ": " + player.mover.GetDirection(), guiStyle);
             GUI.Label(new Rect(14, 166 + 20 * 8, 120, 20), "steedType" + ": " + kingdom.playerOne.steed.steedType, guiStyle);
 
             if (kingdom.boat != null)
@@ -951,8 +1603,8 @@ namespace KingdomMapMod.TwoCrowns
             if (steed != null)
             {
                 GUI.Label(new Rect(14, 166 + 20 * 14, 120, 20), $"stamina: {steed.stamina}", guiStyle);
-                GUI.Label(new Rect(14, 166 + 20 * 15, 120, 20), $"reserveStamina: {steed.reserveStamina}", guiStyle);
-                GUI.Label(new Rect(14, 166 + 20 * 16, 120, 20), $"eatFullStaminaDelay: {steed.eatFullStaminaDelay}", guiStyle);
+                GUI.Label(new Rect(14, 166 + 20 * 15, 120, 20), $"reserveStamina: {steed.reserveStamina}, {steed.reserveProbability}", guiStyle);
+                GUI.Label(new Rect(14, 166 + 20 * 16, 120, 20), $"eatDelay: {steed.eatDelay}, {steed.eatFullStaminaDelay}", guiStyle);
                 GUI.Label(new Rect(14, 166 + 20 * 17, 120, 20), $"runStaminaRate: {steed.runStaminaRate}", guiStyle);
                 GUI.Label(new Rect(14, 166 + 20 * 18, 120, 20), $"standStaminaRate: {steed.standStaminaRate}", guiStyle);
                 GUI.Label(new Rect(14, 166 + 20 * 19, 120, 20), $"walkStaminaRate: {steed.walkStaminaRate}", guiStyle);
@@ -960,8 +1612,11 @@ namespace KingdomMapMod.TwoCrowns
                 GUI.Label(new Rect(14, 166 + 20 * 21, 120, 20), $"tiredDuration: {steed.tiredDuration}", guiStyle);
                 GUI.Label(new Rect(14, 166 + 20 * 22, 120, 20), $"wellFedTimer: {steed.wellFedTimer}", guiStyle);
                 GUI.Label(new Rect(14, 166 + 20 * 23, 120, 20), $"wellFedDuration: {steed.wellFedDuration}", guiStyle);
-
+                GUI.Label(new Rect(14, 166 + 20 * 24, 120, 20), $"walkSpeed: {steed.walkSpeed}", guiStyle);
+                GUI.Label(new Rect(14, 166 + 20 * 25, 120, 20), $"runSpeed: {steed.runSpeed}", guiStyle);
+                GUI.Label(new Rect(14, 166 + 20 * 26, 120, 20), $"forestSpeedMultiplier: {steed.forestSpeedMultiplier}", guiStyle);
             }
+
 #endif   
         }
 
@@ -973,6 +1628,7 @@ namespace KingdomMapMod.TwoCrowns
             var top = 136;
 
             GUI.Label(new Rect(14, top, 60, 20),  Strings.Land + ": " + (Managers.Inst.game.currentLand + 1), guiStyle);
+            GUI.Label(new Rect(14 + 60, top, 60, 20), Strings.Days + ": " + (Managers.Inst.director.CurrentDaysSinceFirstLandingThisReign), guiStyle);
 
             float currentTime = Managers.Inst.director.currentTime;
             var currentHour = Math.Truncate(currentTime);
@@ -1066,12 +1722,81 @@ namespace KingdomMapMod.TwoCrowns
         }
     }
 
-    public static class PrefabIDs
+    public enum PrefabIDs
     {
-        public static int QuarryUndeveloped = 21;
-        public static int Quarry = 22;
-        public static int MineUndeveloped = 49;
-        public static int Mine = 50;
-        public static int MerchantSpawner = 60;
+        Castle0 = 0,
+        Castle1 = 1,
+        Castle2 = 2,
+        Castle3 = 3,
+        Castle4 = 4,
+        Castle5 = 5,
+        Castle6 = 6,
+        Farmhouse0 = 7,
+        Farmhouse1 = 8,
+        Farmhouse2 = 9,
+        Tower0 = 10,
+        Tower1 = 11,
+        Tower2 = 12,
+        Tower3 = 13,
+        Tower4 = 14,
+        Wall0 = 15,
+        Wall1 = 16,
+        Wall2 = 17,
+        Wall3 = 18,
+        Wall4 = 19,
+        Wreck = 20,
+        Quarry_undeveloped = 21,
+        Quarry = 22,
+        Tree = 23,
+        Chest = 24,
+        Wall1_Wreck = 25,
+        Wall2_Wreck = 26,
+        Wall3_Wreck = 27,
+        Wall4_Wreck = 28,
+        Wall5_Wreck = 29,
+        Wall4_horn = 30,
+        Wall5_horn = 31,
+        Wall5 = 32,
+        Tower_Baker = 33,
+        Tower_Ballista = 34,
+        Tower_Knight = 35,
+        Lighthouse_undeveloped = 36,
+        Beach = 37,
+        Wharf = 38,
+        Beggar_Camp = 39,
+        Portal = 40,
+        Teleporter = 41,
+        TeleporterRift = 42,
+        Cliff_Portal = 43,
+        BoatSailPosition = 44,
+        Lighthouse_Stone = 45,
+        Lighthouse_Iron = 46,
+        Lighthouse_Wood = 47,
+        Castle7 = 48,
+        Mine_undeveloped = 49,
+        Mine = 50,
+        oakTree = 51,
+        Forge = 52,
+        ShopPike = 53,
+        Workshop = 54,
+        ShopScythe = 55,
+        CaveSpawnerTree = 56,
+        Title = 57,
+        Tower5 = 58,
+        Tower6 = 59,
+        MerchantHouse = 60,
+        FarmhouseStable = 61,
+        BeachPortal = 62,
+        BoatSailPosition_Stone = 63,
+        Citizen_House = 64
     }
+
+    public static class EnumUtil
+    {
+        public static IEnumerable<T> GetValues<T>()
+        {
+            return Enum.GetValues(typeof(T)).Cast<T>();
+        }
+    }
+
 }

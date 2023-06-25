@@ -127,7 +127,7 @@
     <value>小穴</value>
   </data>
   <data name="BeggarCamp" xml:space="preserve">
-    <value>贫民窟</value>
+    <value>难民营</value>
   </data>
   <data name="You" xml:space="preserve">
     <value>你</value>
@@ -193,19 +193,19 @@
     <value>栅栏</value>
   </data>
   <data name="Bloodstained" xml:space="preserve">
-    <value>血马</value>
+    <value>加米金</value>
   </data>
   <data name="Gullinbursti" xml:space="preserve">
-    <value>巨型野猪</value>
+    <value>金猪</value>
   </data>
   <data name="Sleipnir" xml:space="preserve">
     <value>神骏天马</value>
   </data>
   <data name="CatCart" xml:space="preserve">
-    <value>猫车</value>
+    <value>猫战车</value>
   </data>
   <data name="DayNight" xml:space="preserve">
-    <value>日夜骏马</value>
+    <value>昼夜马</value>
   </data>
   <data name="HermitBaker" xml:space="preserve">
     <value>厨师隐士</value>
@@ -220,7 +220,7 @@
     <value>马厩隐士</value>
   </data>
   <data name="Kelpie" xml:space="preserve">
-    <value>马形水鬼</value>
+    <value>水马</value>
   </data>
   <data name="HermitKnight" xml:space="preserve">
     <value>骑士隐士</value>
@@ -241,7 +241,7 @@
     <value>沙漏雕像</value>
   </data>
   <data name="Wreck" xml:space="preserve">
-    <value>沉船</value>
+    <value>破船</value>
   </data>
   <data name="Quarry" xml:space="preserve">
     <value>石矿</value>
@@ -307,7 +307,7 @@
     <value>金币</value>
   </data>
   <data name="Beggar" xml:space="preserve">
-    <value>贫民</value>
+    <value>难民</value>
   </data>
   <data name="King" xml:space="preserve">
     <value>国王</value>
@@ -343,7 +343,7 @@
     <value>鹿</value>
   </data>
   <data name="MerchantSpawner" xml:space="preserve">
-    <value>商舍</value>
+    <value>旅商</value>
   </data>
   <data name="Bomb" xml:space="preserve">
     <value>炸弹</value>
@@ -356,5 +356,20 @@
   </data>
   <data name="Boss" xml:space="preserve">
     <value>巨魔</value>
+  </data>
+  <data name="CitizenHouse" xml:space="preserve">
+    <value>市民之家</value>
+  </data>
+  <data name="Days" xml:space="preserve">
+    <value>天数</value>
+  </data>
+  <data name="GemMerchant" xml:space="preserve">
+    <value>宝石商人</value>
+  </data>
+  <data name="ThorPuzzleStatue" xml:space="preserve">
+    <value>雷神谜题</value>
+  </data>
+  <data name="HelPuzzleStatue" xml:space="preserve">
+    <value>赫尔谜题</value>
   </data>
 </root>

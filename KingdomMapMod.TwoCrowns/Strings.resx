@@ -127,7 +127,7 @@
     <value>Portal</value>
   </data>
   <data name="BeggarCamp" xml:space="preserve">
-    <value>Beggars</value>
+    <value>Camp</value>
   </data>
   <data name="You" xml:space="preserve">
     <value>You</value>
@@ -193,7 +193,7 @@
     <value>Barrier</value>
   </data>
   <data name="Bloodstained" xml:space="preserve">
-    <value>Bloodstained</value>
+    <value>Gamigin</value>
   </data>
   <data name="Gullinbursti" xml:space="preserve">
     <value>Gullinbursti</value>
@@ -356,5 +356,20 @@
   </data>
   <data name="Boss" xml:space="preserve">
     <value>Boss</value>
+  </data>
+  <data name="CitizenHouse" xml:space="preserve">
+    <value>CitizenHouse</value>
+  </data>
+  <data name="Days" xml:space="preserve">
+    <value>Days</value>
+  </data>
+  <data name="GemMerchant" xml:space="preserve">
+    <value>GemMerchant</value>
+  </data>
+  <data name="ThorPuzzleStatue" xml:space="preserve">
+    <value>ThorPuzzle</value>
+  </data>
+  <data name="HelPuzzleStatue" xml:space="preserve">
+    <value>HelPuzzle</value>
   </data>
 </root>
