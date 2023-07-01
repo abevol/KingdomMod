@@ -2,20 +2,70 @@
 
 游戏《[王国：两位君主](https://store.steampowered.com/app/701160/)》的相关功能模组。
 
+* [BetterPayableUpgrade](https://github.com/abevol/KingdomMod#betterpayableupgrade)
+* [DevTools](https://github.com/abevol/KingdomMod#devtools)
+* [OverlayMap](https://github.com/abevol/KingdomMod#overlaymap)
+* [StaminaBar](https://github.com/abevol/KingdomMod#staminabar)
+
 ## 预览
 
-![预览](https://github.com/abevol/KingdomMapMod/blob/master/preview.png?raw=true)
+![预览](https://github.com/abevol/KingdomMod/blob/master/preview.png?raw=true)
 
 ## 支持的语言
 
-1. [中文](https://github.com/abevol/KingdomMapMod/blob/master/Readme.zh-CN.md)
-2. [English](https://github.com/abevol/KingdomMapMod/blob/master/Readme.md)
+1. [中文](https://github.com/abevol/KingdomMod/blob/master/Readme.zh-CN.md)
+2. [English](https://github.com/abevol/KingdomMod/blob/master/Readme.md)
 
 ## 安装
 
 1. 下载 [BepInEx-Unity.IL2CPP-win-x86-6.0.0-be.668](https://builds.bepinex.dev/projects/bepinex_be/668/BepInEx-Unity.IL2CPP-win-x86-6.0.0-be.668%2B46e297f.zip)，将所有文件解压至游戏根目录，确保 `BepInEx` 文件夹和 `winhttp.dll` 等文件与游戏主程序 `KingdomTwoCrowns.exe` 处在同一目录。
 2. 删除旧版本MOD。检查游戏目录 `Kingdom Two Crowns\BepInEx\plugins`，如果存在旧版本的MOD，请先手动删除，以免发生文件冲突。
-3. 从 [Releases](https://github.com/abevol/KingdomMapMod/releases) 下载 KingdomMapMod 压缩包文件，将所有文件解压至 `Kingdom Two Crowns\BepInEx\plugins` 目录。
+3. 从 [Releases](https://github.com/abevol/KingdomMod/releases) 下载 KingdomMod 压缩包文件，将所有文件解压至 `Kingdom Two Crowns\BepInEx\plugins` 目录。
+
+## BetterPayableUpgrade
+
+更好的支付升级。调整了游戏内部分可支付升级对象的价格和下一级的对象以及建造的时间，使其更加合理。
+
+### 调整详情
+
+| 等级 | 名称 | 升级价格 | 建造时间 |
+|-----|------|---------|----------|
+|0    |巨石桩| 3 => 2 | - |
+|1    |岩石平台 -| 6 => - | 30 => - |
+|2    |木制瞭望塔| 9 => 5 | 60 => 30 |
+|3    |石塔| 12 => 8 | 90 => 50 |
+|4    |三重塔 -| 15 => - | 120 => - |
+|5    |有屋顶的三重塔| 18 => 12 | 150 => 70 |
+|6    |四重塔| 18 => 16 | 180 => 100 |
+|-    |市民之家招募| 5 => 3 | - |
+|-    |制作油桶| 5 => 3 | - |
+|-    |制作面包| 4 => 2 | - |
+
+* `-` 表示不可用或已移除。
+* 暂时不支持DLC。
+
+## DevTools
+
+开发者工具模组。包含一些方便制作MOD的功能。
+
+### 详情
+
+* 部分功能严重影响游戏平衡，强烈不建议普通玩家使用该模组。
+* 游戏开始时自动将钱袋上限设置为1000。
+
+### 热键
+
+1. `End` 显示调试信息
+2. `Insert` 测试一些有趣的功能
+3. `X` 转储游戏对象到 JSON 文件
+4. `P` 打印预设件到控制台
+5. `L` 打印关卡模块到控制台
+6. `Delete` 删除当前可支付的对象
+7. `F1` 添加游民
+8. `F2` 添加格里芬
+9. `F3` 添加土堆
+10. `F4` 添加巨石桩
+11. `R` 扔出巨石
 
 ## OverlayMap
 
@@ -64,48 +114,3 @@
 ### 热键
 
 1. `N` 显示/隐藏耐力条
-
-## BetterPayableUpgrade
-
-更好的支付升级。调整了游戏内部分可支付升级对象的价格和下一级的对象以及建造的时间，使其更加合理。
-
-### 调整详情
-
-| 等级 | 名称 | 升级价格 | 建造时间 |
-|-----|------|---------|----------|
-|0    |巨石桩| 3 => 2 | - |
-|1    |岩石平台 -| 6 => - | 30 => - |
-|2    |木制瞭望塔| 9 => 5 | 60 => 30 |
-|3    |石塔| 12 => 8 | 90 => 50 |
-|4    |三重塔 -| 15 => - | 120 => - |
-|5    |有屋顶的三重塔| 18 => 12 | 150 => 70 |
-|6    |四重塔| 18 => 16 | 180 => 100 |
-|-    |市民之家招募| 5 => 3 | - |
-|-    |制作油桶| 5 => 3 | - |
-|-    |制作面包| 4 => 2 | - |
-
-* `-` 表示不可用或已移除。
-* 暂时不支持DLC。
-
-## DevTools
-
-开发者工具模组。包含一些方便制作MOD的功能。
-
-### 详情
-
-* 部分功能严重影响游戏平衡，强烈不建议普通玩家使用该模组。
-* 游戏开始时自动将钱袋上限设置为1000。
-
-### 热键
-
-1. `End` 显示调试信息
-2. `Insert` 测试一些有趣的功能
-3. `X` 转储游戏对象到 JSON 文件
-4. `P` 打印预设件到控制台
-5. `L` 打印关卡模块到控制台
-6. `Delete` 删除当前可支付的对象
-7. `F1` 添加游民
-8. `F2` 添加格里芬
-9. `F3` 添加土堆
-10. `F4` 添加巨石桩
-11. `R` 扔出巨石
