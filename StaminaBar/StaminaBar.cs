@@ -1,24 +1,20 @@
 ﻿using BepInEx.Logging;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
-namespace KingdomMapMod.TwoCrowns
+namespace KingdomMod
 {
     public class StaminaBar : MonoBehaviour
     {
         private static ManualLogSource log;
         private bool enableStaminaBar = true;
 
-        public static void Initialize(Plugin plugin)
+        public static void Initialize(StaminaBarPlugin plugin)
         {
             log = plugin.Log;
-            var addComponent = plugin.AddComponent<StaminaBar>();
-            addComponent.hideFlags = HideFlags.HideAndDontSave;
-            DontDestroyOnLoad(addComponent.gameObject);
+            var component = plugin.AddComponent<StaminaBar>();
+            component.hideFlags = HideFlags.HideAndDontSave;
+            DontDestroyOnLoad(component.gameObject);
         }
 
         public StaminaBar()
@@ -28,7 +24,7 @@ namespace KingdomMapMod.TwoCrowns
 
         private void Start()
         {
-            log.LogMessage("StaminaBar Start.");
+            log.LogMessage($"{this.GetType().Name} Start.");
         }
 
         private void Update()
@@ -59,7 +55,7 @@ namespace KingdomMapMod.TwoCrowns
 
                 float widthScale = 1.0f;
                 float heightScale = 1.0f;
-                float runConsumeScale = 0.08f / Math.Abs(steed.runStaminaRate);
+                float runConsumeScale = 0.08f * 3.6f / (Math.Abs(steed.runStaminaRate) * steed.runSpeed);
                 float baseWidth = 60 * runConsumeScale * widthScale;
                 float baseHeight = 14 * heightScale;
                 float baseLeft = uiPos.x - baseWidth / 2;
@@ -96,9 +92,9 @@ namespace KingdomMapMod.TwoCrowns
 
         private bool IsPlaying()
         {
-            if (!Managers._Inst) return false;
-            if (!Managers._Inst.game) return false;
-            return Managers._Inst.game.playingOrInMenuWithClient;
+            if (!Managers.Inst) return false;
+            if (!Managers.Inst.game) return false;
+            return Managers.Inst.game.state is Game.State.Playing or Game.State.Menu;
         }
     }
 }

@@ -6,7 +6,7 @@ using Il2CppInterop.Runtime;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace KingdomMapMod.TwoCrowns
+namespace KingdomMod
 {
     [Serializable]
     public class GameObjectDetails

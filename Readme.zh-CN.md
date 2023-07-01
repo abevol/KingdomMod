@@ -1,34 +1,42 @@
-# KingdomMapMod
+# KingdomMod
 
-游戏《[王国：两位君主](https://store.steampowered.com/app/701160/)》的地图模组。它标记了兴趣点，以及一些额外的细节。还有人口统计功能，它可以告诉你每种类型的人口有多少。
+游戏《[王国：两位君主](https://store.steampowered.com/app/701160/)》的相关功能模组。
+
+## 预览
+
+![预览](https://github.com/abevol/KingdomMapMod/blob/master/preview.png?raw=true)
 
 ## 支持的语言
 
 1. [中文](https://github.com/abevol/KingdomMapMod/blob/master/Readme.zh-CN.md)
 2. [English](https://github.com/abevol/KingdomMapMod/blob/master/Readme.md)
 
-## 功能
+## 安装
+
+1. 下载 [BepInEx-Unity.IL2CPP-win-x86-6.0.0-be.668](https://builds.bepinex.dev/projects/bepinex_be/668/BepInEx-Unity.IL2CPP-win-x86-6.0.0-be.668%2B46e297f.zip)，将所有文件解压至游戏根目录，确保 `BepInEx` 文件夹和 `winhttp.dll` 等文件与游戏主程序 `KingdomTwoCrowns.exe` 处在同一目录。
+2. 删除旧版本MOD。检查游戏目录 `Kingdom Two Crowns\BepInEx\plugins`，如果存在旧版本的MOD，请先手动删除，以免发生文件冲突。
+3. 从 [Releases](https://github.com/abevol/KingdomMapMod/releases) 下载 KingdomMapMod 压缩包文件，将所有文件解压至 `Kingdom Two Crowns\BepInEx\plugins` 目录。
+
+## OverlayMap
+
+地图模组。它标记了兴趣点，以及一些额外的细节。还有人口统计功能，它可以告诉你每种类型的人口有多少。
+
+### 功能
 
 1. 在屏幕上方添加一个地图浮层，并在上面标识游戏内的兴趣点，包括城堡、贫民窟、码头、悬崖等。
 2. 默认情况下，只显示你已探索的区域内的标识，当然你也可以通过按下`F`键立即显示完整地图。
 3. 显示一些有用的统计信息，包括闲置的村民、工人、弓箭手、农民和农田的数量。
 4. 显示额外的有用信息，比如当前时间、当前小岛、宝石数和金币数等等。
 5. 一些快捷功能，比如快速保存或重载游戏，而不用退出游戏。
-6. 一些调试功能，方便制作插件。
 
-## 热键
+### 热键
 
 1. `M` 显示地图浮层
-2. `N` 显示体力条
-3. `End` 显示调试信息
-4. `Insert` 测试一些有趣的功能
-5. `F` 显示完整地图
-6. `X` 转储游戏对象到 JSON 文件
-7. `P` 转储预设件到控制台
-8. `F5` 重新加载已保存的游戏 (不用退出游戏): 体验电影蝴蝶效应的乐趣，直到有一天，你把F5错按成了F8(> <)
-9. `F8` 保存游戏 (不用退出游戏)
+2. `F` 显示完整地图
+3. `F5` 重新加载已保存的游戏 (不用退出游戏): 体验电影蝴蝶效应的乐趣，直到有一天，你把F5错按成了F8(> <)
+4. `F8` 保存游戏 (不用退出游戏)
 
-## 符号与颜色
+### 符号与颜色
 
 | 符号或颜色 | 涵义 |
 |----|----|
@@ -41,11 +49,63 @@
 |$\color{blue}{蓝色}$|建造中|
 |$\color{green}{绿色}$|已解锁，安全的|
 
-## 安装
+## StaminaBar
 
-1. 下载 [BepInEx-Unity.IL2CPP-win-x86-6.0.0-be.668](https://builds.bepinex.dev/projects/bepinex_be/668/BepInEx-Unity.IL2CPP-win-x86-6.0.0-be.668%2B46e297f.zip)，将所有文件解压至游戏根目录，确保 `BepInEx` 文件夹和 `winhttp.dll` 等文件与游戏主程序 `KingdomTwoCrowns.exe` 处在同一目录。
-2. 从 [Releases](https://github.com/abevol/KingdomMapMod/releases) 下载 KingdomMapMod 压缩包文件，将所有文件解压至 `Kingdom Two Crowns\BepInEx\plugins` 目录。
+耐力条模组。它通过绘制可视化的图形来直观展示坐骑的耐力值。
 
-## 预览
+### 详情
 
-![预览](https://github.com/abevol/KingdomMapMod/blob/master/preview.png?raw=true)
+* 蓝色部分表示耐力值，跑步会消耗耐力值，行走和站立会恢复耐力值，站立时恢复耐力值的速度比行走时快很多。
+* 不同坐骑的跑步消耗和奔跑速度不同，该模组通过耐力条的长度来体现它们。
+* 黄色部分表示完全吃饱状态的持续时间，在该状态下行动不会消耗耐力值。
+* 不同坐骑的完全吃饱状态的持续时间不同，该模组通过黄色部分的长度来体现它。
+* 即使不行动，完全吃饱状态的持续时间也会随着时间逐渐减少。
+
+### 热键
+
+1. `N` 显示/隐藏耐力条
+
+## BetterPayableUpgrade
+
+更好的支付升级。调整了游戏内部分可支付升级对象的价格和下一级的对象以及建造的时间，使其更加合理。
+
+### 调整详情
+
+| 等级 | 名称 | 升级价格 | 建造时间 |
+|-----|------|---------|----------|
+|0    |巨石桩| 3 => 2 | - |
+|1    |岩石平台 -| 6 => - | 30 => - |
+|2    |木制瞭望塔| 9 => 5 | 60 => 30 |
+|3    |石塔| 12 => 8 | 90 => 50 |
+|4    |三重塔 -| 15 => - | 120 => - |
+|5    |有屋顶的三重塔| 18 => 12 | 150 => 70 |
+|6    |四重塔| 18 => 16 | 180 => 100 |
+|-    |市民之家招募| 5 => 3 | - |
+|-    |制作油桶| 5 => 3 | - |
+|-    |制作面包| 4 => 2 | - |
+
+* `-` 表示不可用或已移除。
+* 暂时不支持DLC。
+
+## DevTools
+
+开发者工具模组。包含一些方便制作MOD的功能。
+
+### 详情
+
+* 部分功能严重影响游戏平衡，强烈不建议普通玩家使用该模组。
+* 游戏开始时自动将钱袋上限设置为1000。
+
+### 热键
+
+1. `End` 显示调试信息
+2. `Insert` 测试一些有趣的功能
+3. `X` 转储游戏对象到 JSON 文件
+4. `P` 打印预设件到控制台
+5. `L` 打印关卡模块到控制台
+6. `Delete` 删除当前可支付的对象
+7. `F1` 添加游民
+8. `F2` 添加格里芬
+9. `F3` 添加土堆
+10. `F4` 添加巨石桩
+11. `R` 扔出巨石

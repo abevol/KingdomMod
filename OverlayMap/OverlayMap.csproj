@@ -1,18 +1,20 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <AssemblyName>KingdomMapMod.TwoCrowns</AssemblyName>
+    <AssemblyName>KingdomMod.OverlayMap</AssemblyName>
     <Description>Kingdom map mod</Description>
-    <Version>1.2.4</Version>
+    <Version>1.3.0</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>
     <RestoreAdditionalProjectSources>
       https://api.nuget.org/v3/index.json;
       https://nuget.bepinex.dev/v3/index.json
     </RestoreAdditionalProjectSources>
-    <RootNamespace>KingdomMapMod.TwoCrowns</RootNamespace>
+    <RootNamespace>KingdomMod</RootNamespace>
     <Authors>ZMan</Authors>
+    <BepInExPluginsPath>D:\SteamLibrary\steamapps\common\Kingdom Two Crowns\BepInEx\plugins\</BepInExPluginsPath>
   </PropertyGroup>
+  
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <WarningsAsErrors>$(WarningsAsErrors);NU1605</WarningsAsErrors>
   </PropertyGroup>
@@ -26,71 +28,71 @@
 
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
-      <HintPath>libs\interop\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\_libs\interop\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="BepInEx.Core">
-      <HintPath>libs\core\BepInEx.Core.dll</HintPath>
+      <HintPath>..\_libs\core\BepInEx.Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="BepInEx.Unity.IL2CPP">
-      <HintPath>libs\core\BepInEx.Unity.IL2CPP.dll</HintPath>
+      <HintPath>..\_libs\core\BepInEx.Unity.IL2CPP.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Il2CppInterop.Runtime">
-      <HintPath>libs\core\Il2CppInterop.Runtime.dll</HintPath>
+      <HintPath>..\_libs\core\Il2CppInterop.Runtime.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Il2Cppmscorlib">
-      <HintPath>libs\interop\Il2Cppmscorlib.dll</HintPath>
+      <HintPath>..\_libs\interop\Il2Cppmscorlib.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Il2CppSystem.Core">
-      <HintPath>libs\interop\Il2CppSystem.Core.dll</HintPath>
+      <HintPath>..\_libs\interop\Il2CppSystem.Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine">
-      <HintPath>libs\interop\UnityEngine.dll</HintPath>
+      <HintPath>..\_libs\interop\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.AnimationModule">
-      <HintPath>libs\interop\UnityEngine.AnimationModule.dll</HintPath>
+      <HintPath>..\_libs\interop\UnityEngine.AnimationModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>libs\interop\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>..\_libs\interop\UnityEngine.CoreModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.IMGUIModule">
-      <HintPath>libs\interop\UnityEngine.IMGUIModule.dll</HintPath>
+      <HintPath>..\_libs\interop\UnityEngine.IMGUIModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.InputLegacyModule">
-      <HintPath>libs\interop\UnityEngine.InputLegacyModule.dll</HintPath>
+      <HintPath>..\_libs\interop\UnityEngine.InputLegacyModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.ParticleSystemModule">
-      <HintPath>libs\interop\UnityEngine.ParticleSystemModule.dll</HintPath>
+      <HintPath>..\_libs\interop\UnityEngine.ParticleSystemModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.Physics2DModule">
-      <HintPath>libs\interop\UnityEngine.Physics2DModule.dll</HintPath>
+      <HintPath>..\_libs\interop\UnityEngine.Physics2DModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.TextRenderingModule">
-      <HintPath>libs\interop\UnityEngine.TextRenderingModule.dll</HintPath>
+      <HintPath>..\_libs\interop\UnityEngine.TextRenderingModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>libs\interop\UnityEngine.UI.dll</HintPath>
+      <HintPath>..\_libs\interop\UnityEngine.UI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UIElementsModule">
-      <HintPath>libs\interop\UnityEngine.UIElementsModule.dll</HintPath>
+      <HintPath>..\_libs\interop\UnityEngine.UIElementsModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UIModule">
-      <HintPath>libs\interop\UnityEngine.UIModule.dll</HintPath>
+      <HintPath>..\_libs\interop\UnityEngine.UIModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
@@ -114,6 +116,6 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy &quot;D:\workspace\games\KingdomTwoCrowns\KingdomMapMod\KingdomMapMod.TwoCrowns\bin\Debug\net6.0\KingdomMapMod.TwoCrowns.dll&quot; &quot;D:\SteamLibrary\steamapps\common\Kingdom Two Crowns\BepInEx\plugins\KingdomMapMod.TwoCrowns\&quot; /Y&#xD;&#xA;xcopy &quot;D:\workspace\games\KingdomTwoCrowns\KingdomMapMod\KingdomMapMod.TwoCrowns\bin\Debug\net6.0\KingdomMapMod.TwoCrowns.pdb&quot; &quot;D:\SteamLibrary\steamapps\common\Kingdom Two Crowns\BepInEx\plugins\KingdomMapMod.TwoCrowns\&quot; /Y&#xD;&#xA;xcopy &quot;D:\workspace\games\KingdomTwoCrowns\KingdomMapMod\KingdomMapMod.TwoCrowns\bin\Debug\net6.0\KingdomMapMod.TwoCrowns.deps.json&quot; &quot;D:\SteamLibrary\steamapps\common\Kingdom Two Crowns\BepInEx\plugins\KingdomMapMod.TwoCrowns\&quot; /Y&#xD;&#xA;xcopy &quot;D:\workspace\games\KingdomTwoCrowns\KingdomMapMod\KingdomMapMod.TwoCrowns\bin\Debug\net6.0\zh-CN\KingdomMapMod.TwoCrowns.resources.dll&quot; &quot;D:\SteamLibrary\steamapps\common\Kingdom Two Crowns\BepInEx\plugins\KingdomMapMod.TwoCrowns\zh-CN\&quot; /Y" />
+    <Exec Command="xcopy &quot;$(OutputPath)$(AssemblyName).dll&quot; &quot;$(BepInExPluginsPath)$(AssemblyName)\&quot; /Y&#xD;&#xA;xcopy &quot;$(OutputPath)$(AssemblyName).pdb&quot; &quot;$(BepInExPluginsPath)$(AssemblyName)\&quot; /Y&#xD;&#xA;xcopy &quot;$(OutputPath)$(AssemblyName).deps.json&quot; &quot;$(BepInExPluginsPath)$(AssemblyName)\&quot; /Y&#xD;&#xA;xcopy &quot;$(OutputPath)zh-CN\$(AssemblyName).resources.dll&quot; &quot;$(BepInExPluginsPath)$(AssemblyName)\zh-CN\&quot; /Y" />
   </Target>
 </Project>

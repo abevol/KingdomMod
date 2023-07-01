@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace KingdomMapMod.TwoCrowns {
+namespace KingdomMod {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace KingdomMapMod.TwoCrowns {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("KingdomMapMod.TwoCrowns.Strings", typeof(Strings).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("KingdomMod.Strings", typeof(Strings).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -385,7 +385,7 @@ namespace KingdomMapMod.TwoCrowns {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to HelPuzzle.
         /// </summary>
         internal static string HelPuzzleStatue {
             get {

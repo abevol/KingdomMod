@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace KingdomMapMod.TwoCrowns
+namespace KingdomMod
 {
     public static class GuiHelper
     {
