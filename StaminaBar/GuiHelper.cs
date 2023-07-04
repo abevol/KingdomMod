@@ -13,7 +13,7 @@ namespace KingdomMod
         private static Texture2D _coloredLineTexture;
 
         // The color used by DrawLine(Color)
-        private static Color _coloredLineColor;
+        private static Color _coloredLineColor = Color.white;
 
         /// <summary>
         /// Draw a line between two points with the specified color and a thickness of 1

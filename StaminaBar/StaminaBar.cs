@@ -94,7 +94,7 @@ namespace KingdomMod
         {
             if (!Managers.Inst) return false;
             if (!Managers.Inst.game) return false;
-            return Managers.Inst.game.state is Game.State.Playing or Game.State.Menu;
+            return Managers.Inst.game.state is Game.State.Playing;
         }
     }
 }

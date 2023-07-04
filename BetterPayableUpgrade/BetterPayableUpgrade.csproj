@@ -21,6 +21,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="0Harmony">
+      <HintPath>..\_libs\core\0Harmony.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>..\_libs\interop\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>

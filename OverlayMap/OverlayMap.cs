@@ -972,7 +972,15 @@ namespace KingdomMod
                 GUI.Label(new Rect(14, 166 + 20 * 26, 120, 20), $"forestSpeedMultiplier: {steed.forestSpeedMultiplier}", guiStyle);
             }
 
-#endif   
+            var castlePayable = kingdom?.castle?._payableUpgrade;
+            if (castlePayable != null)
+            {
+                GUI.Label(new Rect(14, 166 + 20 * 28, 120, 20), $"blockPaymentUpgrade: {castlePayable.blockPaymentUpgrade}", guiStyle);
+                GUI.Label(new Rect(14, 166 + 20 * 29, 120, 20), $"cooldown: {castlePayable.cooldown}", guiStyle);
+                GUI.Label(new Rect(14, 166 + 20 * 30, 120, 20), $"timeAvailableFrom: {castlePayable.timeAvailableFrom}", guiStyle);
+
+            }
+#endif
         }
 
         private void DrawExtraInfo()
