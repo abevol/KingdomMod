@@ -35,14 +35,14 @@ Better pay for upgrades. Adjusted the price of some payable upgrade objects in t
 |2 |Wooden Watchtower| 9 => 5 | 60 => 30|
 |3 |Stone Tower| 12 => 8 | 90 => 50|
 |4 |Triple Tower -| 15 => - | 120 => - |
-|5 | triple tower with roof | 18 => 12 | 150 => 70 |
-|6 |Four Towers| 18 => 16 | 180 => 100|
+|5 | triple tower with roof | 18 => 12 | 150 => 80 |
+|6 |Four Towers| 18 => 16 | 180 => 120|
 |- |Citizen Home Recruitment| 5 => 3 |- |
 |- |Craft Oil Barrel| 5 => 3 |-|
 |- |making bread| 4 => 2 |-|
 
 * `-` means unavailable or removed.
-* Temporarily does not support DLC.
+* All modes and DLC are now supported.
 
 ## DevTools
 
@@ -65,7 +65,8 @@ Developer tools mod. Contains some functions that are convenient for making MODs
 8. `F2` Add Griffin
 9. `F3` Add mound
 10. `F4` Add boulder pile
-11. `R` Throws a boulder
+11. `F9` Activate the Game Developer Debug Toolkit
+12. `R` Throws a boulder
 
 ## OverlayMap
 

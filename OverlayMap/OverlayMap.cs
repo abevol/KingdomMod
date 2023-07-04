@@ -117,7 +117,7 @@ namespace KingdomMod
 
         private void OnGameStart()
         {
-            log.LogMessage("OnGameStart.");
+            log.LogDebug("OnGameStart.");
 
             exploredLeft = exploredRight = 0;
             gameLayer = GameObject.FindGameObjectWithTag(Tags.GameLayer);

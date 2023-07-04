@@ -1,25 +1,19 @@
-﻿using BepInEx.Logging;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using BepInEx.Logging;
+using Coatsink.Common;
 using UnityEngine;
-using HarmonyLib;
-using Il2CppInterop.Runtime.InteropTypes.Arrays;
 
 namespace KingdomMod
 {
     public class BetterPayableUpgrade : MonoBehaviour
     {
         private static ManualLogSource log;
-        private bool enableStaminaBar = true;
-        private static GameObject[] TowerPrefabs = new GameObject[7];
-        private static Dictionary<PrefabIDs, ModifyData> ModifyDataDict = null;
+        private static Dictionary<PrefabIDs, ModifyData> ModifyDataDict;
 
         public static void Initialize(BetterPayableUpgradePlugin plugin)
         {
             log = plugin.Log;
-            log.LogMessage($"BetterPayableUpgrade Initialize");
-            Patcher.PatchAll();
-
             var component = plugin.AddComponent<BetterPayableUpgrade>();
             component.hideFlags = HideFlags.HideAndDontSave;
             DontDestroyOnLoad(component.gameObject);
@@ -27,7 +21,7 @@ namespace KingdomMod
 
         public BetterPayableUpgrade()
         {
-            log.LogMessage($"{this.GetType().Name} constructor");
+            log.LogDebug($"{this.GetType().Name} constructor");
         }
 
         private void Start()
@@ -38,20 +32,10 @@ namespace KingdomMod
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.N))
-            {
-                log.LogMessage("N key pressed.");
-                enableStaminaBar = !enableStaminaBar;
-            }
         }
 
         private void OnGUI()
         {
-            if (!IsPlaying()) return;
-            if (!enableStaminaBar) return;
-
-            var kingdom = Managers.Inst.kingdom;
-            if (kingdom == null) return;
         }
 
         private bool IsPlaying()
@@ -63,215 +47,75 @@ namespace KingdomMod
 
         public void OnGameStart()
         {
-            log.LogMessage("OnGameStart.");
-
-            var holder = Managers.Inst.holder;
-            if (holder != null)
-            {
-                log.LogMessage($"towerPrefabs: {holder.towerPrefabs.Count}");
-                foreach (var obj in holder.towerPrefabs)
-                {
-                    log.LogMessage($"{obj.name}, {obj.GetComponent<PayableUpgrade>()?.price}, {obj.GetComponent<WorkableBuilding>()?.buildPoints}");
-                }
-                log.LogMessage("towerPrefabs end.");
-
-                log.LogMessage($"campaignMapLandPrefabs: {holder.campaignMapLandPrefabs.Count}");
-                foreach (var obj in holder.campaignMapLandPrefabs)
-                {
-                    log.LogMessage($"{obj.name}, {obj.GetComponent<PayableUpgrade>()?.price}, {obj.GetComponent<WorkableBuilding>()?.buildPoints}");
-                }
-                log.LogMessage("campaignMapLandPrefabs end.");
-            }
+            log.LogDebug("OnGameStart.");
 
             AdjustCosts();
-        }
-
-        public class Patcher
-        {
-            // TODO: try to hook Resources.Load
-            // TODO: try to hook Pool.SpawnOrInstantiateGO
-            // TODO: try to hook UnityEngine.Object.Instantiate
-
-            public static void PatchAll()
-            {
-                // Managers;
-                // Pool.SpawnOrInstantiateGO
-                try
-                {
-                    // var Load1 = typeof(Resources).GetMethod("Load", 0, new Type[] { typeof(string) });
-                    // var Load2 = typeof(Resources).GetMethod("Load", 1, new Type[] { typeof(string) });
-                    // log.LogMessage($"Load1: {Load1}");
-                    // log.LogMessage($"Load2: {Load2}");
-
-                    var harmony = new Harmony("KingdomMod.BetterPayableUpgrade.Patcher");
-                    harmony.PatchAll();
-                }
-                catch (Exception ex)
-                {
-                    log.LogMessage($"[Patcher] => {ex}");
-                }
-            }
-
-            [HarmonyPatch(typeof(Resources), nameof(Resources.Load), new Type[] { typeof(string), typeof(Il2CppSystem.Type) })]
-            public class ResourcesLoadPatcher
-            {
-                public static void Postfix(ref UnityEngine.Object __result, string path, Il2CppSystem.Type systemTypeInstance)
-                {
-                    log.LogMessage($"[ResourcesLoadPatcher] Postfix: path: {path}, name: {__result.name}, type: {systemTypeInstance.FullName}");
-                    if (__result != null)
-                    {
-                        var biomeData = __result.TryCast<BiomeData>();
-                        if (biomeData != null)
-                        {
-                            if (__result.name == "NorselandsBiomeData")
-                                HandleBiomeData(biomeData);
-                        }
-
-                        var biomeObjectPools = __result.TryCast<BiomeObjectPools>();
-                        if (biomeObjectPools != null)
-                        {
-                            HandleBiomeObjectPools(biomeObjectPools);
-                        }
-
-                        var go = __result.TryCast<GameObject>();
-                        if (go == null)
-                        {
-                            var comp = __result.TryCast<Component>();
-                            if (comp != null)
-                            {
-                                go = comp.gameObject;
-                            }
-                        }
-                        if (go != null)
-                        {
-                            HandlePayable(go, true);
-                        }
-                    }
-                }
-            }
-
-            [HarmonyPatch(typeof(Resources), nameof(Resources.LoadAsync),
-                new Type[] { typeof(string), typeof(Il2CppSystem.Type) })]
-            public class ResourcesLoadAsyncPatcher
-            {
-                public static void Postfix(ref ResourceRequest __result,
-                    string path, Il2CppSystem.Type type)
-                {
-                    log.LogMessage($"[ResourcesLoadAsyncPatcher] path:{path}, {type.FullName}");
-
-                    __result.add_completed((Il2CppSystem.Action<AsyncOperation>)ResourcesLoadAsyncCompleted);
-                }
-
-                private static void ResourcesLoadAsyncCompleted(AsyncOperation op)
-                {
-                    var res = op.TryCast<ResourceRequest>();
-                    if (res == null)
-                        return;
-
-                    log.LogMessage($"[ResourcesLoadAsyncCompleted] path:{res.m_Path}, {res.m_Type.FullName}, {res.asset.name}");
-                    var biomeData = res.asset.TryCast<BiomeData>();
-                    if (biomeData != null)
-                    {
-                        HandleBiomeData(biomeData);
-                    }
-                }
-            }
-
-            private static void HandleBiomeData(BiomeData biomeData)
-            {
-                log.LogMessage($"blockName: {biomeData.blockName}");
-                log.LogMessage($"mapLandPrefabs: {biomeData.campaignData.mapLandPrefabs.Count}");
-                foreach (var obj in biomeData.campaignData.mapLandPrefabs)
-                {
-                    log.LogMessage($"obj: {obj.name}");
-                }
-
-                log.LogMessage($"objectDatas: {biomeData.objectDatas.Count}");
-                foreach (var obj in biomeData.objectDatas)
-                {
-                    log.LogMessage($"objectName: {obj.objectName}");
-                    log.LogMessage($"objectOverrides: {obj.objectOverrides.Count}");
-                    foreach (var o in obj.objectOverrides)
-                    {
-                        log.LogMessage($"o: {o.name}");
-                        HandlePayable(o.gameObject, true);
-                    }
-                }
-
-                log.LogMessage($"uniqueShopPrefabs: {biomeData.biomeSpecificAssets.uniqueShopPrefabs.Count}");
-                foreach (var obj in biomeData.biomeSpecificAssets.uniqueShopPrefabs)
-                {
-                    log.LogMessage($"obj: {obj.name}, type: {obj.type}");
-                }
-            }
-
-            private static void HandleBiomeObjectPools(BiomeObjectPools biomeObjectPools)
-            {
-                log.LogMessage($"biomeObjectPools: {biomeObjectPools.biomeObjectPools.Count}");
-                foreach (var pool in biomeObjectPools.biomeObjectPools)
-                {
-                    log.LogMessage($"pool: {pool.name}, {pool.prefab.name}");
-                }
-            }
-
-            [HarmonyPatch(typeof(Resources), nameof(Resources.LoadAll),
-                new Type[] { typeof(string), typeof(Il2CppSystem.Type) })]
-            public class ResourcesLoadAllPatcher
-            {
-                public static void Postfix(ref Il2CppReferenceArray<UnityEngine.Object> __result,
-                    string path, Il2CppSystem.Type systemTypeInstance)
-                {
-                    log.LogMessage($"[ResourcesLoadAllPatcher] path:{path}, {systemTypeInstance.FullName}");
-                }
-            }
-
-            // [HarmonyPatch(typeof(UnityEngine.Object), nameof(UnityEngine.Object.Instantiate),
-            //     new Type[] { typeof(UnityEngine.Object), typeof(Vector3), typeof(Quaternion) })]
-            // public class ObjectInstantiatePatcher01
-            // {
-            //     public static void Postfix(ref UnityEngine.Object __result,
-            //         UnityEngine.Object original, Vector3 position, Quaternion rotation)
-            //     {
-            //         log.LogMessage($"[Object.Instantiate01] {original.name}");
-            //     }
-            // }
         }
         
         public void AdjustCosts()
         {
-            // var prefabs = Managers.Inst.prefabs;
-            // if (prefabs != null)
-            // {
-            //     log.LogMessage("Handle prefabs start.");
-            //
-            //     var prefabIds = new List<PrefabIDs>
-            //     {
-            //         PrefabIDs.Citizen_House,
-            //         PrefabIDs.Workshop,
-            //         PrefabIDs.Tower_Baker,
-            //         PrefabIDs.Tower6,
-            //         PrefabIDs.Tower5,
-            //         PrefabIDs.Tower4,
-            //         PrefabIDs.Tower3,
-            //         PrefabIDs.Tower2,
-            //         PrefabIDs.Tower1,
-            //         PrefabIDs.Tower0
-            //     };
-            //     foreach (var prefabId in prefabIds)
-            //     {
-            //         if (prefabId == PrefabIDs.MerchantHouse) continue;
-            //         var go = prefabs.GetPrefabById((int)prefabId);
-            //         if (go == null) continue;
-            //         var prefab = go.GetComponent<PrefabID>();
-            //         if (prefab == null) continue;
-            //
-            //         HandlePayable(go, (PrefabIDs)prefab.prefabID, true);
-            //     }
-            //
-            //     log.LogMessage("Handle prefabs end.");
-            // }
+            var prefabs = Managers.Inst.prefabs;
+            if (prefabs != null)
+            {
+                log.LogDebug("Handle prefabs start.");
+            
+                var prefabIds = new List<PrefabIDs>
+                {
+                    PrefabIDs.Citizen_House,
+                    PrefabIDs.Workshop,
+                    PrefabIDs.Tower_Baker,
+                    PrefabIDs.Tower6,
+                    PrefabIDs.Tower5,
+                    PrefabIDs.Tower4,
+                    PrefabIDs.Tower3,
+                    PrefabIDs.Tower2,
+                    PrefabIDs.Tower1,
+                    PrefabIDs.Tower0
+                };
+                foreach (var prefabId in prefabIds)
+                {
+                    if (prefabId == PrefabIDs.MerchantHouse) continue;
+                    var go = prefabs.GetPrefabById((int)prefabId);
+                    if (go == null) continue;
+            
+                    HandlePayable(go, true);
+                }
+            
+                log.LogDebug("Handle prefabs end.");
+            }
 
-            var payables = Managers.Inst.payables;
+            var holder = SingletonMonoBehaviour<Managers>.Inst.holder;
+            if (holder != null)
+            {
+                foreach (var towerPrefab in holder.towerPrefabs)
+                {
+                    HandlePayable(towerPrefab.gameObject, true);
+                }
+            }
+
+            var swapData = BiomeHolder.Inst.LoadedBiome?.swapData;
+            if (swapData != null)
+            {
+                log.LogDebug($"swapData._prefabSwapDictionary: {swapData._prefabSwapDictionary.Count}");
+                foreach (var pair in swapData._prefabSwapDictionary)
+                {
+                    log.LogDebug($"swapData: {pair.key.name}, {pair.value.name}, {pair.value.GetComponent<PrefabID>()?.prefabID}");
+                    HandlePayable(pair.value.gameObject, true);
+                }
+            }
+
+            var customSwapData = ChallengeData.Current?.customSwapData;
+            if (customSwapData != null)
+            {
+                log.LogDebug($"customSwapData._prefabSwapDictionary: {customSwapData._prefabSwapDictionary.Count}");
+                foreach (var pair in customSwapData._prefabSwapDictionary)
+                {
+                    log.LogDebug($"customSwapData: {pair.key.name}, {pair.value.name}");
+                    HandlePayable(pair.value.gameObject, true);
+                }
+            }
+
+            var payables = SingletonMonoBehaviour<Managers>.Inst.payables;
             if (payables != null)
             {
                 foreach (var obj in payables.AllPayables)
@@ -305,12 +149,12 @@ namespace KingdomMod
                 { PrefabIDs.Workshop, new ModifyData(3) },
                 { PrefabIDs.Tower_Baker, new ModifyData(2) },
                 { PrefabIDs.Tower6, new ModifyData(16, 120) },
-                { PrefabIDs.Tower5, new ModifyData(12, 80, -1, 3) },
+                { PrefabIDs.Tower5, new ModifyData(12, 80, PrefabIDs.None, PrefabIDs.Tower3) },
                 { PrefabIDs.Tower4, new ModifyData(8, 70) },
-                { PrefabIDs.Tower3, new ModifyData(8, 50, 5) },
-                { PrefabIDs.Tower2, new ModifyData(5, 30, -1, 0) },
+                { PrefabIDs.Tower3, new ModifyData(8, 50, PrefabIDs.Tower5) },
+                { PrefabIDs.Tower2, new ModifyData(5, 30, PrefabIDs.None, PrefabIDs.Tower0) },
                 { PrefabIDs.Tower1, new ModifyData(4, 20) },
-                { PrefabIDs.Tower0, new ModifyData(2, 10, 2) },
+                { PrefabIDs.Tower0, new ModifyData(2, 10, PrefabIDs.Tower2) },
             };
 
             var prefab = go.GetComponent<PrefabID>();
@@ -325,7 +169,7 @@ namespace KingdomMod
                         var payable = go.GetComponent<CitizenHousePayable>();
                         if (payable != null)
                         {
-                            log.LogMessage($"Change {go.name} price from {payable.price} to 3");
+                            log.LogDebug($"Change {go.name} price from {payable.price} to 3");
                             payable.price = 3;
                         }
                         break;
@@ -338,7 +182,7 @@ namespace KingdomMod
                             var payable = payableWorkshop.barrelCounterpart;
                             if (payable != null)
                             {
-                                log.LogMessage($"Change {go.name} price from {payable.price} to 3");
+                                log.LogDebug($"Change {go.name} price from {payable.price} to 3");
                                 payable.price = 3;
                             }
                         }
@@ -349,7 +193,7 @@ namespace KingdomMod
                         var payable = go.GetComponent<PayableShop>();
                         if (payable != null)
                         {
-                            log.LogMessage($"Change {go.name} price from {payable.price} to 2");
+                            log.LogDebug($"Change {go.name} price from {payable.price} to 2");
                             payable.price = 2;
                         }
                         break;
@@ -394,12 +238,8 @@ namespace KingdomMod
 
         private static void HandleTower(GameObject go, PrefabIDs prefabId, int index, bool isPrefab, bool modifyBuildPoints = true)
         {
-            if (isPrefab)
-            {
-                if (TowerPrefabs[index] != null)
-                    return;
-                TowerPrefabs[index] = go;
-            }
+            var prefabs = SingletonMonoBehaviour<Managers>.Inst.prefabs;
+            if (prefabs == null) return;
 
             var modifyData = ModifyDataDict[prefabId];
 
@@ -408,7 +248,7 @@ namespace KingdomMod
                 var workable = go.GetComponent<WorkableBuilding>();
                 if (workable != null)
                 {
-                    log.LogMessage($"Change {go.name} buildPoints from {workable.buildPoints} to {modifyData.BuildPoints}");
+                    log.LogDebug($"Change {go.name} buildPoints from {workable.buildPoints} to {modifyData.BuildPoints}");
                     workable.buildPoints = modifyData.BuildPoints;
                 }
             }
@@ -416,33 +256,20 @@ namespace KingdomMod
             var payable = go.GetComponent<PayableUpgrade>();
             if (payable != null)
             {
-                log.LogMessage($"Change {go.name} price from {payable.price} to {modifyData.Price}");
+                log.LogDebug($"Change {go.name} price from {payable.price} to {modifyData.Price}");
                 payable.price = modifyData.Price;
 
-                if (modifyData.NextPrefab != -1 && TowerPrefabs[modifyData.NextPrefab] != null)
+                if (modifyData.NextPrefab != PrefabIDs.None)
                 {
-                    payable.nextPrefab = TowerPrefabs[modifyData.NextPrefab];
-                    log.LogMessage($"Change Tower{index} nextPrefab to Tower{modifyData.NextPrefab}");
+                    payable.nextPrefab = prefabs.GetPrefabById((int)modifyData.NextPrefab);
+
+                    log.LogDebug($"Change {prefabId} nextPrefab to {modifyData.NextPrefab}");
                 }
 
-                if (isPrefab && modifyData.LastPrefab != -1 && TowerPrefabs[modifyData.LastPrefab] != null)
-                {
-                    var payableUpgrade = TowerPrefabs[modifyData.LastPrefab].GetComponent<PayableUpgrade>();
-                    if (payableUpgrade != null)
-                    {
-                        if (payableUpgrade.nextPrefab != go)
-                        {
-                            payableUpgrade.nextPrefab = go;
-
-                            log.LogMessage($"Change Tower{modifyData.LastPrefab} nextPrefab to Tower{index}");
-                        }
-                    }
-                }
-
-                if (payable.nextPrefab != null)
-                {
-                    HandlePayable(payable.nextPrefab, true);
-                }
+                // if (payable.nextPrefab != null)
+                // {
+                //     HandlePayable(payable.nextPrefab, true);
+                // }
             }
         }
 
@@ -450,10 +277,10 @@ namespace KingdomMod
         {
             public int Price;
             public int BuildPoints;
-            public int NextPrefab;
-            public int LastPrefab;
+            public PrefabIDs NextPrefab;
+            public PrefabIDs LastPrefab;
 
-            public ModifyData(int price, int buildPoints = 0, int nextPrefab = -1, int lastPrefab = -1)
+            public ModifyData(int price, int buildPoints = 0, PrefabIDs nextPrefab = PrefabIDs.None, PrefabIDs lastPrefab = PrefabIDs.None)
             {
                 Price = price; BuildPoints = buildPoints; NextPrefab = nextPrefab; LastPrefab = lastPrefab;
             }
@@ -461,6 +288,7 @@ namespace KingdomMod
 
         public enum PrefabIDs
         {
+            None = -1,
             Castle0 = 0,
             Castle1 = 1,
             Castle2 = 2,
