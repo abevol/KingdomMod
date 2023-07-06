@@ -280,7 +280,7 @@ namespace KingdomMod
                 CoinBag.OverflowLimit = 1000;
             }
 
-            if (Input.GetKeyDown(KeyCode.R))
+            if (Input.GetKeyDown(KeyCode.Space))
             {
                 var player = GetLocalPlayer();
                 if (player != null)

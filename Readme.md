@@ -26,7 +26,7 @@ It's supported CO-OP and ONLINE modes now!
 
 ## BetterPayableUpgrade
 
-Better pay for upgrades. Adjusted the price of some payable upgrade objects in the game, the objects of the next level and the construction time to make them more reasonable.
+Better pay for upgrades. Adjusted the price of some payable upgrade objects in the game, the objects of the next level and the construction time to make them more reasonable and comfortable.
 
 ### Adjust details
 
@@ -69,7 +69,7 @@ Developer tools mod. Contains some functions that are convenient for making MODs
 11. `F4` Add boulder pile
 12. `F9` Activate the Game Developer Debug Toolkit
 13. `F10` Set coin limit to 1000
-14. `R` Throws a boulder
+14. `Space` Throws a boulder
 
 ## OverlayMap
 
