@@ -1,6 +1,7 @@
 # KingdomMod - Now support the real TWO crowns!
 
 Some mods for the game "[Kingdom Two Crowns](https://store.steampowered.com/app/701160/)".
+
 It's supported CO-OP and ONLINE modes now!
 
 * [BetterPayableUpgrade](https://github.com/abevol/KingdomMod#betterpayableupgrade)
@@ -52,7 +53,6 @@ Developer tools mod. Contains some functions that are convenient for making MODs
 ### Details
 
 * Some functions seriously affect the game balance, and it is strongly not recommended for ordinary players to use this mod.
-* Automatically set the money bag limit to 1000 when the game starts.
 
 ### Hotkeys
 
@@ -68,7 +68,8 @@ Developer tools mod. Contains some functions that are convenient for making MODs
 10. `F3` Add mound
 11. `F4` Add boulder pile
 12. `F9` Activate the Game Developer Debug Toolkit
-13. `R` Throws a boulder
+13. `F10` Set coin limit to 1000
+14. `R` Throws a boulder
 
 ## OverlayMap
 

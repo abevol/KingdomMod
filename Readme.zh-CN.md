@@ -1,6 +1,7 @@
 # KingdomMod - 现在支持真正的双冠了！
 
 游戏《[王国：两位君主](https://store.steampowered.com/app/701160/)》的相关功能模组。
+
 现已支持合作和在线模式！
 
 * [BetterPayableUpgrade](https://github.com/abevol/KingdomMod#betterpayableupgrade)
@@ -52,7 +53,6 @@
 ### 详情
 
 * 部分功能严重影响游戏平衡，强烈不建议普通玩家使用该模组。
-* 游戏开始时自动将钱袋上限设置为1000。
 
 ### 热键
 
@@ -68,7 +68,8 @@
 10. `F3` 添加土堆
 11. `F4` 添加巨石桩
 12. `F9` 激活游戏开发者调试工具箱
-13. `R` 扔出巨石
+13. `F10` 将硬币上限设置为1000
+14. `R` 扔出巨石
 
 ## OverlayMap
 
