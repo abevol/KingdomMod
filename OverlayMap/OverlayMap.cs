@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using BepInEx.Logging;
 using UnityEngine;
+using HarmonyLib;
 
 namespace KingdomMod
 {
@@ -12,7 +12,7 @@ namespace KingdomMod
         private static ManualLogSource log;
         private readonly GUIStyle guiStyle = new();
         private int tick = 0;
-        private bool enableOverlayMap = true;
+        private bool enabledOverlayMap = true;
         private List<MarkInfo> minimapMarkList = new();
         private List<LineInfo> drawLineList = new();
         private readonly StatsInfo statsInfo = new();
@@ -20,6 +20,35 @@ namespace KingdomMod
         private float exploredRight = 0;
         private bool showFullMap = false;
         private GameObject gameLayer = null;
+
+        public class Patcher
+        {
+            private static OverlayMap _overlayMap;
+
+            public static void PatchAll(OverlayMap overlayMap)
+            {
+                try
+                {
+                    _overlayMap = overlayMap;
+                    var harmony = new Harmony("KingdomMod.BetterPayableUpgrade.Patcher");
+                    harmony.PatchAll();
+                }
+                catch (Exception ex)
+                {
+                    log.LogError($"[Patcher] => {ex}");
+                }
+            }
+
+            [HarmonyPatch(typeof(NetworkBigBoss), nameof(NetworkBigBoss.Client_OnCaughtUp))]
+            public class DebugIsDebugBuildPatcher
+            {
+                public static void Postfix()
+                {
+                    log.LogMessage("NetworkBigBoss.Client_OnCaughtUp.");
+                    _overlayMap.OnGameStart();
+                }
+            }
+        }
 
         public OverlayMap()
         {
@@ -47,8 +76,10 @@ namespace KingdomMod
         private void Start()
         {
             log.LogMessage($"{this.GetType().Name} Start.");
+            Patcher.PatchAll(this);
             Game.add_OnGameStart((Action)OnGameStart);
-            
+            NetworkBigBoss.Instance._postCatchupEvent += (Action)this.OnClientCaughtUp;
+
             // GlobalSaveData.add_OnCurrentCampaignSwitch((Action)OnCurrentCampaignSwitch);
         }
 
@@ -57,7 +88,7 @@ namespace KingdomMod
             if (Input.GetKeyDown(KeyCode.M))
             {
                 log.LogMessage("M key pressed.");
-                enableOverlayMap = !enableOverlayMap;
+                enabledOverlayMap = !enabledOverlayMap;
             }
 
             if (Input.GetKeyDown(KeyCode.F))
@@ -88,7 +119,7 @@ namespace KingdomMod
             {
                 if (!IsPlaying()) return;
 
-                if (enableOverlayMap)
+                if (enabledOverlayMap)
                 {
                     UpdateMinimapMarkList();
                     UpdateStatsInfo();
@@ -96,28 +127,58 @@ namespace KingdomMod
             }
         }
 
-        private bool IsPlaying()
+        private static bool IsPlaying()
         {
-            if (!Managers.Inst) return false;
-            if (!Managers.Inst.game) return false;
-            return Managers.Inst.game.state is Game.State.Playing or Game.State.Menu;
+            var game = Managers.Inst?.game;
+            if (game == null) return false;
+            return game.state is Game.State.Playing or Game.State.NetworkClientPlaying or Game.State.Menu;
         }
 
         private void OnGUI()
         {
             if (!IsPlaying()) return;
 
-            if (enableOverlayMap)
+            if (enabledOverlayMap)
             {
-                DrawMinimap();
-                DrawStatsInfo();
-                DrawExtraInfo();
+                DrawGuiForPlayer(0);
+                DrawGuiForPlayer(1);
             }
+        }
+
+        private void DrawGuiForPlayer(int playerId)
+        {
+            var player = Managers.Inst.kingdom.GetPlayer(playerId);
+            if (player == null) return;
+            if (player.isActiveAndEnabled == false) return;
+            if (player.hasLocalAuthority == false && NetworkBigBoss.IsOnline) return;
+
+            var groupY = 0.0f;
+            var groupHeight = Screen.height * 1.0f;
+
+            if (Managers.COOP_ENABLED)
+            {
+                groupHeight = Screen.height / 2.0f;
+                if (playerId == 1)
+                    groupY = Screen.height / 2.0f;
+            }
+
+            GUI.BeginGroup(new Rect(0, groupY, Screen.width, groupHeight));
+            DrawMinimap(playerId);
+            DrawStatsInfo(playerId);
+            DrawExtraInfo(playerId);
+            GUI.EndGroup();
+        }
+
+        private void OnClientCaughtUp()
+        {
+            log.LogMessage("host_OnClientCaughtUp.");
+
+            // OnGameStart();
         }
 
         private void OnGameStart()
         {
-            log.LogDebug("OnGameStart.");
+            log.LogMessage("OnGameStart.");
 
             exploredLeft = exploredRight = 0;
             gameLayer = GameObject.FindGameObjectWithTag(Tags.GameLayer);
@@ -127,6 +188,11 @@ namespace KingdomMod
         {
             log.LogMessage($"OnCurrentCampaignSwitch: {GlobalSaveData.loaded.currentCampaign}");
 
+        }
+
+        private static Player GetLocalPlayer()
+        {
+            return Managers.Inst.kingdom.GetPlayer(NetworkBigBoss.HasWorldAuth ? 0 : 1);
         }
 
         private void UpdateMinimapMarkList()
@@ -181,10 +247,14 @@ namespace KingdomMod
                 }
             }
 
-            var mover = kingdom.playerOne.mover;
-            if (mover != null)
+            foreach (var player in new List<Player>{ kingdom.playerOne, kingdom.playerTwo })
             {
-                poiList.Add(new MarkInfo(mover.transform.position.x, Color.green, Strings.You, 0, MarkRow.Movable));
+                if (player == null) continue;
+                if (player.isActiveAndEnabled == false) continue;
+                var mover = player.mover;
+                if (mover == null) continue;
+
+                poiList.Add(new MarkInfo(mover.transform.position.x, Color.blue, player.playerId == 0 ? Strings.P1 : Strings.P2, 0, MarkRow.Movable));
                 float l = mover.transform.position.x - 12;
                 float r = mover.transform.position.x + 12;
                 if (l < exploredLeft)
@@ -193,31 +263,15 @@ namespace KingdomMod
                     exploredRight = r;
             }
 
-            var steed = kingdom.playerOne.steed;
-            if (steed != null)
+            var deers = FindObjectsWithTagOfType<Deer>(Tags.Wildlife);
+            foreach (var deer in deers)
             {
-                var deerHunters = new List<Steed.SteedType>
-                {
-                    Steed.SteedType.Stag, 
-                    Steed.SteedType.P1Wolf, 
-                    Steed.SteedType.Reindeer, 
-                    Steed.SteedType.Reindeer_Norselands
-                };
-                var steedType = steed.steedType;
-                if (deerHunters.Contains(steedType))
-                {
-                    var deers = FindObjectsWithTagOfType<Deer>(Tags.Wildlife);
-                    foreach (var deer in deers)
-                    {
-                        poiList.Add(new MarkInfo(deer.transform.position.x, deer._fsm.current == 5 ? Color.green : Color.blue, Strings.Deer, 0, MarkRow.Movable));
-                    }
-                }
+                poiList.Add(new MarkInfo(deer.transform.position.x, deer._fsm.current == 5 ? Color.green : Color.blue, Strings.Deer, 0, MarkRow.Movable));
             }
 
             var enemies = Managers.Inst.enemies._enemies;
             if (enemies != null && enemies.Count > 0)
             {
-                var youX = mover.transform.position.x;
                 var leftEnemies = new List<float>();
                 var rightEnemies = new List<float>();
                 var leftBosses = new List<float>();
@@ -226,7 +280,7 @@ namespace KingdomMod
                 {
                     if (enemy == null) continue;
                     var enemyX = enemy.transform.position.x;
-                    if (enemyX < youX)
+                    if (kingdom.GetBorderSideForPosition(enemyX) == Side.Left)
                     {
                         leftEnemies.Add(enemyX);
                         if (enemy.GetComponent<Boss>() != null)
@@ -277,13 +331,20 @@ namespace KingdomMod
             var castle = kingdom.castle;
             if (castle != null)
             {
-                var price = castle._payableUpgrade.CanPay(kingdom.playerOne) ? castle._payableUpgrade.price : 0;
-                poiList.Add(new MarkInfo(castle.transform.position.x, Color.green, Strings.Castle, price));
+                var payable = castle._payableUpgrade;
+                var reason = payable.IsLocked(GetLocalPlayer());
+                bool canPay = reason == PayableUpgrade.LockedReason.NotLocked;
+                bool isLocked = reason != PayableUpgrade.LockedReason.NotLocked && reason != PayableUpgrade.LockedReason.NoUpgrade;
+                bool isLockedForInvalidTime = reason == PayableUpgrade.LockedReason.InvalidTime;
+                var price = isLockedForInvalidTime ? (int)(payable.timeAvailableFrom - Time.time) : canPay ? payable.price : 0;
+                var color = isLocked ? Color.gray : Color.green;
+                poiList.Add(new MarkInfo(castle.transform.position.x, color, Strings.Castle, price));
+
                 poiList.Add(new MarkInfo(castle.transform.position.x, Color.green, Strings.CastleSign, 0, MarkRow.Sign));
                 leftWalls.Add(new WallPoint(castle.transform.position, Color.green));
                 rightWalls.Add(new WallPoint(castle.transform.position, Color.green));
             }
-            
+
             var campfire = kingdom.campfire;
             if (campfire !=  null)
             {
@@ -787,16 +848,29 @@ namespace KingdomMod
             return null;
         }
 
-        private void DrawMinimapWindow(int winId)
+        private static bool IsYourSelf(int playerId, string name)
         {
+            if (name == Strings.P1)
+            {
+                if (playerId == 0 && NetworkBigBoss.HasWorldAuth)
+                {
+                    return true;
+                }
+            }
+            else if (name == Strings.P2)
+            {
+                if (playerId == 1 && (Managers.COOP_ENABLED || ProgramDirector.IsClient))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
-        private void DrawMinimap()
+        private void DrawMinimap(int playerId)
         {
-            // Rect windowRect = new Rect(5, 5, Screen.width - 10, 150);
-            // GUI.Window(1000, windowRect, (GUI.WindowFunction)DrawMinimapWindow, "");
-
             Rect boxRect = new Rect(5, 5, Screen.width - 10, 150);
+            GUI.Box(boxRect, "");
             GUI.Box(boxRect, "");
 
             foreach (var line in drawLineList)
@@ -809,10 +883,21 @@ namespace KingdomMod
                 if (!markInfo.Visible)
                     continue;
 
+                var info = markInfo.Info;
+                var color = markInfo.Color;
+                if (markInfo.Row == MarkRow.Movable)
+                {
+                    if (IsYourSelf(playerId, info))
+                    {
+                        info = Strings.You;
+                        color = Color.green;
+                    }
+                }
+
                 guiStyle.alignment = TextAnchor.UpperCenter;
-                guiStyle.normal.textColor = markInfo.Color;
+                guiStyle.normal.textColor = color;
                 markInfo.Pos.width = 0;
-                GUI.Label(markInfo.Pos, markInfo.Info, guiStyle);
+                GUI.Label(markInfo.Pos, info, guiStyle);
                 if (markInfo.Count != 0)
                 {
                     Rect pos = markInfo.Pos;
@@ -922,13 +1007,14 @@ namespace KingdomMod
             return knightCount;
         }
 
-        private void DrawStatsInfo()
+        private void DrawStatsInfo(int playerId)
         {
             var kingdom = Managers.Inst.kingdom;
             guiStyle.normal.textColor = Color.white;
             guiStyle.alignment = TextAnchor.UpperLeft;
 
-            Rect boxRect = new Rect(5, 160, 120, 146);
+            var boxRect = new Rect(5, 160, 120, 146);
+            GUI.Box(boxRect, "");
             GUI.Box(boxRect, "");
 
             GUI.Label(new Rect(14, 166 + 20 * 0, 120, 20), Strings.Peasant + ": " + statsInfo.PeasantCount, guiStyle);
@@ -938,52 +1024,9 @@ namespace KingdomMod
             GUI.Label(new Rect(14, 166 + 20 * 4, 120, 20), $"{Strings.Knight}: {kingdom.knights.Count} ({GetKnightCount(true)})", guiStyle);
             GUI.Label(new Rect(14, 166 + 20 * 5, 120, 20), Strings.Farmer + ": " + statsInfo.FarmerCount, guiStyle);
             GUI.Label(new Rect(14, 166 + 20 * 6, 120, 20), Strings.Farmlands + ": " + statsInfo.MaxFarmlands, guiStyle);
-
-#if DEBUG
-            var player = Managers.Inst.kingdom.playerOne;
-            GUI.Label(new Rect(14, 166 + 20 * 7, 120, 20), "forward" + ": " + player.mover.GetDirection(), guiStyle);
-            GUI.Label(new Rect(14, 166 + 20 * 8, 120, 20), "steedType" + ": " + kingdom.playerOne.steed.steedType, guiStyle);
-
-            if (kingdom.boat != null)
-            {
-                // GUI.Label(new Rect(14, 166 + 20 * 9, 120, 20), $"Boat Workers: {kingdom.boat.numWorkers[0]}/{kingdom.boat.maxWorkers}", guiStyle);
-                // GUI.Label(new Rect(14, 166 + 20 * 10, 120, 20), $"Boat Archers: {kingdom.boat.numArchers[0]}/{kingdom.boat.numArchers[0]}", guiStyle);
-                GUI.Label(new Rect(14, 166 + 20 * 10, 120, 20), $"Boat Farmers: {kingdom.boat.numFarmers}/{kingdom.boat.maxFarmers}", guiStyle);
-                GUI.Label(new Rect(14, 166 + 20 * 11, 120, 20), $"Boat Knights: {kingdom.boat.numKnights}/{kingdom.boat.maxKnights}", guiStyle);
-                GUI.Label(new Rect(14, 166 + 20 * 12, 120, 20), $"Boat Pikemen: {kingdom.boat.numPikemen}/{kingdom.boat.maxPikemen}", guiStyle);
-                GUI.Label(new Rect(14, 166 + 20 * 13, 120, 20), $"Boat Squires: {kingdom.boat.numSquires}/{kingdom.boat.numSquires}", guiStyle);
-            }
-
-            var steed = kingdom.playerOne.steed;
-            if (steed != null)
-            {
-                GUI.Label(new Rect(14, 166 + 20 * 14, 120, 20), $"stamina: {steed.stamina}", guiStyle);
-                GUI.Label(new Rect(14, 166 + 20 * 15, 120, 20), $"reserveStamina: {steed.reserveStamina}, {steed.reserveProbability}", guiStyle);
-                GUI.Label(new Rect(14, 166 + 20 * 16, 120, 20), $"eatDelay: {steed.eatDelay}, {steed.eatFullStaminaDelay}", guiStyle);
-                GUI.Label(new Rect(14, 166 + 20 * 17, 120, 20), $"runStaminaRate: {steed.runStaminaRate}", guiStyle);
-                GUI.Label(new Rect(14, 166 + 20 * 18, 120, 20), $"standStaminaRate: {steed.standStaminaRate}", guiStyle);
-                GUI.Label(new Rect(14, 166 + 20 * 19, 120, 20), $"walkStaminaRate: {steed.walkStaminaRate}", guiStyle);
-                GUI.Label(new Rect(14, 166 + 20 * 20, 120, 20), $"tiredTimer: {steed.tiredTimer}", guiStyle);
-                GUI.Label(new Rect(14, 166 + 20 * 21, 120, 20), $"tiredDuration: {steed.tiredDuration}", guiStyle);
-                GUI.Label(new Rect(14, 166 + 20 * 22, 120, 20), $"wellFedTimer: {steed.wellFedTimer}", guiStyle);
-                GUI.Label(new Rect(14, 166 + 20 * 23, 120, 20), $"wellFedDuration: {steed.wellFedDuration}", guiStyle);
-                GUI.Label(new Rect(14, 166 + 20 * 24, 120, 20), $"walkSpeed: {steed.walkSpeed}", guiStyle);
-                GUI.Label(new Rect(14, 166 + 20 * 25, 120, 20), $"runSpeed: {steed.runSpeed}", guiStyle);
-                GUI.Label(new Rect(14, 166 + 20 * 26, 120, 20), $"forestSpeedMultiplier: {steed.forestSpeedMultiplier}", guiStyle);
-            }
-
-            var castlePayable = kingdom?.castle?._payableUpgrade;
-            if (castlePayable != null)
-            {
-                GUI.Label(new Rect(14, 166 + 20 * 28, 120, 20), $"blockPaymentUpgrade: {castlePayable.blockPaymentUpgrade}", guiStyle);
-                GUI.Label(new Rect(14, 166 + 20 * 29, 120, 20), $"cooldown: {castlePayable.cooldown}", guiStyle);
-                GUI.Label(new Rect(14, 166 + 20 * 30, 120, 20), $"timeAvailableFrom: {castlePayable.timeAvailableFrom}", guiStyle);
-
-            }
-#endif
         }
 
-        private void DrawExtraInfo()
+        private void DrawExtraInfo(int playerId)
         {
             guiStyle.normal.textColor = Color.white;
             guiStyle.alignment = TextAnchor.UpperLeft;
@@ -999,7 +1042,7 @@ namespace KingdomMod
             var currentMints = Math.Truncate((currentTime - currentHour) * 60);
             GUI.Label(new Rect(left, top + 22, 40, 20), $"{currentHour:00.}:{currentMints:00.}", guiStyle);
 
-            var player = Managers.Inst.kingdom.playerOne;
+            var player = Managers.Inst.kingdom.GetPlayer(playerId);
             if (player != null)
             {
                 GUI.Label(new Rect(Screen.width - 126, top + 22, 60, 20), Strings.Gems + ": " + player.gems, guiStyle);

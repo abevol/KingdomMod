@@ -372,4 +372,10 @@
   <data name="HelPuzzleStatue" xml:space="preserve">
     <value>HelPuzzle</value>
   </data>
+  <data name="P1" xml:space="preserve">
+    <value>P1</value>
+  </data>
+  <data name="P2" xml:space="preserve">
+    <value>P2</value>
+  </data>
 </root>

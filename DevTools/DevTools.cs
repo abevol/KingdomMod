@@ -10,10 +10,13 @@ namespace KingdomMod
     public class DevTools : MonoBehaviour
     {
         private static ManualLogSource log;
-        private bool enableDebugInfo = false;
+        private bool enabledDebugInfo =false;
+        private bool enabledObjectsInfo = false;
         private readonly GUIStyle guiStyle = new();
         private int tick = 0;
-        private readonly List<DebugInfo> debugInfoList = new();
+        private readonly List<ObjectsInfo> objectsInfoList = new();
+        private static Texture2D ColoredTexture2D = null;
+        private static readonly GUIStyle boxGuiStyle = new();
 
         public static void Initialize(DevToolsPlugin plugin)
         {
@@ -33,7 +36,6 @@ namespace KingdomMod
         {
             log.LogMessage($"{this.GetType().Name} Start.");
 
-            CoinBag.OverflowLimit = 1000;
         }
 
         public class Patcher
@@ -61,12 +63,23 @@ namespace KingdomMod
             }
         }
 
+        private static Player GetLocalPlayer()
+        {
+            return Managers.Inst.kingdom.GetPlayer(NetworkBigBoss.HasWorldAuth ? 0 : 1);
+        }
+
         private void Update()
         {
+            if (Input.GetKeyDown(KeyCode.Home))
+            {
+                log.LogMessage("Home key pressed.");
+                enabledDebugInfo = !enabledDebugInfo;
+            }
+
             if (Input.GetKeyDown(KeyCode.End))
             {
                 log.LogMessage("End key pressed.");
-                enableDebugInfo = !enableDebugInfo;
+                enabledObjectsInfo = !enabledObjectsInfo;
             }
 
             if (Input.GetKeyDown(KeyCode.Insert))
@@ -88,24 +101,6 @@ namespace KingdomMod
                 }
 
                 InterfaceOverlay.DebugDisable = false;
-
-                // DebugTools.Inst.OpenButtonPressed();
-                //
-                // var debugTools = GameObject.Find("DebugTools");
-                // if (debugTools)
-                // {
-                //     var iDebugTools = new IDebugTools(debugTools.Pointer);
-                //     iDebugTools.OpenButtonPressed();
-                //
-                //     // debugTools.SetState(DebugTools.State.Open);
-                //     // var component = debugTools.GetComponent<DebugTools>();
-                //     // if (component)
-                //     // {
-                //     //     component.SetState(DebugTools.State.Open);
-                //     //     Plugin.Logger.LogInfo("DebugTools SetState Open");
-                //     // }
-                // }
-
             }
 
             if (Input.GetKeyDown(KeyCode.X))
@@ -168,7 +163,7 @@ namespace KingdomMod
 
             if (Input.GetKeyDown(KeyCode.Delete))
             {
-                var player = Managers.Inst.kingdom.playerOne;
+                var player = GetLocalPlayer();
                 if (player != null)
                 {
                     var payable = player.selectedPayable;
@@ -182,13 +177,13 @@ namespace KingdomMod
 
             if (Input.GetKeyDown(KeyCode.F1))
             {
-                var kingdom = Managers.Inst.kingdom;
-                if (kingdom != null)
+                var player = GetLocalPlayer();
+                if (player != null)
                 {
                     log.LogMessage($"Try to add Peasant.");
 
                     var prefab = Resources.Load<Peasant>("Prefabs/Characters/Peasant").gameObject;
-                    Vector3 vector = kingdom.playerOne.transform.TransformPoint(new Vector3(1f, 1f, 0.01f));
+                    Vector3 vector = player.transform.TransformPoint(new Vector3(1f, 1f, 0.01f));
                     var lastSpawned = Pool.SpawnOrInstantiateGO(prefab, vector, Quaternion.identity, null);
                     lastSpawned.transform.SetParent(GameObject.FindGameObjectWithTag("GameLayer").transform);
                 }
@@ -196,14 +191,14 @@ namespace KingdomMod
 
             if (Input.GetKeyDown(KeyCode.F2))
             {
-                var kingdom = Managers.Inst.kingdom;
-                if (kingdom != null)
+                var player = GetLocalPlayer();
+                if (player != null)
                 {
                     log.LogMessage($"Try to add Griffin.");
 
                     var prefab = Resources.Load<Steed>("Prefabs/Steeds/Griffin P1");
                     prefab.price = 1;
-                    Vector3 vector = kingdom.playerOne.transform.TransformPoint(new Vector3(1f, 1f, 0.01f));
+                    Vector3 vector = player.transform.TransformPoint(new Vector3(1f, 1f, 0.01f));
                     var lastSpawned = Pool.SpawnOrInstantiateGO(prefab.gameObject, vector, Quaternion.identity, null);
                     lastSpawned.transform.SetParent(GameObject.FindGameObjectWithTag("GameLayer").transform);
                 }
@@ -211,13 +206,13 @@ namespace KingdomMod
 
             if (Input.GetKeyDown(KeyCode.F3))
             {
-                var kingdom = Managers.Inst.kingdom;
-                if (kingdom != null)
+                var player = GetLocalPlayer();
+                if (player != null)
                 {
                     log.LogMessage($"Try to add Wall0.");
 
                     // var prefab = Resources.Load<Wall>("prefabs/buildings and interactive/wall0");
-                    Vector3 vector = new Vector3(kingdom.playerOne.transform.position.x, 0.0f, 0.1f);
+                    Vector3 vector = new Vector3(player.transform.position.x, 0.0f, 0.1f);
 
                     Wall wall = Instantiate<Wall>(Managers.Inst.holder.wallPrefabs[0]);
                     wall.transform.SetParent(GameObject.FindGameObjectWithTag("GameLayer").transform);
@@ -230,8 +225,8 @@ namespace KingdomMod
 
             if (Input.GetKeyDown(KeyCode.F4))
             {
-                var kingdom = Managers.Inst.kingdom;
-                if (kingdom != null)
+                var player = GetLocalPlayer();
+                if (player != null)
                 {
                     log.LogMessage($"Try to add Tower0.");
 
@@ -240,7 +235,7 @@ namespace KingdomMod
                     var prefab = Managers.Inst.prefabs.GetPrefabById((int)PrefabIDs.Tower0);
                     prefab.GetComponent<PayableUpgrade>().nextPrefab = Managers.Inst.prefabs.GetPrefabById((int)PrefabIDs.Tower2);
 
-                    Vector3 vector = new Vector3(kingdom.playerOne.transform.position.x, 0.0f, 1.6f);
+                    Vector3 vector = new Vector3(player.transform.position.x, 0.0f, 1.6f);
                     var lastSpawned = Pool.SpawnOrInstantiateGO(prefab.gameObject, vector, Quaternion.identity,
                         GameObject.FindGameObjectWithTag("GameLayer").transform);
                     // lastSpawned.transform.SetParent(GameObject.FindGameObjectWithTag("GameLayer").transform);
@@ -249,6 +244,8 @@ namespace KingdomMod
 
             if (Input.GetKeyDown(KeyCode.F9))
             {
+                log.LogMessage($"F9 key pressed.");
+
                 Transform[] array = Resources.FindObjectsOfTypeAll<Transform>();
                 for (int i = 0; i < array.Length; i++)
                 {
@@ -275,32 +272,43 @@ namespace KingdomMod
                 }
             }
 
+            if (Input.GetKeyDown(KeyCode.F10))
+            {
+                log.LogMessage($"F10 key pressed.");
+                log.LogMessage($"Try to change max coins to 1000, you may need to reload game by F5 key.");
+
+                CoinBag.OverflowLimit = 1000;
+            }
+
             if (Input.GetKeyDown(KeyCode.R))
             {
-                var player = Managers.Inst.kingdom.playerOne;
-                player.TeleportFlash();
-                player.coinLaunchSound.Play(player.transform.position, 1);
+                var player = GetLocalPlayer();
+                if (player != null)
+                {
+                    player.TeleportFlash();
+                    player.coinLaunchSound.Play(player.transform.position, 1);
 
-                GameObject gameObject = Pool.SpawnGO(Resources.Load<Boulder>("Prefabs/Objects/Boulder").gameObject, Vector3.zero, Quaternion.identity);
-                var compCacher = Managers.Inst.compCacher;
-                compCacher.GetCachedComponent<Boulder>(gameObject)._launchedByEnemies = false;
-                compCacher.GetCachedComponent<Boulder>(gameObject).maxHitCitizens = 1000;
-                compCacher.GetCachedComponent<Boulder>(gameObject).StuckProbability = 0f;
-                compCacher.GetCachedComponent<Boulder>(gameObject).hitDamage = 300;
-                compCacher.GetCachedComponent<SpriteRendererFX>(gameObject).FadeIn(0.5f);
-                gameObject.transform.parent = player.transform.parent;
-                gameObject.transform.localPosition = Vector3.zero;
-                gameObject.transform.localRotation = Quaternion.identity;
-                compCacher.GetCachedComponent<Boulder>(gameObject).SetFake();
-                gameObject.transform.SetParent(player.transform.parent, true);
-                gameObject.transform.localScale = new Vector3(3f, 3f, 3f);
-                gameObject.transform.position = player.transform.position;
-                gameObject.transform.rotation = Quaternion.LookRotation(player.transform.forward);
+                    GameObject boulder = Pool.SpawnGO(Resources.Load<Boulder>("Prefabs/Objects/Boulder").gameObject, Vector3.zero, Quaternion.identity);
+                    var compCacher = Managers.Inst.compCacher;
+                    compCacher.GetCachedComponent<Boulder>(boulder)._launchedByEnemies = false;
+                    compCacher.GetCachedComponent<Boulder>(boulder).maxHitCitizens = 1000;
+                    compCacher.GetCachedComponent<Boulder>(boulder).StuckProbability = 0f;
+                    compCacher.GetCachedComponent<Boulder>(boulder).hitDamage = 300;
+                    compCacher.GetCachedComponent<SpriteRendererFX>(boulder).FadeIn(0.5f);
+                    boulder.transform.parent = player.transform.parent;
+                    boulder.transform.localPosition = Vector3.zero;
+                    boulder.transform.localRotation = Quaternion.identity;
+                    compCacher.GetCachedComponent<Boulder>(boulder).SetFake();
+                    boulder.transform.SetParent(player.transform.parent, true);
+                    boulder.transform.localScale = new Vector3(3f, 3f, 3f);
+                    boulder.transform.position = player.transform.position;
+                    boulder.transform.rotation = Quaternion.LookRotation(player.transform.forward);
 
-                Vector2 vector6 = new Vector2((int)player.mover.GetDirection(), 0.2f);
-                Vector2 vector7 = vector6.normalized * 14f;
-                compCacher.GetCachedComponent<Boulder>(gameObject).Launch(vector7, player.gameObject);
-                Pool.Despawn(gameObject, 5f);
+                    Vector2 vector6 = new Vector2((int)player.mover.GetDirection(), 0.2f);
+                    Vector2 vector7 = vector6.normalized * 14f;
+                    compCacher.GetCachedComponent<Boulder>(boulder).Launch(vector7, player.gameObject);
+                    Pool.Despawn(boulder, 5f);
+                }
             }
 
             tick = tick + 1;
@@ -311,9 +319,8 @@ namespace KingdomMod
             {
                 if (!IsPlaying()) return;
 
-                if (enableDebugInfo)
-                    UpdateDebugInfo();
-
+                if (enabledObjectsInfo)
+                    UpdateObjectsInfo();
             }
         }
 
@@ -321,23 +328,25 @@ namespace KingdomMod
         {
             if (!IsPlaying()) return;
 
-            if (enableDebugInfo)
+            if (enabledObjectsInfo)
+                DrawObjectsInfo();
+            if (enabledDebugInfo)
                 DrawDebugInfo();
         }
 
         private bool IsPlaying()
         {
-            if (!Managers.Inst) return false;
-            if (!Managers.Inst.game) return false;
-            return Managers.Inst.game.state is Game.State.Playing or Game.State.Menu;
+            var game = Managers.Inst?.game;
+            if (game == null) return false;
+            return game.state is Game.State.Playing or Game.State.NetworkClientPlaying or Game.State.Menu;
         }
 
-        private void UpdateDebugInfo()
+        private void UpdateObjectsInfo()
         {
             var worldCam = Managers.Inst.game._mainCameraComponent;
             if (!worldCam) return;
 
-            debugInfoList.Clear();
+            objectsInfoList.Clear();
             var objects = GameObject.FindObjectsOfType<GameObject>();
             foreach (var obj in objects)
             {
@@ -373,17 +382,17 @@ namespace KingdomMod
                 Vector3 uiPos = new Vector3(screenPos.x, Screen.height - screenPos.y, 0);
                 if (uiPos.x > 0 && uiPos.x < Screen.width && uiPos.y > 0 && uiPos.y < Screen.height)
                 {
-                    debugInfoList.Add(new DebugInfo(new Rect(uiPos.x, uiPos.y, 100, 100), obj.transform.position, obj.name));
+                    objectsInfoList.Add(new ObjectsInfo(new Rect(uiPos.x, uiPos.y, 100, 100), obj.transform.position, obj.name));
                     //  + " (" + obj.transform.position.ToString() + ")(" + uiPos.ToString() + ")"
                     log.LogInfo(obj.name);
                 }
             }
         }
 
-        private void DrawDebugInfo()
+        private void DrawObjectsInfo()
         {
             guiStyle.normal.textColor = Color.white;
-            foreach (var obj in debugInfoList)
+            foreach (var obj in objectsInfoList)
             {
                 GUI.Label(obj.Pos, obj.Info, guiStyle);
                 // var vecPos = obj.pos;
@@ -401,13 +410,123 @@ namespace KingdomMod
 
         }
 
-        public class DebugInfo
+        private void DrawDebugInfo()
+        {
+            if (ColoredTexture2D == null)
+            {
+                ColoredTexture2D = MakeColoredTexture2D(1, 1, Color.black);
+                boxGuiStyle.normal.background = ColoredTexture2D;
+                log.LogMessage("MakeColoredTexture2D.");
+            }
+            DrawGlobalDebugInfo();
+            DrawPlayerDebugInfo(0);
+            DrawPlayerDebugInfo(1);
+        }
+
+        private void DrawGlobalDebugInfo()
+        {
+            GUI.BeginGroup(new Rect(Screen.width - 210, 0, 210, Screen.height));
+            {
+                GUI.Box(new Rect(5, 5, 200, Screen.height - 10), "", boxGuiStyle);
+
+                var infoLines = new List<string>();
+                infoLines.Add($"Global");
+                infoLines.Add($"HasWorldAuth: {NetworkBigBoss.HasWorldAuth}");
+                infoLines.Add($"IsHost: {NetworkBigBoss.Instance.activeNetRouter.IsHost()}");
+                infoLines.Add($"IsClient: {NetworkBigBoss.Instance.activeNetRouter.IsClient()}");
+                infoLines.Add($"ProgramDirector.state: {ProgramDirector.state}");
+                infoLines.Add($"ProgramDirector.IsClient: {ProgramDirector.IsClient}");
+                infoLines.Add($"COOP_ENABLED: {Managers.COOP_ENABLED}");
+
+                var kingdom = Managers.Inst.kingdom;
+                var castlePayable = kingdom.castle?._payableUpgrade;
+                if (castlePayable != null)
+                {
+                    infoLines.Add($"castle: {kingdom.castle.name}");
+                    infoLines.Add($"blockPaymentUpgrade: {castlePayable.blockPaymentUpgrade}");
+                    infoLines.Add($"cooldown: {castlePayable.cooldown}");
+                    infoLines.Add($"timeAvailableFrom: {castlePayable.timeAvailableFrom}");
+                    infoLines.Add($"timeAvailableFrom: {castlePayable.timeAvailableFrom - Time.time}");
+                    infoLines.Add($"IsLocked: {castlePayable.IsLocked(GetLocalPlayer())}");
+                    infoLines.Add($"price: {castlePayable.price}");
+                }
+
+                guiStyle.normal.textColor = Color.white;
+                guiStyle.alignment = TextAnchor.UpperLeft;
+                for (int i = 0; i < infoLines.Count; i++)
+                {
+                    GUI.Label(new Rect(14, 16 + 20 * i, 200, 20), infoLines[i], guiStyle);
+                }
+            }
+            GUI.EndGroup();
+        }
+
+        private void DrawPlayerDebugInfo(int playerId)
+        {
+            var kingdom = Managers.Inst.kingdom;
+            var player = kingdom.GetPlayer(playerId);
+            if (player == null) return;
+            if (player.isActiveAndEnabled == false) return;
+
+            var groupX = 0.0f;
+            var groupHeight = Screen.height * 1.0f;
+
+            if (playerId == 1)
+                groupX = 210;
+
+            GUI.BeginGroup(new Rect(groupX, 0, 210, groupHeight));
+            {
+                GUI.Box(new Rect(5, 5, 200, groupHeight - 10), "", boxGuiStyle);
+
+                var infoLines = new List<string>();
+                infoLines.Add($"player: {player.model}");
+                infoLines.Add($"isActiveAndEnabled: {player.isActiveAndEnabled}");
+                infoLines.Add($"hasLocalAuthority: {player.hasLocalAuthority}");
+                var steed = player.steed;
+                if (steed != null)
+                {
+                    infoLines.Add("steedType" + ": " + steed.steedType);
+                    infoLines.Add($"stamina: {steed.stamina}");
+                    infoLines.Add($"reserveStamina: {steed.reserveStamina}, {steed.reserveProbability}");
+                    infoLines.Add($"eatDelay: {steed.eatDelay}, {steed.eatFullStaminaDelay}");
+                    infoLines.Add($"runStaminaRate: {steed.runStaminaRate}");
+                    infoLines.Add($"standStaminaRate: {steed.standStaminaRate}");
+                    infoLines.Add($"walkStaminaRate: {steed.walkStaminaRate}");
+                    infoLines.Add($"tiredTimer: {steed.tiredTimer}");
+                    infoLines.Add($"tiredDuration: {steed.tiredDuration}");
+                    infoLines.Add($"wellFedTimer: {steed.wellFedTimer}");
+                    infoLines.Add($"wellFedDuration: {steed.wellFedDuration}");
+                    infoLines.Add($"walkSpeed: {steed.walkSpeed}");
+                    infoLines.Add($"runSpeed: {steed.runSpeed}");
+                    infoLines.Add($"forestSpeedMultiplier: {steed.forestSpeedMultiplier}");
+                }
+
+                guiStyle.normal.textColor = Color.white;
+                guiStyle.alignment = TextAnchor.UpperLeft;
+                for (int i = 0; i < infoLines.Count; i++)
+                {
+                    GUI.Label(new Rect(14, 16 + 20 * i, 200, 20), infoLines[i], guiStyle);
+                }
+            }
+            GUI.EndGroup();
+        }
+
+        private static Texture2D MakeColoredTexture2D(int width, int height, Color color)
+        {
+            var coloredTexture = new Texture2D(width, height);
+            coloredTexture.SetPixel(0, 0, color);
+            coloredTexture.wrapMode = TextureWrapMode.Repeat;
+            coloredTexture.Apply();
+            return coloredTexture;
+        }
+
+        public class ObjectsInfo
         {
             public Rect Pos;
             public Vector3 Vec;
             public string Info;
 
-            public DebugInfo(Rect pos, Vector3 vec, string info)
+            public ObjectsInfo(Rect pos, Vector3 vec, string info)
             {
                 this.Pos = pos;
                 this.Vec = vec;

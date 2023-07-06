@@ -9,7 +9,7 @@ namespace KingdomMod
     public class BetterPayableUpgrade : MonoBehaviour
     {
         private static ManualLogSource log;
-        private static Dictionary<PrefabIDs, ModifyData> ModifyDataDict;
+        private static Dictionary<PrefabIDs, ModifyData> _modifyDataDict;
 
         public static void Initialize(BetterPayableUpgradePlugin plugin)
         {
@@ -40,9 +40,9 @@ namespace KingdomMod
 
         private bool IsPlaying()
         {
-            if (!Managers.Inst) return false;
-            if (!Managers.Inst.game) return false;
-            return Managers.Inst.game.state is Game.State.Playing or Game.State.Menu;
+            var game = Managers.Inst?.game;
+            if (game == null) return false;
+            return game.state is Game.State.Playing or Game.State.NetworkClientPlaying or Game.State.Menu;
         }
 
         public void OnGameStart()
@@ -72,6 +72,7 @@ namespace KingdomMod
                     PrefabIDs.Tower1,
                     PrefabIDs.Tower0
                 };
+
                 foreach (var prefabId in prefabIds)
                 {
                     if (prefabId == PrefabIDs.MerchantHouse) continue;
@@ -82,15 +83,6 @@ namespace KingdomMod
                 }
             
                 log.LogDebug("Handle prefabs end.");
-            }
-
-            var holder = SingletonMonoBehaviour<Managers>.Inst.holder;
-            if (holder != null)
-            {
-                foreach (var towerPrefab in holder.towerPrefabs)
-                {
-                    HandlePayable(towerPrefab.gameObject, true);
-                }
             }
 
             var swapData = BiomeHolder.Inst.LoadedBiome?.swapData;
@@ -143,7 +135,7 @@ namespace KingdomMod
 
         private static void HandlePayable(GameObject go, bool isPrefab, bool modifyBuildPoints = true)
         {
-            ModifyDataDict ??= new Dictionary<PrefabIDs, ModifyData>
+            _modifyDataDict ??= new Dictionary<PrefabIDs, ModifyData>
             {
                 { PrefabIDs.Citizen_House, new ModifyData(3) },
                 { PrefabIDs.Workshop, new ModifyData(3) },
@@ -199,49 +191,23 @@ namespace KingdomMod
                         break;
                     }
                 case PrefabIDs.Tower6:
-                    {
-                        HandleTower(go, prefabId, 6, isPrefab, modifyBuildPoints);
-                        break;
-                    }
                 case PrefabIDs.Tower5:
-                    {
-                        HandleTower(go, prefabId, 5, isPrefab, modifyBuildPoints);
-                        break;
-                    }
                 case PrefabIDs.Tower4:
-                    {
-                        HandleTower(go, prefabId, 4, isPrefab, modifyBuildPoints);
-                        break;
-                    }
                 case PrefabIDs.Tower3:
-                    {
-                        HandleTower(go, prefabId, 3, isPrefab, modifyBuildPoints);
-                        break;
-                    }
                 case PrefabIDs.Tower2:
-                    {
-                        HandleTower(go, prefabId, 2, isPrefab, modifyBuildPoints);
-                        break;
-                    }
                 case PrefabIDs.Tower1:
-                    {
-                        HandleTower(go, prefabId, 1, isPrefab, modifyBuildPoints);
-                        break;
-                    }
                 case PrefabIDs.Tower0:
-                    {
-                        HandleTower(go, prefabId, 0, isPrefab, modifyBuildPoints);
-                        break;
-                    }
+                    HandleTower(go, prefabId, isPrefab, modifyBuildPoints);
+                    break;
             }
         }
 
-        private static void HandleTower(GameObject go, PrefabIDs prefabId, int index, bool isPrefab, bool modifyBuildPoints = true)
+        private static void HandleTower(GameObject go, PrefabIDs prefabId, bool isPrefab, bool modifyBuildPoints = true)
         {
             var prefabs = SingletonMonoBehaviour<Managers>.Inst.prefabs;
             if (prefabs == null) return;
 
-            var modifyData = ModifyDataDict[prefabId];
+            var modifyData = _modifyDataDict[prefabId];
 
             if (modifyBuildPoints)
             {
@@ -261,15 +227,13 @@ namespace KingdomMod
 
                 if (modifyData.NextPrefab != PrefabIDs.None)
                 {
-                    payable.nextPrefab = prefabs.GetPrefabById((int)modifyData.NextPrefab);
+                    if (isPrefab)
+                        payable.nextPrefab = prefabs.GetPrefabById((int)modifyData.NextPrefab);
+                    else
+                        payable.SetNextPrefab((int)modifyData.NextPrefab);
 
                     log.LogDebug($"Change {prefabId} nextPrefab to {modifyData.NextPrefab}");
                 }
-
-                // if (payable.nextPrefab != null)
-                // {
-                //     HandlePayable(payable.nextPrefab, true);
-                // }
             }
         }
 

@@ -547,6 +547,24 @@ namespace KingdomMod {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to P1.
+        /// </summary>
+        internal static string P1 {
+            get {
+                return ResourceManager.GetString("P1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string P2 {
+            get {
+                return ResourceManager.GetString("P2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Peasant.
         /// </summary>
         internal static string Peasant {

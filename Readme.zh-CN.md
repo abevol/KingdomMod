@@ -1,6 +1,7 @@
-# KingdomMod
+# KingdomMod - 现在支持真正的双冠了！
 
 游戏《[王国：两位君主](https://store.steampowered.com/app/701160/)》的相关功能模组。
+现已支持合作和在线模式！
 
 * [BetterPayableUpgrade](https://github.com/abevol/KingdomMod#betterpayableupgrade)
 * [DevTools](https://github.com/abevol/KingdomMod#devtools)
@@ -18,7 +19,7 @@
 
 ## 安装
 
-1. 下载 [BepInEx-Unity.IL2CPP-win-x86-6.0.0-be.668](https://builds.bepinex.dev/projects/bepinex_be/668/BepInEx-Unity.IL2CPP-win-x86-6.0.0-be.668%2B46e297f.zip)，将所有文件解压至游戏根目录，确保 `BepInEx` 文件夹和 `winhttp.dll` 等文件与游戏主程序 `KingdomTwoCrowns.exe` 处在同一目录。
+1. 下载 [BepInEx-Unity.IL2CPP-win-x86-6.0.0-be.670](https://builds.bepinex.dev/projects/bepinex_be/670/BepInEx-Unity.IL2CPP-win-x86-6.0.0-be.670%2B42a6727.zip)，将所有文件解压至游戏根目录，确保 `BepInEx` 文件夹和 `winhttp.dll` 等文件与游戏主程序 `KingdomTwoCrowns.exe` 处在同一目录。
 2. 删除旧版本MOD。检查游戏目录 `Kingdom Two Crowns\BepInEx\plugins`，如果存在旧版本的MOD，请先手动删除，以免发生文件冲突。
 3. 从 [Releases](https://github.com/abevol/KingdomMod/releases) 下载 KingdomMod 压缩包文件，将所有文件解压至 `Kingdom Two Crowns\BepInEx\plugins` 目录。
 
@@ -55,18 +56,19 @@
 
 ### 热键
 
-1. `End` 显示调试信息
-2. `Insert` 测试一些有趣的功能
-3. `X` 转储游戏对象到 JSON 文件
-4. `P` 打印预设件到控制台
-5. `L` 打印关卡模块到控制台
-6. `Delete` 删除当前可支付的对象
-7. `F1` 添加游民
-8. `F2` 添加格里芬
-9. `F3` 添加土堆
-10. `F4` 添加巨石桩
-11. `F9` 激活游戏开发者调试工具箱
-12. `R` 扔出巨石
+1. `Home` 显示调试信息
+2. `End` 显示对象信息
+3. `Insert` 测试一些有趣的功能
+4. `X` 转储游戏对象到 JSON 文件
+5. `P` 打印预设件到控制台
+6. `L` 打印关卡模块到控制台
+7. `Delete` 删除当前可支付的对象
+8. `F1` 添加游民
+9. `F2` 添加格里芬
+10. `F3` 添加土堆
+11. `F4` 添加巨石桩
+12. `F9` 激活游戏开发者调试工具箱
+13. `R` 扔出巨石
 
 ## OverlayMap
 
@@ -111,6 +113,8 @@
 * 黄色部分表示完全吃饱状态的持续时间，在该状态下行动不会消耗耐力值。
 * 不同坐骑的完全吃饱状态的持续时间不同，该模组通过黄色部分的长度来体现它。
 * 即使不行动，完全吃饱状态的持续时间也会随着时间逐渐减少。
+* 红色部分表示疲劳状态的持续时间，在该状态下不能跑步。
+* 不同坐骑的疲劳状态的持续时间不同。
 
 ### 热键
 

@@ -1,6 +1,7 @@
-# KingdomMod
+# KingdomMod - Now support the real TWO crowns!
 
 Some mods for the game "[Kingdom Two Crowns](https://store.steampowered.com/app/701160/)".
+It's supported CO-OP and ONLINE modes now!
 
 * [BetterPayableUpgrade](https://github.com/abevol/KingdomMod#betterpayableupgrade)
 * [DevTools](https://github.com/abevol/KingdomMod#devtools)
@@ -18,7 +19,7 @@ Some mods for the game "[Kingdom Two Crowns](https://store.steampowered.com/app/
 
 ## Install
 
-1. Download [BepInEx-Unity.IL2CPP-win-x86-6.0.0-be.668](https://builds.bepinex.dev/projects/bepinex_be/668/BepInEx-Unity.IL2CPP-win-x86-6.0.0-be.668%2B46e297f.zip)，unzip all the files to the root directory of the game, and ensure that the `BepInEx` folder and `winhttp.dll` file are in the same directory as the main game program `KingdomTwoCrowns.exe`.
+1. Download [BepInEx-Unity.IL2CPP-win-x86-6.0.0-be.670](https://builds.bepinex.dev/projects/bepinex_be/670/BepInEx-Unity.IL2CPP-win-x86-6.0.0-be.670%2B42a6727.zip)，unzip all the files to the root directory of the game, and ensure that the `BepInEx` folder and `winhttp.dll` file are in the same directory as the main game program `KingdomTwoCrowns.exe`.
 2. Delete old version MOD. Check the game directory `Kingdom Two Crowns\BepInEx\plugins`, if there is an old version of the MOD, please delete it manually to avoid file conflicts.
 3. Download the KingdomMod zip file from [Releases](https://github.com/abevol/KingdomMod/releases), and unzip all the files to the `Kingdom Two Crowns\BepInEx\plugins` directory.
 
@@ -55,18 +56,19 @@ Developer tools mod. Contains some functions that are convenient for making MODs
 
 ### Hotkeys
 
-1. `End` Displays debug information
-2. `Insert` Tests some interesting features
-3. `X` Dumps game objects to JSON file
-4. `P` Print presets to console
-5. `L` Prints the level module to the console
-6. `Delete` Deletes the current payable object
-7. `F1` Add vagrant
-8. `F2` Add Griffin
-9. `F3` Add mound
-10. `F4` Add boulder pile
-11. `F9` Activate the Game Developer Debug Toolkit
-12. `R` Throws a boulder
+1. `Home` Displays debug information
+2. `End` Displays objects information
+3. `Insert` Tests some interesting features
+4. `X` Dumps game objects to JSON file
+5. `P` Print presets to console
+6. `L` Prints the level module to the console
+7. `Delete` Deletes the current payable object
+8. `F1` Add vagrant
+9. `F2` Add Griffin
+10. `F3` Add mound
+11. `F4` Add boulder pile
+12. `F9` Activate the Game Developer Debug Toolkit
+13. `R` Throws a boulder
 
 ## OverlayMap
 
@@ -111,6 +113,8 @@ Stamina bar mod. It visually shows the stamina value of the mount by drawing a v
 * The yellow part indicates the duration of the fully fed state, and actions in this state will not consume stamina.
 * The duration of the fully fed state of different mounts is different, and this mod reflects it through the length of the yellow part.
 * Even if you don't act, the duration of the fully fed state will gradually decrease over time.
+* The red part indicates the duration of the fatigue state, in which you cannot run.
+* The duration of the fatigue state of different mounts is different.
 
 ### Hotkeys
 
