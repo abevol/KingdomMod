@@ -266,7 +266,8 @@ namespace KingdomMod
             var deers = FindObjectsWithTagOfType<Deer>(Tags.Wildlife);
             foreach (var deer in deers)
             {
-                poiList.Add(new MarkInfo(deer.transform.position.x, deer._fsm.current == 5 ? Color.green : Color.blue, Strings.Deer, 0, MarkRow.Movable));
+                if (!deer._damageable.isDead)
+                    poiList.Add(new MarkInfo(deer.transform.position.x, deer._fsm.current == 5 ? Color.green : Color.blue, Strings.Deer, 0, MarkRow.Movable));
             }
 
             var enemies = Managers.Inst.enemies._enemies;
@@ -279,6 +280,10 @@ namespace KingdomMod
                 foreach (var enemy in enemies)
                 {
                     if (enemy == null) continue;
+                    var damageable = enemy.GetComponent<Damageable>();
+                    if (damageable != null && damageable.isDead)
+                        continue;
+
                     var enemyX = enemy.transform.position.x;
                     if (kingdom.GetBorderSideForPosition(enemyX) == Side.Left)
                     {
@@ -354,7 +359,8 @@ namespace KingdomMod
             var chestList = gameLayer.GetComponentsInChildren<Chest>();
             foreach (var obj in chestList)
             {
-                poiList.Add(new MarkInfo(obj.transform.position.x, Color.white, obj.isGems ? Strings.GemChest : Strings.Chest, obj.coins));
+                if (obj.coins > 0)
+                    poiList.Add(new MarkInfo(obj.transform.position.x, Color.white, obj.isGems ? Strings.GemChest : Strings.Chest, obj.coins));
             }
 
             foreach (var obj in kingdom._walls)
@@ -423,7 +429,7 @@ namespace KingdomMod
             var boarSpawn = world.boarSpawnGroup;
             if (boarSpawn != null)
             {
-                poiList.Add(new MarkInfo(boarSpawn.transform.position.x, Color.red, Strings.BoarSpawn, boarSpawn._spawnedBoar ? 1 : 0));
+                poiList.Add(new MarkInfo(boarSpawn.transform.position.x, Color.red, Strings.BoarSpawn, boarSpawn._spawnedBoar ? 0 : 1));
             }
 
             var caveHelper = Managers.Inst.caveHelper;
