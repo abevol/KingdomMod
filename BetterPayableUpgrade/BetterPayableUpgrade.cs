@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using BepInEx.Logging;
 using Coatsink.Common;
 using UnityEngine;
+using HarmonyLib;
 
 namespace KingdomMod
 {
@@ -10,6 +11,37 @@ namespace KingdomMod
     {
         private static ManualLogSource log;
         private static Dictionary<PrefabIDs, ModifyData> _modifyDataDict;
+
+        public class Patcher
+        {
+            public static void PatchAll()
+            {
+                try
+                {
+                    var harmony = new Harmony("KingdomMod.BetterPayableUpgrade.Patcher");
+                    harmony.PatchAll();
+                }
+                catch (Exception ex)
+                {
+                    log.LogError($"[Patcher] => {ex}");
+                }
+            }
+
+            [HarmonyPatch(typeof(CoinBag), nameof(CoinBag.Init))]
+            public class CoinBagInitPatcher
+            {
+                public static void Prefix(CoinBag __instance)
+                {
+                    log.LogMessage($"CoinBagInitPatcher localScale: {__instance.bagCoinPrefab.gameObject.transform.localScale}");
+
+                    __instance.bagCoinPrefab.gameObject.transform.localScale = new Vector3(0.668f, 0.668f, 0.668f);
+                    __instance.bagGemPrefab.gameObject.transform.localScale = new Vector3(0.668f, 0.668f, 0.668f);
+
+                    var bagCoinPrefab = BiomeData.GetPrefabSwap(__instance.bagCoinPrefab);
+                    bagCoinPrefab.gameObject.transform.localScale = new Vector3(0.668f, 0.668f, 0.668f);
+                }
+            }
+        }
 
         public static void Initialize(BetterPayableUpgradePlugin plugin)
         {
@@ -27,6 +59,8 @@ namespace KingdomMod
         private void Start()
         {
             log.LogMessage($"{this.GetType().Name} Start.");
+
+            Patcher.PatchAll();
             Game.add_OnGameStart((Action)OnGameStart);
         }
 

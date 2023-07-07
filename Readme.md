@@ -30,6 +30,8 @@ Better pay for upgrades. Adjusted the price of some payable upgrade objects in t
 
 ### Adjust details
 
+* Reduced the size of the coin, now your coin bag can hold more coins (about 100).
+
 | Level | Name | Upgrade Price | Build Time |
 |-----|------|---------|----------|
 |0|monolith|3 => 2|-|
