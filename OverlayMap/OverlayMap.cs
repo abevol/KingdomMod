@@ -30,7 +30,7 @@ namespace KingdomMod
                 try
                 {
                     _overlayMap = overlayMap;
-                    var harmony = new Harmony("KingdomMod.BetterPayableUpgrade.Patcher");
+                    var harmony = new Harmony("KingdomMod.OverlayMap.Patcher");
                     harmony.PatchAll();
                 }
                 catch (Exception ex)
@@ -763,46 +763,6 @@ namespace KingdomMod
             }
 
             drawLineList = lineList;
-        }
-
-        private Payable GetPayableWithPrefabID(PrefabIDs prefabID)
-        {
-            var payables = Managers.Inst.payables;
-            if (!payables) return null;
-
-            foreach (var obj in payables.AllPayables)
-            {
-                if (obj == null) continue;
-                var go = obj.gameObject;
-                if (go == null) continue;
-                var prefab = go.GetComponent<PrefabID>();
-                if (prefab == null) continue;
-                if (prefab.prefabID == (int)prefabID)
-                    return obj;
-            }
-
-            return null;
-        }
-
-        private List<Payable> GetPayablesWithPrefabID(PrefabIDs prefabID)
-        {
-            var result = new List<Payable>();
-            var payables = Managers.Inst.payables;
-            if (!payables) return result;
-
-            foreach (var obj in payables.AllPayables)
-            {
-                if (obj == null) continue;
-                var go = obj.gameObject;
-                if (go == null) continue;
-                var prefab = go.GetComponent<PrefabID>();
-                if (prefab == null) continue;
-                if (prefab.prefabID == (int)prefabID)
-                {
-                    result.Add(obj);
-                }
-            }
-            return result;
         }
 
         private T GetPayableOfType<T>() where T : Component

@@ -64,7 +64,7 @@ Developer tools mod. Contains some functions that are convenient for making MODs
 4. `X` Dumps game objects to JSON file
 5. `P` Print presets to console
 6. `L` Prints the level module to the console
-7. `Delete` Deletes the current payable object
+7. `Delete` Deletes the current selected payable object
 8. `F1` Add vagrant
 9. `F2` Add Griffin
 10. `F3` Add mound

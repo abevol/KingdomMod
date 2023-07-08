@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using File = System.IO.File;
 using HarmonyLib;
+using Il2CppInterop.Runtime.InteropTypes.Arrays;
+using System.Runtime.InteropServices;
 
 namespace KingdomMod
 {
@@ -44,8 +46,12 @@ namespace KingdomMod
             {
                 try
                 {
-                    var harmony = new Harmony("KingdomMod.BetterPayableUpgrade.Patcher");
+                    var harmony = new Harmony("KingdomMod.DevTools.Patcher");
                     harmony.PatchAll();
+                    foreach (var patchedMethod in harmony.GetPatchedMethods())
+                    {
+                        log.LogMessage($"patchedMethod: {patchedMethod.Name}");
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -59,6 +65,108 @@ namespace KingdomMod
                 public static void Postfix(ref bool __result)
                 {
                     __result = true;
+                }
+            }
+
+            // [HarmonyPatch(typeof(UnityEngine.DebugLogHandler), nameof(DebugLogHandler.Internal_Log))]
+            // public class DebugLogHandlerPatcher
+            // {
+            //     public static void Postfix(LogType level, LogOption options, string msg, UnityEngine.Object obj)
+            //     {
+            //         log.LogMessage(msg);
+            //
+            //     }
+            // }
+            //
+            // [HarmonyPatch(typeof(UnityEngine.Debug), nameof(UnityEngine.Debug.Log), new Type[] { typeof(Il2CppSystem.Object) })]
+            // public class DebugLogPatcher
+            // {
+            //     public static void Postfix(Il2CppSystem.Object message)
+            //     {
+            //         log.LogMessage(message.ToString());
+            //
+            //     }
+            // }
+            //
+            // [HarmonyPatch(typeof(UnityEngine.Debug), nameof(UnityEngine.Debug.LogFormat), new Type[]{ typeof(string), typeof(Il2CppSystem.Object[]) })]
+            // public class DebugLogFormatPatcher
+            // {
+            //     public static void Postfix(string format, params Il2CppSystem.Object[] args)
+            //     {
+            //         log.LogMessage(format);
+            //
+            //     }
+            // }
+            //
+            // [HarmonyPatch(typeof(UnityEngine.Debug), nameof(UnityEngine.Debug.LogWarningFormat), new Type[] { typeof(string), typeof(Il2CppSystem.Object[]) })]
+            // public class DebugLogWarningFormatPatcher
+            // {
+            //     public static void Postfix(string format, params Il2CppSystem.Object[] args)
+            //     {
+            //         log.LogMessage(format);
+            //
+            //     }
+            // }
+            //
+            // [HarmonyPatch(typeof(UnityEngine.Debug), nameof(UnityEngine.Debug.LogWarningFormat),
+            //     new Type[] { typeof(UnityEngine.Object), typeof(string), typeof(Il2CppSystem.Object[]) })]
+            // public class DebugLogWarningFormatPatcher01
+            // {
+            //     public static void Postfix(UnityEngine.Object context, string format, params Il2CppSystem.Object[] args)
+            //     {
+            //         log.LogMessage(format);
+            //
+            //     }
+            // }
+            //
+            // [HarmonyPatch(typeof(UnityEngine.Debug), nameof(UnityEngine.Debug.LogWarningFormat),
+            //     new Type[] { typeof(UnityEngine.Object), typeof(string), typeof(Il2CppReferenceArray<Il2CppSystem.Object>) })]
+            // public class DebugLogWarningFormatPatcher02
+            // {
+            //     public static void Postfix(string format, [Optional] Il2CppReferenceArray<Il2CppSystem.Object> args)
+            //     {
+            //         log.LogMessage(format);
+            //
+            //     }
+            // }
+            //
+            // [HarmonyPatch(typeof(UnityEngine.Debug), nameof(UnityEngine.Debug.LogWarningFormat),
+            //     new Type[] { typeof(UnityEngine.Object), typeof(string), typeof(Il2CppReferenceArray<Il2CppSystem.Object>) })]
+            // public class DebugLogWarningFormatPatcher03
+            // {
+            //     public static void Postfix(UnityEngine.Object context, string format, [Optional] Il2CppReferenceArray<Il2CppSystem.Object> args)
+            //     {
+            //         log.LogMessage(format);
+            //
+            //     }
+            // }
+
+            [HarmonyPatch(typeof(UnityEngine.TextGenerator), nameof(UnityEngine.TextGenerator.ValidatedSettings))]
+            public class TextGeneratorValidatedSettingsPatcher
+            {
+                public static bool Prefix(ref TextGenerationSettings __result, TextGenerationSettings settings)
+                {
+                    if (settings.font == null) return true;
+
+                    // log.LogMessage($"fontNames: {string.Join(", ", settings.font.fontNames)}, {settings.font.fontSize}, {settings.font.dynamic}, {settings.fontSize}, {settings.fontStyle}, {settings.resizeTextForBestFit}");
+
+                    if (settings.font.dynamic == false)
+                    {
+                        if (settings.fontSize != 0 || settings.fontStyle > FontStyle.Normal)
+                        {
+                            settings.fontSize = 0;
+                            settings.fontStyle = FontStyle.Normal;
+                        }
+
+                        if (settings.resizeTextForBestFit)
+                        {
+                            settings.resizeTextForBestFit = false;
+                        }
+
+                        __result = settings;
+                        return false;
+                    }
+                    return true;
                 }
             }
         }
@@ -450,6 +558,11 @@ namespace KingdomMod
                     infoLines.Add($"IsLocked: {castlePayable.IsLocked(GetLocalPlayer())}");
                     infoLines.Add($"price: {castlePayable.price}");
                 }
+
+                infoLines.Add($"regularFont: {string.Join(", ", Language.current.regularFont.font.fontNames)}, {Language.current.menuFont.font.dynamic}");
+                infoLines.Add($"bigTextFont: {string.Join(", ", Language.current.bigTextFont.font.fontNames)}, {Language.current.menuFont.font.dynamic}");
+                infoLines.Add($"menuFont: {string.Join(", ", Language.current.menuFont.font.fontNames)}, {Language.current.menuFont.font.dynamic}");
+                infoLines.Add($"menuAltFont: {string.Join(", ", Language.current.menuAltFont.font.fontNames)}, {Language.current.menuFont.font.dynamic}");
 
                 guiStyle.normal.textColor = Color.white;
                 guiStyle.alignment = TextAnchor.UpperLeft;
