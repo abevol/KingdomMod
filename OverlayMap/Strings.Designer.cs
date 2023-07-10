@@ -117,9 +117,9 @@ namespace KingdomMod {
         /// <summary>
         ///   Looks up a localized string similar to ♣.
         /// </summary>
-        internal static string BerryBush {
+        internal static string BerryBushSign {
             get {
-                return ResourceManager.GetString("BerryBush", resourceCulture);
+                return ResourceManager.GetString("BerryBushSign", resourceCulture);
             }
         }
         
@@ -556,7 +556,7 @@ namespace KingdomMod {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to P2.
         /// </summary>
         internal static string P2 {
             get {
@@ -639,9 +639,9 @@ namespace KingdomMod {
         /// <summary>
         ///   Looks up a localized string similar to ≈.
         /// </summary>
-        internal static string River {
+        internal static string RiverSign {
             get {
-                return ResourceManager.GetString("River", resourceCulture);
+                return ResourceManager.GetString("RiverSign", resourceCulture);
             }
         }
         
@@ -763,29 +763,29 @@ namespace KingdomMod {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ۩.
-        /// </summary>
-        internal static string Wall {
-            get {
-                return ResourceManager.GetString("Wall", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to ∧.
         /// </summary>
-        internal static string WallFoundation {
+        internal static string WallFoundationSign {
             get {
-                return ResourceManager.GetString("WallFoundation", resourceCulture);
+                return ResourceManager.GetString("WallFoundationSign", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to ۩.
         /// </summary>
-        internal static string WallWreck {
+        internal static string WallSign {
             get {
-                return ResourceManager.GetString("WallWreck", resourceCulture);
+                return ResourceManager.GetString("WallSign", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ۩.
+        /// </summary>
+        internal static string WallWreckSign {
+            get {
+                return ResourceManager.GetString("WallWreckSign", resourceCulture);
             }
         }
         

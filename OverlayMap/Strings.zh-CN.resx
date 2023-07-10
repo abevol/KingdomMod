@@ -270,16 +270,16 @@
   <data name="Boat" xml:space="preserve">
     <value>船</value>
   </data>
-  <data name="Wall" xml:space="preserve">
+  <data name="WallSign" xml:space="preserve">
     <value>۩</value>
   </data>
-  <data name="WallWreck" xml:space="preserve">
+  <data name="WallWreckSign" xml:space="preserve">
     <value>۩</value>
   </data>
-  <data name="WallFoundation" xml:space="preserve">
+  <data name="WallFoundationSign" xml:space="preserve">
     <value>∧</value>
   </data>
-  <data name="River" xml:space="preserve">
+  <data name="RiverSign" xml:space="preserve">
     <value>≈</value>
   </data>
   <data name="Pikeman" xml:space="preserve">
@@ -294,7 +294,7 @@
   <data name="Time" xml:space="preserve">
     <value>时间</value>
   </data>
-  <data name="BerryBush" xml:space="preserve">
+  <data name="BerryBushSign" xml:space="preserve">
     <value>♣</value>
   </data>
   <data name="CastleSign" xml:space="preserve">
