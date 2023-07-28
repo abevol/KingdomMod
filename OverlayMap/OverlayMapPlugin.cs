@@ -15,8 +15,9 @@ namespace KingdomMod
             {
                 // debug localization
 
-                // string myCulture = "en-US";
+                // string myCulture = "en-GB";
                 // Strings.Culture = CultureInfo.GetCultureInfo(myCulture);
+                // CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo(myCulture);
 
                 Log.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded!");
 

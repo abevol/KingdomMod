@@ -55,6 +55,7 @@
 ### 详情
 
 * 部分功能严重影响游戏平衡，强烈不建议普通玩家使用该模组。
+* 出于平衡性考虑，所有功能仅在`Debug`构建版本中可用。
 
 ### 热键
 
@@ -64,14 +65,12 @@
 4. `X` 转储游戏对象到 JSON 文件
 5. `P` 打印预设件到控制台
 6. `L` 打印关卡模块到控制台
-7. `Delete` 删除当前选中的可支付的对象
+7. `Delete` 砍伐当前选中的树木
 8. `F1` 添加游民
 9. `F2` 添加格里芬
-10. `F3` 添加土堆
-11. `F4` 添加巨石桩
-12. `F9` 激活游戏开发者调试工具箱
-13. `F10` 将硬币上限设置为1000
-14. `Space` 扔出巨石
+10. `F9` 激活游戏开发者调试工具箱
+11. `F10` 将硬币上限设置为1000
+12. `Space` 扔出巨石
 
 ## OverlayMap
 
@@ -104,6 +103,15 @@
 |$\color{red}{红色}$|未解锁，未攻陷，已损坏|
 |$\color{blue}{蓝色}$|建造中|
 |$\color{green}{绿色}$|已解锁，安全的|
+
+### 自定义风格和语言
+
+现在地图模组已支持自定义风格和语言，您可以在游戏目录`Kingdom Two Crowns\BepInEx\config`找到它们的配置文件。
+
+* `KingdomMod.OverlayMap.cfg`，配置当前使用的语言和风格文件名，
+* `KingdomMod.OverlayMap.Style.cfg`，地图模组的风格文件。您可以修改其中的文本颜色及标记符号。
+* `KingdomMod.OverlayMap.Language.en-US.cfg`，地图模组的语言文件。您可以以该文件为模板制作您的母语语言文件。复制该文件，将文件名的`en-US`部分改为您自己国家/地区的语言代码，比如`KingdomMod.OverlayMap.Language.ru-RU.cfg`，然后对文件内的字符串进行本地化翻译。
+* 欢迎分享您的语言和风格文件：[分享入口](https://github.com/abevol/KingdomMod/issues/new)。
 
 ## StaminaBar
 

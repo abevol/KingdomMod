@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using File = System.IO.File;
 using HarmonyLib;
-using Il2CppInterop.Runtime.InteropTypes.Arrays;
-using System.Runtime.InteropServices;
 
 namespace KingdomMod
 {
@@ -59,6 +57,7 @@ namespace KingdomMod
                 }
             }
 
+#if DEBUG
             [HarmonyPatch(typeof(UnityEngine.Debug), "get_isDebugBuild")]
             public class DebugIsDebugBuildPatcher
             {
@@ -67,6 +66,7 @@ namespace KingdomMod
                     __result = true;
                 }
             }
+#endif
 
             // [HarmonyPatch(typeof(UnityEngine.DebugLogHandler), nameof(DebugLogHandler.Internal_Log))]
             // public class DebugLogHandlerPatcher
@@ -178,6 +178,7 @@ namespace KingdomMod
 
         private void Update()
         {
+#if DEBUG
             if (Input.GetKeyDown(KeyCode.Home))
             {
                 log.LogMessage("Home key pressed.");
@@ -277,8 +278,14 @@ namespace KingdomMod
                     var payable = player.selectedPayable;
                     if (payable != null)
                     {
-                        log.LogMessage($"Try to destroy the game object: {payable.GetGO.name}");
-                        Destroy(payable.GetGO);
+                        var payableTree = payable.TryCast<PayableTree>();
+                        if (payableTree != null)
+                        {
+                            log.LogMessage($"Try to cutdown the tree: {payable.GetGO.name}");
+                            WorkableTree.s_autoChopTrees = true;
+                            payableTree.Pay();
+                            WorkableTree.s_autoChopTrees = false;
+                        }
                     }
                 }
             }
@@ -312,43 +319,43 @@ namespace KingdomMod
                 }
             }
 
-            if (Input.GetKeyDown(KeyCode.F3))
-            {
-                var player = GetLocalPlayer();
-                if (player != null)
-                {
-                    log.LogMessage($"Try to add Wall0.");
-
-                    // var prefab = Resources.Load<Wall>("prefabs/buildings and interactive/wall0");
-                    Vector3 vector = new Vector3(player.transform.position.x, 0.0f, 0.1f);
-
-                    Wall wall = Instantiate<Wall>(Managers.Inst.holder.wallPrefabs[0]);
-                    wall.transform.SetParent(GameObject.FindGameObjectWithTag("GameLayer").transform);
-                    wall.transform.position = vector;
-
-                    // var lastSpawned = Pool.SpawnOrInstantiateGO(prefab.gameObject, vector, Quaternion.identity, GameObject.FindGameObjectWithTag("GameLayer").transform);
-                    // lastSpawned.transform.SetParent(GameObject.FindGameObjectWithTag("GameLayer").transform);
-                }
-            }
-
-            if (Input.GetKeyDown(KeyCode.F4))
-            {
-                var player = GetLocalPlayer();
-                if (player != null)
-                {
-                    log.LogMessage($"Try to add Tower0.");
-
-                    // var prefab = Resources.Load<Tower>("prefabs/buildings and interactive/tower0");
-
-                    var prefab = Managers.Inst.prefabs.GetPrefabById((int)PrefabIDs.Tower0);
-                    prefab.GetComponent<PayableUpgrade>().nextPrefab = Managers.Inst.prefabs.GetPrefabById((int)PrefabIDs.Tower2);
-
-                    Vector3 vector = new Vector3(player.transform.position.x, 0.0f, 1.6f);
-                    var lastSpawned = Pool.SpawnOrInstantiateGO(prefab.gameObject, vector, Quaternion.identity,
-                        GameObject.FindGameObjectWithTag("GameLayer").transform);
-                    // lastSpawned.transform.SetParent(GameObject.FindGameObjectWithTag("GameLayer").transform);
-                }
-            }
+            // if (Input.GetKeyDown(KeyCode.F3))
+            // {
+            //     var player = GetLocalPlayer();
+            //     if (player != null)
+            //     {
+            //         log.LogMessage($"Try to add Wall0.");
+            //
+            //         // var prefab = Resources.Load<Wall>("prefabs/buildings and interactive/wall0");
+            //         Vector3 vector = new Vector3(player.transform.position.x, 0.0f, 0.1f);
+            //
+            //         Wall wall = Instantiate<Wall>(Managers.Inst.holder.wallPrefabs[0]);
+            //         wall.transform.SetParent(GameObject.FindGameObjectWithTag("GameLayer").transform);
+            //         wall.transform.position = vector;
+            //
+            //         // var lastSpawned = Pool.SpawnOrInstantiateGO(prefab.gameObject, vector, Quaternion.identity, GameObject.FindGameObjectWithTag("GameLayer").transform);
+            //         // lastSpawned.transform.SetParent(GameObject.FindGameObjectWithTag("GameLayer").transform);
+            //     }
+            // }
+            //
+            // if (Input.GetKeyDown(KeyCode.F4))
+            // {
+            //     var player = GetLocalPlayer();
+            //     if (player != null)
+            //     {
+            //         log.LogMessage($"Try to add Tower0.");
+            //
+            //         // var prefab = Resources.Load<Tower>("prefabs/buildings and interactive/tower0");
+            //
+            //         var prefab = Managers.Inst.prefabs.GetPrefabById((int)PrefabIDs.Tower0);
+            //         prefab.GetComponent<PayableUpgrade>().nextPrefab = Managers.Inst.prefabs.GetPrefabById((int)PrefabIDs.Tower2);
+            //
+            //         Vector3 vector = new Vector3(player.transform.position.x, 0.0f, 1.6f);
+            //         var lastSpawned = Pool.SpawnOrInstantiateGO(prefab.gameObject, vector, Quaternion.identity,
+            //             GameObject.FindGameObjectWithTag("GameLayer").transform);
+            //         // lastSpawned.transform.SetParent(GameObject.FindGameObjectWithTag("GameLayer").transform);
+            //     }
+            // }
 
             if (Input.GetKeyDown(KeyCode.F9))
             {
@@ -418,6 +425,7 @@ namespace KingdomMod
                     Pool.Despawn(boulder, 5f);
                 }
             }
+#endif
 
             tick = tick + 1;
             if (tick > 60)

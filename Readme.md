@@ -55,6 +55,7 @@ Developer tools mod. Contains some functions that are convenient for making MODs
 ### Details
 
 * Some functions seriously affect the game balance, and it is strongly not recommended for ordinary players to use this mod.
+* For balance reasons, all features are only available in `Debug` builds.
 
 ### Hotkeys
 
@@ -64,14 +65,12 @@ Developer tools mod. Contains some functions that are convenient for making MODs
 4. `X` Dumps game objects to JSON file
 5. `P` Print presets to console
 6. `L` Prints the level module to the console
-7. `Delete` Deletes the current selected payable object
+7. `Delete` Cut down the currently selected tree
 8. `F1` Add vagrant
 9. `F2` Add Griffin
-10. `F3` Add mound
-11. `F4` Add boulder pile
-12. `F9` Activate the Game Developer Debug Toolkit
-13. `F10` Set coin limit to 1000
-14. `Space` Throws a boulder
+10. `F9` Activate the Game Developer Debug Toolkit
+11. `F10` Set coin limit to 1000
+12. `Space` Throws a boulder
 
 ## OverlayMap
 
@@ -104,6 +103,15 @@ A map mod. It marks points of interest, along with some extra details. There's a
 |$\color{red}{Red}$|Not unlocked, not captured, wrecked|
 |$\color{blue}{Blue}$|Under construction|
 |$\color{green}{Green}$|Unlocked, safe|
+
+### Custom style and language
+
+Map mods now support custom styles and languages, and you can find their configuration files in the game directory `Kingdom Two Crowns\BepInEx\config`.
+
+* `KingdomMod.OverlayMap.cfg`, configure the current language and style file name,
+* `KingdomMod.OverlayMap.Style.cfg`, the style file of the map mod. You can modify the text color and marker symbols in it.
+* `KingdomMod.OverlayMap.Language.en-US.cfg`, the language file of the map mod. You can use this file as a template to make your native language files. Copy the file, change the `en-US` part of the file name to the language code of your own country, such as `KingdomMod.OverlayMap.Language.ru-RU.cfg`, and then localize the strings in the file translate.
+* Welcome to share your language and style files: [Share Entry](https://github.com/abevol/KingdomMod/issues/new).
 
 ## StaminaBar
 

@@ -3,7 +3,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <AssemblyName>KingdomMod.OverlayMap</AssemblyName>
     <Description>Kingdom map mod</Description>
-    <Version>2.0.1</Version>
+    <Version>2.1.0</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>
     <RestoreAdditionalProjectSources>
@@ -21,6 +21,18 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <WarningsAsErrors>$(WarningsAsErrors);NU1605</WarningsAsErrors>
   </PropertyGroup>
+  <ItemGroup>
+    <None Remove="prefabs\KingdomMod.OverlayMap.Language-en-US.cfg" />
+    <None Remove="prefabs\KingdomMod.OverlayMap.Language-zh-CN.cfg" />
+    <None Remove="prefabs\KingdomMod.OverlayMap.Language_en-US.cfg" />
+    <None Remove="prefabs\KingdomMod.OverlayMap.Language_zh-CN.cfg" />
+    <None Remove="prefabs\KingdomMod.OverlayMap.Style.cfg" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="prefabs\KingdomMod.OverlayMap.Language_en-US.cfg" />
+    <EmbeddedResource Include="prefabs\KingdomMod.OverlayMap.Language_zh-CN.cfg" />
+    <EmbeddedResource Include="prefabs\KingdomMod.OverlayMap.Style.cfg" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="BepInEx.PluginInfoProps" Version="2.*" />
@@ -102,24 +114,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Strings.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Strings.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Update="Strings.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
     <EmbeddedResource Update="Strings.zh-CN.resx">
       <Generator></Generator>
     </EmbeddedResource>
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy &quot;$(OutputPath)$(AssemblyName).dll&quot; &quot;$(BepInExPluginsPath)$(AssemblyName)\&quot; /Y&#xD;&#xA;xcopy &quot;$(OutputPath)$(AssemblyName).pdb&quot; &quot;$(BepInExPluginsPath)$(AssemblyName)\&quot; /Y&#xD;&#xA;xcopy &quot;$(OutputPath)$(AssemblyName).deps.json&quot; &quot;$(BepInExPluginsPath)$(AssemblyName)\&quot; /Y&#xD;&#xA;xcopy &quot;$(OutputPath)zh-CN\$(AssemblyName).resources.dll&quot; &quot;$(BepInExPluginsPath)$(AssemblyName)\zh-CN\&quot; /Y" />
+    <Exec Command="xcopy &quot;$(OutputPath)$(AssemblyName).dll&quot; &quot;$(BepInExPluginsPath)$(AssemblyName)\&quot; /Y&#xD;&#xA;xcopy &quot;$(OutputPath)$(AssemblyName).pdb&quot; &quot;$(BepInExPluginsPath)$(AssemblyName)\&quot; /Y&#xD;&#xA;xcopy &quot;$(OutputPath)$(AssemblyName).deps.json&quot; &quot;$(BepInExPluginsPath)$(AssemblyName)\&quot; /Y" />
   </Target>
 </Project>

@@ -1,13 +1,15 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using BepInEx.Logging;
 using UnityEngine;
-using HarmonyLib;
+using static KingdomMod.OverlayMap.Config;
 
 namespace KingdomMod
 {
-    public class OverlayMap : MonoBehaviour
+    public partial class OverlayMap : MonoBehaviour
     {
         private static ManualLogSource log;
         private readonly GUIStyle guiStyle = new();
@@ -21,33 +23,12 @@ namespace KingdomMod
         private bool showFullMap = false;
         private GameObject gameLayer = null;
 
-        public class Patcher
+        public static void LogMessage(string message, 
+            [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
+            [System.Runtime.CompilerServices.CallerFilePath]   string sourceFilePath = "",
+            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0)
         {
-            private static OverlayMap _overlayMap;
-
-            public static void PatchAll(OverlayMap overlayMap)
-            {
-                try
-                {
-                    _overlayMap = overlayMap;
-                    var harmony = new Harmony("KingdomMod.OverlayMap.Patcher");
-                    harmony.PatchAll();
-                }
-                catch (Exception ex)
-                {
-                    log.LogError($"[Patcher] => {ex}");
-                }
-            }
-
-            [HarmonyPatch(typeof(NetworkBigBoss), nameof(NetworkBigBoss.Client_OnCaughtUp))]
-            public class DebugIsDebugBuildPatcher
-            {
-                public static void Postfix()
-                {
-                    log.LogMessage("NetworkBigBoss.Client_OnCaughtUp.");
-                    _overlayMap.OnGameStart();
-                }
-            }
+            log.LogMessage($"[{sourceLineNumber}][{memberName}] {message}");
         }
 
         public OverlayMap()
@@ -68,6 +49,7 @@ namespace KingdomMod
         public static void Initialize(OverlayMapPlugin plugin)
         {
             log = plugin.Log;
+            Config.Global.ConfigBind(plugin.Config);
             var component = plugin.AddComponent<OverlayMap>();
             component.hideFlags = HideFlags.HideAndDontSave;
             DontDestroyOnLoad(component.gameObject);
@@ -81,6 +63,34 @@ namespace KingdomMod
             NetworkBigBoss.Instance._postCatchupEvent += (Action)this.OnClientCaughtUp;
 
             // GlobalSaveData.add_OnCurrentCampaignSwitch((Action)OnCurrentCampaignSwitch);
+
+            // log.LogMessage($"resSet test Alfred: {Strings.Alfred}");
+            // log.LogMessage($"resSet test Culture: {Strings.Culture?.Name}");
+            // var resSet = Strings.ResourceManager.GetResourceSet(CultureInfo.CurrentCulture, false, true);
+            // if (resSet != null)
+            // {
+            //     var dict = new SortedDictionary<string, string>();
+            //     log.LogMessage($"resSet: ");
+            //     var defines = "";
+            //     var binds = "";
+            //     foreach (DictionaryEntry dictionaryEntry in resSet)
+            //     {
+            //         dict.Add(dictionaryEntry.Key.ToString() ?? "", dictionaryEntry.Value?.ToString() ?? "");
+            //         // defines += $"public static ConfigEntry<string> {dictionaryEntry.Key};\r\n";
+            //         // binds += $"{dictionaryEntry.Key} = config.Bind(\"Strings\", \"{dictionaryEntry.Key}\", \"{dictionaryEntry.Value}\", \"\");\r\n";
+            //         
+            //         // log.LogMessage($"resSet: {dictionaryEntry.Key}, {dictionaryEntry.Value}");
+            //     }
+            //
+            //     foreach (var dictionaryEntry in dict)
+            //     {
+            //         defines += $"public static ConfigEntry<string> {dictionaryEntry.Key};\r\n";
+            //         binds += $"{dictionaryEntry.Key} = config.Bind(\"Strings\", \"{dictionaryEntry.Key}\", \"{dictionaryEntry.Value}\", \"\");\r\n";
+            //
+            //     }
+            //     // log.LogMessage($"defines: {defines}");
+            //     // log.LogMessage($"binds: {binds}");
+            // }
         }
 
         private void Update()
@@ -215,16 +225,16 @@ namespace KingdomMod
             foreach (var obj in kingdom.AllPortals)
             {
                 if (obj.type == Portal.Type.Regular)
-                    poiList.Add(new MarkInfo(obj.transform.position.x, new Color(0.62f, 0.0f, 1.0f), "", Strings.Portal));
+                    poiList.Add(new MarkInfo(obj.transform.position.x, Style.Portal.Color, Style.Portal.Sign, Strings.Portal));
                 else if (obj.type == Portal.Type.Cliff)
-                    poiList.Add(new MarkInfo(obj.transform.position.x, obj.state switch{ Portal.State.Destroyed => Color.green, Portal.State.Rebuilding => Color.blue, _=> Color.red}, "", Strings.Cliff));
+                    poiList.Add(new MarkInfo(obj.transform.position.x, obj.state switch{ Portal.State.Destroyed => Style.Cliff.Destroyed.Color, Portal.State.Rebuilding => Style.Cliff.Rebuilding.Color, _=> Style.Cliff.Color }, Style.Cliff.Sign, Strings.Cliff));
                 else if (obj.type == Portal.Type.Dock)
                     dock = obj;
             }
 
             var beach = gameLayer.GetComponentInChildren<Beach>();
             if (beach != null)
-                poiList.Add(new MarkInfo(beach.transform.position.x, (dock && (dock.state != Portal.State.Destroyed)) ? Color.red : Color.green, "", Strings.Dock));
+                poiList.Add(new MarkInfo(beach.transform.position.x, (dock && (dock.state != Portal.State.Destroyed)) ? Style.Beach.Color : Style.Beach.Destroyed.Color, Style.Beach.Sign, Strings.Beach));
 
             foreach (var beggarCamp in kingdom.BeggarCamps)
             {
@@ -234,7 +244,7 @@ namespace KingdomMod
                     if (beggar != null && beggar.isActiveAndEnabled)
                         count++;
                 }
-                poiList.Add(new MarkInfo(beggarCamp.transform.position.x, Color.white, "", Strings.BeggarCamp, count));
+                poiList.Add(new MarkInfo(beggarCamp.transform.position.x, Style.BeggarCamp.Color, Style.BeggarCamp.Sign, Strings.BeggarCamp, count));
             }
 
             foreach (var beggar in kingdom.beggars)
@@ -243,7 +253,7 @@ namespace KingdomMod
 
                 if (beggar.hasFoundBaker)
                 {
-                    poiList.Add(new MarkInfo(beggar.transform.position.x, Color.red, "", Strings.Beggar, 0, MarkRow.Movable));
+                    poiList.Add(new MarkInfo(beggar.transform.position.x, Style.Beggar.Color, Style.Beggar.Sign, Strings.Beggar, 0, MarkRow.Movable));
                 }
             }
 
@@ -254,7 +264,7 @@ namespace KingdomMod
                 var mover = player.mover;
                 if (mover == null) continue;
 
-                poiList.Add(new MarkInfo(mover.transform.position.x, Color.blue, "", player.playerId == 0 ? Strings.P1 : Strings.P2, 0, MarkRow.Movable));
+                poiList.Add(new MarkInfo(mover.transform.position.x, Style.Player.Color, Style.Player.Sign, player.playerId == 0 ? Strings.P1 : Strings.P2, 0, MarkRow.Movable));
                 float l = mover.transform.position.x - 12;
                 float r = mover.transform.position.x + 12;
                 if (l < exploredLeft)
@@ -267,7 +277,7 @@ namespace KingdomMod
             foreach (var deer in deers)
             {
                 if (!deer._damageable.isDead)
-                    poiList.Add(new MarkInfo(deer.transform.position.x, deer._fsm.current == 5 ? Color.green : Color.blue, "", Strings.Deer, 0, MarkRow.Movable));
+                    poiList.Add(new MarkInfo(deer.transform.position.x, deer._fsm.current == 5 ? Style.DeerFollowing.Color : Style.Deer.Color, Style.Deer.Sign, Strings.Deer, 0, MarkRow.Movable));
             }
 
             var enemies = Managers.Inst.enemies._enemies;
@@ -306,13 +316,13 @@ namespace KingdomMod
                     if (leftBosses.Count > 0)
                     {
                         leftBosses.Sort((a, b) => b.CompareTo(a));
-                        poiList.Add(new MarkInfo(leftBosses[0], Color.red, "", Strings.Boss, leftBosses.Count, MarkRow.Movable));
+                        poiList.Add(new MarkInfo(leftBosses[0], Style.Boss.Color, Style.Boss.Sign, Strings.Boss, leftBosses.Count, MarkRow.Movable));
                         if (leftEnemies[0] - leftBosses[0] < 6)
                             drawEnemies = false;
                     }
 
                     if (drawEnemies)
-                        poiList.Add(new MarkInfo(leftEnemies[0], Color.red, "", Strings.Enemy, leftEnemies.Count, MarkRow.Movable));
+                        poiList.Add(new MarkInfo(leftEnemies[0], Style.Enemy.Color, Style.Enemy.Sign, Strings.Enemy, leftEnemies.Count, MarkRow.Movable));
                 }
 
                 if (rightEnemies.Count > 0)
@@ -323,13 +333,13 @@ namespace KingdomMod
                     if (rightBosses.Count > 0)
                     {
                         rightBosses.Sort((a, b) => a.CompareTo(b));
-                        poiList.Add(new MarkInfo(rightBosses[0], Color.red, "", Strings.Boss, rightBosses.Count, MarkRow.Movable));
+                        poiList.Add(new MarkInfo(rightBosses[0], Style.Boss.Color, Style.Boss.Sign, Strings.Boss, rightBosses.Count, MarkRow.Movable));
                         if (rightBosses[0] - rightEnemies[0] < 6)
                             drawEnemies = false;
                     }
 
                     if (drawEnemies)
-                        poiList.Add(new MarkInfo(rightEnemies[0], Color.red, "", Strings.Enemy, rightEnemies.Count, MarkRow.Movable));
+                        poiList.Add(new MarkInfo(rightEnemies[0], Style.Enemy.Color, Style.Enemy.Sign, Strings.Enemy, rightEnemies.Count, MarkRow.Movable));
                 }
             }
 
@@ -342,39 +352,43 @@ namespace KingdomMod
                 bool isLocked = reason != PayableUpgrade.LockedReason.NotLocked && reason != PayableUpgrade.LockedReason.NoUpgrade;
                 bool isLockedForInvalidTime = reason == PayableUpgrade.LockedReason.InvalidTime;
                 var price = isLockedForInvalidTime ? (int)(payable.timeAvailableFrom - Time.time) : canPay ? payable.price : 0;
-                var color = isLocked ? Color.gray : Color.green;
-                poiList.Add(new MarkInfo(castle.transform.position.x, color, Strings.CastleSign, Strings.Castle, price));
+                var color = isLocked ? Style.Castle.Destroyed.Color : Style.Castle.Color;
+                poiList.Add(new MarkInfo(castle.transform.position.x, color, Style.Castle.Sign, Strings.Castle, price));
 
-                leftWalls.Add(new WallPoint(castle.transform.position, Color.green));
-                rightWalls.Add(new WallPoint(castle.transform.position, Color.green));
+                leftWalls.Add(new WallPoint(castle.transform.position, Style.WallLine.Color));
+                rightWalls.Add(new WallPoint(castle.transform.position, Style.WallLine.Color));
             }
 
             var campfire = kingdom.campfire;
             if (campfire !=  null)
             {
-                poiList.Add(new MarkInfo(campfire.transform.position.x, Color.white, "", Strings.Campfire));
+                poiList.Add(new MarkInfo(campfire.transform.position.x, Style.Campfire.Color, Style.Campfire.Sign, Strings.Campfire));
             }
 
             var chestList = gameLayer.GetComponentsInChildren<Chest>();
             foreach (var obj in chestList)
             {
-                if (obj.coins > 0)
-                    poiList.Add(new MarkInfo(obj.transform.position.x, Color.white, "", obj.isGems ? Strings.GemChest : Strings.Chest, obj.coins));
+                if (obj.coins == 0) continue;
+
+                if (obj.isGems)
+                    poiList.Add(new MarkInfo(obj.transform.position.x, Style.GemChest.Color, Style.GemChest.Sign, Strings.GemChest, obj.coins));
+                else
+                    poiList.Add(new MarkInfo(obj.transform.position.x, Style.Chest.Color, Style.Chest.Sign, Strings.Chest, obj.coins));
             }
 
             foreach (var obj in kingdom._walls)
             {
-                poiList.Add(new MarkInfo(obj.transform.position.x, Color.green, Strings.WallSign, ""));
+                poiList.Add(new MarkInfo(obj.transform.position.x, Style.Wall.Color, Style.Wall.Sign, ""));
                 if (kingdom.GetBorderSideForPosition(obj.transform.position.x) == Side.Left)
-                    leftWalls.Add(new WallPoint(obj.transform.position, Color.green));
+                    leftWalls.Add(new WallPoint(obj.transform.position, Style.WallLine.Color));
                 else
-                    rightWalls.Add(new WallPoint(obj.transform.position, Color.green));
+                    rightWalls.Add(new WallPoint(obj.transform.position, Style.WallLine.Color));
             }
 
             var shopForge = GameObject.FindGameObjectWithTag(Tags.ShopForge);
             if (shopForge != null)
             {
-                poiList.Add(new MarkInfo(shopForge.transform.position.x, Color.white, "", Strings.ShopForge));
+                poiList.Add(new MarkInfo(shopForge.transform.position.x, Style.ShopForge.Color, Style.ShopForge.Sign, Strings.ShopForge));
             }
 
             var citizenHouses = GameObject.FindGameObjectsWithTag(Tags.CitizenHouse);
@@ -383,52 +397,55 @@ namespace KingdomMod
                 var citizenHouse = obj.GetComponent<CitizenHousePayable>();
                 if (citizenHouse != null)
                 {
-                    poiList.Add(new MarkInfo(obj.transform.position.x, Color.white, "", Strings.CitizenHouse, citizenHouse._numberOfAvaliableCitizens));
+                    poiList.Add(new MarkInfo(obj.transform.position.x, Style.CitizenHouse.Color, Style.CitizenHouse.Sign, Strings.CitizenHouse, citizenHouse._numberOfAvaliableCitizens));
                 }
             }
 
             var wallWreckList = GameObject.FindGameObjectsWithTag(Tags.WallWreck);
             foreach (var obj in wallWreckList)
             {
-                poiList.Add(new MarkInfo(obj.transform.position.x, Color.red, Strings.WallWreckSign, ""));
+                poiList.Add(new MarkInfo(obj.transform.position.x, Style.Wall.Wrecked.Color, Style.Wall.Sign, ""));
                 if (kingdom.GetBorderSideForPosition(obj.transform.position.x) == Side.Left)
-                    leftWalls.Add(new WallPoint(obj.transform.position, Color.red));
+                    leftWalls.Add(new WallPoint(obj.transform.position, Style.WallLine.Wrecked.Color));
                 else
-                    rightWalls.Add(new WallPoint(obj.transform.position, Color.red));
+                    rightWalls.Add(new WallPoint(obj.transform.position, Style.WallLine.Wrecked.Color));
             }
 
             var wallFoundation = GameObject.FindGameObjectsWithTag(Tags.WallFoundation);
             foreach (var obj in wallFoundation)
             {
-                poiList.Add(new MarkInfo(obj.transform.position.x, Color.gray, Strings.WallFoundationSign, ""));
+                poiList.Add(new MarkInfo(obj.transform.position.x, Style.WallFoundation.Color, Style.WallFoundation.Sign, ""));
             }
 
             var riverList = gameLayer.GetComponentsInChildren<River>();
             foreach (var obj in riverList)
             {
-                poiList.Add(new MarkInfo(obj.transform.position.x, new Color(0.46f, 0.84f, 0.92f), Strings.RiverSign, ""));
+                poiList.Add(new MarkInfo(obj.transform.position.x, Style.River.Color, Style.River.Sign, ""));
             }
 
             foreach (var obj in Managers.Inst.world._berryBushes)
             {
-                poiList.Add(new MarkInfo(obj.transform.position.x, obj.paid ? Color.green : Color.red, Strings.BerryBushSign, ""));
+                if (obj.paid)
+                    poiList.Add(new MarkInfo(obj.transform.position.x, Style.BerryBushPaid.Color, Style.BerryBushPaid.Sign, ""));
+                else
+                    poiList.Add(new MarkInfo(obj.transform.position.x, Style.BerryBush.Color, Style.BerryBush.Sign, ""));
             }
 
             var payableGemChest = GetPayableOfType<PayableGemChest>();
             if (payableGemChest != null)
             {
                 var gemsCount = payableGemChest.infiniteGems ? payableGemChest.guardRef.price : payableGemChest.gemsStored;
-                poiList.Add(new MarkInfo(payableGemChest.transform.position.x, Color.white, "", Strings.GemMerchant, gemsCount));
+                poiList.Add(new MarkInfo(payableGemChest.transform.position.x, Style.GemMerchant.Color, Style.GemMerchant.Sign, Strings.GemMerchant, gemsCount));
             }
 
             var dogSpawn = GetPayableBlockerOfType<DogSpawn>();
             if (dogSpawn != null && !dogSpawn._dogFreed)
-                poiList.Add(new MarkInfo(dogSpawn.transform.position.x, Color.red, "", Strings.DogSpawn));
+                poiList.Add(new MarkInfo(dogSpawn.transform.position.x, Style.DogSpawn.Color, Style.DogSpawn.Sign, Strings.DogSpawn));
 
             var boarSpawn = world.boarSpawnGroup;
             if (boarSpawn != null)
             {
-                poiList.Add(new MarkInfo(boarSpawn.transform.position.x, Color.red, "", Strings.BoarSpawn, boarSpawn._spawnedBoar ? 0 : 1));
+                poiList.Add(new MarkInfo(boarSpawn.transform.position.x, Style.BoarSpawn.Color, Style.BoarSpawn.Sign, Strings.BoarSpawn, boarSpawn._spawnedBoar ? 0 : 1));
             }
 
             var caveHelper = Managers.Inst.caveHelper;
@@ -437,13 +454,13 @@ namespace KingdomMod
                 var bomb = caveHelper.Getbomb(caveHelper.CurrentlyBombingPortal.side);
                 if (bomb != null)
                 {
-                    poiList.Add(new MarkInfo(bomb.transform.position.x, Color.green, "", Strings.Bomb, 0, MarkRow.Movable));
+                    poiList.Add(new MarkInfo(bomb.transform.position.x, Style.Bomb.Color, Style.Bomb.Sign, Strings.Bomb, 0, MarkRow.Movable));
                 }
             }
 
             foreach (var obj in kingdom._farmHouses)
             {
-                poiList.Add(new MarkInfo(obj.transform.position.x, Color.white, "", Strings.Farmhouse));
+                poiList.Add(new MarkInfo(obj.transform.position.x, Style.Farmhouse.Color, Style.Farmhouse.Sign, Strings.Farmhouse));
             }
 
             var steedNames = new Dictionary<Steed.SteedType, string>
@@ -482,7 +499,7 @@ namespace KingdomMod
             foreach (var obj in kingdom.spawnedSteeds)
             {
                 if (obj.CurrentMode != Steed.Mode.Player)
-                    poiList.Add(new MarkInfo(obj.transform.position.x, Color.blue, "", steedNames[obj.steedType], obj.price));
+                    poiList.Add(new MarkInfo(obj.transform.position.x, Style.Steeds.Color, Style.Steeds.Sign, steedNames[obj.steedType], obj.price));
             }
 
             foreach (var obj in kingdom.steedSpawns)
@@ -494,7 +511,7 @@ namespace KingdomMod
                 }
 
                 if (!obj._hasSpawned)
-                    poiList.Add(new MarkInfo(obj.transform.position.x, Color.red, "", info, obj.price));
+                    poiList.Add(new MarkInfo(obj.transform.position.x, Style.SteedSpawns.Color, Style.SteedSpawns.Sign, info, obj.price));
             }
             
             var cabinList = GetPayablesOfType<Cabin>();
@@ -511,7 +528,7 @@ namespace KingdomMod
                 };
 
                 if (obj.canPay)
-                    poiList.Add(new MarkInfo(obj.transform.position.x, Color.red, "", info, obj.price));
+                    poiList.Add(new MarkInfo(obj.transform.position.x, Style.HermitCabins.Color, Style.HermitCabins.Sign, info, obj.price));
             }
 
             var statueList = GetPayablesOfType<Statue>();
@@ -528,22 +545,22 @@ namespace KingdomMod
                 };
 
                 if (obj.deityStatus != Statue.DeityStatus.Activated)
-                    poiList.Add(new MarkInfo(obj.transform.position.x, Color.red, "", info, obj.price));
+                    poiList.Add(new MarkInfo(obj.transform.position.x, Style.Statues.Color, Style.Statues.Sign, info, obj.price));
             }
 
             var timeStatue = kingdom.timeStatue;
             if (timeStatue)
-                poiList.Add(new MarkInfo(timeStatue.transform.position.x, Color.green, "", Strings.StatueTime, timeStatue.daysRemaining));
+                poiList.Add(new MarkInfo(timeStatue.transform.position.x, Style.StatueTime.Color, Style.StatueTime.Sign, Strings.StatueTime, timeStatue.daysRemaining));
 
             // var wharf = kingdom.wharf;
             var boat = kingdom.boat;
             if (boat)
-                poiList.Add(new MarkInfo(boat.transform.position.x, Color.green, "", Strings.Boat));
+                poiList.Add(new MarkInfo(boat.transform.position.x, Style.Boat.Color, Style.Boat.Sign, Strings.Boat));
             else
             {
                 var wreck = kingdom.wreckPlaceholder;
                 if (wreck)
-                    poiList.Add(new MarkInfo(wreck.transform.position.x, Color.red, "", Strings.Wreck));
+                    poiList.Add(new MarkInfo(wreck.transform.position.x, Style.Boat.Wrecked.Color, Style.Boat.Sign, Strings.BoatWreck));
             }
 
             foreach (var obj in payables.AllPayables)
@@ -556,11 +573,11 @@ namespace KingdomMod
 
                 if (prefab.prefabID == (int)PrefabIDs.Quarry_undeveloped)
                 {
-                    poiList.Add(new MarkInfo(go.transform.position.x, Color.red, "", Strings.Quarry, obj.price));
+                    poiList.Add(new MarkInfo(go.transform.position.x, Style.Quarry.Color, Style.Quarry.Sign, Strings.Quarry, obj.price));
                 }
                 else if (prefab.prefabID == (int)PrefabIDs.Mine_undeveloped)
                 {
-                    poiList.Add(new MarkInfo(go.transform.position.x, Color.red, "", Strings.Mine, obj.price));
+                    poiList.Add(new MarkInfo(go.transform.position.x, Style.Mine.Color, Style.Mine.Sign, Strings.Mine, obj.price));
                 }
                 else
                 {
@@ -569,11 +586,11 @@ namespace KingdomMod
                     {
                         var color = unlockNewRulerStatue.status switch
                         {
-                            UnlockNewRulerStatue.Status.Locked => Color.red,
-                            UnlockNewRulerStatue.Status.WaitingForArcher => Color.blue,
-                            _ => Color.green
+                            UnlockNewRulerStatue.Status.Locked => Style.RulerSpawns.Locked.Color,
+                            UnlockNewRulerStatue.Status.WaitingForArcher => Style.RulerSpawns.Building.Color,
+                            _ => Style.RulerSpawns.Unlocked.Color
                         };
-                        if (color != Color.green)
+                        if (color != Style.RulerSpawns.Unlocked.Color)
                         {
                             var markName = unlockNewRulerStatue.rulerToUnlock switch
                             {
@@ -590,7 +607,7 @@ namespace KingdomMod
                                 Player.Model.Total => "",
                                 _ => ""
                             };
-                            poiList.Add(new MarkInfo(go.transform.position.x, color, "", markName, obj.price));
+                            poiList.Add(new MarkInfo(go.transform.position.x, color, Style.RulerSpawns.Sign, markName, obj.price));
                         }
                     }
                 }
@@ -606,30 +623,30 @@ namespace KingdomMod
 
                 if (prefab.prefabID == (int)PrefabIDs.Quarry)
                 {
-                    poiList.Add(new MarkInfo(go.transform.position.x, Color.green, "", Strings.Quarry));
+                    poiList.Add(new MarkInfo(go.transform.position.x, Style.Quarry.Unlocked.Color, Style.Quarry.Sign, Strings.Quarry));
                 }
                 else if (prefab.prefabID == (int)PrefabIDs.Mine)
                 {
-                    poiList.Add(new MarkInfo(go.transform.position.x, Color.green, "", Strings.Mine));
+                    poiList.Add(new MarkInfo(go.transform.position.x, Style.Mine.Unlocked.Color, Style.Mine.Sign, Strings.Mine));
                 }
                 else if (prefab.prefabID == (int)PrefabIDs.MerchantHouse)
                 {
-                    poiList.Add(new MarkInfo(go.transform.position.x, Color.white, "", Strings.MerchantSpawner));
+                    poiList.Add(new MarkInfo(go.transform.position.x, Style.MerchantHouse.Color, Style.MerchantHouse.Sign, Strings.MerchantHouse));
                 }
                 else
                 {
                     var thorPuzzleController = go.GetComponent<ThorPuzzleController>();
                     if (thorPuzzleController != null)
                     {
-                        var color = thorPuzzleController.State == 0 ? Color.red : Color.green;
-                        poiList.Add(new MarkInfo(thorPuzzleController.transform.position.x, color, "", Strings.ThorPuzzleStatue));
+                        var color = thorPuzzleController.State == 0 ? Style.ThorPuzzleStatue.Locked.Color : Style.ThorPuzzleStatue.Unlocked.Color;
+                        poiList.Add(new MarkInfo(thorPuzzleController.transform.position.x, color, Style.ThorPuzzleStatue.Sign, Strings.ThorPuzzleStatue));
                     }
 
                     var helPuzzleController = go.GetComponent<HelPuzzleController>();
                     if (helPuzzleController != null)
                     {
-                        var color = helPuzzleController.State == 0 ? Color.red : Color.green;
-                        poiList.Add(new MarkInfo(helPuzzleController.transform.position.x, color, "", Strings.HelPuzzleStatue));
+                        var color = helPuzzleController.State == 0 ? Style.HelPuzzleStatue.Locked.Color : Style.HelPuzzleStatue.Unlocked.Color;
+                        poiList.Add(new MarkInfo(helPuzzleController.transform.position.x, color, Style.HelPuzzleStatue.Sign, Strings.HelPuzzleStatue));
                     }
                 }
             }
@@ -645,22 +662,22 @@ namespace KingdomMod
                 var wall = go.GetComponent<Wall>();
                 if (wall)
                 {
-                    poiList.Add(new MarkInfo(go.transform.position.x, Color.blue, Strings.WallSign, ""));
+                    poiList.Add(new MarkInfo(go.transform.position.x, Style.Wall.Building.Color, Style.Wall.Sign, ""));
                     if (kingdom.GetBorderSideForPosition(go.transform.position.x) == Side.Left)
-                        leftWalls.Add(new WallPoint(go.transform.position, Color.blue));
+                        leftWalls.Add(new WallPoint(go.transform.position, Style.WallLine.Building.Color));
                     else
-                        rightWalls.Add(new WallPoint(go.transform.position, Color.blue));
+                        rightWalls.Add(new WallPoint(go.transform.position, Style.WallLine.Building.Color));
                 }
 
                 var prefab = go.GetComponent<PrefabID>();
                 if (prefab == null) continue;
                 if (prefab.prefabID == (int)PrefabIDs.Quarry)
                 {
-                    poiList.Add(new MarkInfo(go.transform.position.x, Color.blue, "", Strings.Quarry));
+                    poiList.Add(new MarkInfo(go.transform.position.x, Style.Quarry.Building.Color, Style.Quarry.Sign, Strings.Quarry));
                 }
                 else if (prefab.prefabID == (int)PrefabIDs.Mine)
                 {
-                    poiList.Add(new MarkInfo(go.transform.position.x, Color.blue, "", Strings.Mine));
+                    poiList.Add(new MarkInfo(go.transform.position.x, Style.Mine.Building.Color, Style.Mine.Sign, Strings.Mine));
                 }
             }
 
@@ -845,8 +862,8 @@ namespace KingdomMod
                 {
                     if (IsYourSelf(playerId, markName))
                     {
-                        markName = Strings.You;
-                        color = Color.green;
+                        markName = Strings.You.Value;
+                        color = Style.PlayerSelf.Color;
                     }
                 }
 
@@ -972,26 +989,26 @@ namespace KingdomMod
 
         private void DrawStatsInfo(int playerId)
         {
-            var kingdom = Managers.Inst.kingdom;
-            guiStyle.normal.textColor = Color.white;
+            guiStyle.normal.textColor = Style.StatsInfo.Color;
             guiStyle.alignment = TextAnchor.UpperLeft;
 
+            var kingdom = Managers.Inst.kingdom;
             var boxRect = new Rect(5, 160, 120, 146);
             GUI.Box(boxRect, "");
             GUI.Box(boxRect, "");
 
             GUI.Label(new Rect(14, 166 + 20 * 0, 120, 20), Strings.Peasant + ": " + statsInfo.PeasantCount, guiStyle);
             GUI.Label(new Rect(14, 166 + 20 * 1, 120, 20), Strings.Worker + ": " + statsInfo.WorkerCount, guiStyle);
-            GUI.Label(new Rect(14, 166 + 20 * 2, 120, 20), $"{Strings.Archer}: {statsInfo.ArcherCount} ({GetArcherCount(ArcherType.Free)}|{GetArcherCount(ArcherType.GuardSlot)}|{GetArcherCount(ArcherType.KnightSoldier)})", guiStyle);
+            GUI.Label(new Rect(14, 166 + 20 * 2, 120, 20), $"{Strings.Archer.Value}: {statsInfo.ArcherCount} ({GetArcherCount(ArcherType.Free)}|{GetArcherCount(ArcherType.GuardSlot)}|{GetArcherCount(ArcherType.KnightSoldier)})", guiStyle);
             GUI.Label(new Rect(14, 166 + 20 * 3, 120, 20), Strings.Pikeman + ": " + kingdom.Pikemen.Count, guiStyle);
-            GUI.Label(new Rect(14, 166 + 20 * 4, 120, 20), $"{Strings.Knight}: {kingdom.knights.Count} ({GetKnightCount(true)})", guiStyle);
+            GUI.Label(new Rect(14, 166 + 20 * 4, 120, 20), $"{Strings.Knight.Value}: {kingdom.knights.Count} ({GetKnightCount(true)})", guiStyle);
             GUI.Label(new Rect(14, 166 + 20 * 5, 120, 20), Strings.Farmer + ": " + statsInfo.FarmerCount, guiStyle);
             GUI.Label(new Rect(14, 166 + 20 * 6, 120, 20), Strings.Farmlands + ": " + statsInfo.MaxFarmlands, guiStyle);
         }
 
         private void DrawExtraInfo(int playerId)
         {
-            guiStyle.normal.textColor = Color.white;
+            guiStyle.normal.textColor = Style.ExtraInfo.Color;
             guiStyle.alignment = TextAnchor.UpperLeft;
 
             var left = Screen.width / 2 - 20;
@@ -1032,7 +1049,7 @@ namespace KingdomMod
             public Color Color;
         }
 
-        private enum MarkRow
+        public enum MarkRow
         {
             Settled = 0,
             Movable = 1
