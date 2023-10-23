@@ -352,7 +352,7 @@ namespace KingdomMod
                 bool isLocked = reason != PayableUpgrade.LockedReason.NotLocked && reason != PayableUpgrade.LockedReason.NoUpgrade;
                 bool isLockedForInvalidTime = reason == PayableUpgrade.LockedReason.InvalidTime;
                 var price = isLockedForInvalidTime ? (int)(payable.timeAvailableFrom - Time.time) : canPay ? payable.price : 0;
-                var color = isLocked ? Style.Castle.Destroyed.Color : Style.Castle.Color;
+                var color = isLocked ? Style.Castle.Locked.Color : Style.Castle.Color;
                 poiList.Add(new MarkInfo(castle.transform.position.x, color, Style.Castle.Sign, Strings.Castle, price));
 
                 leftWalls.Add(new WallPoint(castle.transform.position, Style.WallLine.Color));

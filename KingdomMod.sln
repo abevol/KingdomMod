@@ -8,13 +8,14 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5A0F1070-A8CB-4CFC-883D-7BCF2D9EC9A9}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		version.txt = version.txt
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StaminaBar", "StaminaBar\StaminaBar.csproj", "{C35ED36A-0021-4B9C-B848-A158CFB59652}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DevTools", "DevTools\DevTools.csproj", "{F307EFAD-0352-469E-8DC2-49A7185D032A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BetterPayableUpgrade", "BetterPayableUpgrade\BetterPayableUpgrade.csproj", "{18F60A34-6683-4950-ADA2-2C3B464D8B7B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BetterPayableUpgrade", "BetterPayableUpgrade\BetterPayableUpgrade.csproj", "{18F60A34-6683-4950-ADA2-2C3B464D8B7B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
