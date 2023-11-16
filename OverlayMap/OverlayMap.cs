@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using BepInEx.Logging;
 using UnityEngine;
@@ -18,10 +16,13 @@ namespace KingdomMod
         private List<MarkInfo> minimapMarkList = new();
         private List<LineInfo> drawLineList = new();
         private readonly StatsInfo statsInfo = new();
-        private float exploredLeft = 0;
-        private float exploredRight = 0;
         private bool showFullMap = false;
         private GameObject gameLayer = null;
+        private static int _campaignIndex = 0;
+        private static int _land = 0;
+        private static int _challengeId = 0;
+        private static string _archiveFilename;
+        private static readonly ExploredRegion _exploredRegion = new ExploredRegion();
 
         public static void LogMessage(string message, 
             [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
@@ -141,7 +142,7 @@ namespace KingdomMod
         {
             var game = Managers.Inst?.game;
             if (game == null) return false;
-            return game.state is Game.State.Playing or Game.State.NetworkClientPlaying or Game.State.Menu;
+            return game.state is Game.State.Playing or Game.State.NetworkClientPlaying;
         }
 
         private void OnGUI()
@@ -186,12 +187,109 @@ namespace KingdomMod
             // OnGameStart();
         }
 
+        public class ExploredRegion
+        {
+            private float _exploredLeft;
+            private float _exploredRight;
+
+            public float ExploredLeft
+            {
+                get { return _exploredLeft; }
+                set
+                {
+                    _exploredLeft = value;
+                    SetExploredLeft(value);
+                }
+            }
+
+            public float ExploredRight
+            {
+                get { return _exploredRight; }
+                set
+                {
+                    _exploredRight = value;
+                    SetExploredRight(value);
+                }
+            }
+
+            private static void SetExploredLeft(float value)
+            {
+                Global.ConfigFile.Bind(_archiveFilename, "ExploredLeft", 0f, "").Value = value;
+                Global.ConfigFile.Bind(_archiveFilename, "Time", 0f, "").Value = Managers.Inst.director.currentTime;
+                Global.ConfigFile.Bind(_archiveFilename, "Days", 0, "").Value = Managers.Inst.director.CurrentDayForSpawning;
+            }
+
+            private static void SetExploredRight(float value)
+            {
+                Global.ConfigFile.Bind(_archiveFilename, "ExploredRight", 0f, "").Value = value;
+                Global.ConfigFile.Bind(_archiveFilename, "Time", 0f, "").Value = Managers.Inst.director.currentTime;
+                Global.ConfigFile.Bind(_archiveFilename, "Days", 0, "").Value = Managers.Inst.director.CurrentDayForSpawning;
+            }
+
+            private static float GetExploredLeft()
+            {
+                return Global.ConfigFile.Bind(_archiveFilename, "ExploredLeft", 0f, "").Value;
+            }
+
+            private static float GetExploredRight()
+            {
+                return Global.ConfigFile.Bind(_archiveFilename, "ExploredRight", 0f, "").Value;
+            }
+
+            private static float GetTime()
+            {
+                return Global.ConfigFile.Bind(_archiveFilename, "Time", 0f, "").Value;
+            }
+
+            private static int GetDays()
+            {
+                return Global.ConfigFile.Bind(_archiveFilename, "Days", 0, "").Value;
+            }
+
+            private static bool HasAvailableConfig()
+            {
+                if (GetExploredLeft() == 0 && GetExploredRight() == 0)
+                    return false;
+
+                if (GetDays() > Managers.Inst.director.CurrentDayForSpawning)
+                    return false;
+
+                if (GetDays() == Managers.Inst.director.CurrentDayForSpawning && GetTime() > Managers.Inst.director.currentTime)
+                    return false;
+
+                return true;
+            }
+
+            public void Init()
+            {
+                if (HasAvailableConfig())
+                {
+                    _exploredLeft = GetExploredLeft();
+                    _exploredRight = GetExploredRight();
+                }
+                else
+                {
+                    var player = GetLocalPlayer();
+                    _exploredLeft = player.transform.localPosition.x;
+                    _exploredRight = player.transform.localPosition.x;
+                }
+            }
+        }
+
         private void OnGameStart()
         {
             log.LogMessage("OnGameStart.");
 
-            exploredLeft = exploredRight = 0;
             gameLayer = GameObject.FindGameObjectWithTag(Tags.GameLayer);
+
+            _campaignIndex = GlobalSaveData.loaded.currentCampaign;
+            _land = CampaignSaveData.current.CurrentLand;
+            _challengeId = GlobalSaveData.loaded.currentChallenge;
+            _archiveFilename = IslandSaveData.GetFilePropsForLand(_campaignIndex, _land, _challengeId).filename;
+
+            log.LogMessage($"OnGameStart: _archiveFilename {_archiveFilename}, Campaign {_campaignIndex}, CurrentLand {_land}, currentChallenge {_challengeId}");
+
+            _exploredRegion.Init();
         }
 
         private void OnCurrentCampaignSwitch()
@@ -267,10 +365,10 @@ namespace KingdomMod
                 poiList.Add(new MarkInfo(mover.transform.position.x, Style.Player.Color, Style.Player.Sign, player.playerId == 0 ? Strings.P1 : Strings.P2, 0, MarkRow.Movable));
                 float l = mover.transform.position.x - 12;
                 float r = mover.transform.position.x + 12;
-                if (l < exploredLeft)
-                    exploredLeft = l;
-                if (r > exploredRight)
-                    exploredRight = r;
+                if (l < _exploredRegion.ExploredLeft)
+                    _exploredRegion.ExploredLeft = l;
+                if (r > _exploredRegion.ExploredRight)
+                    _exploredRegion.ExploredRight = r;
             }
 
             var deers = FindObjectsWithTagOfType<Deer>(Tags.Wildlife);
@@ -697,7 +795,7 @@ namespace KingdomMod
             {
                 if (showFullMap)
                     poi.Visible = true;
-                else if(poi.WorldPosX >= exploredLeft && poi.WorldPosX <= exploredRight)
+                else if(poi.WorldPosX >= _exploredRegion.ExploredLeft && poi.WorldPosX <= _exploredRegion.ExploredRight)
                     poi.Visible = true;
                 else if (poi.WorldPosX >= wallLeft && poi.WorldPosX <= wallRight)
                     poi.Visible = true;
@@ -1015,7 +1113,7 @@ namespace KingdomMod
             var top = 136;
 
             GUI.Label(new Rect(14, top, 60, 20),  Strings.Land + ": " + (Managers.Inst.game.currentLand + 1), guiStyle);
-            GUI.Label(new Rect(14 + 60, top, 60, 20), Strings.Days + ": " + (Managers.Inst.director.CurrentDaysSinceFirstLandingThisReign), guiStyle);
+            GUI.Label(new Rect(14 + 60, top, 60, 20), Strings.Days + ": " + (Managers.Inst.director.CurrentDayForSpawning), guiStyle);
 
             float currentTime = Managers.Inst.director.currentTime;
             var currentHour = Math.Truncate(currentTime);

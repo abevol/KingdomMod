@@ -79,15 +79,16 @@ A map mod. It marks points of interest, along with some extra details. There's a
 ## Features
 
 1. Add a map floating layer on the top of the screen, and marks points of interest in the game on it, including castles, slums, docks, cliffs, etc.
-2. By default, only the markers in the area you have explored are displayed, of course you can also show the full map immediately by pressing the `F` key.
+2. By default, only the markers in the area you have explored are displayed, of course you can also show the full map immediately by pressing the `F` key (Not recommended).
 3. Displays some useful stats, including the number of idle villagers, workers, archers, farmers and farmland.
 4. Display additional useful information, such as current time, current island, number of gems and coins, etc.
 5. Some shortcut features, such as quick save or reload the game without exiting the game.
+6. The progress of the exploring area now can be saved with the saving archive of the game.
 
 ## Hotkeys
 
 1. `M` Display the map overlay
-2. `F` Show the full map
+2. `F` Show the full map (Not recommended, it will reduce the fun of the game)
 3. `F5` Reload saved game (without exiting game)
 4. `F8` Save game (without exiting game)
 

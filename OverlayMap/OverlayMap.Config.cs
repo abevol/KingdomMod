@@ -155,7 +155,7 @@ namespace KingdomMod
                 {
                     try
                     {
-                        LogMessage($"OnConfigFileChanged: {e.Name}, {e.ChangeType}");
+                        // LogMessage($"OnConfigFileChanged: {e.Name}, {e.ChangeType}");
 
                         ConfigFile.Reload();
                     }
