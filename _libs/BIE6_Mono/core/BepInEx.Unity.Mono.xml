@@ -1,0 +1,232 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>BepInEx.Unity.Mono</name>
+    </assembly>
+    <members>
+        <member name="T:BepInEx.Unity.Mono.BaseUnityPlugin">
+            <summary>
+                The base plugin type that is used by the BepInEx plugin loader.
+            </summary>
+        </member>
+        <member name="M:BepInEx.Unity.Mono.BaseUnityPlugin.#ctor">
+            <summary>
+                Create a new instance of a plugin and all of its tied in objects.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">BepInPlugin attribute is missing.</exception>
+        </member>
+        <member name="P:BepInEx.Unity.Mono.BaseUnityPlugin.Info">
+            <summary>
+                Information about this plugin as it was loaded.
+            </summary>
+        </member>
+        <member name="P:BepInEx.Unity.Mono.BaseUnityPlugin.Logger">
+            <summary>
+                Logger instance tied to this plugin.
+            </summary>
+        </member>
+        <member name="P:BepInEx.Unity.Mono.BaseUnityPlugin.Config">
+            <summary>
+                Default config file tied to this plugin. The config file will not be created until
+                any settings are added and changed, or <see cref="M:BepInEx.Configuration.ConfigFile.Save" /> is called.
+            </summary>
+        </member>
+        <member name="T:BepInEx.Unity.Mono.Bootstrap.UnityChainloader">
+            <summary>
+                The manager and loader for all plugins, and the entry point for BepInEx plugin system.
+            </summary>
+        </member>
+        <member name="P:BepInEx.Unity.Mono.Bootstrap.UnityChainloader.ManagerObject">
+            <summary>
+                The GameObject that all plugins are attached to as components.
+            </summary>
+        </member>
+        <member name="T:BepInEx.Unity.Mono.Configuration.KeyboardShortcut">
+            <summary>
+                A keyboard shortcut that can be used in Update method to check if user presses a key combo. The shortcut is only
+                triggered when the user presses the exact combination. For example, <c>F + LeftCtrl</c> will trigger only if user
+                presses and holds only LeftCtrl, and then presses F. If any other keys are pressed, the shortcut will not trigger.
+                Can be used as a value of a setting in <see cref="M:BepInEx.Configuration.ConfigFile.Bind``1(BepInEx.Configuration.ConfigDefinition,``0,BepInEx.Configuration.ConfigDescription)" />
+                to allow user to change this shortcut and have the changes saved.
+                How to use: Use <see cref="M:BepInEx.Unity.Mono.Configuration.KeyboardShortcut.IsDown" /> in this class instead of <see cref="M:UnityEngine.Input.GetKeyDown(UnityEngine.KeyCode)" /> in the
+                Update loop.
+            </summary>
+        </member>
+        <member name="F:BepInEx.Unity.Mono.Configuration.KeyboardShortcut.Empty">
+            <summary>
+                Shortcut that never triggers.
+            </summary>
+        </member>
+        <member name="F:BepInEx.Unity.Mono.Configuration.KeyboardShortcut.AllKeyCodes">
+            <summary>
+                All KeyCode values that can be used in a keyboard shortcut.
+            </summary>
+        </member>
+        <member name="M:BepInEx.Unity.Mono.Configuration.KeyboardShortcut.#ctor(UnityEngine.KeyCode,UnityEngine.KeyCode[])">
+            <summary>
+                Create a new keyboard shortcut.
+            </summary>
+            <param name="mainKey">Main key to press</param>
+            <param name="modifiers">Keys that should be held down before main key is registered</param>
+        </member>
+        <member name="P:BepInEx.Unity.Mono.Configuration.KeyboardShortcut.MainKey">
+            <summary>
+                Main key of the key combination. It has to be pressed / let go last for the combination to be triggered.
+                If the combination is empty, <see cref="F:UnityEngine.KeyCode.None" /> is returned.
+            </summary>
+        </member>
+        <member name="P:BepInEx.Unity.Mono.Configuration.KeyboardShortcut.Modifiers">
+            <summary>
+                Modifiers of the key combination, if any.
+            </summary>
+        </member>
+        <member name="M:BepInEx.Unity.Mono.Configuration.KeyboardShortcut.Deserialize(System.String)">
+            <summary>
+                Attempt to deserialize key combination from the string.
+            </summary>
+        </member>
+        <member name="M:BepInEx.Unity.Mono.Configuration.KeyboardShortcut.Serialize">
+            <summary>
+                Serialize the key combination into a user readable string.
+            </summary>
+        </member>
+        <member name="M:BepInEx.Unity.Mono.Configuration.KeyboardShortcut.IsDown">
+            <summary>
+                Check if the main key was just pressed (Input.GetKeyDown), and specified modifier keys are all pressed
+            </summary>
+        </member>
+        <member name="M:BepInEx.Unity.Mono.Configuration.KeyboardShortcut.IsPressed">
+            <summary>
+                Check if the main key is currently held down (Input.GetKey), and specified modifier keys are all pressed
+            </summary>
+        </member>
+        <member name="M:BepInEx.Unity.Mono.Configuration.KeyboardShortcut.IsUp">
+            <summary>
+                Check if the main key was just lifted (Input.GetKeyUp), and specified modifier keys are all pressed.
+            </summary>
+        </member>
+        <member name="M:BepInEx.Unity.Mono.Configuration.KeyboardShortcut.ToString">
+            <inheritdoc />
+        </member>
+        <member name="M:BepInEx.Unity.Mono.Configuration.KeyboardShortcut.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:BepInEx.Unity.Mono.Configuration.KeyboardShortcut.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="T:BepInEx.Unity.Mono.Logging.UnityLogListener">
+            <summary>
+                Logs entries using Unity specific outputs.
+            </summary>
+        </member>
+        <member name="P:BepInEx.Unity.Mono.Logging.UnityLogListener.LogLevelFilter">
+            <inheritdoc />
+        </member>
+        <member name="M:BepInEx.Unity.Mono.Logging.UnityLogListener.LogEvent(System.Object,BepInEx.Logging.LogEventArgs)">
+            <inheritdoc />
+        </member>
+        <member name="M:BepInEx.Unity.Mono.Logging.UnityLogListener.Dispose">
+            <inheritdoc />
+        </member>
+        <member name="T:BepInEx.Unity.Mono.Logging.UnityLogSource">
+            <summary>
+                Logs entries using Unity specific outputs.
+            </summary>
+        </member>
+        <member name="M:BepInEx.Unity.Mono.Logging.UnityLogSource.#ctor">
+            <summary>
+                Creates a new Unity log source.
+            </summary>
+        </member>
+        <member name="P:BepInEx.Unity.Mono.Logging.UnityLogSource.SourceName">
+            <inheritdoc />
+        </member>
+        <member name="E:BepInEx.Unity.Mono.Logging.UnityLogSource.LogEvent">
+            <inheritdoc />
+        </member>
+        <member name="M:BepInEx.Unity.Mono.Logging.UnityLogSource.Dispose">
+            <inheritdoc />
+        </member>
+        <member name="T:BepInEx.Unity.Mono.ThreadingHelper">
+            <summary>
+                Provides methods for running code on other threads and synchronizing with the main thread.
+            </summary>
+        </member>
+        <member name="P:BepInEx.Unity.Mono.ThreadingHelper.Instance">
+            <summary>
+                Current instance of the helper.
+            </summary>
+        </member>
+        <member name="P:BepInEx.Unity.Mono.ThreadingHelper.SynchronizingObject">
+            <summary>
+                Gives methods for invoking delegates on the main unity thread, both synchronously and asynchronously.
+                Can be used in many built-in framework types, for example
+                <see cref="P:System.IO.FileSystemWatcher.SynchronizingObject" />
+                and <see cref="P:System.Timers.Timer.SynchronizingObject" /> to make their events fire on the main unity thread.
+            </summary>
+        </member>
+        <member name="M:BepInEx.Unity.Mono.ThreadingHelper.StartSyncInvoke(System.Action)">
+            <summary>
+                Queue the delegate to be invoked on the main unity thread. Use to synchronize your threads.
+            </summary>
+        </member>
+        <member name="M:BepInEx.Unity.Mono.ThreadingHelper.StartAsyncInvoke(System.Func{System.Action})">
+            <summary>
+                Queue the delegate to be invoked on a background thread. Use this to run slow tasks without affecting the game.
+                NOTE: Most of Unity API can not be accessed while running on another thread!
+            </summary>
+            <param name="action">
+                Task to be executed on another thread. Can optionally return an Action that will be executed on the main thread.
+                You can use this action to return results of your work safely. Return null if this is not needed.
+            </param>
+        </member>
+        <member name="P:BepInEx.Unity.Mono.ThreadingHelper.InvokeRequired">
+            <summary>
+                False if current code is executing on the main unity thread, otherwise True.
+                Warning: Will return true before the first frame finishes (i.e. inside plugin Awake and Start methods).
+            </summary>
+            <inheritdoc />
+        </member>
+        <member name="T:BepInEx.Unity.Mono.ThreadingExtensions">
+            <summary>
+                Convenience extensions for utilizing multiple threads and using the <see cref="T:BepInEx.Unity.Mono.ThreadingHelper" />.
+            </summary>
+        </member>
+        <member name="M:BepInEx.Unity.Mono.ThreadingExtensions.RunParallel``2(System.Collections.Generic.IEnumerable{``0},System.Func{``0,``1},System.Int32)">
+            <inheritdoc cref="M:BepInEx.Unity.Mono.ThreadingExtensions.RunParallel``2(System.Collections.Generic.IList{``0},System.Func{``0,``1},System.Int32)" />
+        </member>
+        <member name="M:BepInEx.Unity.Mono.ThreadingExtensions.RunParallel``2(System.Collections.Generic.IList{``0},System.Func{``0,``1},System.Int32)">
+            <summary>
+                Apply a function to a collection of data by spreading the work on multiple threads.
+                Outputs of the functions are returned to the current thread and yielded one by one.
+            </summary>
+            <typeparam name="TIn">Type of the input values.</typeparam>
+            <typeparam name="TOut">Type of the output values.</typeparam>
+            <param name="data">Input values for the work function.</param>
+            <param name="work">Function to apply to the data on multiple threads at once.</param>
+            <param name="workerCount">Number of worker threads. By default Environment.ProcessorCount is used.</param>
+            <exception cref="T:System.Reflection.TargetInvocationException">
+                An exception was thrown inside one of the threads, and the operation was
+                aborted.
+            </exception>
+            <exception cref="T:System.ArgumentException">Need at least 1 workerCount.</exception>
+        </member>
+        <member name="M:BepInEx.Unity.Mono.ThreadingExtensions.ForEachParallel``1(System.Collections.Generic.IList{``0},System.Action{``0},System.Int32)">
+            <summary>
+            Apply a function to a collection of data by spreading the work on multiple threads.
+            Lower overhead than RunParallel but it blocks the main thread until all work is completed or an exception has been thrown.
+            </summary>
+            <typeparam name="T">Type of the input values.</typeparam>
+            <param name="data">Input values for the work function.</param>
+            <param name="work">Function to apply to the data on multiple threads at once.</param>
+            <param name="workerCount">Number of worker threads. By default Environment.ProcessorCount is used.</param>
+            <exception cref="T:System.Reflection.TargetInvocationException">An exception was thrown inside one of the threads, and the operation was aborted.</exception>
+            <exception cref="T:System.ArgumentException">Need at least 1 workerCount.</exception>
+        </member>
+        <member name="T:BepInEx.Unity.Mono.UnityTomlTypeConverters">
+            <summary>
+                Config types that are unity specific
+            </summary>
+        </member>
+    </members>
+</doc>

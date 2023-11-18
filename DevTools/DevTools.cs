@@ -4,11 +4,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using File = System.IO.File;
 using HarmonyLib;
+#if IL2CPP
+using Il2CppInterop.Runtime.Injection;
+#endif
 
 namespace KingdomMod
 {
     public class DevTools : MonoBehaviour
     {
+        public static DevTools Instance { get; private set; }
         private static ManualLogSource log;
         private bool enabledDebugInfo =false;
         private bool enabledObjectsInfo = false;
@@ -20,10 +24,14 @@ namespace KingdomMod
 
         public static void Initialize(DevToolsPlugin plugin)
         {
-            log = plugin.Log;
-            var component = plugin.AddComponent<DevTools>();
-            component.hideFlags = HideFlags.HideAndDontSave;
-            DontDestroyOnLoad(component.gameObject);
+            log = plugin.LogSource;
+#if IL2CPP
+            ClassInjector.RegisterTypeInIl2Cpp<DevTools>();
+#endif
+            GameObject obj = new(nameof(DevTools));
+            DontDestroyOnLoad(obj);
+            obj.hideFlags = HideFlags.HideAndDontSave;
+            Instance = obj.AddComponent<DevTools>();
         }
 
         public DevTools()
@@ -141,7 +149,7 @@ namespace KingdomMod
             //     }
             // }
 
-            [HarmonyPatch(typeof(UnityEngine.TextGenerator), nameof(UnityEngine.TextGenerator.ValidatedSettings))]
+            [HarmonyPatch(typeof(UnityEngine.TextGenerator), "ValidatedSettings")]
             public class TextGeneratorValidatedSettingsPatcher
             {
                 public static bool Prefix(ref TextGenerationSettings __result, TextGenerationSettings settings)
@@ -459,7 +467,7 @@ namespace KingdomMod
 
         private void UpdateObjectsInfo()
         {
-            var worldCam = Managers.Inst.game._mainCameraComponent;
+            var worldCam = Managers.Inst.game.GetFieldOrPropertyValue<Camera>("_mainCameraComponent");
             if (!worldCam) return;
 
             objectsInfoList.Clear();
@@ -555,14 +563,14 @@ namespace KingdomMod
                 infoLines.Add($"COOP_ENABLED: {Managers.COOP_ENABLED}");
 
                 var kingdom = Managers.Inst.kingdom;
-                var castlePayable = kingdom.castle?._payableUpgrade;
+                var castlePayable = kingdom.castle?.GetFieldOrPropertyValue<PayableUpgrade>("_payableUpgrade");
                 if (castlePayable != null)
                 {
                     infoLines.Add($"castle: {kingdom.castle.name}");
                     infoLines.Add($"blockPaymentUpgrade: {castlePayable.blockPaymentUpgrade}");
                     infoLines.Add($"cooldown: {castlePayable.cooldown}");
-                    infoLines.Add($"timeAvailableFrom: {castlePayable.timeAvailableFrom}");
-                    infoLines.Add($"timeAvailableFrom: {castlePayable.timeAvailableFrom - Time.time}");
+                    infoLines.Add($"timeAvailableFrom: {castlePayable.GetFieldOrPropertyValue<float>("timeAvailableFrom")}");
+                    infoLines.Add($"timeAvailableFrom: {castlePayable.GetFieldOrPropertyValue<float>("timeAvailableFrom") - Time.time}");
                     infoLines.Add($"IsLocked: {castlePayable.IsLocked(GetLocalPlayer())}");
                     infoLines.Add($"price: {castlePayable.price}");
                 }

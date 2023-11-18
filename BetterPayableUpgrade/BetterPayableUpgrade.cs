@@ -1,16 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
 using BepInEx.Logging;
 using Coatsink.Common;
 using UnityEngine;
 using HarmonyLib;
+#if IL2CPP
+using Il2CppInterop.Runtime.Injection;
+using Il2CppSystem.Collections.Generic;
+
+#else
+using System.Collections.Generic;
+#endif
 
 namespace KingdomMod
 {
     public class BetterPayableUpgrade : MonoBehaviour
     {
+        public static BetterPayableUpgrade Instance { get; private set; }
         private static ManualLogSource log;
-        private static Dictionary<PrefabIDs, ModifyData> _modifyDataDict;
+        private static System.Collections.Generic.Dictionary<PrefabIDs, ModifyData> _modifyDataDict;
 
         public class Patcher
         {
@@ -27,7 +34,7 @@ namespace KingdomMod
                 }
             }
 
-            [HarmonyPatch(typeof(CoinBag), nameof(CoinBag.Init))]
+            [HarmonyPatch(typeof(CoinBag), "Init")]
             public class CoinBagInitPatcher
             {
                 public static void Prefix(CoinBag __instance)
@@ -45,10 +52,14 @@ namespace KingdomMod
 
         public static void Initialize(BetterPayableUpgradePlugin plugin)
         {
-            log = plugin.Log;
-            var component = plugin.AddComponent<BetterPayableUpgrade>();
-            component.hideFlags = HideFlags.HideAndDontSave;
-            DontDestroyOnLoad(component.gameObject);
+            log = plugin.LogSource;
+#if IL2CPP
+            ClassInjector.RegisterTypeInIl2Cpp<BetterPayableUpgrade>();
+#endif
+            GameObject obj = new(nameof(BetterPayableUpgrade));
+            DontDestroyOnLoad(obj);
+            obj.hideFlags = HideFlags.HideAndDontSave;
+            Instance = obj.AddComponent<BetterPayableUpgrade>();
         }
 
         public BetterPayableUpgrade()
@@ -61,7 +72,7 @@ namespace KingdomMod
             log.LogMessage($"{this.GetType().Name} Start.");
 
             Patcher.PatchAll();
-            Game.add_OnGameStart((Action)OnGameStart);
+            Game.OnGameStart += (Action)OnGameStart;
         }
 
         private void Update()
@@ -93,7 +104,7 @@ namespace KingdomMod
             {
                 log.LogDebug("Handle prefabs start.");
             
-                var prefabIds = new List<PrefabIDs>
+                var prefabIds = new System.Collections.Generic.List<PrefabIDs>
                 {
                     PrefabIDs.Citizen_House,
                     PrefabIDs.Workshop,
@@ -122,29 +133,35 @@ namespace KingdomMod
             var swapData = BiomeHolder.Inst.LoadedBiome?.swapData;
             if (swapData != null)
             {
-                log.LogDebug($"swapData._prefabSwapDictionary: {swapData._prefabSwapDictionary.Count}");
-                foreach (var pair in swapData._prefabSwapDictionary)
+                log.LogDebug($"swapData._prefabSwapDictionary: {swapData.GetFieldOrPropertyValue<Dictionary<GameObject, GameObject>>("_prefabSwapDictionary").Count}");
+                foreach (var pair in swapData.GetFieldOrPropertyValue<Dictionary<GameObject, GameObject>>("_prefabSwapDictionary"))
                 {
-                    log.LogDebug($"swapData: {pair.key.name}, {pair.value.name}, {pair.value.GetComponent<PrefabID>()?.prefabID}");
-                    HandlePayable(pair.value.gameObject, true);
+                    log.LogDebug($"swapData: {pair.Key.name}, {pair.Value.name}, {pair.Value.GetComponent<PrefabID>()?.prefabID}");
+                    HandlePayable(pair.Value.gameObject, true);
                 }
             }
 
             var customSwapData = ChallengeData.Current?.customSwapData;
             if (customSwapData != null)
             {
-                log.LogDebug($"customSwapData._prefabSwapDictionary: {customSwapData._prefabSwapDictionary.Count}");
-                foreach (var pair in customSwapData._prefabSwapDictionary)
+                log.LogDebug($"customSwapData._prefabSwapDictionary: {customSwapData.GetFieldOrPropertyValue<Dictionary<GameObject, GameObject>>("_prefabSwapDictionary").Count}");
+                foreach (var pair in customSwapData.GetFieldOrPropertyValue<Dictionary<GameObject, GameObject>>("_prefabSwapDictionary"))
                 {
-                    log.LogDebug($"customSwapData: {pair.key.name}, {pair.value.name}");
-                    HandlePayable(pair.value.gameObject, true);
+                    log.LogDebug($"customSwapData: {pair.Key.name}, {pair.Value.name}");
+                    HandlePayable(pair.Value.gameObject, true);
                 }
             }
 
             var payables = SingletonMonoBehaviour<Managers>.Inst.payables;
             if (payables != null)
             {
-                foreach (var obj in payables.AllPayables)
+                foreach (var obj in payables.
+#if IL2CPP
+                             AllPayables
+#else
+                             GetFieldOrPropertyValue<Payable[]>("AllPayables")
+#endif
+                         )
                 {
                     if (obj == null) continue;
                     var go = obj.gameObject;
@@ -153,7 +170,7 @@ namespace KingdomMod
                     HandlePayable(go, false);
                 }
 
-                foreach (var obj in payables._allBlockers)
+                foreach (var obj in payables.GetFieldOrPropertyValue<List<PayableBlocker>>("_allBlockers"))
                 {
                     if (obj == null) continue;
                     var scaffolding = obj.GetComponent<Scaffolding>();
@@ -169,7 +186,7 @@ namespace KingdomMod
 
         private static void HandlePayable(GameObject go, bool isPrefab, bool modifyBuildPoints = true)
         {
-            _modifyDataDict ??= new Dictionary<PrefabIDs, ModifyData>
+            _modifyDataDict ??= new System.Collections.Generic.Dictionary<PrefabIDs, ModifyData>
             {
                 { PrefabIDs.Citizen_House, new ModifyData(3) },
                 { PrefabIDs.Workshop, new ModifyData(3) },

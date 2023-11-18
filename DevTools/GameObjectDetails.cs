@@ -1,8 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using Il2CppInterop.Runtime;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+#if IL2CPP
+using Il2CppInterop.Runtime;
+using Il2CppSystem.Collections.Generic;
+#else
+using System.Collections.Generic;
+#endif
 
 namespace KingdomMod
 {
@@ -19,8 +23,8 @@ namespace KingdomMod
         public int prefabID = -1;
         public string position = "";
         public string localPosition = "";
-        public List<string> components = new List<string>();
-        public List<GameObjectDetails> children = new List<GameObjectDetails>();
+        public System.Collections.Generic.List<string> components = new();
+        public System.Collections.Generic.List<GameObjectDetails> children = new();
 
         #endregion
 
@@ -52,7 +56,13 @@ namespace KingdomMod
             var tmpComps = rootObject.GetComponents<Component>();
             foreach(var comp in tmpComps)
             {
-                components.Add(comp.GetIl2CppType().FullName);
+                components.Add(comp.
+#if IL2CPP
+                    GetIl2CppType()
+#else
+                    GetType()
+#endif
+                    .FullName);
             }
 
             var childCount = rootObject.transform.childCount;
@@ -62,18 +72,18 @@ namespace KingdomMod
             }
         }
 
-        internal delegate void getRootSceneObjects(int handle, IntPtr list);
+        // internal delegate void getRootSceneObjects(int handle, IntPtr list);
+        //
+        // // Resolve the GetRootGameObjects ICall (internal Unity MethodImp functions)
+        // internal static getRootSceneObjects getRootSceneObjects_iCall =
+        //     IL2CPP.ResolveICall<getRootSceneObjects>("UnityEngine.SceneManagement.Scene::GetRootGameObjectsInternal");
+        //
+        // private static void GetRootGameObjects_Internal(Scene scene, IntPtr list)
+        // {
+        //     getRootSceneObjects_iCall(scene.handle, list);
+        // }
 
-        // Resolve the GetRootGameObjects ICall (internal Unity MethodImp functions)
-        internal static getRootSceneObjects getRootSceneObjects_iCall =
-            IL2CPP.ResolveICall<getRootSceneObjects>("UnityEngine.SceneManagement.Scene::GetRootGameObjectsInternal");
-
-        private static void GetRootGameObjects_Internal(Scene scene, IntPtr list)
-        {
-            getRootSceneObjects_iCall(scene.handle, list);
-        }
-
-        public static Il2CppSystem.Collections.Generic.List<GameObject> GetAllScenesGameObjects()
+        public static System.Collections.Generic.List<GameObject> GetAllScenesGameObjects()
         {
             Scene[] array = new Scene[SceneManager.sceneCount];
             for (int i = 0; i < SceneManager.sceneCount; i++)
@@ -81,11 +91,16 @@ namespace KingdomMod
                 array[i] = SceneManager.GetSceneAt(i);
             }
 
-            var allObjectsList = new Il2CppSystem.Collections.Generic.List<GameObject>();
+            var allObjectsList = new System.Collections.Generic.List<GameObject>();
             foreach (var scene in array)
             {
-                var list = new Il2CppSystem.Collections.Generic.List<GameObject>(scene.rootCount);
-                GetRootGameObjects_Internal(scene, list.Pointer);
+#if IL2CPP
+                var list = new List<GameObject>(scene.rootCount);
+                Scene.GetRootGameObjectsInternal(scene.handle, list);
+#else
+                var list = new System.Collections.Generic.List<GameObject>(scene.rootCount);
+                scene.GetMethodDelegate<Action<int, object>>("GetRootGameObjectsInternal")(scene.handle, list);
+#endif
                 foreach (var obj in list)
                 {
                     allObjectsList.Add(obj);
@@ -106,7 +121,7 @@ namespace KingdomMod
             return allObjectsList;
         }
 
-        public static string XMLSerialize(List<GameObjectDetails> objectTree)
+        public static string XMLSerialize(System.Collections.Generic.List<GameObjectDetails> objectTree)
         {
             string xml = "<?xml version=\"1.0\"?>\r\n";
 
@@ -157,7 +172,7 @@ namespace KingdomMod
             return xml;
         }
 
-        public static string JsonSerialize(List<GameObjectDetails> objectTree)
+        public static string JsonSerialize(System.Collections.Generic.List<GameObjectDetails> objectTree)
         {
             string json = "{";
 

@@ -3,11 +3,12 @@
 游戏《[王国：两位君主](https://store.steampowered.com/app/701160/)》的相关功能模组。
 
 现已支持合作和在线模式！
+现在同时支持`IL2CPP`和`Mono`版本的游戏了！
 
-* [BetterPayableUpgrade](https://github.com/abevol/KingdomMod#betterpayableupgrade)
-* [DevTools](https://github.com/abevol/KingdomMod#devtools)
-* [OverlayMap](https://github.com/abevol/KingdomMod#overlaymap)
-* [StaminaBar](https://github.com/abevol/KingdomMod#staminabar)
+* 更好的支付升级 [BetterPayableUpgrade](https://github.com/abevol/KingdomMod#betterpayableupgrade)
+* 开发者工具 [DevTools](https://github.com/abevol/KingdomMod#devtools)
+* 活点地图 [OverlayMap](https://github.com/abevol/KingdomMod#overlaymap)
+* 坐骑耐力条 [StaminaBar](https://github.com/abevol/KingdomMod#staminabar)
 
 ## 预览
 
@@ -20,9 +21,16 @@
 
 ## 安装
 
-1. 下载 [BepInEx-Unity.IL2CPP-win-x86-6.0.0-be.670](https://builds.bepinex.dev/projects/bepinex_be/670/BepInEx-Unity.IL2CPP-win-x86-6.0.0-be.670%2B42a6727.zip)，将所有文件解压至游戏根目录，确保 `BepInEx` 文件夹和 `winhttp.dll` 等文件与游戏主程序 `KingdomTwoCrowns.exe` 处在同一目录。
-2. 删除旧版本MOD。检查游戏目录 `Kingdom Two Crowns\BepInEx\plugins`，如果存在旧版本的MOD，请先手动删除，以免发生文件冲突。
-3. 从 [Releases](https://github.com/abevol/KingdomMod/releases) 下载 KingdomMod 压缩包文件，将所有文件解压至 `Kingdom Two Crowns\BepInEx\plugins` 目录。
+1. 首先确定你的游戏版本是`IL2CPP`版，还是`Mono`版。
+   * `IL2CPP`版，游戏目录中含有文件夹`KingdomTwoCrowns_Data\il2cpp_data`
+   * `Mono`版，游戏目录中含有文件夹`KingdomTwoCrowns_Data\Managed`
+2. 根据您的游戏版本，下载特定版本的模组加载器。将所有文件解压至游戏根目录，确保 `BepInEx` 文件夹和 `winhttp.dll` 等文件与游戏主程序 `KingdomTwoCrowns.exe` 处在同一目录。
+   * `IL2CPP`版，下载 [BepInEx-Unity.IL2CPP-win-x86-6.0.0-be.670](https://builds.bepinex.dev/projects/bepinex_be/670/BepInEx-Unity.IL2CPP-win-x86-6.0.0-be.670%2B42a6727.zip)
+   * `Mono`版，下载 [BepInEx-Unity.Mono-win-x86-6.0.0-be.670](https://builds.bepinex.dev/projects/bepinex_be/670/BepInEx-Unity.Mono-win-x86-6.0.0-be.670%2B42a6727.zip)
+3. 根据您的游戏版本，下载特定版本的模组。从 [Releases](https://github.com/abevol/KingdomMod/releases) 下载模组文件，将所有文件解压至 `Kingdom Two Crowns\BepInEx\plugins` 目录。
+   * `IL2CPP`版，下载文件名中包含`BIE6_IL2CPP`的模组。
+   * `Mono`版，下载文件名中包含`BIE6_Mono`的模组。
+4. 现在已完成模组的安装，启动游戏后即可自动加载模组。
 
 ## BetterPayableUpgrade
 

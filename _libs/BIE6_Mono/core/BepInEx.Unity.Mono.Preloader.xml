@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>BepInEx.Unity.Mono.Preloader</name>
+    </assembly>
+    <members>
+        <member name="M:Doorstop.Entrypoint.Start">
+            <summary>
+                The main entrypoint of BepInEx, called from Doorstop.
+            </summary>
+        </member>
+        <member name="T:BepInEx.Unity.Mono.Preloader.RuntimeFixes.TraceFix">
+            <summary>
+                This exists because the Mono implementation of <see cref="T:System.Diagnostics.Trace" /> is/was broken, and would call Write directly
+                instead of calling TraceEvent.
+            </summary>
+        </member>
+        <member name="T:BepInEx.Unity.Mono.Preloader.UnityPreloader">
+            <summary>
+                The main entrypoint of BepInEx, and initializes all patchers and the chainloader.
+            </summary>
+        </member>
+        <member name="P:BepInEx.Unity.Mono.Preloader.UnityPreloader.PreloaderLog">
+            <summary>
+                The log writer that is specific to the preloader.
+            </summary>
+        </member>
+        <member name="M:BepInEx.Unity.Mono.Preloader.UnityPreloader.AllocateConsole">
+            <summary>
+                Allocates a console window for use by BepInEx safely.
+            </summary>
+        </member>
+    </members>
+</doc>

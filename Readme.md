@@ -20,9 +20,16 @@ It's supported CO-OP and ONLINE modes now!
 
 ## Install
 
-1. Download [BepInEx-Unity.IL2CPP-win-x86-6.0.0-be.670](https://builds.bepinex.dev/projects/bepinex_be/670/BepInEx-Unity.IL2CPP-win-x86-6.0.0-be.670%2B42a6727.zip)，unzip all the files to the root directory of the game, and ensure that the `BepInEx` folder and `winhttp.dll` file are in the same directory as the main game program `KingdomTwoCrowns.exe`.
-2. Delete old version MOD. Check the game directory `Kingdom Two Crowns\BepInEx\plugins`, if there is an old version of the MOD, please delete it manually to avoid file conflicts.
-3. Download the KingdomMod zip file from [Releases](https://github.com/abevol/KingdomMod/releases), and unzip all the files to the `Kingdom Two Crowns\BepInEx\plugins` directory.
+1. First determine whether your game version is `IL2CPP`, or the`Mono` version.
+    * `IL2CPP` version, the game directory contains the folder `KingdomTwoCrowns_Data\il2cpp_data`
+    * `Mono` version, the game directory contains the folder `KingdomTwoCrowns_Data\Managed`
+2. According to your game version, download the mod loader of a specific version. Unzip all files to the root directory of the game, and ensure that the `BepInEx` folder and `winhttp.dll` file are in the same directory with the game main program `KingdomTwoCrowns.exe`.
+    * `IL2CPP` version, download [BepInEx-Unity.IL2CPP-win-x86-6.0.0-be.670](https://builds.bepinex.dev/projects/bepinex_be/670/BepInEx-Unity.IL2CPP-win-x86-6.0.0-be.670%2B42a6727.zip)
+    * `Mono` version, download [BepInEx-Unity.Mono-win-x86-6.0.0-be.670](https://builds.bepinex.dev/projects/bepinex_be/670/BepInEx-Unity.Mono-win-x86-6.0.0-be.670%2B42a6727.zip)
+3. Download the mod of a specific version according to your game version. Download the mod file from [Releases](https://github.com/abevol/KingdomMod/releases), unzip all files to the directory `Kingdom Two Crowns\BepInEx\plugins`.
+    * `IL2CPP` version, download mods with `BIE6_IL2CPP` in the file name.
+    * `Mono` version, download mods with `BIE6_Mono` in the file name.
+4. Now mods are installed. After starting the game, mods can be automatically loaded.
 
 ## BetterPayableUpgrade
 

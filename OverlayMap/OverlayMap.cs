@@ -1,20 +1,26 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using BepInEx.Logging;
 using UnityEngine;
 using static KingdomMod.OverlayMap.Config;
+#if IL2CPP
+using Il2CppInterop.Runtime.Injection;
+using Il2CppSystem.Collections.Generic;
+#else
+using System.Collections.Generic;
+#endif
 
 namespace KingdomMod
 {
     public partial class OverlayMap : MonoBehaviour
     {
+        public static OverlayMap Instance { get; private set; }
         private static ManualLogSource log;
         private readonly GUIStyle guiStyle = new();
         private int tick = 0;
         private bool enabledOverlayMap = true;
-        private List<MarkInfo> minimapMarkList = new();
-        private List<LineInfo> drawLineList = new();
+        private System.Collections.Generic.List<MarkInfo> minimapMarkList = new();
+        private System.Collections.Generic.List<LineInfo> drawLineList = new();
         private readonly StatsInfo statsInfo = new();
         private bool showFullMap = false;
         private GameObject gameLayer = null;
@@ -22,7 +28,7 @@ namespace KingdomMod
         private static int _land = 0;
         private static int _challengeId = 0;
         private static string _archiveFilename;
-        private static readonly ExploredRegion _exploredRegion = new ExploredRegion();
+        private static readonly ExploredRegion _exploredRegion = new ();
 
         public static void LogMessage(string message, 
             [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
@@ -49,18 +55,22 @@ namespace KingdomMod
 
         public static void Initialize(OverlayMapPlugin plugin)
         {
-            log = plugin.Log;
+            log = plugin.LogSource;
             Config.Global.ConfigBind(plugin.Config);
-            var component = plugin.AddComponent<OverlayMap>();
-            component.hideFlags = HideFlags.HideAndDontSave;
-            DontDestroyOnLoad(component.gameObject);
+#if IL2CPP
+            ClassInjector.RegisterTypeInIl2Cpp<OverlayMap>();
+#endif
+            GameObject obj = new(nameof(OverlayMap));
+            DontDestroyOnLoad(obj);
+            obj.hideFlags = HideFlags.HideAndDontSave;
+            Instance = obj.AddComponent<OverlayMap>();
         }
 
         private void Start()
         {
             log.LogMessage($"{this.GetType().Name} Start.");
             Patcher.PatchAll(this);
-            Game.add_OnGameStart((Action)OnGameStart);
+            Game.OnGameStart += (Action)OnGameStart;
             NetworkBigBoss.Instance._postCatchupEvent += (Action)this.OnClientCaughtUp;
 
             // GlobalSaveData.add_OnCurrentCampaignSwitch((Action)OnCurrentCampaignSwitch);
@@ -228,22 +238,54 @@ namespace KingdomMod
 
             private static float GetExploredLeft()
             {
-                return Global.ConfigFile.Bind(_archiveFilename, "ExploredLeft", 0f, "").Value;
+                try
+                {
+                    return Global.ConfigFile.Bind(_archiveFilename, "ExploredLeft", 0f, "").Value;
+                }
+                catch (Exception e)
+                {
+                    log.LogWarning(e);
+                }
+                return 0f;
             }
 
             private static float GetExploredRight()
             {
-                return Global.ConfigFile.Bind(_archiveFilename, "ExploredRight", 0f, "").Value;
+                try
+                {
+                    return Global.ConfigFile.Bind(_archiveFilename, "ExploredRight", 0f, "").Value;
+                }
+                catch (Exception e)
+                {
+                    log.LogWarning(e);
+                }
+                return 0f;
             }
 
             private static float GetTime()
             {
-                return Global.ConfigFile.Bind(_archiveFilename, "Time", 0f, "").Value;
+                try
+                {
+                    return Global.ConfigFile.Bind(_archiveFilename, "Time", 0f, "").Value;
+                }
+                catch (Exception e)
+                {
+                    log.LogWarning(e);
+                }
+                return 0f;
             }
 
             private static int GetDays()
             {
-                return Global.ConfigFile.Bind(_archiveFilename, "Days", 0, "").Value;
+                try
+                {
+                    return Global.ConfigFile.Bind(_archiveFilename, "Days", 0, "").Value;
+                }
+                catch (Exception e)
+                {
+                    log.LogWarning(e);
+                }
+                return 0;
             }
 
             private static bool HasAvailableConfig()
@@ -254,8 +296,9 @@ namespace KingdomMod
                 if (GetDays() > Managers.Inst.director.CurrentDayForSpawning)
                     return false;
 
-                if (GetDays() == Managers.Inst.director.CurrentDayForSpawning && GetTime() > Managers.Inst.director.currentTime)
-                    return false;
+                if (GetDays() == Managers.Inst.director.CurrentDayForSpawning)
+                    if (GetTime() > Managers.Inst.director.currentTime)
+                        return false;
 
                 return true;
             }
@@ -315,9 +358,9 @@ namespace KingdomMod
             if (payables == null) return;
 
             minimapMarkList.Clear();
-            var poiList = new List<MarkInfo>();
-            var leftWalls = new List<WallPoint>();
-            var rightWalls = new List<WallPoint>();
+            var poiList = new System.Collections.Generic.List<MarkInfo>();
+            var leftWalls = new System.Collections.Generic.List<WallPoint>();
+            var rightWalls = new System.Collections.Generic.List<WallPoint>();
 
             Portal dock = null;
             foreach (var obj in kingdom.AllPortals)
@@ -337,7 +380,7 @@ namespace KingdomMod
             foreach (var beggarCamp in kingdom.BeggarCamps)
             {
                 int count = 0;
-                foreach (var beggar in beggarCamp._beggars)
+                foreach (var beggar in beggarCamp.GetFieldOrPropertyValue<List<Beggar>>("_beggars"))
                 {
                     if (beggar != null && beggar.isActiveAndEnabled)
                         count++;
@@ -355,7 +398,7 @@ namespace KingdomMod
                 }
             }
 
-            foreach (var player in new List<Player>{ kingdom.playerOne, kingdom.playerTwo })
+            foreach (var player in new System.Collections.Generic.List<Player>{ kingdom.playerOne, kingdom.playerTwo })
             {
                 if (player == null) continue;
                 if (player.isActiveAndEnabled == false) continue;
@@ -374,17 +417,17 @@ namespace KingdomMod
             var deers = FindObjectsWithTagOfType<Deer>(Tags.Wildlife);
             foreach (var deer in deers)
             {
-                if (!deer._damageable.isDead)
-                    poiList.Add(new MarkInfo(deer.transform.position.x, deer._fsm.current == 5 ? Style.DeerFollowing.Color : Style.Deer.Color, Style.Deer.Sign, Strings.Deer, 0, MarkRow.Movable));
+                if (!deer.GetFieldOrPropertyValue<Damageable>("_damageable").isDead)
+                    poiList.Add(new MarkInfo(deer.transform.position.x, deer.GetFieldOrPropertyValue<StateMachine>("_fsm").current == 5 ? Style.DeerFollowing.Color : Style.Deer.Color, Style.Deer.Sign, Strings.Deer, 0, MarkRow.Movable));
             }
 
-            var enemies = Managers.Inst.enemies._enemies;
+            var enemies = Managers.Inst.enemies.GetFieldOrPropertyValue<HashSet<Enemy>>("_enemies");
             if (enemies != null && enemies.Count > 0)
             {
-                var leftEnemies = new List<float>();
-                var rightEnemies = new List<float>();
-                var leftBosses = new List<float>();
-                var rightBosses = new List<float>();
+                var leftEnemies = new System.Collections.Generic.List<float>();
+                var rightEnemies = new System.Collections.Generic.List<float>();
+                var leftBosses = new System.Collections.Generic.List<float>();
+                var rightBosses = new System.Collections.Generic.List<float>();
                 foreach (var enemy in enemies)
                 {
                     if (enemy == null) continue;
@@ -444,12 +487,12 @@ namespace KingdomMod
             var castle = kingdom.castle;
             if (castle != null)
             {
-                var payable = castle._payableUpgrade;
+                var payable = castle.GetFieldOrPropertyValue<PayableUpgrade>("_payableUpgrade");
                 var reason = payable.IsLocked(GetLocalPlayer());
                 bool canPay = reason == PayableUpgrade.LockedReason.NotLocked;
                 bool isLocked = reason != PayableUpgrade.LockedReason.NotLocked && reason != PayableUpgrade.LockedReason.NoUpgrade;
                 bool isLockedForInvalidTime = reason == PayableUpgrade.LockedReason.InvalidTime;
-                var price = isLockedForInvalidTime ? (int)(payable.timeAvailableFrom - Time.time) : canPay ? payable.price : 0;
+                var price = isLockedForInvalidTime ? (int)(payable.GetFieldOrPropertyValue<float>("timeAvailableFrom") - Time.time) : canPay ? payable.price : 0;
                 var color = isLocked ? Style.Castle.Locked.Color : Style.Castle.Color;
                 poiList.Add(new MarkInfo(castle.transform.position.x, color, Style.Castle.Sign, Strings.Castle, price));
 
@@ -474,7 +517,7 @@ namespace KingdomMod
                     poiList.Add(new MarkInfo(obj.transform.position.x, Style.Chest.Color, Style.Chest.Sign, Strings.Chest, obj.coins));
             }
 
-            foreach (var obj in kingdom._walls)
+            foreach (var obj in kingdom.GetFieldOrPropertyValue<HashSet<Wall>>("_walls"))
             {
                 poiList.Add(new MarkInfo(obj.transform.position.x, Style.Wall.Color, Style.Wall.Sign, ""));
                 if (kingdom.GetBorderSideForPosition(obj.transform.position.x) == Side.Left)
@@ -495,7 +538,7 @@ namespace KingdomMod
                 var citizenHouse = obj.GetComponent<CitizenHousePayable>();
                 if (citizenHouse != null)
                 {
-                    poiList.Add(new MarkInfo(obj.transform.position.x, Style.CitizenHouse.Color, Style.CitizenHouse.Sign, Strings.CitizenHouse, citizenHouse._numberOfAvaliableCitizens));
+                    poiList.Add(new MarkInfo(obj.transform.position.x, Style.CitizenHouse.Color, Style.CitizenHouse.Sign, Strings.CitizenHouse, citizenHouse.GetPropertyValue<int>("_numberOfAvaliableCitizens")));
                 }
             }
 
@@ -521,9 +564,9 @@ namespace KingdomMod
                 poiList.Add(new MarkInfo(obj.transform.position.x, Style.River.Color, Style.River.Sign, ""));
             }
 
-            foreach (var obj in Managers.Inst.world._berryBushes)
+            foreach (var obj in Managers.Inst.world.GetFieldOrPropertyValue<List<PayableBush>>("_berryBushes"))
             {
-                if (obj.paid)
+                if (obj.GetFieldOrPropertyValue<bool>("paid"))
                     poiList.Add(new MarkInfo(obj.transform.position.x, Style.BerryBushPaid.Color, Style.BerryBushPaid.Sign, ""));
                 else
                     poiList.Add(new MarkInfo(obj.transform.position.x, Style.BerryBush.Color, Style.BerryBush.Sign, ""));
@@ -532,18 +575,19 @@ namespace KingdomMod
             var payableGemChest = GetPayableOfType<PayableGemChest>();
             if (payableGemChest != null)
             {
-                var gemsCount = payableGemChest.infiniteGems ? payableGemChest.guardRef.price : payableGemChest.gemsStored;
+                var gemsCount = payableGemChest.infiniteGems ? payableGemChest.GetFieldOrPropertyValue<PayableGemGuard>("guardRef").price : payableGemChest.gemsStored;
                 poiList.Add(new MarkInfo(payableGemChest.transform.position.x, Style.GemMerchant.Color, Style.GemMerchant.Sign, Strings.GemMerchant, gemsCount));
             }
 
             var dogSpawn = GetPayableBlockerOfType<DogSpawn>();
-            if (dogSpawn != null && !dogSpawn._dogFreed)
+            if (dogSpawn != null && !dogSpawn.GetPropertyValue<bool>("_dogFreed"))
                 poiList.Add(new MarkInfo(dogSpawn.transform.position.x, Style.DogSpawn.Color, Style.DogSpawn.Sign, Strings.DogSpawn));
 
-            var boarSpawn = world.boarSpawnGroup;
+            var boarSpawn = world.GetFieldOrPropertyValue<BoarSpawnGroup>("boarSpawnGroup");
             if (boarSpawn != null)
             {
-                poiList.Add(new MarkInfo(boarSpawn.transform.position.x, Style.BoarSpawn.Color, Style.BoarSpawn.Sign, Strings.BoarSpawn, boarSpawn._spawnedBoar ? 0 : 1));
+                poiList.Add(new MarkInfo(boarSpawn.transform.position.x, Style.BoarSpawn.Color, Style.BoarSpawn.Sign,
+                    Strings.BoarSpawn, boarSpawn.GetFieldOrPropertyValue<bool>("_spawnedBoar") ? 0 : 1));
             }
 
             var caveHelper = Managers.Inst.caveHelper;
@@ -556,12 +600,12 @@ namespace KingdomMod
                 }
             }
 
-            foreach (var obj in kingdom._farmHouses)
+            foreach (var obj in kingdom.GetFarmHouses())
             {
                 poiList.Add(new MarkInfo(obj.transform.position.x, Style.Farmhouse.Color, Style.Farmhouse.Sign, Strings.Farmhouse));
             }
 
-            var steedNames = new Dictionary<Steed.SteedType, string>
+            var steedNames = new System.Collections.Generic.Dictionary<Steed.SteedType, string>
                     {
                         { Steed.SteedType.Bear,                  Strings.Bear },
                         { Steed.SteedType.P1Griffin,             Strings.Griffin },
@@ -603,12 +647,12 @@ namespace KingdomMod
             foreach (var obj in kingdom.steedSpawns)
             {
                 var info = "";
-                foreach (var steedTmp in obj.steedPool)
+                foreach (var steedTmp in obj.GetFieldOrPropertyValue<List<Steed>>("steedPool"))
                 {
                     info = steedNames[steedTmp.steedType];
                 }
 
-                if (!obj._hasSpawned)
+                if (!obj.GetPropertyValue<bool>("_hasSpawned"))
                     poiList.Add(new MarkInfo(obj.transform.position.x, Style.SteedSpawns.Color, Style.SteedSpawns.Sign, info, obj.price));
             }
             
@@ -625,7 +669,7 @@ namespace KingdomMod
                     _ => ""
                 };
 
-                if (obj.canPay)
+                if (obj.GetPropertyValue<bool>("canPay"))
                     poiList.Add(new MarkInfo(obj.transform.position.x, Style.HermitCabins.Color, Style.HermitCabins.Sign, info, obj.price));
             }
 
@@ -661,7 +705,13 @@ namespace KingdomMod
                     poiList.Add(new MarkInfo(wreck.transform.position.x, Style.Boat.Wrecked.Color, Style.Boat.Sign, Strings.BoatWreck));
             }
 
-            foreach (var obj in payables.AllPayables)
+            foreach (var obj in payables.
+#if IL2CPP
+                         AllPayables
+#else
+                         GetFieldOrPropertyValue<Payable[]>("AllPayables")
+#endif
+                     )
             {
                 if (obj == null) continue;
                 var go = obj.gameObject;
@@ -671,11 +721,11 @@ namespace KingdomMod
 
                 if (prefab.prefabID == (int)PrefabIDs.Quarry_undeveloped)
                 {
-                    poiList.Add(new MarkInfo(go.transform.position.x, Style.Quarry.Color, Style.Quarry.Sign, Strings.Quarry, obj.price));
+                    poiList.Add(new MarkInfo(go.transform.position.x, Style.Quarry.Locked.Color, Style.Quarry.Sign, Strings.Quarry, obj.price));
                 }
                 else if (prefab.prefabID == (int)PrefabIDs.Mine_undeveloped)
                 {
-                    poiList.Add(new MarkInfo(go.transform.position.x, Style.Mine.Color, Style.Mine.Sign, Strings.Mine, obj.price));
+                    poiList.Add(new MarkInfo(go.transform.position.x, Style.Mine.Locked.Color, Style.Mine.Sign, Strings.Mine, obj.price));
                 }
                 else
                 {
@@ -711,7 +761,7 @@ namespace KingdomMod
                 }
             }
 
-            foreach (var obj in payables._allBlockers)
+            foreach (var obj in payables.GetFieldOrPropertyValue<List<PayableBlocker>>("_allBlockers"))
             {
                 if (obj == null) continue;
                 var go = obj.gameObject;
@@ -749,7 +799,7 @@ namespace KingdomMod
                 }
             }
 
-            foreach (var blocker in payables._allBlockers)
+            foreach (var blocker in payables.GetFieldOrPropertyValue<List<PayableBlocker>>("_allBlockers"))
             {
                 if (blocker == null) continue;
                 var scaffolding = blocker.GetComponent<Scaffolding>();
@@ -830,7 +880,7 @@ namespace KingdomMod
 
             // Make wall lines
 
-            var lineList = new List<LineInfo>();
+            var lineList = new System.Collections.Generic.List<LineInfo>();
             if (leftWalls.Count > 1)
             {
                 leftWalls.Sort((a, b) => b.Pos.x.CompareTo(a.Pos.x));
@@ -875,7 +925,13 @@ namespace KingdomMod
             var payables = Managers.Inst.payables;
             if (!payables) return null;
             
-            foreach (var obj in payables.AllPayables)
+            foreach (var obj in payables.
+#if IL2CPP
+                         AllPayables
+#else
+                         GetFieldOrPropertyValue<Payable[]>("AllPayables")
+#endif
+                     )
             {
                 if (obj == null) continue;
                 var comp = obj.GetComponent<T>();
@@ -886,13 +942,19 @@ namespace KingdomMod
             return null;
         }
 
-        private List<T> GetPayablesOfType<T>() where T : Component
+        private System.Collections.Generic.List<T> GetPayablesOfType<T>() where T : Component
         {
-            var result = new List<T>();
+            var result = new System.Collections.Generic.List<T>();
             var payables = Managers.Inst.payables;
             if (!payables) return result;
 
-            foreach (var obj in payables.AllPayables)
+            foreach (var obj in payables.
+#if IL2CPP
+                         AllPayables
+#else
+                         GetFieldOrPropertyValue<Payable[]>("AllPayables")
+#endif
+                     )
             {
                 if (obj == null) continue;
                 var comp = obj.GetComponent<T>();
@@ -908,7 +970,7 @@ namespace KingdomMod
             var payables = Managers.Inst.payables;
             if (!payables) return null;
 
-            foreach (var obj in payables._allBlockers)
+            foreach (var obj in payables.GetFieldOrPropertyValue<List<PayableBlocker>>("_allBlockers"))
             {
                 if (obj == null) continue;
                 var comp = obj.GetComponent<T>();
@@ -940,7 +1002,10 @@ namespace KingdomMod
 
         private void DrawMinimap(int playerId)
         {
-            Rect boxRect = new Rect(5, 5, Screen.width - 10, 150);
+            float boxHeight = 150;
+            if (Managers.COOP_ENABLED)
+                boxHeight = 150 - 56;
+            Rect boxRect = new Rect(5, 5, Screen.width - 10, boxHeight);
             GUI.Box(boxRect, "");
             GUI.Box(boxRect, "");
 
@@ -995,9 +1060,9 @@ namespace KingdomMod
             }
         }
 
-        private static List<T> FindObjectsWithTagOfType<T>(string tagName)
+        private static System.Collections.Generic.List<T> FindObjectsWithTagOfType<T>(string tagName)
         {
-            var list = new List<T>();
+            var list = new System.Collections.Generic.List<T>();
             foreach (var obj in GameObject.FindGameObjectsWithTag(tagName))
             {
                 if (obj == null) continue;
@@ -1009,12 +1074,12 @@ namespace KingdomMod
             return list;
         }
 
-        private static List<Character> FindCharactersOfType<T>()
+        private static System.Collections.Generic.List<Character> FindCharactersOfType<T>()
         {
-            var list = new List<Character>();
+            var list = new System.Collections.Generic.List<Character>();
             var kingdom = Managers.Inst.kingdom;
             if (kingdom == null) return list;
-            foreach (var character in kingdom._characters)
+            foreach (var character in kingdom.GetFieldOrPropertyValue<HashSet<Character>>("_characters"))
             {
                 if (character == null) continue;
                 if (character.GetComponent<T>() != null)
@@ -1029,22 +1094,22 @@ namespace KingdomMod
             if (kingdom == null) return;
 
             var peasantList = GameObject.FindGameObjectsWithTag(Tags.Peasant);
-            statsInfo.PeasantCount = peasantList.Count;
+            statsInfo.PeasantCount = peasantList.Length;
 
-            var workerList = kingdom._workers;
+            var workerList = kingdom.GetFieldOrPropertyValue<HashSet<Worker>>("_workers");
             statsInfo.WorkerCount = workerList.Count;
 
-            var archerList = kingdom._archers;
+            var archerList = kingdom.GetFieldOrPropertyValue<HashSet<Archer>>("_archers");
             statsInfo.ArcherCount = archerList.Count;
 
-            var farmerList = kingdom._farmers;
+            var farmerList = kingdom.Farmers;
             statsInfo.FarmerCount = farmerList.Count;
 
-            var farmhouseList = kingdom._farmHouses;
+            var farmhouseList = kingdom.GetFarmHouses();
             int maxFarmlands = 0;
             foreach (var obj in farmhouseList)
             {
-                maxFarmlands += obj.CurrentMaxFarmlands();
+                maxFarmlands += obj.GetMethodDelegate<Func<int>>("CurrentMaxFarmlands")();
             }
             statsInfo.MaxFarmlands = maxFarmlands;
         }
@@ -1052,7 +1117,7 @@ namespace KingdomMod
         private int GetArcherCount(ArcherType archerType)
         {
             var result = 0;
-            foreach (var obj in Managers.Inst.kingdom._archers)
+            foreach (var obj in Managers.Inst.kingdom.GetFieldOrPropertyValue<HashSet<Archer>>("_archers"))
             {
                 if (archerType == ArcherType.Free)
                 {
@@ -1077,9 +1142,9 @@ namespace KingdomMod
         private int GetKnightCount(bool needsArmor)
         {
             var knightCount = 0;
-            foreach (var knight in Managers.Inst.kingdom._knights)
+            foreach (var knight in Managers.Inst.kingdom.GetFieldOrPropertyValue<HashSet<Knight>>("_knights"))
             {
-                if (knight._needsArmor == needsArmor)
+                if (knight.GetFieldOrPropertyValue<bool>("_needsArmor") == needsArmor)
                     knightCount++;
             }
             return knightCount;
@@ -1090,18 +1155,22 @@ namespace KingdomMod
             guiStyle.normal.textColor = Style.StatsInfo.Color;
             guiStyle.alignment = TextAnchor.UpperLeft;
 
+            float boxTop = 160;
+            if (Managers.COOP_ENABLED)
+                boxTop = 160 - 56;
+
             var kingdom = Managers.Inst.kingdom;
-            var boxRect = new Rect(5, 160, 120, 146);
+            var boxRect = new Rect(5, boxTop, 120, 146);
             GUI.Box(boxRect, "");
             GUI.Box(boxRect, "");
 
-            GUI.Label(new Rect(14, 166 + 20 * 0, 120, 20), Strings.Peasant + ": " + statsInfo.PeasantCount, guiStyle);
-            GUI.Label(new Rect(14, 166 + 20 * 1, 120, 20), Strings.Worker + ": " + statsInfo.WorkerCount, guiStyle);
-            GUI.Label(new Rect(14, 166 + 20 * 2, 120, 20), $"{Strings.Archer.Value}: {statsInfo.ArcherCount} ({GetArcherCount(ArcherType.Free)}|{GetArcherCount(ArcherType.GuardSlot)}|{GetArcherCount(ArcherType.KnightSoldier)})", guiStyle);
-            GUI.Label(new Rect(14, 166 + 20 * 3, 120, 20), Strings.Pikeman + ": " + kingdom.Pikemen.Count, guiStyle);
-            GUI.Label(new Rect(14, 166 + 20 * 4, 120, 20), $"{Strings.Knight.Value}: {kingdom.knights.Count} ({GetKnightCount(true)})", guiStyle);
-            GUI.Label(new Rect(14, 166 + 20 * 5, 120, 20), Strings.Farmer + ": " + statsInfo.FarmerCount, guiStyle);
-            GUI.Label(new Rect(14, 166 + 20 * 6, 120, 20), Strings.Farmlands + ": " + statsInfo.MaxFarmlands, guiStyle);
+            GUI.Label(new Rect(14, boxTop + 6 + 20 * 0, 120, 20), Strings.Peasant + ": " + statsInfo.PeasantCount, guiStyle);
+            GUI.Label(new Rect(14, boxTop + 6 + 20 * 1, 120, 20), Strings.Worker + ": " + statsInfo.WorkerCount, guiStyle);
+            GUI.Label(new Rect(14, boxTop + 6 + 20 * 2, 120, 20), $"{Strings.Archer.Value}: {statsInfo.ArcherCount} ({GetArcherCount(ArcherType.Free)}|{GetArcherCount(ArcherType.GuardSlot)}|{GetArcherCount(ArcherType.KnightSoldier)})", guiStyle);
+            GUI.Label(new Rect(14, boxTop + 6 + 20 * 3, 120, 20), Strings.Pikeman + ": " + kingdom.Pikemen.Count, guiStyle);
+            GUI.Label(new Rect(14, boxTop + 6 + 20 * 4, 120, 20), $"{Strings.Knight.Value}: {kingdom.knights.Count} ({GetKnightCount(true)})", guiStyle);
+            GUI.Label(new Rect(14, boxTop + 6 + 20 * 5, 120, 20), Strings.Farmer + ": " + statsInfo.FarmerCount, guiStyle);
+            GUI.Label(new Rect(14, boxTop + 6 + 20 * 6, 120, 20), Strings.Farmlands + ": " + statsInfo.MaxFarmlands, guiStyle);
         }
 
         private void DrawExtraInfo(int playerId)
@@ -1111,6 +1180,8 @@ namespace KingdomMod
 
             var left = Screen.width / 2 - 20;
             var top = 136;
+            if (Managers.COOP_ENABLED)
+                top = 136 - 56;
 
             GUI.Label(new Rect(14, top, 60, 20),  Strings.Land + ": " + (Managers.Inst.game.currentLand + 1), guiStyle);
             GUI.Label(new Rect(14 + 60, top, 60, 20), Strings.Days + ": " + (Managers.Inst.director.CurrentDayForSpawning), guiStyle);
@@ -1123,8 +1194,8 @@ namespace KingdomMod
             var player = Managers.Inst.kingdom.GetPlayer(playerId);
             if (player != null)
             {
-                GUI.Label(new Rect(Screen.width - 126, top + 22, 60, 20), Strings.Gems + ": " + player.gems, guiStyle);
-                GUI.Label(new Rect(Screen.width - 66, top + 22, 60, 20), Strings.Coins + ": " + player.coins, guiStyle);
+                GUI.Label(new Rect(Screen.width - 126, 136 + 22, 60, 20), Strings.Gems + ": " + player.gems, guiStyle);
+                GUI.Label(new Rect(Screen.width - 66, 136 + 22, 60, 20), Strings.Coins + ": " + player.coins, guiStyle);
             }
         }
 
@@ -1263,7 +1334,7 @@ namespace KingdomMod
 
     public static class EnumUtil
     {
-        public static IEnumerable<T> GetValues<T>()
+        public static System.Collections.Generic.IEnumerable<T> GetValues<T>()
         {
             return Enum.GetValues(typeof(T)).Cast<T>();
         }
