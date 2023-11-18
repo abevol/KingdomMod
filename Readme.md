@@ -3,6 +3,7 @@
 Some mods for the game "[Kingdom Two Crowns](https://store.steampowered.com/app/701160/)".
 
 It's supported CO-OP and ONLINE modes now!
+Both `IL2CPP` and `Mono` versions of the game are now supported!
 
 * [BetterPayableUpgrade](https://github.com/abevol/KingdomMod#betterpayableupgrade)
 * [DevTools](https://github.com/abevol/KingdomMod#devtools)
