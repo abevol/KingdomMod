@@ -38,6 +38,28 @@ namespace KingdomMod
             log.LogMessage($"[{sourceLineNumber}][{memberName}] {message}");
         }
 
+        public static void LogError(string message,
+            [System.Runtime.CompilerServices.CallerMemberName]
+            string memberName = "",
+            [System.Runtime.CompilerServices.CallerFilePath]
+            string sourceFilePath = "",
+            [System.Runtime.CompilerServices.CallerLineNumber]
+            int sourceLineNumber = 0)
+        {
+            log.LogError($"[{sourceLineNumber}][{memberName}] {message}");
+        }
+
+        public static void LogWarning(string message,
+            [System.Runtime.CompilerServices.CallerMemberName]
+            string memberName = "",
+            [System.Runtime.CompilerServices.CallerFilePath]
+            string sourceFilePath = "",
+            [System.Runtime.CompilerServices.CallerLineNumber]
+            int sourceLineNumber = 0)
+        {
+            log.LogWarning($"[{sourceLineNumber}][{memberName}] {message}");
+        }
+
         public OverlayMap()
         {
             try

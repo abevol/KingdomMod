@@ -33,7 +33,7 @@ namespace KingdomMod
                     if (d._cachedColor == null)
                     {
                         d.Entry.SettingChanged += (sender, args) => OnValueChanged(d, args);
-                        d._cachedColor = StrToColor(d.Entry.Value as string);
+                        d._cachedColor = StrToColor(d.Entry as ConfigEntry<string>);
                     }
                     return d._cachedColor.Value;
                 }
@@ -42,21 +42,28 @@ namespace KingdomMod
                 {
                     if (sender is ConfigEntryWrapper<string> entryWrapper)
                     {
-                        entryWrapper._cachedColor = StrToColor(entryWrapper.Entry.Value);
+                        entryWrapper._cachedColor = StrToColor(entryWrapper.Entry);
                     }
                 }
 
-                private static Color StrToColor(string str)
+                private static Color StrToColor(ConfigEntry<string> entry)
                 {
-                    if (str != null)
+                    try
                     {
-                        var color = str.Split(',');
-                        if (color.Length == 4)
-                            return new Color(float.Parse(color[0]), float.Parse(color[1]), float.Parse(color[2]), float.Parse(color[3]));
+                        var str = entry.Value;
+                        if (str != null)
+                        {
+                            var color = str.Split(',');
+                            if (color.Length == 4)
+                                return new Color(float.Parse(color[0]), float.Parse(color[1]), float.Parse(color[2]), float.Parse(color[3]));
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        LogError($"Parse Color failed: ConfigEntry: [{entry.Definition.Section}].{entry.Definition.Key}, ConfigValue: {entry.Value}\nException: {e}");
                     }
 
-                    LogMessage($"Parse Color failed: {str}");
-                    return new Color();
+                    return Color.white;
                 }
             }
 
