@@ -246,80 +246,28 @@ namespace KingdomMod
 
             private static void SetExploredLeft(float value)
             {
-                Global.ConfigFile.Bind(_archiveFilename, "ExploredLeft", 0f, "").Value = value;
-                Global.ConfigFile.Bind(_archiveFilename, "Time", 0f, "").Value = Managers.Inst.director.currentTime;
-                Global.ConfigFile.Bind(_archiveFilename, "Days", 0, "").Value = Managers.Inst.director.CurrentDayForSpawning;
+                ExploredRegions.ExploredLeft.Value = value;
+                ExploredRegions.Time.Value = Managers.Inst.director.currentTime;
+                ExploredRegions.Days.Value = Managers.Inst.director.CurrentDayForSpawning;
             }
 
             private static void SetExploredRight(float value)
             {
-                Global.ConfigFile.Bind(_archiveFilename, "ExploredRight", 0f, "").Value = value;
-                Global.ConfigFile.Bind(_archiveFilename, "Time", 0f, "").Value = Managers.Inst.director.currentTime;
-                Global.ConfigFile.Bind(_archiveFilename, "Days", 0, "").Value = Managers.Inst.director.CurrentDayForSpawning;
-            }
-
-            private static float GetExploredLeft()
-            {
-                try
-                {
-                    return Global.ConfigFile.Bind(_archiveFilename, "ExploredLeft", 0f, "").Value;
-                }
-                catch (Exception e)
-                {
-                    log.LogWarning(e);
-                }
-                return 0f;
-            }
-
-            private static float GetExploredRight()
-            {
-                try
-                {
-                    return Global.ConfigFile.Bind(_archiveFilename, "ExploredRight", 0f, "").Value;
-                }
-                catch (Exception e)
-                {
-                    log.LogWarning(e);
-                }
-                return 0f;
-            }
-
-            private static float GetTime()
-            {
-                try
-                {
-                    return Global.ConfigFile.Bind(_archiveFilename, "Time", 0f, "").Value;
-                }
-                catch (Exception e)
-                {
-                    log.LogWarning(e);
-                }
-                return 0f;
-            }
-
-            private static int GetDays()
-            {
-                try
-                {
-                    return Global.ConfigFile.Bind(_archiveFilename, "Days", 0, "").Value;
-                }
-                catch (Exception e)
-                {
-                    log.LogWarning(e);
-                }
-                return 0;
+                ExploredRegions.ExploredRight.Value = value;
+                ExploredRegions.Time.Value = Managers.Inst.director.currentTime;
+                ExploredRegions.Days.Value = Managers.Inst.director.CurrentDayForSpawning;
             }
 
             private static bool HasAvailableConfig()
             {
-                if (GetExploredLeft() == 0 && GetExploredRight() == 0)
+                if (ExploredRegions.ExploredLeft == 0 && ExploredRegions.ExploredRight == 0)
                     return false;
 
-                if (GetDays() > Managers.Inst.director.CurrentDayForSpawning)
+                if (ExploredRegions.Days > Managers.Inst.director.CurrentDayForSpawning)
                     return false;
 
-                if (GetDays() == Managers.Inst.director.CurrentDayForSpawning)
-                    if (GetTime() > Managers.Inst.director.currentTime)
+                if (ExploredRegions.Days == Managers.Inst.director.CurrentDayForSpawning)
+                    if (ExploredRegions.Time > Managers.Inst.director.currentTime)
                         return false;
 
                 return true;
@@ -327,10 +275,11 @@ namespace KingdomMod
 
             public void Init()
             {
+                ExploredRegions.ConfigBind(_archiveFilename);
                 if (HasAvailableConfig())
                 {
-                    _exploredLeft = GetExploredLeft();
-                    _exploredRight = GetExploredRight();
+                    _exploredLeft = ExploredRegions.ExploredLeft;
+                    _exploredRight = ExploredRegions.ExploredRight;
                 }
                 else
                 {
@@ -436,7 +385,7 @@ namespace KingdomMod
                     _exploredRegion.ExploredRight = r;
             }
 
-            var deers = FindObjectsWithTagOfType<Deer>(Tags.Wildlife);
+            var deers = GameExtensions.FindObjectsWithTagOfType<Deer>(Tags.Wildlife);
             foreach (var deer in deers)
             {
                 if (!deer.GetFieldOrPropertyValue<Damageable>("_damageable").isDead)
@@ -594,14 +543,14 @@ namespace KingdomMod
                     poiList.Add(new MarkInfo(obj.transform.position.x, Style.BerryBush.Color, Style.BerryBush.Sign, ""));
             }
 
-            var payableGemChest = GetPayableOfType<PayableGemChest>();
+            var payableGemChest = GameExtensions.GetPayableOfType<PayableGemChest>();
             if (payableGemChest != null)
             {
                 var gemsCount = payableGemChest.infiniteGems ? payableGemChest.GetFieldOrPropertyValue<PayableGemGuard>("guardRef").price : payableGemChest.gemsStored;
                 poiList.Add(new MarkInfo(payableGemChest.transform.position.x, Style.GemMerchant.Color, Style.GemMerchant.Sign, Strings.GemMerchant, gemsCount));
             }
 
-            var dogSpawn = GetPayableBlockerOfType<DogSpawn>();
+            var dogSpawn = GameExtensions.GetPayableBlockerOfType<DogSpawn>();
             if (dogSpawn != null && !dogSpawn.GetPropertyValue<bool>("_dogFreed"))
                 poiList.Add(new MarkInfo(dogSpawn.transform.position.x, Style.DogSpawn.Color, Style.DogSpawn.Sign, Strings.DogSpawn));
 
@@ -678,7 +627,7 @@ namespace KingdomMod
                     poiList.Add(new MarkInfo(obj.transform.position.x, Style.SteedSpawns.Color, Style.SteedSpawns.Sign, info, obj.price));
             }
             
-            var cabinList = GetPayablesOfType<Cabin>();
+            var cabinList = GameExtensions.GetPayablesOfType<Cabin>();
             foreach (var obj in cabinList)
             {
                 var info = obj.hermitType switch
@@ -695,7 +644,7 @@ namespace KingdomMod
                     poiList.Add(new MarkInfo(obj.transform.position.x, Style.HermitCabins.Color, Style.HermitCabins.Sign, info, obj.price));
             }
 
-            var statueList = GetPayablesOfType<Statue>();
+            var statueList = GameExtensions.GetPayablesOfType<Statue>();
             foreach (var obj in statueList)
             {
                 var info = obj.deity switch
@@ -942,67 +891,6 @@ namespace KingdomMod
             drawLineList = lineList;
         }
 
-        private T GetPayableOfType<T>() where T : Component
-        {
-            var payables = Managers.Inst.payables;
-            if (!payables) return null;
-            
-            foreach (var obj in payables.
-#if IL2CPP
-                         AllPayables
-#else
-                         GetFieldOrPropertyValue<Payable[]>("AllPayables")
-#endif
-                     )
-            {
-                if (obj == null) continue;
-                var comp = obj.GetComponent<T>();
-                if (comp != null)
-                    return comp;
-            }
-
-            return null;
-        }
-
-        private System.Collections.Generic.List<T> GetPayablesOfType<T>() where T : Component
-        {
-            var result = new System.Collections.Generic.List<T>();
-            var payables = Managers.Inst.payables;
-            if (!payables) return result;
-
-            foreach (var obj in payables.
-#if IL2CPP
-                         AllPayables
-#else
-                         GetFieldOrPropertyValue<Payable[]>("AllPayables")
-#endif
-                     )
-            {
-                if (obj == null) continue;
-                var comp = obj.GetComponent<T>();
-                if (comp != null)
-                    result.Add(comp);
-            }
-
-            return result;
-        }
-
-        private T GetPayableBlockerOfType<T>() where T : Component
-        {
-            var payables = Managers.Inst.payables;
-            if (!payables) return null;
-
-            foreach (var obj in payables.GetFieldOrPropertyValue<List<PayableBlocker>>("_allBlockers"))
-            {
-                if (obj == null) continue;
-                var comp = obj.GetComponent<T>();
-                if (comp != null)
-                    return comp;
-            }
-
-            return null;
-        }
-
         private static bool IsYourSelf(int playerId, string name)
         {
             if (name == Strings.P1)
@@ -1082,34 +970,6 @@ namespace KingdomMod
             }
         }
 
-        private static System.Collections.Generic.List<T> FindObjectsWithTagOfType<T>(string tagName)
-        {
-            var list = new System.Collections.Generic.List<T>();
-            foreach (var obj in GameObject.FindGameObjectsWithTag(tagName))
-            {
-                if (obj == null) continue;
-                var comp = obj.GetComponent<T>();
-                if (comp != null)
-                    list.Add(comp);
-            }
-
-            return list;
-        }
-
-        private static System.Collections.Generic.List<Character> FindCharactersOfType<T>()
-        {
-            var list = new System.Collections.Generic.List<Character>();
-            var kingdom = Managers.Inst.kingdom;
-            if (kingdom == null) return list;
-            foreach (var character in kingdom.GetFieldOrPropertyValue<HashSet<Character>>("_characters"))
-            {
-                if (character == null) continue;
-                if (character.GetComponent<T>() != null)
-                    list.Add(character);
-            }
-            return list;
-        }
-
         private void UpdateStatsInfo()
         {
             var kingdom = Managers.Inst.kingdom;
@@ -1136,42 +996,6 @@ namespace KingdomMod
             statsInfo.MaxFarmlands = maxFarmlands;
         }
 
-        private int GetArcherCount(ArcherType archerType)
-        {
-            var result = 0;
-            foreach (var obj in Managers.Inst.kingdom.GetFieldOrPropertyValue<HashSet<Archer>>("_archers"))
-            {
-                if (archerType == ArcherType.Free)
-                {
-                    if (!obj.inGuardSlot && !obj.isKnightSoldier)
-                        result++;
-                }
-                else if (archerType == ArcherType.GuardSlot)
-                {
-                    if (obj.inGuardSlot)
-                        result++;
-                }
-                else if (archerType == ArcherType.KnightSoldier)
-                {
-                    if (obj.isKnightSoldier)
-                        result++;
-                }
-            }
-
-            return result;
-        }
-
-        private int GetKnightCount(bool needsArmor)
-        {
-            var knightCount = 0;
-            foreach (var knight in Managers.Inst.kingdom.GetFieldOrPropertyValue<HashSet<Knight>>("_knights"))
-            {
-                if (knight.GetFieldOrPropertyValue<bool>("_needsArmor") == needsArmor)
-                    knightCount++;
-            }
-            return knightCount;
-        }
-
         private void DrawStatsInfo(int playerId)
         {
             guiStyle.normal.textColor = Style.StatsInfo.Color;
@@ -1188,9 +1012,9 @@ namespace KingdomMod
 
             GUI.Label(new Rect(14, boxTop + 6 + 20 * 0, 120, 20), Strings.Peasant + ": " + statsInfo.PeasantCount, guiStyle);
             GUI.Label(new Rect(14, boxTop + 6 + 20 * 1, 120, 20), Strings.Worker + ": " + statsInfo.WorkerCount, guiStyle);
-            GUI.Label(new Rect(14, boxTop + 6 + 20 * 2, 120, 20), $"{Strings.Archer.Value}: {statsInfo.ArcherCount} ({GetArcherCount(ArcherType.Free)}|{GetArcherCount(ArcherType.GuardSlot)}|{GetArcherCount(ArcherType.KnightSoldier)})", guiStyle);
+            GUI.Label(new Rect(14, boxTop + 6 + 20 * 2, 120, 20), $"{Strings.Archer.Value}: {statsInfo.ArcherCount} ({GameExtensions.GetArcherCount(GameExtensions.ArcherType.Free)}|{GameExtensions.GetArcherCount(GameExtensions.ArcherType.GuardSlot)}|{GameExtensions.GetArcherCount(GameExtensions.ArcherType.KnightSoldier)})", guiStyle);
             GUI.Label(new Rect(14, boxTop + 6 + 20 * 3, 120, 20), Strings.Pikeman + ": " + kingdom.Pikemen.Count, guiStyle);
-            GUI.Label(new Rect(14, boxTop + 6 + 20 * 4, 120, 20), $"{Strings.Knight.Value}: {kingdom.knights.Count} ({GetKnightCount(true)})", guiStyle);
+            GUI.Label(new Rect(14, boxTop + 6 + 20 * 4, 120, 20), $"{Strings.Knight.Value}: {kingdom.knights.Count} ({GameExtensions.GetKnightCount(true)})", guiStyle);
             GUI.Label(new Rect(14, boxTop + 6 + 20 * 5, 120, 20), Strings.Farmer + ": " + statsInfo.FarmerCount, guiStyle);
             GUI.Label(new Rect(14, boxTop + 6 + 20 * 6, 120, 20), Strings.Farmlands + ": " + statsInfo.MaxFarmlands, guiStyle);
         }
@@ -1275,13 +1099,6 @@ namespace KingdomMod
             public int ArcherCount;
             public int FarmerCount;
             public int MaxFarmlands;
-        }
-
-        private enum ArcherType
-        {
-            Free,
-            GuardSlot,
-            KnightSoldier
         }
 
         private enum PrefabIDs
