@@ -3,6 +3,7 @@ using System.Linq;
 using BepInEx.Logging;
 using UnityEngine;
 using static KingdomMod.OverlayMap.Config;
+
 #if IL2CPP
 using Il2CppInterop.Runtime.Injection;
 using Il2CppSystem.Collections.Generic;

@@ -55,7 +55,11 @@ namespace KingdomMod
                         {
                             var color = str.Split(',');
                             if (color.Length == 4)
-                                return new Color(float.Parse(color[0]), float.Parse(color[1]), float.Parse(color[2]), float.Parse(color[3]));
+                                return new Color(
+                                    float.Parse(color[0], CultureInfo.InvariantCulture.NumberFormat),
+                                    float.Parse(color[1], CultureInfo.InvariantCulture.NumberFormat),
+                                    float.Parse(color[2], CultureInfo.InvariantCulture.NumberFormat),
+                                    float.Parse(color[3], CultureInfo.InvariantCulture.NumberFormat));
                         }
                     }
                     catch (Exception e)
