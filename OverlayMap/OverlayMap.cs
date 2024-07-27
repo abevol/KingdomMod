@@ -18,7 +18,7 @@ namespace KingdomMod
         public static OverlayMap Instance { get; private set; }
         private static ManualLogSource log;
         private readonly GUIStyle guiStyle = new();
-        private int tick = 0;
+        private float timeSinceLastGuiUpdate = 0;
         private bool enabledOverlayMap = true;
         private System.Collections.Generic.List<MarkInfo> minimapMarkList = new();
         private System.Collections.Generic.List<LineInfo> drawLineList = new();
@@ -79,7 +79,7 @@ namespace KingdomMod
         public static void Initialize(OverlayMapPlugin plugin)
         {
             log = plugin.LogSource;
-            Config.Global.ConfigBind(plugin.Config);
+            Global.ConfigBind(plugin.Config);
 #if IL2CPP
             ClassInjector.RegisterTypeInIl2Cpp<OverlayMap>();
 #endif
@@ -155,12 +155,12 @@ namespace KingdomMod
                 Managers.Inst.game.TriggerSave();
             }
 
-            tick = tick + 1;
-            if (tick > 60)
-                tick = 0;
+            timeSinceLastGuiUpdate += Time.deltaTime;
 
-            if (tick == 0)
+            if (timeSinceLastGuiUpdate > (1 / Global.GUIUpdatesPerSecond))
             {
+                timeSinceLastGuiUpdate = 0;
+
                 if (!IsPlaying()) return;
 
                 if (enabledOverlayMap)

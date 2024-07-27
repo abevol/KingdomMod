@@ -135,6 +135,7 @@ namespace KingdomMod
                 private static readonly ConfigFileWatcher _configFileWatcher = new ();
                 public static ConfigEntryWrapper<string> Language;
                 public static ConfigEntryWrapper<string> StyleFile;
+                public static ConfigEntryWrapper<int> GUIUpdatesPerSecond;
 
                 public static void ConfigBind(ConfigFile config)
                 {
@@ -148,10 +149,12 @@ namespace KingdomMod
 
                     Language = config.Bind("Global", "Language", "system", "");
                     StyleFile = config.Bind("Global", "StyleFile", "KingdomMod.OverlayMap.Style.cfg", "");
+                    GUIUpdatesPerSecond = config.Bind("Global", "GUIUpdatesPerSecond", 10, "Increase to be more accurate, decrease to reduce performance impact");
 
                     LogMessage($"ConfigFilePath: {config.ConfigFilePath}");
                     LogMessage($"Language: {Language.Value}");
                     LogMessage($"StyleFile: {StyleFile.Value}");
+                    LogMessage($"GUIUpdatesPerSecond: {GUIUpdatesPerSecond.Value}");
 
                     LogMessage($"Loaded config: {Path.GetFileName(ConfigFile.ConfigFilePath)}");
 
