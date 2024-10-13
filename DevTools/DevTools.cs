@@ -215,7 +215,7 @@ namespace KingdomMod
                     var biomeHolder = biomeHelper.GetComponent<BiomeHolder>();
                     if (biomeHolder)
                     {
-                        biomeHolder.SetFieldOrPropertyValue("debugToolsEnabled", true);
+                        biomeHolder.debugToolsEnabled = true;
                     }
                 }
 
@@ -257,7 +257,7 @@ namespace KingdomMod
                 if (prefabs != null)
                 {
                     var dumpStr = "\npublic enum PrefabIDs\n{\n";
-                    foreach (var prefab in prefabs.GetFieldOrPropertyValue<List<PrefabID>>("prefabMasterCopies"))
+                    foreach (var prefab in prefabs.prefabMasterCopies)
                     {
                         var prefabName = prefab.name.Replace(' ', '_');
                         dumpStr = dumpStr + "    " + prefabName + " = " + prefab.prefabID + ",\n";
@@ -272,7 +272,7 @@ namespace KingdomMod
             {
                 log.LogMessage($"Dump LevelBlocks:");
 
-                var levelBlocks = Managers.Inst.level.GetMethodDelegate<Func<List<LevelBlock>>>("GetLevelBlocks").Invoke();
+                var levelBlocks = Managers.Inst.level.GetLevelBlocks();
                 log.LogMessage($"LevelBlocks: {levelBlocks.Count}");
                 foreach (var levelBlock in levelBlocks)
                 {
@@ -426,7 +426,7 @@ namespace KingdomMod
 
                     GameObject boulder = Pool.SpawnGO(Resources.Load<Boulder>("Prefabs/Objects/Boulder").gameObject, Vector3.zero, Quaternion.identity);
                     var compCacher = Managers.Inst.compCacher;
-                    compCacher.GetCachedComponent<Boulder>(boulder).SetFieldOrPropertyValue("_launchedByEnemies", false);
+                    compCacher.GetCachedComponent<Boulder>(boulder)._launchedByEnemies = false;
                     compCacher.GetCachedComponent<Boulder>(boulder).maxHitCitizens = 1000;
                     compCacher.GetCachedComponent<Boulder>(boulder).StuckProbability = 0f;
                     compCacher.GetCachedComponent<Boulder>(boulder).hitDamage = 300;
@@ -480,7 +480,7 @@ namespace KingdomMod
 
         private void UpdateObjectsInfo()
         {
-            var worldCam = Managers.Inst.game.GetFieldOrPropertyValue<Camera>("_mainCameraComponent");
+            var worldCam = Managers.Inst.game._mainCameraComponent;
             if (!worldCam) return;
 
             objectsInfoList.Clear();
@@ -576,14 +576,14 @@ namespace KingdomMod
                 infoLines.Add($"COOP_ENABLED: {Managers.COOP_ENABLED}");
 
                 var kingdom = Managers.Inst.kingdom;
-                var castlePayable = kingdom.castle?.GetFieldOrPropertyValue<PayableUpgrade>("_payableUpgrade");
+                var castlePayable = kingdom.castle?._payableUpgrade;
                 if (castlePayable != null)
                 {
                     infoLines.Add($"castle: {kingdom.castle.name}");
                     infoLines.Add($"blockPaymentUpgrade: {castlePayable.blockPaymentUpgrade}");
                     infoLines.Add($"cooldown: {castlePayable.cooldown}");
-                    infoLines.Add($"timeAvailableFrom: {castlePayable.GetFieldOrPropertyValue<float>("timeAvailableFrom")}");
-                    infoLines.Add($"timeAvailableFrom: {castlePayable.GetFieldOrPropertyValue<float>("timeAvailableFrom") - Time.time}");
+                    infoLines.Add($"timeAvailableFrom: {castlePayable.timeAvailableFrom}");
+                    infoLines.Add($"timeAvailableFrom: {castlePayable.timeAvailableFrom - Time.time}");
                     castlePayable.IsLocked(GetLocalPlayer(), out var reason);
                     infoLines.Add($"IsLocked: {reason}");
                     infoLines.Add($"price: {castlePayable.Price}");
@@ -635,8 +635,7 @@ namespace KingdomMod
                     infoLines.Add($"runStaminaRate: {steed.runStaminaRate}");
                     infoLines.Add($"standStaminaRate: {steed.standStaminaRate}");
                     infoLines.Add($"walkStaminaRate: {steed.walkStaminaRate}");
-                    var tiredTimer = steed.GetFieldOrPropertyValue<float>("_tiredTimer");
-                    infoLines.Add($"tiredTimer: {tiredTimer}");
+                    infoLines.Add($"tiredTimer: {steed._tiredTimer}");
                     infoLines.Add($"tiredDuration: {steed.tiredDuration}");
                     infoLines.Add($"wellFedTimer: {steed.WellFedTimer}");
                     infoLines.Add($"wellFedDuration: {steed.wellFedDuration}");

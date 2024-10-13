@@ -14,12 +14,7 @@ namespace KingdomMod
             var payables = Managers.Inst.payables;
             if (!payables) return null;
 
-            foreach (var obj in payables.
-#if IL2CPP
-                         AllPayables
-#else
-                         GetFieldOrPropertyValue<Payable[]>("AllPayables")
-#endif
+            foreach (var obj in payables.AllPayables
                     )
             {
                 if (obj == null) continue;
@@ -37,12 +32,7 @@ namespace KingdomMod
             var payables = Managers.Inst.payables;
             if (!payables) return result;
 
-            foreach (var obj in payables.
-#if IL2CPP
-                         AllPayables
-#else
-                         GetFieldOrPropertyValue<Payable[]>("AllPayables")
-#endif
+            foreach (var obj in payables.AllPayables
                     )
             {
                 if (obj == null) continue;
@@ -59,7 +49,7 @@ namespace KingdomMod
             var payables = Managers.Inst.payables;
             if (!payables) return null;
 
-            foreach (var obj in payables.GetFieldOrPropertyValue<List<PayableBlocker>>("_allBlockers"))
+            foreach (var obj in payables._allBlockers)
             {
                 if (obj == null) continue;
                 var comp = obj.GetComponent<T>();
@@ -89,7 +79,7 @@ namespace KingdomMod
             var list = new List<Character>();
             var kingdom = Managers.Inst.kingdom;
             if (kingdom == null) return list;
-            foreach (var character in kingdom.GetFieldOrPropertyValue<HashSet<Character>>("_characters"))
+            foreach (var character in kingdom._characters)
             {
                 if (character == null) continue;
                 if (character.GetComponent<T>() != null)
@@ -102,7 +92,7 @@ namespace KingdomMod
         public static int GetArcherCount(ArcherType archerType)
         {
             var result = 0;
-            foreach (var obj in Managers.Inst.kingdom.GetFieldOrPropertyValue<HashSet<Archer>>("_archers"))
+            foreach (var obj in Managers.Inst.kingdom._archers)
             {
                 if (archerType == ArcherType.Free)
                 {
@@ -127,9 +117,9 @@ namespace KingdomMod
         public static int GetKnightCount(bool needsArmor)
         {
             var knightCount = 0;
-            foreach (var knight in Managers.Inst.kingdom.GetFieldOrPropertyValue<HashSet<Knight>>("_knights"))
+            foreach (var knight in Managers.Inst.kingdom._knights)
             {
-                if (knight.GetFieldOrPropertyValue<bool>("_needsArmor") == needsArmor)
+                if (knight._needsArmor == needsArmor)
                     knightCount++;
             }
             return knightCount;

@@ -63,7 +63,7 @@ namespace KingdomMod
             var steed = player.steed;
             if (steed == null) return;
 
-            var uiPos = WorldToScreenPoint(playerId, steed.GetFieldOrPropertyValue<Mover>("_mover").transform.position);
+            var uiPos = WorldToScreenPoint(playerId, steed._mover.transform.position);
             if (uiPos == null) return;
             
             float widthScale = 1.0f;
@@ -80,7 +80,7 @@ namespace KingdomMod
 
             GUI.BeginGroup(new Rect(baseLeft + 2, uiPos.Value.y + 2, baseWidth, baseHeight));
 
-            var tiredTimer = steed.GetFieldOrPropertyValue<float>("_tiredTimer");
+            var tiredTimer = steed._tiredTimer;
             if (tiredTimer > 0)
             {
                 var lineStart = new Vector2(0, 0);
@@ -127,9 +127,9 @@ namespace KingdomMod
         {
             if (playerId == 1 && Managers.COOP_ENABLED)
             {
-                return Managers.Inst.game?.GetFieldOrPropertyValue<Camera>("_secondCameraComponent");
+                return Managers.Inst.game?._secondCameraComponent;
             }
-            return Managers.Inst.game?.GetFieldOrPropertyValue<Camera>("_mainCameraComponent");
+            return Managers.Inst.game?._mainCameraComponent;
         }
 
         private static bool IsPlaying()

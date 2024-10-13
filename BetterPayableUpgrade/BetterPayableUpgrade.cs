@@ -144,8 +144,8 @@ namespace KingdomMod
             var swapData = BiomeHolder.Inst.LoadedBiome?.swapData;
             if (swapData != null)
             {
-                log.LogDebug($"swapData._prefabSwapDictionary: {swapData.GetFieldOrPropertyValue<Dictionary<GameObject, GameObject>>("_prefabSwapDictionary").Count}");
-                foreach (var pair in swapData.GetFieldOrPropertyValue<Dictionary<GameObject, GameObject>>("_prefabSwapDictionary"))
+                log.LogDebug($"swapData._prefabSwapDictionary: {swapData._prefabSwapDictionary.Count}");
+                foreach (var pair in swapData._prefabSwapDictionary)
                 {
                     log.LogDebug($"swapData: {pair.Key.name}, {pair.Value.name}, {pair.Value.GetComponent<PrefabID>()?.prefabID}");
                     HandlePayable(pair.Value.gameObject, true);
@@ -155,8 +155,8 @@ namespace KingdomMod
             var customSwapData = ChallengeData.Current?.customSwapData;
             if (customSwapData != null)
             {
-                log.LogDebug($"customSwapData._prefabSwapDictionary: {customSwapData.GetFieldOrPropertyValue<Dictionary<GameObject, GameObject>>("_prefabSwapDictionary").Count}");
-                foreach (var pair in customSwapData.GetFieldOrPropertyValue<Dictionary<GameObject, GameObject>>("_prefabSwapDictionary"))
+                log.LogDebug($"customSwapData._prefabSwapDictionary: {customSwapData._prefabSwapDictionary.Count}");
+                foreach (var pair in customSwapData._prefabSwapDictionary)
                 {
                     log.LogDebug($"customSwapData: {pair.Key.name}, {pair.Value.name}");
                     HandlePayable(pair.Value.gameObject, true);
@@ -166,12 +166,7 @@ namespace KingdomMod
             var payables = SingletonMonoBehaviour<Managers>.Inst.payables;
             if (payables != null)
             {
-                foreach (var obj in payables.
-#if IL2CPP
-                             AllPayables
-#else
-                             GetFieldOrPropertyValue<Payable[]>("AllPayables")
-#endif
+                foreach (var obj in payables.AllPayables
                          )
                 {
                     if (obj == null) continue;
@@ -181,7 +176,7 @@ namespace KingdomMod
                     HandlePayable(go, false);
                 }
 
-                foreach (var obj in payables.GetFieldOrPropertyValue<List<PayableBlocker>>("_allBlockers"))
+                foreach (var obj in payables._allBlockers)
                 {
                     if (obj == null) continue;
                     var scaffolding = obj.GetComponent<Scaffolding>();
@@ -277,9 +272,9 @@ namespace KingdomMod
                 if (workable != null)
                 {
                     var constructionBuilding = Require.Component<ConstructionBuildingComponent>(workable);
-                    var buildPoints = constructionBuilding.GetFieldOrPropertyValue<int>("_buildPoints");
+                    var buildPoints = constructionBuilding._buildPoints;
                     log.LogDebug($"Change {go.name} buildPoints from {buildPoints} to {modifyData.BuildPoints}");
-                    constructionBuilding.SetFieldOrPropertyValue("_buildPoints", modifyData.BuildPoints);
+                    constructionBuilding._buildPoints = modifyData.BuildPoints;
                 }
             }
 
