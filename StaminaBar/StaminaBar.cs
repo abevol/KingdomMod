@@ -80,24 +80,25 @@ namespace KingdomMod
 
             GUI.BeginGroup(new Rect(baseLeft + 2, uiPos.Value.y + 2, baseWidth, baseHeight));
 
-            if (steed.tiredTimer > 0)
+            var tiredTimer = steed.GetFieldOrPropertyValue<float>("_tiredTimer");
+            if (tiredTimer > 0)
             {
                 var lineStart = new Vector2(0, 0);
-                var lineEnd = new Vector2(baseWidth * steed.tiredTimer / durationMax, 0);
+                var lineEnd = new Vector2(baseWidth * tiredTimer / durationMax, 0);
                 GuiHelper.DrawLine(lineStart, lineEnd, Color.red, (uint)baseHeight - 4);
             }
 
-            if (steed.wellFedTimer > 0)
+            if (steed.WellFedTimer > 0)
             {
                 var lineStart = new Vector2(0, 0);
-                var lineEnd = new Vector2(baseWidth * steed.wellFedTimer / durationMax, 0);
+                var lineEnd = new Vector2(baseWidth * steed.WellFedTimer / durationMax, 0);
                 GuiHelper.DrawLine(lineStart, lineEnd, new Color(1.0f, 0.84f, 0.0f), (uint)baseHeight - 4);
             }
 
-            if (steed.stamina > 0)
+            if (steed.Stamina > 0)
             {
                 var lineStart = new Vector2(0, 2);
-                var lineEnd = new Vector2(baseWidth * steed.stamina, 2);
+                var lineEnd = new Vector2(baseWidth * steed.Stamina, 2);
                 GuiHelper.DrawLine(lineStart, lineEnd, new Color(0.46f, 0.84f, 0.92f), (uint)baseHeight - 8);
             }
 

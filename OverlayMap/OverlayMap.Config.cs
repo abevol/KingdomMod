@@ -83,17 +83,17 @@ namespace KingdomMod
                 {
                     new ConfigPrefab
                     {
-                        ResName = "KingdomMod.prefabs.KingdomMod.OverlayMap.Style.cfg",
+                        ResName = "KingdomMod.ConfigPrefabs.KingdomMod.OverlayMap.Style.cfg",
                         FileName = "KingdomMod.OverlayMap.Style.cfg"
                     },
                     new ConfigPrefab
                     {
-                        ResName = "KingdomMod.prefabs.KingdomMod.OverlayMap.Language_en-US.cfg",
+                        ResName = "KingdomMod.ConfigPrefabs.KingdomMod.OverlayMap.Language_en-US.cfg",
                         FileName = "KingdomMod.OverlayMap.Language.en-US.cfg"
                     },
                     new ConfigPrefab
                     {
-                        ResName = "KingdomMod.prefabs.KingdomMod.OverlayMap.Language_zh-CN.cfg",
+                        ResName = "KingdomMod.ConfigPrefabs.KingdomMod.OverlayMap.Language_zh-CN.cfg",
                         FileName = "KingdomMod.OverlayMap.Language.zh-CN.cfg"
                     }
                 };
@@ -304,6 +304,7 @@ namespace KingdomMod
                 public static ConfigEntryWrapper<string> Archer;
                 public static ConfigEntryWrapper<string> Barrier;
                 public static ConfigEntryWrapper<string> Bear;
+                public static ConfigEntryWrapper<string> Invalid;
                 public static ConfigEntryWrapper<string> Beggar;
                 public static ConfigEntryWrapper<string> BeggarCamp;
                 public static ConfigEntryWrapper<string> Bloodstained;
@@ -341,6 +342,8 @@ namespace KingdomMod
                 public static ConfigEntryWrapper<string> HermitHorn;
                 public static ConfigEntryWrapper<string> HermitHorse;
                 public static ConfigEntryWrapper<string> HermitKnight;
+                public static ConfigEntryWrapper<string> HermitPersephone;
+                public static ConfigEntryWrapper<string> HermitFire;
                 public static ConfigEntryWrapper<string> Hooded;
                 public static ConfigEntryWrapper<string> HorseBurst;
                 public static ConfigEntryWrapper<string> HorseFast;
@@ -363,6 +366,16 @@ namespace KingdomMod
                 public static ConfigEntryWrapper<string> Quarry;
                 public static ConfigEntryWrapper<string> Queen;
                 public static ConfigEntryWrapper<string> Reindeer;
+                public static ConfigEntryWrapper<string> Hippocampus;
+                public static ConfigEntryWrapper<string> Cerberus;
+                public static ConfigEntryWrapper<string> Spider;
+                public static ConfigEntryWrapper<string> TheChariotDay;
+                public static ConfigEntryWrapper<string> TheChariotNight;
+                public static ConfigEntryWrapper<string> Pegasus;
+                public static ConfigEntryWrapper<string> Donkey;
+                public static ConfigEntryWrapper<string> MolossianHound;
+                public static ConfigEntryWrapper<string> Chimera;
+                public static ConfigEntryWrapper<string> Total;
                 public static ConfigEntryWrapper<string> ShopForge;
                 public static ConfigEntryWrapper<string> Sleipnir;
                 public static ConfigEntryWrapper<string> Spookyhorse;
@@ -390,7 +403,7 @@ namespace KingdomMod
                     config.SaveOnConfigSet = false;
                     config.Clear();
 
-                    Alfred             = config.Bind("Strings", "Alfred", "Alfred", "");
+                    Alfred = config.Bind("Strings", "Alfred", "Alfred", "");
                     Archer             = config.Bind("Strings", "Archer", "Archer", "");
                     Barrier            = config.Bind("Strings", "Barrier", "Barrier", "");
                     Bear               = config.Bind("Strings", "Bear", "Bear", "");
@@ -431,6 +444,8 @@ namespace KingdomMod
                     HermitHorn         = config.Bind("Strings", "HermitHorn", "HermitHorn", "");
                     HermitHorse        = config.Bind("Strings", "HermitHorse", "HermitHorse", "");
                     HermitKnight       = config.Bind("Strings", "HermitKnight", "HermitKnight", "");
+                    HermitPersephone   = config.Bind("Strings", "HermitPersephone", "HermitPersephone", "");
+                    HermitFire         = config.Bind("Strings", "HermitFire", "HermitFire", "");
                     Hooded             = config.Bind("Strings", "Hooded", "Hooded", "");
                     HorseBurst         = config.Bind("Strings", "HorseBurst", "HorseBurst", "");
                     HorseFast          = config.Bind("Strings", "HorseFast", "HorseFast", "");
@@ -471,6 +486,17 @@ namespace KingdomMod
                     Worker             = config.Bind("Strings", "Worker", "Worker", "");
                     You                = config.Bind("Strings", "You", "You", "");
                     Zangetsu           = config.Bind("Strings", "Zangetsu", "Zangetsu", "");
+                    Invalid            = config.Bind("Strings", "Invalid", "INVALID", "");
+                    Hippocampus        = config.Bind("Strings", "Hippocampus", "Hippocampus", "");
+                    Cerberus           = config.Bind("Strings", "Cerberus", "Cerberus", "");
+                    Spider             = config.Bind("Strings", "Spider", "Spider", "");
+                    TheChariotDay      = config.Bind("Strings", "TheChariotDay", "TheChariotDay", "");
+                    TheChariotNight    = config.Bind("Strings", "TheChariotNight", "TheChariotNight", "");
+                    Pegasus            = config.Bind("Strings", "Pegasus", "Pegasus", "");
+                    Donkey             = config.Bind("Strings", "Donkey", "Donkey", "");
+                    MolossianHound     = config.Bind("Strings", "MolossianHound", "MolossianHound", "");
+                    Chimera            = config.Bind("Strings", "Chimera", "Chimera", "");
+                    Total              = config.Bind("Strings", "Total", "Total", "");
 
                     LogMessage($"Loaded config: {Path.GetFileName(ConfigFile.ConfigFilePath)}");
 
@@ -549,13 +575,13 @@ namespace KingdomMod
                 public static MarkerConfig Farmhouse;
                 public static MarkerConfig Steeds;
                 public static MarkerConfig SteedSpawns;
-                public static MarkerConfig HermitCabins;
                 public static MarkerConfig Statues;
                 public static MarkerConfig StatueTime;
                 public static MarkerConfigStated Boat;
                 public static MarkerConfigStated Quarry;
                 public static MarkerConfigStated Mine;
                 public static MarkerConfigStated RulerSpawns;
+                public static MarkerConfigStated HermitCabins;
                 public static MarkerConfig MerchantHouse;
                 public static MarkerConfigStated ThorPuzzleStatue;
                 public static MarkerConfigStated HelPuzzleStatue;
@@ -660,9 +686,6 @@ namespace KingdomMod
                     SteedSpawns.Color = config.Bind("SteedSpawns", "Color", "1,0,0,1", "");
                     SteedSpawns.Sign = config.Bind("SteedSpawns", "Sign", "", "");
 
-                    HermitCabins.Color = config.Bind("HermitCabins", "Color", "1,0,0,1", "");
-                    HermitCabins.Sign = config.Bind("HermitCabins", "Sign", "", "");
-
                     Statues.Color = config.Bind("Statues", "Color", "1,0,0,1", "");
                     Statues.Sign = config.Bind("Statues", "Sign", "", "");
 
@@ -698,6 +721,10 @@ namespace KingdomMod
                     HelPuzzleStatue.Locked.Color = config.Bind("HelPuzzleStatue.Locked", "Color", "1,0,0,1", "");
                     HelPuzzleStatue.Unlocked.Color = config.Bind("HelPuzzleStatue.Unlocked", "Color", "0,1,0,1", "");
                     HelPuzzleStatue.Sign = config.Bind("HelPuzzleStatue", "Sign", "", "");
+
+                    HermitCabins.Locked.Color = config.Bind("HermitCabins.Locked", "Color", "1,0,0,1", "");
+                    HermitCabins.Unlocked.Color = config.Bind("HermitCabins.Unlocked", "Color", "0,1,0,1", "");
+                    HermitCabins.Sign = config.Bind("HermitCabins", "Sign", "", "");
 
                     StatsInfo.Color = config.Bind("StatsInfo", "Color", "1,1,1,1", "");
 

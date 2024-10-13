@@ -1,160 +1,153 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+    <Import Project="..\ProjectSettings.shared.props" />
+    <Import Project="..\ProjectSettings.custom.props" />
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <AssemblyName>KingdomMod.DevTools</AssemblyName>
-    <Description>KingdomMod.DevTools</Description>
-    <Version>2.2.0</Version>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <LangVersion>latest</LangVersion>
-    <RestoreAdditionalProjectSources>
-      https://api.nuget.org/v3/index.json;
-      https://nuget.bepinex.dev/v3/index.json;
-      https://nuget.samboy.dev/v3/index.json
-    </RestoreAdditionalProjectSources>
-    <RootNamespace>KingdomMod</RootNamespace>
-    <Configurations>Debug;BIE6_IL2CPP;BIE6_Mono</Configurations>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-  </PropertyGroup>
-  
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DefineConstants>IL2CPP,BIE,BIE6</DefineConstants>
-    <WarningsAsErrors>$(WarningsAsErrors);NU1605</WarningsAsErrors>
-    <BepInExPluginsDir>D:\SteamLibrary\steamapps\common\Kingdom Two Crowns\BepInEx\plugins\</BepInExPluginsDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='BIE6_IL2CPP|AnyCPU'">
-    <DefineConstants>IL2CPP,BIE,BIE6</DefineConstants>
-    <WarningsAsErrors>$(WarningsAsErrors);NU1605</WarningsAsErrors>
-    <BepInExPluginsDir>D:\SteamLibrary\steamapps\common\Kingdom Two Crowns\BepInEx\plugins\</BepInExPluginsDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='BIE6_Mono|AnyCPU'">
-    <TargetFramework>net472</TargetFramework>
-    <DefineConstants>MONO,BIE,BIE6</DefineConstants>
-    <WarningsAsErrors>$(WarningsAsErrors);NU1605</WarningsAsErrors>
-    <BepInExPluginsDir>D:\Game\Kingdom Two Crowns v1.1.18\BepInEx\plugins\</BepInExPluginsDir>
-  </PropertyGroup>
+    <PropertyGroup>
+        <AssemblyName>KingdomMod.DevTools</AssemblyName>
+        <Description>KingdomMod.DevTools</Description>
+        <Version>2.3.0</Version>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <LangVersion>latest</LangVersion>
+        <RestoreAdditionalProjectSources>
+            https://api.nuget.org/v3/index.json;
+            https://nuget.bepinex.dev/v3/index.json;
+            https://nuget.samboy.dev/v3/index.json
+        </RestoreAdditionalProjectSources>
+        <RootNamespace>KingdomMod</RootNamespace>
+        <Configurations>Debug;BIE6_IL2CPP;BIE6_Mono</Configurations>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="BepInEx.PluginInfoProps" Version="2.*" />
-  </ItemGroup>
+    <ItemGroup>
+        <Compile Include="..\Shared\TypeExtensions.cs" Link="Shared\TypeExtensions.cs" />
+        <Compile Include="..\Shared\ObjectExtensions.cs" Link="Shared\ObjectExtensions.cs" />
+    </ItemGroup>
 
-  <!-- BIE6_IL2CPP -->
-  <ItemGroup Condition="'$(Configuration)'=='BIE6_IL2CPP' or '$(Configuration)'=='Debug'">
-    <Reference Include="0Harmony">
-      <HintPath>..\_libs\BIE6_IL2CPP\core\0Harmony.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>..\_libs\BIE6_IL2CPP\interop\Assembly-CSharp.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="BepInEx.Core">
-      <HintPath>..\_libs\BIE6_IL2CPP\core\BepInEx.Core.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="BepInEx.Unity.IL2CPP">
-      <HintPath>..\_libs\BIE6_IL2CPP\core\BepInEx.Unity.IL2CPP.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Il2CppInterop.Runtime">
-      <HintPath>..\_libs\BIE6_IL2CPP\core\Il2CppInterop.Runtime.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Il2Cppmscorlib">
-      <HintPath>..\_libs\BIE6_IL2CPP\interop\Il2Cppmscorlib.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>..\_libs\BIE6_IL2CPP\interop\UnityEngine.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.CoreModule">
-      <HintPath>..\_libs\BIE6_IL2CPP\interop\UnityEngine.CoreModule.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.IMGUIModule">
-      <HintPath>..\_libs\BIE6_IL2CPP\interop\UnityEngine.IMGUIModule.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.InputLegacyModule">
-      <HintPath>..\_libs\BIE6_IL2CPP\interop\UnityEngine.InputLegacyModule.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.ParticleSystemModule">
-      <HintPath>..\_libs\BIE6_IL2CPP\interop\UnityEngine.ParticleSystemModule.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.TextRenderingModule">
-      <HintPath>..\_libs\BIE6_IL2CPP\interop\UnityEngine.TextRenderingModule.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>..\_libs\BIE6_IL2CPP\interop\UnityEngine.UI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.UIModule">
-      <HintPath>..\_libs\BIE6_IL2CPP\interop\UnityEngine.UIModule.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="BepInEx.PluginInfoProps" Version="2.*" />
+    </ItemGroup>
 
-  <!-- BIE6_Mono -->
-  <ItemGroup Condition="'$(Configuration)'=='BIE6_Mono'">
-    <Reference Include="0Harmony">
-      <HintPath>..\_libs\BIE6_Mono\core\0Harmony.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>..\_libs\BIE6_Mono\Managed\Assembly-CSharp.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="BepInEx.Core">
-      <HintPath>..\_libs\BIE6_Mono\core\BepInEx.Core.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="BepInEx.Unity.Mono">
-      <HintPath>..\_libs\BIE6_Mono\core\BepInEx.Unity.Mono.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Mono.Cecil">
-      <HintPath>..\_libs\BIE6_Mono\core\Mono.Cecil.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>..\_libs\BIE6_Mono\Managed\UnityEngine.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.CoreModule">
-      <HintPath>..\_libs\BIE6_Mono\Managed\UnityEngine.CoreModule.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.IMGUIModule">
-      <HintPath>..\_libs\BIE6_Mono\Managed\UnityEngine.IMGUIModule.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.InputLegacyModule">
-      <HintPath>..\_libs\BIE6_Mono\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.ParticleSystemModule">
-      <HintPath>..\_libs\BIE6_Mono\Managed\UnityEngine.ParticleSystemModule.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.TextRenderingModule">
-      <HintPath>..\_libs\BIE6_Mono\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>..\_libs\BIE6_Mono\Managed\UnityEngine.UI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.UIModule">
-      <HintPath>..\_libs\BIE6_Mono\Managed\UnityEngine.UIModule.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-  </ItemGroup>
+    <!-- BIE6_IL2CPP -->
+    <ItemGroup Condition="'$(Configuration)'=='BIE6_IL2CPP'">
+        <Reference Include="0Harmony">
+            <HintPath>..\_libs\BIE6_IL2CPP\core\0Harmony.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="Assembly-CSharp">
+            <HintPath>..\_libs\BIE6_IL2CPP\interop\Assembly-CSharp.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="BepInEx.Core">
+            <HintPath>..\_libs\BIE6_IL2CPP\core\BepInEx.Core.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="BepInEx.Unity.IL2CPP">
+            <HintPath>..\_libs\BIE6_IL2CPP\core\BepInEx.Unity.IL2CPP.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="Il2CppInterop.Runtime">
+            <HintPath>..\_libs\BIE6_IL2CPP\core\Il2CppInterop.Runtime.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="Il2Cppmscorlib">
+            <HintPath>..\_libs\BIE6_IL2CPP\interop\Il2Cppmscorlib.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine">
+            <HintPath>..\_libs\BIE6_IL2CPP\interop\UnityEngine.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine.CoreModule">
+            <HintPath>..\_libs\BIE6_IL2CPP\interop\UnityEngine.CoreModule.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine.IMGUIModule">
+            <HintPath>..\_libs\BIE6_IL2CPP\interop\UnityEngine.IMGUIModule.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine.InputLegacyModule">
+            <HintPath>..\_libs\BIE6_IL2CPP\interop\UnityEngine.InputLegacyModule.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine.ParticleSystemModule">
+            <HintPath>..\_libs\BIE6_IL2CPP\interop\UnityEngine.ParticleSystemModule.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine.TextRenderingModule">
+            <HintPath>..\_libs\BIE6_IL2CPP\interop\UnityEngine.TextRenderingModule.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine.UI">
+            <HintPath>..\_libs\BIE6_IL2CPP\interop\UnityEngine.UI.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine.UIModule">
+            <HintPath>..\_libs\BIE6_IL2CPP\interop\UnityEngine.UIModule.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+    </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy &quot;$(OutputPath)$(AssemblyName).dll&quot; &quot;$(BepInExPluginsDir)$(AssemblyName)\&quot; /Y&#xD;&#xA;xcopy &quot;$(OutputPath)$(AssemblyName).pdb&quot; &quot;$(BepInExPluginsDir)$(AssemblyName)\&quot; /Y" />
-  </Target>
+    <!-- BIE6_Mono -->
+    <ItemGroup Condition="'$(Configuration)'=='BIE6_Mono' or '$(Configuration)'=='Debug'">
+        <Reference Include="0Harmony">
+            <HintPath>..\_libs\BIE6_Mono\core\0Harmony.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="Assembly-CSharp">
+            <HintPath>..\_libs\BIE6_Mono\Managed\Assembly-CSharp.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="BepInEx.Core">
+            <HintPath>..\_libs\BIE6_Mono\core\BepInEx.Core.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="BepInEx.Unity.Mono">
+            <HintPath>..\_libs\BIE6_Mono\core\BepInEx.Unity.Mono.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="Mono.Cecil">
+            <HintPath>..\_libs\BIE6_Mono\core\Mono.Cecil.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine">
+            <HintPath>..\_libs\BIE6_Mono\Managed\UnityEngine.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine.CoreModule">
+            <HintPath>..\_libs\BIE6_Mono\Managed\UnityEngine.CoreModule.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine.IMGUIModule">
+            <HintPath>..\_libs\BIE6_Mono\Managed\UnityEngine.IMGUIModule.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine.InputLegacyModule">
+            <HintPath>..\_libs\BIE6_Mono\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine.ParticleSystemModule">
+            <HintPath>..\_libs\BIE6_Mono\Managed\UnityEngine.ParticleSystemModule.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine.TextRenderingModule">
+            <HintPath>..\_libs\BIE6_Mono\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine.UI">
+            <HintPath>..\_libs\BIE6_Mono\Managed\UnityEngine.UI.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine.UIModule">
+            <HintPath>..\_libs\BIE6_Mono\Managed\UnityEngine.UIModule.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+    </ItemGroup>
+
+    <Target Name="CopyOutput" AfterTargets="Build">
+        <Copy SourceFiles="$(OutputPath)\$(AssemblyName).dll"
+              DestinationFolder="$(BepInExPluginsPath)\$(AssemblyName)\" OverwriteReadOnlyFiles="true" />
+        <Copy SourceFiles="$(OutputPath)\$(AssemblyName).pdb"
+              DestinationFolder="$(BepInExPluginsPath)\$(AssemblyName)\" OverwriteReadOnlyFiles="true" />
+        <Message Text="Copied output to: $(BepInExPluginsPath)\$(AssemblyName)\" Importance="high" />
+    </Target>
 </Project>

@@ -1,0 +1,17 @@
+<Project>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <TargetFramework>net472</TargetFramework>
+        <DefineConstants>MONO,BIE,BIE6</DefineConstants>
+        <WarningsAsErrors>$(WarningsAsErrors);NU1605</WarningsAsErrors>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='BIE6_IL2CPP|AnyCPU'">
+        <TargetFramework>net6.0</TargetFramework>
+        <DefineConstants>IL2CPP,BIE,BIE6</DefineConstants>
+        <WarningsAsErrors>$(WarningsAsErrors);NU1605</WarningsAsErrors>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='BIE6_Mono|AnyCPU'">
+        <TargetFramework>net472</TargetFramework>
+        <DefineConstants>MONO,BIE,BIE6</DefineConstants>
+        <WarningsAsErrors>$(WarningsAsErrors);NU1605</WarningsAsErrors>
+    </PropertyGroup>
+</Project>
