@@ -352,7 +352,7 @@ namespace KingdomMod
             foreach (var beggarCamp in kingdom.BeggarCamps)
             {
                 int count = 0;
-                foreach (var beggar in beggarCamp.GetFieldOrPropertyValue<List<Beggar>>("_beggars"))
+                foreach (var beggar in beggarCamp._beggars)
                 {
                     if (beggar != null && beggar.isActiveAndEnabled)
                         count++;
@@ -389,11 +389,11 @@ namespace KingdomMod
             var deers = GameExtensions.FindObjectsWithTagOfType<Deer>(Tags.Wildlife);
             foreach (var deer in deers)
             {
-                if (!deer.GetFieldOrPropertyValue<Damageable>("_damageable").isDead)
-                    poiList.Add(new MarkInfo(deer.transform.position.x, deer.GetFieldOrPropertyValue<StateMachine>("_fsm").Current == 5 ? Style.DeerFollowing.Color : Style.Deer.Color, Style.Deer.Sign, Strings.Deer, 0, MarkRow.Movable));
+                if (!deer._damageable.isDead)
+                    poiList.Add(new MarkInfo(deer.transform.position.x, deer._fsm.Current == 5 ? Style.DeerFollowing.Color : Style.Deer.Color, Style.Deer.Sign, Strings.Deer, 0, MarkRow.Movable));
             }
 
-            var enemies = Managers.Inst.enemies.GetFieldOrPropertyValue<HashSet<Enemy>>("_enemies");
+            var enemies = Managers.Inst.enemies._enemies;
             if (enemies != null && enemies.Count > 0)
             {
                 var leftEnemies = new System.Collections.Generic.List<float>();
@@ -459,11 +459,11 @@ namespace KingdomMod
             var castle = kingdom.castle;
             if (castle != null)
             {
-                var payable = castle.GetFieldOrPropertyValue<PayableUpgrade>("_payableUpgrade");
+                var payable = castle._payableUpgrade;
                 bool canPay = payable.IsLocked(GetLocalPlayer(), out var reason);
                 bool isLocked = reason != LockIndicator.LockReason.NotLocked && reason != LockIndicator.LockReason.NoUpgrade;
                 bool isLockedForInvalidTime = reason == LockIndicator.LockReason.InvalidTime;
-                var price = isLockedForInvalidTime ? (int)(payable.GetFieldOrPropertyValue<float>("timeAvailableFrom") - Time.time) : canPay ? payable.Price : 0;
+                var price = isLockedForInvalidTime ? (int)(payable.timeAvailableFrom - Time.time) : canPay ? payable.Price : 0;
                 var color = isLocked ? Style.Castle.Locked.Color : Style.Castle.Color;
                 poiList.Add(new MarkInfo(castle.transform.position.x, color, Style.Castle.Sign, Strings.Castle, price));
 
@@ -488,7 +488,7 @@ namespace KingdomMod
                     poiList.Add(new MarkInfo(obj.transform.position.x, Style.Chest.Color, Style.Chest.Sign, Strings.Chest, obj.currencyAmount));
             }
 
-            foreach (var obj in kingdom.GetFieldOrPropertyValue<HashSet<Wall>>("_walls"))
+            foreach (var obj in kingdom._walls)
             {
                 poiList.Add(new MarkInfo(obj.transform.position.x, Style.Wall.Color, Style.Wall.Sign, ""));
                 if (kingdom.GetBorderSideForPosition(obj.transform.position.x) == Side.Left)
@@ -509,7 +509,7 @@ namespace KingdomMod
                 var citizenHouse = obj.GetComponent<CitizenHousePayable>();
                 if (citizenHouse != null)
                 {
-                    poiList.Add(new MarkInfo(obj.transform.position.x, Style.CitizenHouse.Color, Style.CitizenHouse.Sign, Strings.CitizenHouse, citizenHouse.GetPropertyValue<int>("_numberOfAvailableCitizens")));
+                    poiList.Add(new MarkInfo(obj.transform.position.x, Style.CitizenHouse.Color, Style.CitizenHouse.Sign, Strings.CitizenHouse, citizenHouse._numberOfAvailableCitizens));
                 }
             }
 
@@ -535,9 +535,9 @@ namespace KingdomMod
                 poiList.Add(new MarkInfo(obj.transform.position.x, Style.River.Color, Style.River.Sign, ""));
             }
 
-            foreach (var obj in Managers.Inst.world.GetFieldOrPropertyValue<List<PayableBush>>("_berryBushes"))
+            foreach (var obj in Managers.Inst.world._berryBushes)
             {
-                if (obj.GetFieldOrPropertyValue<bool>("paid"))
+                if (obj.paid)
                     poiList.Add(new MarkInfo(obj.transform.position.x, Style.BerryBushPaid.Color, Style.BerryBushPaid.Sign, ""));
                 else
                     poiList.Add(new MarkInfo(obj.transform.position.x, Style.BerryBush.Color, Style.BerryBush.Sign, ""));
@@ -546,19 +546,19 @@ namespace KingdomMod
             var payableGemChest = GameExtensions.GetPayableOfType<PayableGemChest>();
             if (payableGemChest != null)
             {
-                var gemsCount = payableGemChest.infiniteGems ? payableGemChest.GetFieldOrPropertyValue<PayableGemGuard>("guardRef").Price : payableGemChest.gemsStored;
+                var gemsCount = payableGemChest.infiniteGems ? payableGemChest.guardRef.Price : payableGemChest.gemsStored;
                 poiList.Add(new MarkInfo(payableGemChest.transform.position.x, Style.GemMerchant.Color, Style.GemMerchant.Sign, Strings.GemMerchant, gemsCount));
             }
 
             var dogSpawn = GameExtensions.GetPayableBlockerOfType<DogSpawn>();
-            if (dogSpawn != null && !dogSpawn.GetPropertyValue<bool>("_dogFreed"))
+            if (dogSpawn != null && !dogSpawn._dogFreed)
                 poiList.Add(new MarkInfo(dogSpawn.transform.position.x, Style.DogSpawn.Color, Style.DogSpawn.Sign, Strings.DogSpawn));
 
-            var boarSpawn = world.GetFieldOrPropertyValue<BoarSpawnGroup>("boarSpawnGroup");
+            var boarSpawn = world.boarSpawnGroup;
             if (boarSpawn != null)
             {
                 poiList.Add(new MarkInfo(boarSpawn.transform.position.x, Style.BoarSpawn.Color, Style.BoarSpawn.Sign,
-                    Strings.BoarSpawn, boarSpawn.GetFieldOrPropertyValue<bool>("_spawnedBoar") ? 0 : 1));
+                    Strings.BoarSpawn, boarSpawn._spawnedBoar ? 0 : 1));
             }
 
             var caveHelper = Managers.Inst.caveHelper;
@@ -633,14 +633,14 @@ namespace KingdomMod
             foreach (var obj in kingdom.steedSpawns)
             {
                 var info = "";
-                foreach (var steedTmp in obj.GetFieldOrPropertyValue<List<Steed>>("steedPool"))
+                foreach (var steedTmp in obj.steedPool)
                 {
                     if (!steedNames.TryGetValue(steedTmp.steedType, out var steedName))
                         continue;
                     info = steedName;
                 }
 
-                if (!obj.GetPropertyValue<bool>("_hasSpawned"))
+                if (!obj._hasSpawned)
                     poiList.Add(new MarkInfo(obj.transform.position.x, Style.SteedSpawns.Color, Style.SteedSpawns.Sign, info, obj.Price));
             }
 
@@ -665,9 +665,8 @@ namespace KingdomMod
                     _ => LogUnknownHermitType(obj.hermitType)
                 };
 
-                var canPay = obj.GetPropertyValue<bool>("canPay");
-                var color = canPay ? Style.HermitCabins.Locked.Color : Style.HermitCabins.Unlocked.Color;
-                var price = canPay ? obj.Price : 0;
+                var color = obj.canPay ? Style.HermitCabins.Locked.Color : Style.HermitCabins.Unlocked.Color;
+                var price = obj.canPay ? obj.Price : 0;
                 poiList.Add(new MarkInfo(obj.transform.position.x, color, Style.HermitCabins.Sign, info, price));
             }
 
@@ -703,12 +702,7 @@ namespace KingdomMod
                     poiList.Add(new MarkInfo(wreck.transform.position.x, Style.Boat.Wrecked.Color, Style.Boat.Sign, Strings.BoatWreck));
             }
 
-            foreach (var obj in payables.
-#if IL2CPP
-                         AllPayables
-#else
-                         GetFieldOrPropertyValue<Payable[]>("AllPayables")
-#endif
+            foreach (var obj in payables.AllPayables
                      )
             {
                 if (obj == null) continue;
@@ -758,7 +752,7 @@ namespace KingdomMod
                 }
             }
 
-            foreach (var obj in payables.GetFieldOrPropertyValue<List<PayableBlocker>>("_allBlockers"))
+            foreach (var obj in payables._allBlockers)
             {
                 if (obj == null) continue;
                 var go = obj.gameObject;
@@ -796,7 +790,7 @@ namespace KingdomMod
                 }
             }
 
-            foreach (var blocker in payables.GetFieldOrPropertyValue<List<PayableBlocker>>("_allBlockers"))
+            foreach (var blocker in payables._allBlockers)
             {
                 if (blocker == null) continue;
                 var scaffolding = blocker.GetComponent<Scaffolding>();
@@ -1004,10 +998,10 @@ namespace KingdomMod
             var peasantList = GameObject.FindGameObjectsWithTag(Tags.Peasant);
             statsInfo.PeasantCount = peasantList.Length;
 
-            var workerList = kingdom.GetFieldOrPropertyValue<HashSet<Worker>>("_workers");
+            var workerList = kingdom._workers;
             statsInfo.WorkerCount = workerList.Count;
 
-            var archerList = kingdom.GetFieldOrPropertyValue<HashSet<Archer>>("_archers");
+            var archerList = kingdom._archers;
             statsInfo.ArcherCount = archerList.Count;
 
             var farmerList = kingdom.Farmers;
@@ -1017,7 +1011,7 @@ namespace KingdomMod
             int maxFarmlands = 0;
             foreach (var obj in farmhouseList)
             {
-                maxFarmlands += obj.GetMethodDelegate<Func<int>>("CurrentMaxFarmlands")();
+                maxFarmlands += obj.CurrentMaxFarmlands();
             }
             statsInfo.MaxFarmlands = maxFarmlands;
         }
