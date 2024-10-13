@@ -509,7 +509,7 @@ namespace KingdomMod
                 var citizenHouse = obj.GetComponent<CitizenHousePayable>();
                 if (citizenHouse != null)
                 {
-                    poiList.Add(new MarkInfo(obj.transform.position.x, Style.CitizenHouse.Color, Style.CitizenHouse.Sign, Strings.CitizenHouse, citizenHouse.GetPropertyValue<int>("_numberOfAvaliableCitizens")));
+                    poiList.Add(new MarkInfo(obj.transform.position.x, Style.CitizenHouse.Color, Style.CitizenHouse.Sign, Strings.CitizenHouse, citizenHouse.GetPropertyValue<int>("_numberOfAvailableCitizens")));
                 }
             }
 
