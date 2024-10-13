@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using File = System.IO.File;
 using HarmonyLib;
+using Coatsink.Common;
+using System.Reflection;
 #if IL2CPP
 using Il2CppInterop.Runtime.Injection;
 #endif
@@ -186,7 +188,7 @@ namespace KingdomMod
 
         private void Update()
         {
-#if DEBUG
+// #if DEBUG
             if (Input.GetKeyDown(KeyCode.Home))
             {
                 log.LogMessage("Home key pressed.");
@@ -213,7 +215,7 @@ namespace KingdomMod
                     var biomeHolder = biomeHelper.GetComponent<BiomeHolder>();
                     if (biomeHolder)
                     {
-                        biomeHolder.debugToolsEnabled = true;
+                        biomeHolder.SetFieldOrPropertyValue("debugToolsEnabled", true);
                     }
                 }
 
@@ -255,7 +257,7 @@ namespace KingdomMod
                 if (prefabs != null)
                 {
                     var dumpStr = "\npublic enum PrefabIDs\n{\n";
-                    foreach (var prefab in prefabs.prefabMasterCopies)
+                    foreach (var prefab in prefabs.GetFieldOrPropertyValue<List<PrefabID>>("prefabMasterCopies"))
                     {
                         var prefabName = prefab.name.Replace(' ', '_');
                         dumpStr = dumpStr + "    " + prefabName + " = " + prefab.prefabID + ",\n";
@@ -270,7 +272,7 @@ namespace KingdomMod
             {
                 log.LogMessage($"Dump LevelBlocks:");
 
-                var levelBlocks = Managers.Inst.level.GetLevelBlocks();
+                var levelBlocks = Managers.Inst.level.GetMethodDelegate<Func<List<LevelBlock>>>("GetLevelBlocks").Invoke();
                 log.LogMessage($"LevelBlocks: {levelBlocks.Count}");
                 foreach (var levelBlock in levelBlocks)
                 {
@@ -286,13 +288,17 @@ namespace KingdomMod
                     var payable = player.selectedPayable;
                     if (payable != null)
                     {
+#if IL2CPP
                         var payableTree = payable.TryCast<PayableTree>();
+#else
+                        var payableTree = payable as PayableTree;
+#endif
                         if (payableTree != null)
                         {
                             log.LogMessage($"Try to cutdown the tree: {payable.GetGO.name}");
-                            WorkableTree.s_autoChopTrees = true;
+                            WorkableTree.AutoChopTrees = true;
                             payableTree.Pay();
-                            WorkableTree.s_autoChopTrees = false;
+                            WorkableTree.AutoChopTrees = false;
                         }
                     }
                 }
@@ -320,7 +326,7 @@ namespace KingdomMod
                     log.LogMessage($"Try to add Griffin.");
 
                     var prefab = Resources.Load<Steed>("Prefabs/Steeds/Griffin P1");
-                    prefab.price = 1;
+                    prefab.Price = 1;
                     Vector3 vector = player.transform.TransformPoint(new Vector3(1f, 1f, 0.01f));
                     var lastSpawned = Pool.SpawnOrInstantiateGO(prefab.gameObject, vector, Quaternion.identity, null);
                     lastSpawned.transform.SetParent(GameObject.FindGameObjectWithTag("GameLayer").transform);
@@ -369,13 +375,13 @@ namespace KingdomMod
             {
                 log.LogMessage($"F9 key pressed.");
 
-                Transform[] array = Resources.FindObjectsOfTypeAll<Transform>();
+                var array = Resources.FindObjectsOfTypeAll<Transform>();
                 for (int i = 0; i < array.Length; i++)
                 {
                     if (array[i].name == "DebugTools")
                     {
                         array[i].gameObject.SetActive(true);
-                        UnityEngine.UI.Text[] componentsInChildren = array[i].gameObject.GetComponentsInChildren<UnityEngine.UI.Text>(true);
+                        var componentsInChildren = array[i].gameObject.GetComponentsInChildren<UnityEngine.UI.Text>(true);
                         for (int j = 0; j < componentsInChildren.Length; j++)
                         {
                             componentsInChildren[j].font = Resources.GetBuiltinResource<Font>("Arial.ttf");
@@ -383,9 +389,11 @@ namespace KingdomMod
                             componentsInChildren[j].fontStyle = FontStyle.Bold;
                             componentsInChildren[j].text = componentsInChildren[j].text.ToLower();
                         }
-
+#if IL2CPP
                         var iDebugTools = new IDebugTools(array[i].GetComponent("DebugTools").Pointer);
-
+#else
+                        var iDebugTools = (IDebugTools)(array[i].GetComponent("DebugTools"));
+#endif
                         var cursorSystem = GameObject.FindObjectOfType<CursorSystem>();
                         if (cursorSystem)
                             cursorSystem.SetForceVisibleCursor(!iDebugTools.IsOpen());
@@ -400,7 +408,12 @@ namespace KingdomMod
                 log.LogMessage($"F10 key pressed.");
                 log.LogMessage($"Try to change max coins to 1000, you may need to reload game by F5 key.");
 
-                CoinBag.OverflowLimit = 1000;
+                Type type = typeof(CurrencyBag);
+                FieldInfo field = type.GetField("OVERFLOW_LIMIT", BindingFlags.NonPublic | BindingFlags.Static);
+                if (field != null && field.IsInitOnly)
+                {
+                    field.SetValue(null, 1000);
+                }
             }
 
             if (Input.GetKeyDown(KeyCode.Space))
@@ -409,11 +422,11 @@ namespace KingdomMod
                 if (player != null)
                 {
                     player.TeleportFlash();
-                    player.coinLaunchSound.Play(player.transform.position, 1);
+                    player.dumpPassengerSound.Play(player.transform.position, 1);
 
                     GameObject boulder = Pool.SpawnGO(Resources.Load<Boulder>("Prefabs/Objects/Boulder").gameObject, Vector3.zero, Quaternion.identity);
                     var compCacher = Managers.Inst.compCacher;
-                    compCacher.GetCachedComponent<Boulder>(boulder)._launchedByEnemies = false;
+                    compCacher.GetCachedComponent<Boulder>(boulder).SetFieldOrPropertyValue("_launchedByEnemies", false);
                     compCacher.GetCachedComponent<Boulder>(boulder).maxHitCitizens = 1000;
                     compCacher.GetCachedComponent<Boulder>(boulder).StuckProbability = 0f;
                     compCacher.GetCachedComponent<Boulder>(boulder).hitDamage = 300;
@@ -433,7 +446,7 @@ namespace KingdomMod
                     Pool.Despawn(boulder, 5f);
                 }
             }
-#endif
+// #endif
 
             tick = tick + 1;
             if (tick > 60)
@@ -571,8 +584,9 @@ namespace KingdomMod
                     infoLines.Add($"cooldown: {castlePayable.cooldown}");
                     infoLines.Add($"timeAvailableFrom: {castlePayable.GetFieldOrPropertyValue<float>("timeAvailableFrom")}");
                     infoLines.Add($"timeAvailableFrom: {castlePayable.GetFieldOrPropertyValue<float>("timeAvailableFrom") - Time.time}");
-                    infoLines.Add($"IsLocked: {castlePayable.IsLocked(GetLocalPlayer())}");
-                    infoLines.Add($"price: {castlePayable.price}");
+                    castlePayable.IsLocked(GetLocalPlayer(), out var reason);
+                    infoLines.Add($"IsLocked: {reason}");
+                    infoLines.Add($"price: {castlePayable.Price}");
                 }
 
                 infoLines.Add($"regularFont: {string.Join(", ", Language.current.regularFont.font.fontNames)}, {Language.current.menuFont.font.dynamic}");
@@ -615,15 +629,16 @@ namespace KingdomMod
                 if (steed != null)
                 {
                     infoLines.Add("steedType" + ": " + steed.steedType);
-                    infoLines.Add($"stamina: {steed.stamina}");
+                    infoLines.Add($"stamina: {steed.Stamina}");
                     infoLines.Add($"reserveStamina: {steed.reserveStamina}, {steed.reserveProbability}");
                     infoLines.Add($"eatDelay: {steed.eatDelay}, {steed.eatFullStaminaDelay}");
                     infoLines.Add($"runStaminaRate: {steed.runStaminaRate}");
                     infoLines.Add($"standStaminaRate: {steed.standStaminaRate}");
                     infoLines.Add($"walkStaminaRate: {steed.walkStaminaRate}");
-                    infoLines.Add($"tiredTimer: {steed.tiredTimer}");
+                    var tiredTimer = steed.GetFieldOrPropertyValue<float>("_tiredTimer");
+                    infoLines.Add($"tiredTimer: {tiredTimer}");
                     infoLines.Add($"tiredDuration: {steed.tiredDuration}");
-                    infoLines.Add($"wellFedTimer: {steed.wellFedTimer}");
+                    infoLines.Add($"wellFedTimer: {steed.WellFedTimer}");
                     infoLines.Add($"wellFedDuration: {steed.wellFedDuration}");
                     infoLines.Add($"walkSpeed: {steed.walkSpeed}");
                     infoLines.Add($"runSpeed: {steed.runSpeed}");

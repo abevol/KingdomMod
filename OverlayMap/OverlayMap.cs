@@ -94,7 +94,7 @@ namespace KingdomMod
             log.LogMessage($"{this.GetType().Name} Start.");
             Patcher.PatchAll(this);
             Game.OnGameStart += (Action)OnGameStart;
-            NetworkBigBoss.Instance._postCatchupEvent += (Action)this.OnClientCaughtUp;
+            NetworkBigBoss.Instance.OnClientCaughtUp += (Action)this.OnClientCaughtUp;
 
             // GlobalSaveData.add_OnCurrentCampaignSwitch((Action)OnCurrentCampaignSwitch);
 
@@ -360,7 +360,7 @@ namespace KingdomMod
                 poiList.Add(new MarkInfo(beggarCamp.transform.position.x, Style.BeggarCamp.Color, Style.BeggarCamp.Sign, Strings.BeggarCamp, count));
             }
 
-            foreach (var beggar in kingdom.beggars)
+            foreach (var beggar in kingdom.Beggars)
             {
                 if (beggar == null) continue;
 
@@ -390,7 +390,7 @@ namespace KingdomMod
             foreach (var deer in deers)
             {
                 if (!deer.GetFieldOrPropertyValue<Damageable>("_damageable").isDead)
-                    poiList.Add(new MarkInfo(deer.transform.position.x, deer.GetFieldOrPropertyValue<StateMachine>("_fsm").current == 5 ? Style.DeerFollowing.Color : Style.Deer.Color, Style.Deer.Sign, Strings.Deer, 0, MarkRow.Movable));
+                    poiList.Add(new MarkInfo(deer.transform.position.x, deer.GetFieldOrPropertyValue<StateMachine>("_fsm").Current == 5 ? Style.DeerFollowing.Color : Style.Deer.Color, Style.Deer.Sign, Strings.Deer, 0, MarkRow.Movable));
             }
 
             var enemies = Managers.Inst.enemies.GetFieldOrPropertyValue<HashSet<Enemy>>("_enemies");
@@ -460,11 +460,10 @@ namespace KingdomMod
             if (castle != null)
             {
                 var payable = castle.GetFieldOrPropertyValue<PayableUpgrade>("_payableUpgrade");
-                var reason = payable.IsLocked(GetLocalPlayer());
-                bool canPay = reason == PayableUpgrade.LockedReason.NotLocked;
-                bool isLocked = reason != PayableUpgrade.LockedReason.NotLocked && reason != PayableUpgrade.LockedReason.NoUpgrade;
-                bool isLockedForInvalidTime = reason == PayableUpgrade.LockedReason.InvalidTime;
-                var price = isLockedForInvalidTime ? (int)(payable.GetFieldOrPropertyValue<float>("timeAvailableFrom") - Time.time) : canPay ? payable.price : 0;
+                bool canPay = payable.IsLocked(GetLocalPlayer(), out var reason);
+                bool isLocked = reason != LockIndicator.LockReason.NotLocked && reason != LockIndicator.LockReason.NoUpgrade;
+                bool isLockedForInvalidTime = reason == LockIndicator.LockReason.InvalidTime;
+                var price = isLockedForInvalidTime ? (int)(payable.GetFieldOrPropertyValue<float>("timeAvailableFrom") - Time.time) : canPay ? payable.Price : 0;
                 var color = isLocked ? Style.Castle.Locked.Color : Style.Castle.Color;
                 poiList.Add(new MarkInfo(castle.transform.position.x, color, Style.Castle.Sign, Strings.Castle, price));
 
@@ -481,12 +480,12 @@ namespace KingdomMod
             var chestList = gameLayer.GetComponentsInChildren<Chest>();
             foreach (var obj in chestList)
             {
-                if (obj.coins == 0) continue;
+                if (obj.currencyAmount == 0) continue;
 
-                if (obj.isGems)
-                    poiList.Add(new MarkInfo(obj.transform.position.x, Style.GemChest.Color, Style.GemChest.Sign, Strings.GemChest, obj.coins));
+                if (obj.currencyType == CurrencyType.Gems)
+                    poiList.Add(new MarkInfo(obj.transform.position.x, Style.GemChest.Color, Style.GemChest.Sign, Strings.GemChest, obj.currencyAmount));
                 else
-                    poiList.Add(new MarkInfo(obj.transform.position.x, Style.Chest.Color, Style.Chest.Sign, Strings.Chest, obj.coins));
+                    poiList.Add(new MarkInfo(obj.transform.position.x, Style.Chest.Color, Style.Chest.Sign, Strings.Chest, obj.currencyAmount));
             }
 
             foreach (var obj in kingdom.GetFieldOrPropertyValue<HashSet<Wall>>("_walls"))
@@ -547,7 +546,7 @@ namespace KingdomMod
             var payableGemChest = GameExtensions.GetPayableOfType<PayableGemChest>();
             if (payableGemChest != null)
             {
-                var gemsCount = payableGemChest.infiniteGems ? payableGemChest.GetFieldOrPropertyValue<PayableGemGuard>("guardRef").price : payableGemChest.gemsStored;
+                var gemsCount = payableGemChest.infiniteGems ? payableGemChest.GetFieldOrPropertyValue<PayableGemGuard>("guardRef").Price : payableGemChest.gemsStored;
                 poiList.Add(new MarkInfo(payableGemChest.transform.position.x, Style.GemMerchant.Color, Style.GemMerchant.Sign, Strings.GemMerchant, gemsCount));
             }
 
@@ -577,43 +576,58 @@ namespace KingdomMod
                 poiList.Add(new MarkInfo(obj.transform.position.x, Style.Farmhouse.Color, Style.Farmhouse.Sign, Strings.Farmhouse));
             }
 
-            var steedNames = new System.Collections.Generic.Dictionary<Steed.SteedType, string>
+            var steedNames = new System.Collections.Generic.Dictionary<SteedType, string>
                     {
-                        { Steed.SteedType.Bear,                  Strings.Bear },
-                        { Steed.SteedType.P1Griffin,             Strings.Griffin },
-                        { Steed.SteedType.Lizard,                Strings.Lizard },
-                        { Steed.SteedType.Reindeer,              Strings.Reindeer },
-                        { Steed.SteedType.Spookyhorse,           Strings.Spookyhorse },
-                        { Steed.SteedType.Stag,                  Strings.Stag },
-                        { Steed.SteedType.Unicorn,               Strings.Unicorn },
-                        { Steed.SteedType.P1Warhorse,            Strings.Warhorse },
-                        { Steed.SteedType.P1Default,             Strings.DefaultSteed },
-                        { Steed.SteedType.P2Default,             Strings.DefaultSteed },
-                        { Steed.SteedType.HorseStamina,          Strings.HorseStamina },
-                        { Steed.SteedType.HorseBurst,            Strings.HorseBurst },
-                        { Steed.SteedType.HorseFast,             Strings.HorseFast },
-                        { Steed.SteedType.P1Wolf,                Strings.Wolf },
-                        { Steed.SteedType.Trap,                  Strings.Trap },
-                        { Steed.SteedType.Barrier,               Strings.Barrier },
-                        { Steed.SteedType.Bloodstained,          Strings.Bloodstained },
-                        { Steed.SteedType.P2Wolf,                Strings.Wolf },
-                        { Steed.SteedType.P2Griffin,             Strings.Griffin },
-                        { Steed.SteedType.P2Warhorse,            Strings.Warhorse },
-                        { Steed.SteedType.P2Stag,                Strings.Stag },
-                        { Steed.SteedType.Gullinbursti,          Strings.Gullinbursti },
-                        { Steed.SteedType.Sleipnir,              Strings.Sleipnir },
-                        { Steed.SteedType.Reindeer_Norselands,   Strings.Reindeer },
-                        { Steed.SteedType.CatCart,               Strings.CatCart },
-                        { Steed.SteedType.Kelpie,                Strings.Kelpie },
-                        { Steed.SteedType.DayNight,              Strings.DayNight },
-                        { Steed.SteedType.P2Kelpie,              Strings.Kelpie },
-                        { Steed.SteedType.P2Reindeer_Norselands, Strings.Reindeer },
+                        { SteedType.INVALID,               Strings.Invalid },
+                        { SteedType.Bear,                  Strings.Bear },
+                        { SteedType.P1Griffin,             Strings.Griffin },
+                        { SteedType.Lizard,                Strings.Lizard },
+                        { SteedType.Reindeer,              Strings.Reindeer },
+                        { SteedType.Spookyhorse,           Strings.Spookyhorse },
+                        { SteedType.Stag,                  Strings.Stag },
+                        { SteedType.Unicorn,               Strings.Unicorn },
+                        { SteedType.P1Warhorse,            Strings.Warhorse },
+                        { SteedType.P1Default,             Strings.DefaultSteed },
+                        { SteedType.P2Default,             Strings.DefaultSteed },
+                        { SteedType.HorseStamina,          Strings.HorseStamina },
+                        { SteedType.HorseBurst,            Strings.HorseBurst },
+                        { SteedType.HorseFast,             Strings.HorseFast },
+                        { SteedType.P1Wolf,                Strings.Wolf },
+                        { SteedType.Trap,                  Strings.Trap },
+                        { SteedType.Barrier,               Strings.Barrier },
+                        { SteedType.Bloodstained,          Strings.Bloodstained },
+                        { SteedType.P2Wolf,                Strings.Wolf },
+                        { SteedType.P2Griffin,             Strings.Griffin },
+                        { SteedType.P2Warhorse,            Strings.Warhorse },
+                        { SteedType.P2Stag,                Strings.Stag },
+                        { SteedType.Gullinbursti,          Strings.Gullinbursti },
+                        { SteedType.Sleipnir,              Strings.Sleipnir },
+                        { SteedType.Reindeer_Norselands,   Strings.Reindeer },
+                        { SteedType.CatCart,               Strings.CatCart },
+                        { SteedType.Kelpie,                Strings.Kelpie },
+                        { SteedType.DayNight,              Strings.DayNight },
+                        { SteedType.P2Kelpie,              Strings.Kelpie },
+                        { SteedType.P2Reindeer_Norselands, Strings.Reindeer },
+                        { SteedType.Hippocampus,           Strings.Hippocampus },
+                        { SteedType.Cerberus,              Strings.Cerberus },
+                        { SteedType.Spider,                Strings.Spider },
+                        { SteedType.TheChariotDay,         Strings.TheChariotDay },
+                        { SteedType.TheChariotNight,       Strings.TheChariotNight },
+                        { SteedType.Pegasus,               Strings.Pegasus },
+                        { SteedType.Donkey,                Strings.Donkey },
+                        { SteedType.MolossianHound,        Strings.MolossianHound },
+                        { SteedType.Chimera,               Strings.Chimera },
+                        { SteedType.Total,                 Strings.Total }
                     };
 
             foreach (var obj in kingdom.spawnedSteeds)
             {
-                if (obj.CurrentMode != Steed.Mode.Player)
-                    poiList.Add(new MarkInfo(obj.transform.position.x, Style.Steeds.Color, Style.Steeds.Sign, steedNames[obj.steedType], obj.price));
+                if (obj.CurrentMode != SteedMode.Player)
+                {
+                    if (!steedNames.TryGetValue(obj.steedType, out var steedName))
+                        steedName = obj.steedType.ToString();
+                    poiList.Add(new MarkInfo(obj.transform.position.x, Style.Steeds.Color, Style.Steeds.Sign, steedName, obj.Price));
+                }
             }
 
             foreach (var obj in kingdom.steedSpawns)
@@ -621,13 +635,21 @@ namespace KingdomMod
                 var info = "";
                 foreach (var steedTmp in obj.GetFieldOrPropertyValue<List<Steed>>("steedPool"))
                 {
-                    info = steedNames[steedTmp.steedType];
+                    if (!steedNames.TryGetValue(steedTmp.steedType, out var steedName))
+                        continue;
+                    info = steedName;
                 }
 
                 if (!obj.GetPropertyValue<bool>("_hasSpawned"))
-                    poiList.Add(new MarkInfo(obj.transform.position.x, Style.SteedSpawns.Color, Style.SteedSpawns.Sign, info, obj.price));
+                    poiList.Add(new MarkInfo(obj.transform.position.x, Style.SteedSpawns.Color, Style.SteedSpawns.Sign, info, obj.Price));
             }
-            
+
+            string LogUnknownHermitType(Hermit.HermitType hermitType)
+            {
+                log.LogWarning($"Unknown hermit type: {hermitType}");
+                return hermitType.ToString();
+            }
+
             var cabinList = GameExtensions.GetPayablesOfType<Cabin>();
             foreach (var obj in cabinList)
             {
@@ -638,11 +660,15 @@ namespace KingdomMod
                     Hermit.HermitType.Horn => Strings.HermitHorn,
                     Hermit.HermitType.Horse => Strings.HermitHorse,
                     Hermit.HermitType.Knight => Strings.HermitKnight,
-                    _ => ""
+                    Hermit.HermitType.Persephone => Strings.HermitPersephone,
+                    Hermit.HermitType.Fire => Strings.HermitFire,
+                    _ => LogUnknownHermitType(obj.hermitType)
                 };
 
-                if (obj.GetPropertyValue<bool>("canPay"))
-                    poiList.Add(new MarkInfo(obj.transform.position.x, Style.HermitCabins.Color, Style.HermitCabins.Sign, info, obj.price));
+                var canPay = obj.GetPropertyValue<bool>("canPay");
+                var color = canPay ? Style.HermitCabins.Locked.Color : Style.HermitCabins.Unlocked.Color;
+                var price = canPay ? obj.Price : 0;
+                poiList.Add(new MarkInfo(obj.transform.position.x, color, Style.HermitCabins.Sign, info, price));
             }
 
             var statueList = GameExtensions.GetPayablesOfType<Statue>();
@@ -659,7 +685,7 @@ namespace KingdomMod
                 };
 
                 if (obj.deityStatus != Statue.DeityStatus.Activated)
-                    poiList.Add(new MarkInfo(obj.transform.position.x, Style.Statues.Color, Style.Statues.Sign, info, obj.price));
+                    poiList.Add(new MarkInfo(obj.transform.position.x, Style.Statues.Color, Style.Statues.Sign, info, obj.Price));
             }
 
             var timeStatue = kingdom.timeStatue;
@@ -693,11 +719,11 @@ namespace KingdomMod
 
                 if (prefab.prefabID == (int)PrefabIDs.Quarry_undeveloped)
                 {
-                    poiList.Add(new MarkInfo(go.transform.position.x, Style.Quarry.Locked.Color, Style.Quarry.Sign, Strings.Quarry, obj.price));
+                    poiList.Add(new MarkInfo(go.transform.position.x, Style.Quarry.Locked.Color, Style.Quarry.Sign, Strings.Quarry, obj.Price));
                 }
                 else if (prefab.prefabID == (int)PrefabIDs.Mine_undeveloped)
                 {
-                    poiList.Add(new MarkInfo(go.transform.position.x, Style.Mine.Locked.Color, Style.Mine.Sign, Strings.Mine, obj.price));
+                    poiList.Add(new MarkInfo(go.transform.position.x, Style.Mine.Locked.Color, Style.Mine.Sign, Strings.Mine, obj.Price));
                 }
                 else
                 {
@@ -714,20 +740,19 @@ namespace KingdomMod
                         {
                             var markName = unlockNewRulerStatue.rulerToUnlock switch
                             {
-                                Player.Model.None => "",
-                                Player.Model.King => Strings.King,
-                                Player.Model.Queen => Strings.Queen,
-                                Player.Model.Prince => Strings.Prince,
-                                Player.Model.Princess => Strings.Princess,
-                                Player.Model.Hooded => Strings.Hooded,
-                                Player.Model.Zangetsu => Strings.Zangetsu,
-                                Player.Model.Alfred => Strings.Alfred,
-                                Player.Model.Gebel => Strings.Gebel,
-                                Player.Model.Miriam => Strings.Miriam,
-                                Player.Model.Total => "",
+                                MonarchType.King => Strings.King,
+                                MonarchType.Queen => Strings.Queen,
+                                MonarchType.Prince => Strings.Prince,
+                                MonarchType.Princess => Strings.Princess,
+                                MonarchType.Hooded => Strings.Hooded,
+                                MonarchType.Zangetsu => Strings.Zangetsu,
+                                MonarchType.Alfred => Strings.Alfred,
+                                MonarchType.Gebel => Strings.Gebel,
+                                MonarchType.Miriam => Strings.Miriam,
+                                MonarchType.Total => "",
                                 _ => ""
                             };
-                            poiList.Add(new MarkInfo(go.transform.position.x, color, Style.RulerSpawns.Sign, markName, obj.price));
+                            poiList.Add(new MarkInfo(go.transform.position.x, color, Style.RulerSpawns.Sign, markName, obj.Price));
                         }
                     }
                 }
@@ -776,7 +801,7 @@ namespace KingdomMod
                 if (blocker == null) continue;
                 var scaffolding = blocker.GetComponent<Scaffolding>();
                 if (scaffolding == null) continue;
-                var go = scaffolding.building;
+                var go = scaffolding.Building;
                 if (go == null) continue;
 
                 var wall = go.GetComponent<Wall>();
@@ -1015,7 +1040,7 @@ namespace KingdomMod
             GUI.Label(new Rect(14, boxTop + 6 + 20 * 1, 120, 20), Strings.Worker + ": " + statsInfo.WorkerCount, guiStyle);
             GUI.Label(new Rect(14, boxTop + 6 + 20 * 2, 120, 20), $"{Strings.Archer.Value}: {statsInfo.ArcherCount} ({GameExtensions.GetArcherCount(GameExtensions.ArcherType.Free)}|{GameExtensions.GetArcherCount(GameExtensions.ArcherType.GuardSlot)}|{GameExtensions.GetArcherCount(GameExtensions.ArcherType.KnightSoldier)})", guiStyle);
             GUI.Label(new Rect(14, boxTop + 6 + 20 * 3, 120, 20), Strings.Pikeman + ": " + kingdom.Pikemen.Count, guiStyle);
-            GUI.Label(new Rect(14, boxTop + 6 + 20 * 4, 120, 20), $"{Strings.Knight.Value}: {kingdom.knights.Count} ({GameExtensions.GetKnightCount(true)})", guiStyle);
+            GUI.Label(new Rect(14, boxTop + 6 + 20 * 4, 120, 20), $"{Strings.Knight.Value}: {kingdom.Knights.Count} ({GameExtensions.GetKnightCount(true)})", guiStyle);
             GUI.Label(new Rect(14, boxTop + 6 + 20 * 5, 120, 20), Strings.Farmer + ": " + statsInfo.FarmerCount, guiStyle);
             GUI.Label(new Rect(14, boxTop + 6 + 20 * 6, 120, 20), Strings.Farmlands + ": " + statsInfo.MaxFarmlands, guiStyle);
         }
@@ -1168,7 +1193,12 @@ namespace KingdomMod
             FarmhouseStable = 61,
             BeachPortal = 62,
             BoatSailPosition_Stone = 63,
-            Citizen_House = 64
+            Citizen_House = 64,
+            TrojanHorse_Wheel = 65,
+            TrojanHorse_ConstructionSite = 66,
+            TrojanHorse_SummoningBell = 67,
+            TrojanHorse_MtOlympus_Serpent_Greece = 68,
+            TrojanHorse_Crown = 69,
         }
     }
 

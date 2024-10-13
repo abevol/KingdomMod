@@ -56,6 +56,7 @@ namespace KingdomMod
             var tmpComps = rootObject.GetComponents<Component>();
             foreach(var comp in tmpComps)
             {
+                if (!comp) continue;
                 components.Add(comp.
 #if IL2CPP
                     GetIl2CppType()
@@ -99,7 +100,7 @@ namespace KingdomMod
                 Scene.GetRootGameObjectsInternal(scene.handle, list);
 #else
                 var list = new System.Collections.Generic.List<GameObject>(scene.rootCount);
-                scene.GetMethodDelegate<Action<int, object>>("GetRootGameObjectsInternal")(scene.handle, list);
+                typeof(Scene).GetMethodDelegate<Action<int, object>>("GetRootGameObjectsInternal")(scene.handle, list);
 #endif
                 foreach (var obj in list)
                 {

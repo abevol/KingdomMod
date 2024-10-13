@@ -34,18 +34,29 @@ namespace KingdomMod
                 }
             }
 
-            [HarmonyPatch(typeof(CoinBag), "Init")]
+            [HarmonyPatch(typeof(CurrencyBag), "Init")]
             public class CoinBagInitPatcher
             {
-                public static void Prefix(CoinBag __instance)
+                public static void Prefix(CurrencyBag __instance)
                 {
-                    log.LogMessage($"CoinBagInitPatcher localScale: {__instance.bagCoinPrefab.gameObject.transform.localScale}");
+                    for (int i = 0; i < CurrencyManager.AllCurrencyTypes.Length; i++)
+                    {
+                        CurrencyType type = CurrencyManager.AllCurrencyTypes[i];
+                        if (!SingletonMonoBehaviour<Managers>.Inst.currency.TryGetData(type, out var currencyConfig))
+                        {
+                            throw new Exception(string.Format("Cannot get CurrencyData for {0}!", type));
+                        }
 
-                    __instance.bagCoinPrefab.gameObject.transform.localScale = new Vector3(0.668f, 0.668f, 0.668f);
-                    __instance.bagGemPrefab.gameObject.transform.localScale = new Vector3(0.668f, 0.668f, 0.668f);
+                        if (currencyConfig.BagPrefab)
+                        {
+                            log.LogMessage($"CoinBagInitPatcher localScale: {currencyConfig.BagPrefab.gameObject.transform.localScale}");
 
-                    var bagCoinPrefab = BiomeData.GetPrefabSwap(__instance.bagCoinPrefab);
-                    bagCoinPrefab.gameObject.transform.localScale = new Vector3(0.668f, 0.668f, 0.668f);
+                            currencyConfig.BagPrefab.gameObject.transform.localScale = new Vector3(0.668f, 0.668f, 0.668f);
+
+                            var bagCoinPrefab = BiomeData.GetPrefabSwap(currencyConfig.BagPrefab);
+                            bagCoinPrefab.gameObject.transform.localScale = new Vector3(0.668f, 0.668f, 0.668f);
+                        }
+                    }
                 }
             }
         }
@@ -175,7 +186,7 @@ namespace KingdomMod
                     if (obj == null) continue;
                     var scaffolding = obj.GetComponent<Scaffolding>();
                     if (scaffolding == null) continue;
-                    var go = scaffolding.building;
+                    var go = scaffolding.Building;
                     if (go == null) continue;
 
                     HandlePayable(go, false, false);
@@ -212,8 +223,8 @@ namespace KingdomMod
                         var payable = go.GetComponent<CitizenHousePayable>();
                         if (payable != null)
                         {
-                            log.LogDebug($"Change {go.name} price from {payable.price} to 3");
-                            payable.price = 3;
+                            log.LogDebug($"Change {go.name} price from {payable.Price} to 3");
+                            payable.Price = 3;
                         }
                         break;
                     }
@@ -225,8 +236,8 @@ namespace KingdomMod
                             var payable = payableWorkshop.barrelCounterpart;
                             if (payable != null)
                             {
-                                log.LogDebug($"Change {go.name} price from {payable.price} to 3");
-                                payable.price = 3;
+                                log.LogDebug($"Change {go.name} price from {payable.Price} to 3");
+                                payable.Price = 3;
                             }
                         }
                         break;
@@ -236,8 +247,8 @@ namespace KingdomMod
                         var payable = go.GetComponent<PayableShop>();
                         if (payable != null)
                         {
-                            log.LogDebug($"Change {go.name} price from {payable.price} to 2");
-                            payable.price = 2;
+                            log.LogDebug($"Change {go.name} price from {payable.Price} to 2");
+                            payable.Price = 2;
                         }
                         break;
                     }
@@ -265,16 +276,18 @@ namespace KingdomMod
                 var workable = go.GetComponent<WorkableBuilding>();
                 if (workable != null)
                 {
-                    log.LogDebug($"Change {go.name} buildPoints from {workable.buildPoints} to {modifyData.BuildPoints}");
-                    workable.buildPoints = modifyData.BuildPoints;
+                    var constructionBuilding = Require.Component<ConstructionBuildingComponent>(workable);
+                    var buildPoints = constructionBuilding.GetFieldOrPropertyValue<int>("_buildPoints");
+                    log.LogDebug($"Change {go.name} buildPoints from {buildPoints} to {modifyData.BuildPoints}");
+                    constructionBuilding.SetFieldOrPropertyValue("_buildPoints", modifyData.BuildPoints);
                 }
             }
 
             var payable = go.GetComponent<PayableUpgrade>();
             if (payable != null)
             {
-                log.LogDebug($"Change {go.name} price from {payable.price} to {modifyData.Price}");
-                payable.price = modifyData.Price;
+                log.LogDebug($"Change {go.name} price from {payable.Price} to {modifyData.Price}");
+                payable.Price = modifyData.Price;
 
                 if (modifyData.NextPrefab != PrefabIDs.None)
                 {

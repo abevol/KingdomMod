@@ -23,7 +23,7 @@ csharp_style_expression_bodied_lambdas = true:silent
 csharp_style_expression_bodied_local_functions = false:silent
 
 # 4 space indentation
-[*.{cs}]
+[*.{cs,csproj}]
 indent_style = space
 indent_size = 4
 
