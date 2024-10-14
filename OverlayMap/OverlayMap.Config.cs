@@ -575,13 +575,14 @@ namespace KingdomMod
                 public static MarkerConfig Farmhouse;
                 public static MarkerConfig Steeds;
                 public static MarkerConfig SteedSpawns;
-                public static MarkerConfig Statues;
+                public static MarkerConfigStated Statues;
                 public static MarkerConfig StatueTime;
                 public static MarkerConfigStated Boat;
                 public static MarkerConfigStated Quarry;
                 public static MarkerConfigStated Mine;
                 public static MarkerConfigStated RulerSpawns;
                 public static MarkerConfigStated HermitCabins;
+                public static MarkerConfigStated PersephoneCage;
                 public static MarkerConfig MerchantHouse;
                 public static MarkerConfigStated ThorPuzzleStatue;
                 public static MarkerConfigStated HelPuzzleStatue;
@@ -686,8 +687,9 @@ namespace KingdomMod
                     SteedSpawns.Color = config.Bind("SteedSpawns", "Color", "1,0,0,1", "");
                     SteedSpawns.Sign = config.Bind("SteedSpawns", "Sign", "", "");
 
-                    Statues.Color = config.Bind("Statues", "Color", "1,0,0,1", "");
                     Statues.Sign = config.Bind("Statues", "Sign", "", "");
+                    Statues.Locked.Color = config.Bind("Statues.Locked", "Color", "1,0,0,1", "");
+                    Statues.Unlocked.Color = config.Bind("Statues.Unlocked", "Color", "0,1,0,1", "");
 
                     StatueTime.Color = config.Bind("StatueTime", "Color", "0,1,0,1", "");
                     StatueTime.Sign = config.Bind("StatueTime", "Sign", "", "");
@@ -725,6 +727,10 @@ namespace KingdomMod
                     HermitCabins.Locked.Color = config.Bind("HermitCabins.Locked", "Color", "1,0,0,1", "");
                     HermitCabins.Unlocked.Color = config.Bind("HermitCabins.Unlocked", "Color", "0,1,0,1", "");
                     HermitCabins.Sign = config.Bind("HermitCabins", "Sign", "", "");
+
+                    PersephoneCage.Locked.Color = config.Bind("PersephoneCage.Locked", "Color", "1,0,0,1", "");
+                    PersephoneCage.Unlocked.Color = config.Bind("PersephoneCage.Unlocked", "Color", "0,1,0,1", "");
+                    PersephoneCage.Sign = config.Bind("PersephoneCage", "Sign", "", "");
 
                     StatsInfo.Color = config.Bind("StatsInfo", "Color", "1,1,1,1", "");
 

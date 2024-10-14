@@ -30,6 +30,7 @@ namespace KingdomMod
         private static int _challengeId = 0;
         private static string _archiveFilename;
         private static readonly ExploredRegion _exploredRegion = new ();
+        private static PersephoneCage _persephoneCage;
 
         public static void LogMessage(string message, 
             [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
@@ -296,6 +297,7 @@ namespace KingdomMod
             log.LogMessage("OnGameStart.");
 
             gameLayer = GameObject.FindGameObjectWithTag(Tags.GameLayer);
+            _persephoneCage = UnityEngine.Object.FindAnyObjectByType<PersephoneCage>();
 
             _campaignIndex = GlobalSaveData.loaded.currentCampaign;
             _land = CampaignSaveData.current.CurrentLand;
@@ -670,6 +672,12 @@ namespace KingdomMod
                 poiList.Add(new MarkInfo(obj.transform.position.x, color, Style.HermitCabins.Sign, info, price));
             }
 
+            if (_persephoneCage)
+            {
+                var color = PersephoneCage.State.IsPersephoneLocked(_persephoneCage._fsm.Current) ? Style.PersephoneCage.Locked.Color : Style.PersephoneCage.Unlocked.Color;
+                poiList.Add(new MarkInfo(_persephoneCage.transform.position.x, color, Style.PersephoneCage.Sign, Strings.HermitPersephone, 0));
+            }
+
             var statueList = GameExtensions.GetPayablesOfType<Statue>();
             foreach (var obj in statueList)
             {
@@ -683,8 +691,10 @@ namespace KingdomMod
                     _ => ""
                 };
 
-                if (obj.deityStatus != Statue.DeityStatus.Activated)
-                    poiList.Add(new MarkInfo(obj.transform.position.x, Style.Statues.Color, Style.Statues.Sign, info, obj.Price));
+                bool isLocked = obj.deityStatus != Statue.DeityStatus.Activated;
+                var color = isLocked ? Style.Statues.Locked.Color : Style.Statues.Unlocked.Color;
+                var price = isLocked ? obj.Price : 0;
+                poiList.Add(new MarkInfo(obj.transform.position.x, color, Style.Statues.Sign, info, price));
             }
 
             var timeStatue = kingdom.timeStatue;
@@ -702,8 +712,7 @@ namespace KingdomMod
                     poiList.Add(new MarkInfo(wreck.transform.position.x, Style.Boat.Wrecked.Color, Style.Boat.Sign, Strings.BoatWreck));
             }
 
-            foreach (var obj in payables.AllPayables
-                     )
+            foreach (var obj in payables.AllPayables)
             {
                 if (obj == null) continue;
                 var go = obj.gameObject;
