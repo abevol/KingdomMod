@@ -255,7 +255,7 @@ namespace KingdomMod
                 var prefabs = Managers.Inst.prefabs;
                 if (prefabs != null)
                 {
-                    var dumpStr = "\npublic enum PrefabIDs\n{\n";
+                    var dumpStr = "\npublic enum GamePrefabID\n{\n";
                     foreach (var prefab in prefabs.prefabMasterCopies)
                     {
                         var prefabName = prefab.name.Replace(' ', '_');
@@ -360,8 +360,8 @@ namespace KingdomMod
             //
             //         // var prefab = Resources.Load<Tower>("prefabs/buildings and interactive/tower0");
             //
-            //         var prefab = Managers.Inst.prefabs.GetPrefabById((int)PrefabIDs.Tower0);
-            //         prefab.GetComponent<PayableUpgrade>().nextPrefab = Managers.Inst.prefabs.GetPrefabById((int)PrefabIDs.Tower2);
+            //         var prefab = Managers.Inst.prefabs.GetPrefabById((int)GamePrefabID.Tower0);
+            //         prefab.GetComponent<PayableUpgrade>().nextPrefab = Managers.Inst.prefabs.GetPrefabById((int)GamePrefabID.Tower2);
             //
             //         Vector3 vector = new Vector3(player.transform.position.x, 0.0f, 1.6f);
             //         var lastSpawned = Pool.SpawnOrInstantiateGO(prefab.gameObject, vector, Quaternion.identity,
@@ -674,76 +674,6 @@ namespace KingdomMod
                 this.Vec = vec;
                 this.Info = info;
             }
-        }
-
-        public enum PrefabIDs
-        {
-            None = -1,
-            Castle0 = 0,
-            Castle1 = 1,
-            Castle2 = 2,
-            Castle3 = 3,
-            Castle4 = 4,
-            Castle5 = 5,
-            Castle6 = 6,
-            Farmhouse0 = 7,
-            Farmhouse1 = 8,
-            Farmhouse2 = 9,
-            Tower0 = 10,
-            Tower1 = 11,
-            Tower2 = 12,
-            Tower3 = 13,
-            Tower4 = 14,
-            Wall0 = 15,
-            Wall1 = 16,
-            Wall2 = 17,
-            Wall3 = 18,
-            Wall4 = 19,
-            Wreck = 20,
-            Quarry_undeveloped = 21,
-            Quarry = 22,
-            Tree = 23,
-            Chest = 24,
-            Wall1_Wreck = 25,
-            Wall2_Wreck = 26,
-            Wall3_Wreck = 27,
-            Wall4_Wreck = 28,
-            Wall5_Wreck = 29,
-            Wall4_horn = 30,
-            Wall5_horn = 31,
-            Wall5 = 32,
-            Tower_Baker = 33,
-            Tower_Ballista = 34,
-            Tower_Knight = 35,
-            Lighthouse_undeveloped = 36,
-            Beach = 37,
-            Wharf = 38,
-            Beggar_Camp = 39,
-            Portal = 40,
-            Teleporter = 41,
-            TeleporterRift = 42,
-            Cliff_Portal = 43,
-            BoatSailPosition = 44,
-            Lighthouse_Stone = 45,
-            Lighthouse_Iron = 46,
-            Lighthouse_Wood = 47,
-            Castle7 = 48,
-            Mine_undeveloped = 49,
-            Mine = 50,
-            oakTree = 51,
-            Forge = 52,
-            ShopPike = 53,
-            Workshop = 54,
-            ShopScythe = 55,
-            CaveSpawnerTree = 56,
-            Title = 57,
-            Tower5 = 58,
-            Tower6 = 59,
-            MerchantHouse = 60,
-            FarmhouseStable = 61,
-            BeachPortal = 62,
-            BoatSailPosition_Stone = 63,
-            Citizen_House = 64
         }
 
     }
