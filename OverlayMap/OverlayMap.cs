@@ -470,7 +470,7 @@ namespace KingdomMod
             if (castle != null)
             {
                 var payable = castle._payableUpgrade;
-                bool canPay = payable.IsLocked(GetLocalPlayer(), out var reason);
+                bool canPay = !payable.IsLocked(GetLocalPlayer(), out var reason);
                 bool isLocked = reason != LockIndicator.LockReason.NotLocked && reason != LockIndicator.LockReason.NoUpgrade;
                 bool isLockedForInvalidTime = reason == LockIndicator.LockReason.InvalidTime;
                 var price = isLockedForInvalidTime ? (int)(payable.timeAvailableFrom - Time.time) : canPay ? payable.Price : 0;
