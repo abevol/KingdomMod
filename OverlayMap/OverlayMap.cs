@@ -696,6 +696,7 @@ namespace KingdomMod
                     Statue.Deity.Knight => Strings.StatueKnight,
                     Statue.Deity.Farmer => Strings.StatueFarmer,
                     Statue.Deity.Time => Strings.StatueTime,
+                    Statue.Deity.Pike => Strings.StatuePike,
                     _ => ""
                 };
 

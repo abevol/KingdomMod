@@ -397,6 +397,7 @@ namespace KingdomMod
                 public static ConfigEntryWrapper<string> SummonBell;
                 public static ConfigEntryWrapper<string> TeleExitP1;
                 public static ConfigEntryWrapper<string> TeleExitP2;
+                public static ConfigEntryWrapper<string> StatuePike;
 
                 public static void ConfigBind(ConfigFile config)
                 {
@@ -503,6 +504,7 @@ namespace KingdomMod
                     SummonBell         = config.Bind("Strings", "SummonBell", "SummonBell", "");
                     TeleExitP1         = config.Bind("Strings", "TeleExitP1", "TeleExitP1", "");
                     TeleExitP2         = config.Bind("Strings", "TeleExitP2", "TeleExitP2", "");
+                    StatuePike         = config.Bind("Strings", "StatuePike", "StatuePike", "");
                     
                     LogMessage($"Loaded config: {Path.GetFileName(ConfigFile.ConfigFilePath)}");
 
