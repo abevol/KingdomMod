@@ -159,7 +159,7 @@ namespace KingdomMod
 
             timeSinceLastGuiUpdate += Time.deltaTime;
 
-            if (timeSinceLastGuiUpdate > (1 / Global.GUIUpdatesPerSecond))
+            if (timeSinceLastGuiUpdate > (1.0 / Global.GUIUpdatesPerSecond))
             {
                 timeSinceLastGuiUpdate = 0;
 
