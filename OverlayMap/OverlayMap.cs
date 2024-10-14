@@ -390,6 +390,12 @@ namespace KingdomMod
                     _exploredRegion.ExploredRight = r;
             }
 
+            if (kingdom.teleExitP1)
+                poiList.Add(new MarkInfo(kingdom.teleExitP1.transform.position.x, Style.TeleExitP1.Color, Style.TeleExitP1.Sign, Strings.TeleExitP1, 0, MarkRow.Movable));
+
+            if (kingdom.teleExitP2)
+                poiList.Add(new MarkInfo(kingdom.teleExitP2.transform.position.x, Style.TeleExitP2.Color, Style.TeleExitP2.Sign, Strings.TeleExitP2, 0, MarkRow.Movable));
+
             var deers = GameExtensions.FindObjectsWithTagOfType<Deer>(Tags.Wildlife);
             foreach (var deer in deers)
             {
