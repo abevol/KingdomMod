@@ -395,7 +395,9 @@ namespace KingdomMod
                 public static ConfigEntryWrapper<string> You;
                 public static ConfigEntryWrapper<string> Zangetsu;
                 public static ConfigEntryWrapper<string> SummonBell;
-                
+                public static ConfigEntryWrapper<string> TeleExitP1;
+                public static ConfigEntryWrapper<string> TeleExitP2;
+
                 public static void ConfigBind(ConfigFile config)
                 {
                     LogMessage($"ConfigBind: {Path.GetFileName(config.ConfigFilePath)}");
@@ -499,7 +501,9 @@ namespace KingdomMod
                     Chimera            = config.Bind("Strings", "Chimera", "Chimera", "");
                     Total              = config.Bind("Strings", "Total", "Total", "");
                     SummonBell         = config.Bind("Strings", "SummonBell", "SummonBell", "");
-
+                    TeleExitP1         = config.Bind("Strings", "TeleExitP1", "TeleExitP1", "");
+                    TeleExitP2         = config.Bind("Strings", "TeleExitP2", "TeleExitP2", "");
+                    
                     LogMessage($"Loaded config: {Path.GetFileName(ConfigFile.ConfigFilePath)}");
 
                     _configFileWatcher.Set(Path.GetFileName(config.ConfigFilePath), OnConfigFileChanged);
@@ -592,7 +596,9 @@ namespace KingdomMod
                 public static MarkerConfigColor ExtraInfo;
                 public static MarkerConfigStated WallLine;
                 public static MarkerConfig SummonBell;
-                
+                public static MarkerConfig TeleExitP1;
+                public static MarkerConfig TeleExitP2;
+
                 public static void ConfigBind(ConfigFile config)
                 {
                     LogMessage($"ConfigBind: {Path.GetFileName(config.ConfigFilePath)}");
@@ -745,6 +751,12 @@ namespace KingdomMod
 
                     SummonBell.Color = config.Bind("SummonBell", "Color", "1,1,1,1", "");
                     SummonBell.Sign = config.Bind("SummonBell", "Sign", "", "");
+
+                    TeleExitP1.Color = config.Bind("TeleExitP1", "Color", "1,1,1,1", "");
+                    TeleExitP1.Sign = config.Bind("TeleExitP1", "Sign", "", "");
+
+                    TeleExitP2.Color = config.Bind("TeleExitP2", "Color", "1,1,1,1", "");
+                    TeleExitP2.Sign = config.Bind("TeleExitP2", "Sign", "", "");
 
                     LogMessage($"Loaded config: {Path.GetFileName(ConfigFile.ConfigFilePath)}");
 
