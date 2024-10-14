@@ -236,8 +236,7 @@ namespace KingdomMod
                     GameObjectDetails.JsonSerialize(objectTree));
 
                 log.LogMessage("Complete!");
-                log.LogMessage("JSON written to " +
-                               (AppDomain.CurrentDomain.BaseDirectory + "\\AllObjectsDump.json").Replace("\\\\", "\\"));
+                log.LogMessage("JSON written to " + (AppDomain.CurrentDomain.BaseDirectory + "\\AllObjectsDump.json").Replace("\\\\", "\\"));
 
                 string path = (AppDomain.CurrentDomain.BaseDirectory + "\\AllObjectsDump.json").Replace("\\\\", "\\");
                 Application.OpenURL("file:///" + path.Replace("\\", "/"));
