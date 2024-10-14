@@ -523,6 +523,14 @@ namespace KingdomMod
                 }
             }
 
+            var lighthouses = GameObject.FindGameObjectsWithTag(Tags.Lighthouse);
+            foreach (var obj in lighthouses)
+            {
+                var payable = obj.GetComponent<PayableUpgrade>();
+                var price = payable ? payable.Price : 0;
+                poiList.Add(new MarkInfo(obj.transform.position.x, Style.Lighthouse.Color, Style.Lighthouse.Sign, Strings.Lighthouse, price));
+            }
+
             var wallWreckList = GameObject.FindGameObjectsWithTag(Tags.WallWreck);
             foreach (var obj in wallWreckList)
             {
@@ -725,6 +733,10 @@ namespace KingdomMod
             if (summonBell)
                 poiList.Add(new MarkInfo(summonBell.transform.position.x, Style.SummonBell.Color, Style.SummonBell.Sign, Strings.SummonBell));
 
+            var hephaestusForge = gameLayer.GetComponentInChildren<HephaestusForge>();
+            if (hephaestusForge)
+                poiList.Add(new MarkInfo(hephaestusForge.transform.position.x, Style.HephaestusForge.Color, Style.HephaestusForge.Sign, Strings.HephaestusForge));
+
             foreach (var obj in payables.AllPayables)
             {
                 if (obj == null) continue;
@@ -740,6 +752,10 @@ namespace KingdomMod
                 else if (prefab.prefabID == (int)GamePrefabID.Mine_undeveloped)
                 {
                     poiList.Add(new MarkInfo(go.transform.position.x, Style.Mine.Locked.Color, Style.Mine.Sign, Strings.Mine, obj.Price));
+                }
+                else if (prefab.prefabID == (int)GamePrefabID.Cliff_Portal)
+                {
+                    poiList.Add(new MarkInfo(go.transform.position.x, Style.Cliff.Locked.Color, Style.Cliff.Sign, Strings.Cliff, obj.Price));
                 }
                 else
                 {

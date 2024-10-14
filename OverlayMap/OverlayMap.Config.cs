@@ -398,6 +398,8 @@ namespace KingdomMod
                 public static ConfigEntryWrapper<string> TeleExitP1;
                 public static ConfigEntryWrapper<string> TeleExitP2;
                 public static ConfigEntryWrapper<string> StatuePike;
+                public static ConfigEntryWrapper<string> HephaestusForge;
+                public static ConfigEntryWrapper<string> Lighthouse;
 
                 public static void ConfigBind(ConfigFile config)
                 {
@@ -505,6 +507,8 @@ namespace KingdomMod
                     TeleExitP1         = config.Bind("Strings", "TeleExitP1", "TeleExitP1", "");
                     TeleExitP2         = config.Bind("Strings", "TeleExitP2", "TeleExitP2", "");
                     StatuePike         = config.Bind("Strings", "StatuePike", "StatuePike", "");
+                    HephaestusForge    = config.Bind("Strings", "HephaestusForge", "HephaestusForge", "");
+                    Lighthouse         = config.Bind("Strings", "Lighthouse", "Lighthouse", "");
                     
                     LogMessage($"Loaded config: {Path.GetFileName(ConfigFile.ConfigFilePath)}");
 
@@ -600,6 +604,8 @@ namespace KingdomMod
                 public static MarkerConfig SummonBell;
                 public static MarkerConfig TeleExitP1;
                 public static MarkerConfig TeleExitP2;
+                public static MarkerConfig HephaestusForge;
+                public static MarkerConfig Lighthouse;
 
                 public static void ConfigBind(ConfigFile config)
                 {
@@ -759,6 +765,12 @@ namespace KingdomMod
 
                     TeleExitP2.Color = config.Bind("TeleExitP2", "Color", "1,1,1,1", "");
                     TeleExitP2.Sign = config.Bind("TeleExitP2", "Sign", "", "");
+
+                    HephaestusForge.Color = config.Bind("HephaestusForge", "Color", "1,1,1,1", "");
+                    HephaestusForge.Sign = config.Bind("HephaestusForge", "Sign", "", "");
+
+                    Lighthouse.Color = config.Bind("Lighthouse", "Color", "1,1,1,1", "");
+                    Lighthouse.Sign = config.Bind("Lighthouse", "Sign", "", "");
 
                     LogMessage($"Loaded config: {Path.GetFileName(ConfigFile.ConfigFilePath)}");
 
