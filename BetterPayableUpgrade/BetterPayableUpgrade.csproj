@@ -19,6 +19,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Compile Include="..\Shared\GamePrefabID.cs" Link="Shared\GamePrefabID.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="BepInEx.PluginInfoProps" Version="2.*" />
     </ItemGroup>
 

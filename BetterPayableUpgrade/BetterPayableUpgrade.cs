@@ -17,7 +17,7 @@ namespace KingdomMod
     {
         public static BetterPayableUpgrade Instance { get; private set; }
         private static ManualLogSource log;
-        private static System.Collections.Generic.Dictionary<PrefabIDs, ModifyData> _modifyDataDict;
+        private static System.Collections.Generic.Dictionary<GamePrefabID, ModifyData> _modifyDataDict;
 
         public class Patcher
         {
@@ -115,23 +115,23 @@ namespace KingdomMod
             {
                 log.LogDebug("Handle prefabs start.");
             
-                var prefabIds = new System.Collections.Generic.List<PrefabIDs>
+                var prefabIds = new System.Collections.Generic.List<GamePrefabID>
                 {
-                    PrefabIDs.Citizen_House,
-                    PrefabIDs.Workshop,
-                    PrefabIDs.Tower_Baker,
-                    PrefabIDs.Tower6,
-                    PrefabIDs.Tower5,
-                    PrefabIDs.Tower4,
-                    PrefabIDs.Tower3,
-                    PrefabIDs.Tower2,
-                    PrefabIDs.Tower1,
-                    PrefabIDs.Tower0
+                    GamePrefabID.Citizen_House,
+                    GamePrefabID.Workshop,
+                    GamePrefabID.Tower_Baker,
+                    GamePrefabID.Tower6,
+                    GamePrefabID.Tower5,
+                    GamePrefabID.Tower4,
+                    GamePrefabID.Tower3,
+                    GamePrefabID.Tower2,
+                    GamePrefabID.Tower1,
+                    GamePrefabID.Tower0
                 };
 
                 foreach (var prefabId in prefabIds)
                 {
-                    if (prefabId == PrefabIDs.MerchantHouse) continue;
+                    if (prefabId == GamePrefabID.MerchantHouse) continue;
                     var go = prefabs.GetPrefabById((int)prefabId);
                     if (go == null) continue;
             
@@ -192,28 +192,28 @@ namespace KingdomMod
 
         private static void HandlePayable(GameObject go, bool isPrefab, bool modifyBuildPoints = true)
         {
-            _modifyDataDict ??= new System.Collections.Generic.Dictionary<PrefabIDs, ModifyData>
+            _modifyDataDict ??= new System.Collections.Generic.Dictionary<GamePrefabID, ModifyData>
             {
-                { PrefabIDs.Citizen_House, new ModifyData(3) },
-                { PrefabIDs.Workshop, new ModifyData(3) },
-                { PrefabIDs.Tower_Baker, new ModifyData(2) },
-                { PrefabIDs.Tower6, new ModifyData(16, 120) },
-                { PrefabIDs.Tower5, new ModifyData(12, 80, PrefabIDs.None, PrefabIDs.Tower3) },
-                { PrefabIDs.Tower4, new ModifyData(8, 70) },
-                { PrefabIDs.Tower3, new ModifyData(8, 50, PrefabIDs.Tower5) },
-                { PrefabIDs.Tower2, new ModifyData(5, 30, PrefabIDs.None, PrefabIDs.Tower0) },
-                { PrefabIDs.Tower1, new ModifyData(4, 20) },
-                { PrefabIDs.Tower0, new ModifyData(2, 10, PrefabIDs.Tower2) },
+                { GamePrefabID.Citizen_House, new ModifyData(3) },
+                { GamePrefabID.Workshop, new ModifyData(3) },
+                { GamePrefabID.Tower_Baker, new ModifyData(2) },
+                { GamePrefabID.Tower6, new ModifyData(16, 120) },
+                { GamePrefabID.Tower5, new ModifyData(12, 80, GamePrefabID.Invalid, GamePrefabID.Tower3) },
+                { GamePrefabID.Tower4, new ModifyData(8, 70) },
+                { GamePrefabID.Tower3, new ModifyData(8, 50, GamePrefabID.Tower5) },
+                { GamePrefabID.Tower2, new ModifyData(5, 30, GamePrefabID.Invalid, GamePrefabID.Tower0) },
+                { GamePrefabID.Tower1, new ModifyData(4, 20) },
+                { GamePrefabID.Tower0, new ModifyData(2, 10, GamePrefabID.Tower2) },
             };
 
             var prefab = go.GetComponent<PrefabID>();
             if (prefab == null)
                 return;
 
-            var prefabId = (PrefabIDs)prefab.prefabID;
+            var prefabId = (GamePrefabID)prefab.prefabID;
             switch (prefabId)
             {
-                case PrefabIDs.Citizen_House:
+                case GamePrefabID.Citizen_House:
                     {
                         var payable = go.GetComponent<CitizenHousePayable>();
                         if (payable != null)
@@ -223,7 +223,7 @@ namespace KingdomMod
                         }
                         break;
                     }
-                case PrefabIDs.Workshop:
+                case GamePrefabID.Workshop:
                     {
                         var payableWorkshop = go.GetComponent<PayableWorkshop>();
                         if (payableWorkshop != null)
@@ -237,7 +237,7 @@ namespace KingdomMod
                         }
                         break;
                     }
-                case PrefabIDs.Tower_Baker:
+                case GamePrefabID.Tower_Baker:
                     {
                         var payable = go.GetComponent<PayableShop>();
                         if (payable != null)
@@ -247,19 +247,19 @@ namespace KingdomMod
                         }
                         break;
                     }
-                case PrefabIDs.Tower6:
-                case PrefabIDs.Tower5:
-                case PrefabIDs.Tower4:
-                case PrefabIDs.Tower3:
-                case PrefabIDs.Tower2:
-                case PrefabIDs.Tower1:
-                case PrefabIDs.Tower0:
+                case GamePrefabID.Tower6:
+                case GamePrefabID.Tower5:
+                case GamePrefabID.Tower4:
+                case GamePrefabID.Tower3:
+                case GamePrefabID.Tower2:
+                case GamePrefabID.Tower1:
+                case GamePrefabID.Tower0:
                     HandleTower(go, prefabId, isPrefab, modifyBuildPoints);
                     break;
             }
         }
 
-        private static void HandleTower(GameObject go, PrefabIDs prefabId, bool isPrefab, bool modifyBuildPoints = true)
+        private static void HandleTower(GameObject go, GamePrefabID prefabId, bool isPrefab, bool modifyBuildPoints = true)
         {
             var prefabs = SingletonMonoBehaviour<Managers>.Inst.prefabs;
             if (prefabs == null) return;
@@ -284,7 +284,7 @@ namespace KingdomMod
                 log.LogDebug($"Change {go.name} price from {payable.Price} to {modifyData.Price}");
                 payable.Price = modifyData.Price;
 
-                if (modifyData.NextPrefab != PrefabIDs.None)
+                if (modifyData.NextPrefab != GamePrefabID.Invalid)
                 {
                     if (isPrefab)
                         payable.nextPrefab = prefabs.GetPrefabById((int)modifyData.NextPrefab);
@@ -300,83 +300,13 @@ namespace KingdomMod
         {
             public int Price;
             public int BuildPoints;
-            public PrefabIDs NextPrefab;
-            public PrefabIDs LastPrefab;
+            public GamePrefabID NextPrefab;
+            public GamePrefabID LastPrefab;
 
-            public ModifyData(int price, int buildPoints = 0, PrefabIDs nextPrefab = PrefabIDs.None, PrefabIDs lastPrefab = PrefabIDs.None)
+            public ModifyData(int price, int buildPoints = 0, GamePrefabID nextPrefab = GamePrefabID.Invalid, GamePrefabID lastPrefab = GamePrefabID.Invalid)
             {
                 Price = price; BuildPoints = buildPoints; NextPrefab = nextPrefab; LastPrefab = lastPrefab;
             }
-        }
-
-        public enum PrefabIDs
-        {
-            None = -1,
-            Castle0 = 0,
-            Castle1 = 1,
-            Castle2 = 2,
-            Castle3 = 3,
-            Castle4 = 4,
-            Castle5 = 5,
-            Castle6 = 6,
-            Farmhouse0 = 7,
-            Farmhouse1 = 8,
-            Farmhouse2 = 9,
-            Tower0 = 10,
-            Tower1 = 11,
-            Tower2 = 12,
-            Tower3 = 13,
-            Tower4 = 14,
-            Wall0 = 15,
-            Wall1 = 16,
-            Wall2 = 17,
-            Wall3 = 18,
-            Wall4 = 19,
-            Wreck = 20,
-            Quarry_undeveloped = 21,
-            Quarry = 22,
-            Tree = 23,
-            Chest = 24,
-            Wall1_Wreck = 25,
-            Wall2_Wreck = 26,
-            Wall3_Wreck = 27,
-            Wall4_Wreck = 28,
-            Wall5_Wreck = 29,
-            Wall4_horn = 30,
-            Wall5_horn = 31,
-            Wall5 = 32,
-            Tower_Baker = 33,
-            Tower_Ballista = 34,
-            Tower_Knight = 35,
-            Lighthouse_undeveloped = 36,
-            Beach = 37,
-            Wharf = 38,
-            Beggar_Camp = 39,
-            Portal = 40,
-            Teleporter = 41,
-            TeleporterRift = 42,
-            Cliff_Portal = 43,
-            BoatSailPosition = 44,
-            Lighthouse_Stone = 45,
-            Lighthouse_Iron = 46,
-            Lighthouse_Wood = 47,
-            Castle7 = 48,
-            Mine_undeveloped = 49,
-            Mine = 50,
-            oakTree = 51,
-            Forge = 52,
-            ShopPike = 53,
-            Workshop = 54,
-            ShopScythe = 55,
-            CaveSpawnerTree = 56,
-            Title = 57,
-            Tower5 = 58,
-            Tower6 = 59,
-            MerchantHouse = 60,
-            FarmhouseStable = 61,
-            BeachPortal = 62,
-            BoatSailPosition_Stone = 63,
-            Citizen_House = 64
         }
     }
 }

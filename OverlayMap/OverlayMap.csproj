@@ -19,6 +19,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Compile Include="..\Shared\CachePrefabID.cs" Link="Shared\CachePrefabID.cs" />
+        <Compile Include="..\Shared\GamePrefabID.cs" Link="Shared\GamePrefabID.cs" />
         <Compile Include="..\Shared\GuiHelper.cs" Link="Shared\GuiHelper.cs" />
     </ItemGroup>
 

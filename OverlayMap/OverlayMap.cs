@@ -31,6 +31,7 @@ namespace KingdomMod
         private static string _archiveFilename;
         private static readonly ExploredRegion _exploredRegion = new ();
         private static PersephoneCage _persephoneCage;
+        private static CachePrefabID _cachePrefabID = new CachePrefabID();
 
         public static void LogMessage(string message, 
             [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
@@ -298,6 +299,7 @@ namespace KingdomMod
 
             gameLayer = GameObject.FindGameObjectWithTag(Tags.GameLayer);
             _persephoneCage = UnityEngine.Object.FindAnyObjectByType<PersephoneCage>();
+            _cachePrefabID.CachePrefabIDs();
 
             _campaignIndex = GlobalSaveData.loaded.currentCampaign;
             _land = CampaignSaveData.current.CurrentLand;
@@ -712,6 +714,10 @@ namespace KingdomMod
                     poiList.Add(new MarkInfo(wreck.transform.position.x, Style.Boat.Wrecked.Color, Style.Boat.Sign, Strings.BoatWreck));
             }
 
+            var summonBell = kingdom.boatSailPosition?.GetComponentInChildren<BoatSummoningBell>();
+            if (summonBell)
+                poiList.Add(new MarkInfo(summonBell.transform.position.x, Style.SummonBell.Color, Style.SummonBell.Sign, Strings.SummonBell));
+
             foreach (var obj in payables.AllPayables)
             {
                 if (obj == null) continue;
@@ -720,11 +726,11 @@ namespace KingdomMod
                 var prefab = go.GetComponent<PrefabID>();
                 if (prefab == null) continue;
 
-                if (prefab.prefabID == (int)PrefabIDs.Quarry_undeveloped)
+                if (prefab.prefabID == (int)GamePrefabID.Quarry_undeveloped)
                 {
                     poiList.Add(new MarkInfo(go.transform.position.x, Style.Quarry.Locked.Color, Style.Quarry.Sign, Strings.Quarry, obj.Price));
                 }
-                else if (prefab.prefabID == (int)PrefabIDs.Mine_undeveloped)
+                else if (prefab.prefabID == (int)GamePrefabID.Mine_undeveloped)
                 {
                     poiList.Add(new MarkInfo(go.transform.position.x, Style.Mine.Locked.Color, Style.Mine.Sign, Strings.Mine, obj.Price));
                 }
@@ -769,15 +775,15 @@ namespace KingdomMod
                 var prefab = go.GetComponent<PrefabID>();
                 if (prefab == null) continue;
 
-                if (prefab.prefabID == (int)PrefabIDs.Quarry)
+                if (prefab.prefabID == (int)GamePrefabID.Quarry)
                 {
                     poiList.Add(new MarkInfo(go.transform.position.x, Style.Quarry.Unlocked.Color, Style.Quarry.Sign, Strings.Quarry));
                 }
-                else if (prefab.prefabID == (int)PrefabIDs.Mine)
+                else if (prefab.prefabID == (int)GamePrefabID.Mine)
                 {
                     poiList.Add(new MarkInfo(go.transform.position.x, Style.Mine.Unlocked.Color, Style.Mine.Sign, Strings.Mine));
                 }
-                else if (prefab.prefabID == (int)PrefabIDs.MerchantHouse)
+                else if (prefab.prefabID == (int)GamePrefabID.MerchantHouse)
                 {
                     poiList.Add(new MarkInfo(go.transform.position.x, Style.MerchantHouse.Color, Style.MerchantHouse.Sign, Strings.MerchantHouse));
                 }
@@ -819,11 +825,11 @@ namespace KingdomMod
 
                 var prefab = go.GetComponent<PrefabID>();
                 if (prefab == null) continue;
-                if (prefab.prefabID == (int)PrefabIDs.Quarry)
+                if (prefab.prefabID == (int)GamePrefabID.Quarry)
                 {
                     poiList.Add(new MarkInfo(go.transform.position.x, Style.Quarry.Building.Color, Style.Quarry.Sign, Strings.Quarry));
                 }
-                else if (prefab.prefabID == (int)PrefabIDs.Mine)
+                else if (prefab.prefabID == (int)GamePrefabID.Mine)
                 {
                     poiList.Add(new MarkInfo(go.transform.position.x, Style.Mine.Building.Color, Style.Mine.Sign, Strings.Mine));
                 }
@@ -1130,79 +1136,6 @@ namespace KingdomMod
             public int MaxFarmlands;
         }
 
-        private enum PrefabIDs
-        {
-            Castle0 = 0,
-            Castle1 = 1,
-            Castle2 = 2,
-            Castle3 = 3,
-            Castle4 = 4,
-            Castle5 = 5,
-            Castle6 = 6,
-            Farmhouse0 = 7,
-            Farmhouse1 = 8,
-            Farmhouse2 = 9,
-            Tower0 = 10,
-            Tower1 = 11,
-            Tower2 = 12,
-            Tower3 = 13,
-            Tower4 = 14,
-            Wall0 = 15,
-            Wall1 = 16,
-            Wall2 = 17,
-            Wall3 = 18,
-            Wall4 = 19,
-            Wreck = 20,
-            Quarry_undeveloped = 21,
-            Quarry = 22,
-            Tree = 23,
-            Chest = 24,
-            Wall1_Wreck = 25,
-            Wall2_Wreck = 26,
-            Wall3_Wreck = 27,
-            Wall4_Wreck = 28,
-            Wall5_Wreck = 29,
-            Wall4_horn = 30,
-            Wall5_horn = 31,
-            Wall5 = 32,
-            Tower_Baker = 33,
-            Tower_Ballista = 34,
-            Tower_Knight = 35,
-            Lighthouse_undeveloped = 36,
-            Beach = 37,
-            Wharf = 38,
-            Beggar_Camp = 39,
-            Portal = 40,
-            Teleporter = 41,
-            TeleporterRift = 42,
-            Cliff_Portal = 43,
-            BoatSailPosition = 44,
-            Lighthouse_Stone = 45,
-            Lighthouse_Iron = 46,
-            Lighthouse_Wood = 47,
-            Castle7 = 48,
-            Mine_undeveloped = 49,
-            Mine = 50,
-            oakTree = 51,
-            Forge = 52,
-            ShopPike = 53,
-            Workshop = 54,
-            ShopScythe = 55,
-            CaveSpawnerTree = 56,
-            Title = 57,
-            Tower5 = 58,
-            Tower6 = 59,
-            MerchantHouse = 60,
-            FarmhouseStable = 61,
-            BeachPortal = 62,
-            BoatSailPosition_Stone = 63,
-            Citizen_House = 64,
-            TrojanHorse_Wheel = 65,
-            TrojanHorse_ConstructionSite = 66,
-            TrojanHorse_SummoningBell = 67,
-            TrojanHorse_MtOlympus_Serpent_Greece = 68,
-            TrojanHorse_Crown = 69,
-        }
     }
 
     public static class EnumUtil

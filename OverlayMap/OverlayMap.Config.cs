@@ -394,7 +394,8 @@ namespace KingdomMod
                 public static ConfigEntryWrapper<string> Worker;
                 public static ConfigEntryWrapper<string> You;
                 public static ConfigEntryWrapper<string> Zangetsu;
-
+                public static ConfigEntryWrapper<string> SummonBell;
+                
                 public static void ConfigBind(ConfigFile config)
                 {
                     LogMessage($"ConfigBind: {Path.GetFileName(config.ConfigFilePath)}");
@@ -497,6 +498,7 @@ namespace KingdomMod
                     MolossianHound     = config.Bind("Strings", "MolossianHound", "MolossianHound", "");
                     Chimera            = config.Bind("Strings", "Chimera", "Chimera", "");
                     Total              = config.Bind("Strings", "Total", "Total", "");
+                    SummonBell         = config.Bind("Strings", "SummonBell", "SummonBell", "");
 
                     LogMessage($"Loaded config: {Path.GetFileName(ConfigFile.ConfigFilePath)}");
 
@@ -589,7 +591,8 @@ namespace KingdomMod
                 public static MarkerConfigColor StatsInfo;
                 public static MarkerConfigColor ExtraInfo;
                 public static MarkerConfigStated WallLine;
-
+                public static MarkerConfig SummonBell;
+                
                 public static void ConfigBind(ConfigFile config)
                 {
                     LogMessage($"ConfigBind: {Path.GetFileName(config.ConfigFilePath)}");
@@ -739,6 +742,9 @@ namespace KingdomMod
                     WallLine.Color = config.Bind("WallLine", "Color", "0,1,0,1", "");
                     WallLine.Building.Color = config.Bind("WallLine.Building", "Color", "0,0,1,1", "");
                     WallLine.Wrecked.Color = config.Bind("WallLine.Wrecked", "Color", "1,0,0,1", "");
+
+                    SummonBell.Color = config.Bind("SummonBell", "Color", "1,1,1,1", "");
+                    SummonBell.Sign = config.Bind("SummonBell", "Sign", "", "");
 
                     LogMessage($"Loaded config: {Path.GetFileName(ConfigFile.ConfigFilePath)}");
 
