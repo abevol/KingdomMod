@@ -27,12 +27,12 @@
     <ItemGroup>
         <None Remove="ConfigPrefabs\KingdomMod.OverlayMap.Language_en-US.cfg" />
         <None Remove="ConfigPrefabs\KingdomMod.OverlayMap.Language_zh-CN.cfg" />
-        <None Remove="ConfigPrefabs\KingdomMod.OverlayMap.Style.cfg" />
+        <None Remove="ConfigPrefabs\KingdomMod.OverlayMap.MarkerStyle.cfg" />
     </ItemGroup>
     <ItemGroup>
         <EmbeddedResource Include="ConfigPrefabs\KingdomMod.OverlayMap.Language_en-US.cfg" />
         <EmbeddedResource Include="ConfigPrefabs\KingdomMod.OverlayMap.Language_zh-CN.cfg" />
-        <EmbeddedResource Include="ConfigPrefabs\KingdomMod.OverlayMap.Style.cfg" />
+        <EmbeddedResource Include="ConfigPrefabs\KingdomMod.OverlayMap.MarkerStyle.cfg" />
     </ItemGroup>
 
     <ItemGroup>
@@ -184,10 +184,8 @@
     </ItemGroup>
 
     <Target Name="CopyOutput" AfterTargets="Build">
-        <Copy SourceFiles="$(OutputPath)\$(AssemblyName).dll"
-              DestinationFolder="$(BepInExPluginsPath)\$(AssemblyName)\" OverwriteReadOnlyFiles="true" />
-        <Copy SourceFiles="$(OutputPath)\$(AssemblyName).pdb"
-              DestinationFolder="$(BepInExPluginsPath)\$(AssemblyName)\" OverwriteReadOnlyFiles="true" />
+        <Copy SourceFiles="$(OutputPath)\$(AssemblyName).dll" DestinationFolder="$(BepInExPluginsPath)\$(AssemblyName)\" OverwriteReadOnlyFiles="true" />
+        <Copy SourceFiles="$(OutputPath)\$(AssemblyName).pdb" DestinationFolder="$(BepInExPluginsPath)\$(AssemblyName)\" OverwriteReadOnlyFiles="true" />
         <Message Text="Copied output to: $(BepInExPluginsPath)\$(AssemblyName)\" Importance="high" />
     </Target>
 </Project>
