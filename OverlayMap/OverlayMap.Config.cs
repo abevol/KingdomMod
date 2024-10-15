@@ -83,8 +83,8 @@ namespace KingdomMod
                 {
                     new ConfigPrefab
                     {
-                        ResName = "KingdomMod.ConfigPrefabs.KingdomMod.OverlayMap.Style.cfg",
-                        FileName = "KingdomMod.OverlayMap.Style.cfg"
+                        ResName = "KingdomMod.ConfigPrefabs.KingdomMod.OverlayMap.MarkerStyle.cfg",
+                        FileName = "KingdomMod.OverlayMap.MarkerStyle.cfg"
                     },
                     new ConfigPrefab
                     {
@@ -134,7 +134,7 @@ namespace KingdomMod
                 public static ConfigFile ConfigFile;
                 private static readonly ConfigFileWatcher _configFileWatcher = new ();
                 public static ConfigEntryWrapper<string> Language;
-                public static ConfigEntryWrapper<string> StyleFile;
+                public static ConfigEntryWrapper<string> MarkerStyleFile;
                 public static ConfigEntryWrapper<int> GUIUpdatesPerSecond;
 
                 public static void ConfigBind(ConfigFile config)
@@ -148,18 +148,18 @@ namespace KingdomMod
                     config.Clear();
 
                     Language = config.Bind("Global", "Language", "system", "");
-                    StyleFile = config.Bind("Global", "StyleFile", "KingdomMod.OverlayMap.Style.cfg", "");
+                    MarkerStyleFile = config.Bind("Global", "MarkerStyleFile", "KingdomMod.OverlayMap.MarkerStyle.cfg", "");
                     GUIUpdatesPerSecond = config.Bind("Global", "GUIUpdatesPerSecond", 10, "Increase to be more accurate, decrease to reduce performance impact");
 
                     LogMessage($"ConfigFilePath: {config.ConfigFilePath}");
                     LogMessage($"Language: {Language.Value}");
-                    LogMessage($"StyleFile: {StyleFile.Value}");
+                    LogMessage($"MarkerStyleFile: {MarkerStyleFile.Value}");
                     LogMessage($"GUIUpdatesPerSecond: {GUIUpdatesPerSecond.Value}");
 
                     LogMessage($"Loaded config: {Path.GetFileName(ConfigFile.ConfigFilePath)}");
 
                     OnLanguageChanged();
-                    OnStyleFileChanged();
+                    OnMarkerStyleFileChanged();
 
                     SetConfigDelegates();
                     _configFileWatcher.Set(Path.GetFileName(config.ConfigFilePath), OnConfigFileChanged);
@@ -182,7 +182,7 @@ namespace KingdomMod
                 public static void SetConfigDelegates()
                 {
                     Language.Entry.SettingChanged += (sender, args) => OnLanguageChanged();
-                    StyleFile.Entry.SettingChanged += (sender, args) => OnStyleFileChanged();
+                    MarkerStyleFile.Entry.SettingChanged += (sender, args) => OnMarkerStyleFileChanged();
                 }
 
                 public static void OnLanguageChanged()
@@ -236,34 +236,34 @@ namespace KingdomMod
                     Strings.ConfigBind(new ConfigFile(langFile, true));
                 }
 
-                public static void OnStyleFileChanged()
+                public static void OnMarkerStyleFileChanged()
                 {
-                    LogMessage($"OnStyleFileChanged: {StyleFile.Value}");
+                    LogMessage($"OnMarkerStyleFileChanged: {MarkerStyleFile.Value}");
 
                     var bepInExDir = GetBepInExDir();
-                    var styleFile = Path.Combine(bepInExDir, "config", StyleFile);
-                    LogMessage($"Style file: {styleFile}");
+                    var styleFile = Path.Combine(bepInExDir, "config", MarkerStyleFile);
+                    LogMessage($"MarkerStyle file: {styleFile}");
 
                     if (!File.Exists(styleFile))
                     {
-                        log.LogWarning($"Style file do not exist: {styleFile}");
-                        if (Style.ConfigFile != null)
+                        log.LogWarning($"MarkerStyle file do not exist: {styleFile}");
+                        if (MarkerStyle.ConfigFile != null)
                             return;
-                        styleFile = Path.Combine(bepInExDir, "config", "KingdomMod.OverlayMap.Style.cfg");
-                        log.LogWarning($"Try to use the default style file: {styleFile}");
+                        styleFile = Path.Combine(bepInExDir, "config", "KingdomMod.OverlayMap.MarkerStyle.cfg");
+                        log.LogWarning($"Try to use the default MarkerStyle file: {styleFile}");
                     }
 
-                    if (Style.ConfigFile != null)
+                    if (MarkerStyle.ConfigFile != null)
                     {
-                        if (Path.GetFileName(Style.ConfigFile.ConfigFilePath) == Path.GetFileName(styleFile))
+                        if (Path.GetFileName(MarkerStyle.ConfigFile.ConfigFilePath) == Path.GetFileName(styleFile))
                         {
                             LogMessage("Attempt to load the same configuration file. Skip.");
                             return;
                         }
                     }
 
-                    LogMessage($"Try to bind style file: {Path.GetFileName(styleFile)}");
-                    Style.ConfigBind(new ConfigFile(styleFile, true));
+                    LogMessage($"Try to bind MarkerStyle file: {Path.GetFileName(styleFile)}");
+                    MarkerStyle.ConfigBind(new ConfigFile(styleFile, true));
                 }
             }
 
@@ -556,7 +556,7 @@ namespace KingdomMod
                 public MarkerConfigColor Building;
             }
 
-            public class Style
+            public class MarkerStyle
             {
                 public static ConfigFile ConfigFile;
                 private static readonly ConfigFileWatcher _configFileWatcher = new();
