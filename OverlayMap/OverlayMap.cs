@@ -65,17 +65,9 @@ namespace KingdomMod
 
         public OverlayMap()
         {
-            try
-            {
-                guiStyle.alignment = TextAnchor.UpperLeft;
-                guiStyle.normal.textColor = Color.white;
-                guiStyle.fontSize = 12;
-            }
-            catch (Exception exception)
-            {
-                log.LogInfo(exception);
-                throw;
-            }
+            guiStyle.alignment = TextAnchor.UpperLeft;
+            guiStyle.normal.textColor = Color.white;
+            guiStyle.fontSize = 12;
         }
 
         public static void Initialize(OverlayMapPlugin plugin)
@@ -94,6 +86,7 @@ namespace KingdomMod
         private void Start()
         {
             log.LogMessage($"{this.GetType().Name} Start.");
+
             Patcher.PatchAll(this);
             Game.OnGameStart += (Action)OnGameStart;
             NetworkBigBoss.Instance.OnClientCaughtUp += (Action)this.OnClientCaughtUp;
@@ -338,20 +331,19 @@ namespace KingdomMod
             var leftWalls = new System.Collections.Generic.List<WallPoint>();
             var rightWalls = new System.Collections.Generic.List<WallPoint>();
 
-            Portal dock = null;
             foreach (var obj in kingdom.AllPortals)
             {
                 if (obj.type == Portal.Type.Regular)
                     poiList.Add(new MarkInfo(obj.transform.position.x, Style.Portal.Color, Style.Portal.Sign, Strings.Portal));
                 else if (obj.type == Portal.Type.Cliff)
-                    poiList.Add(new MarkInfo(obj.transform.position.x, obj.state switch{ Portal.State.Destroyed => Style.Cliff.Destroyed.Color, Portal.State.Rebuilding => Style.Cliff.Rebuilding.Color, _=> Style.Cliff.Color }, Style.Cliff.Sign, Strings.Cliff));
+                    poiList.Add(new MarkInfo(obj.transform.position.x, obj.state switch{ Portal.State.Destroyed => Style.PortalCliff.Destroyed.Color, Portal.State.Rebuilding => Style.PortalCliff.Rebuilding.Color, _=> Style.PortalCliff.Color }, Style.PortalCliff.Sign, Strings.PortalCliff));
                 else if (obj.type == Portal.Type.Dock)
-                    dock = obj;
+                    poiList.Add(new MarkInfo(obj.transform.position.x, Style.PortalDock.Color, Style.PortalDock.Sign, Strings.PortalDock));
             }
 
             var beach = gameLayer.GetComponentInChildren<Beach>();
             if (beach != null)
-                poiList.Add(new MarkInfo(beach.transform.position.x, (dock && (dock.state != Portal.State.Destroyed)) ? Style.Beach.Color : Style.Beach.Destroyed.Color, Style.Beach.Sign, Strings.Beach));
+                poiList.Add(new MarkInfo(beach.transform.position.x, Style.Beach.Color, Style.Beach.Sign, Strings.Beach));
 
             foreach (var beggarCamp in kingdom.BeggarCamps)
             {
@@ -527,8 +519,11 @@ namespace KingdomMod
             foreach (var obj in lighthouses)
             {
                 var payable = obj.GetComponent<PayableUpgrade>();
-                var price = payable ? payable.Price : 0;
-                poiList.Add(new MarkInfo(obj.transform.position.x, Style.Lighthouse.Color, Style.Lighthouse.Sign, Strings.Lighthouse, price));
+                bool canPay = !payable.IsLocked(GetLocalPlayer(), out var reason);
+                bool isLocked = reason != LockIndicator.LockReason.NotLocked && reason != LockIndicator.LockReason.NoUpgrade;
+                var price = canPay ? payable.Price : 0;
+                var color = isLocked ? Style.Lighthouse.Locked.Color : Style.Lighthouse.Color;
+                poiList.Add(new MarkInfo(obj.transform.position.x, color, Style.Lighthouse.Sign, Strings.Lighthouse, price));
             }
 
             var wallWreckList = GameObject.FindGameObjectsWithTag(Tags.WallWreck);
@@ -753,9 +748,13 @@ namespace KingdomMod
                 {
                     poiList.Add(new MarkInfo(go.transform.position.x, Style.Mine.Locked.Color, Style.Mine.Sign, Strings.Mine, obj.Price));
                 }
+                else if (prefab.prefabID == (int)GamePrefabID.Lighthouse_undeveloped)
+                {
+                    poiList.Add(new MarkInfo(go.transform.position.x, Style.Lighthouse.Unpaid.Color, Style.Lighthouse.Sign, Strings.Lighthouse, obj.Price));
+                }
                 else if (prefab.prefabID == (int)GamePrefabID.Cliff_Portal)
                 {
-                    poiList.Add(new MarkInfo(go.transform.position.x, Style.Cliff.Locked.Color, Style.Cliff.Sign, Strings.Cliff, obj.Price));
+                    poiList.Add(new MarkInfo(go.transform.position.x, Style.PortalCliff.Locked.Color, Style.PortalCliff.Sign, Strings.PortalCliff, obj.Price));
                 }
                 else
                 {

@@ -318,7 +318,7 @@ namespace KingdomMod
                 public static ConfigEntryWrapper<string> CatCart;
                 public static ConfigEntryWrapper<string> Chest;
                 public static ConfigEntryWrapper<string> CitizenHouse;
-                public static ConfigEntryWrapper<string> Cliff;
+                public static ConfigEntryWrapper<string> PortalCliff;
                 public static ConfigEntryWrapper<string> Coins;
                 public static ConfigEntryWrapper<string> DayNight;
                 public static ConfigEntryWrapper<string> Days;
@@ -361,6 +361,7 @@ namespace KingdomMod
                 public static ConfigEntryWrapper<string> Peasant;
                 public static ConfigEntryWrapper<string> Pikeman;
                 public static ConfigEntryWrapper<string> Portal;
+                public static ConfigEntryWrapper<string> PortalDock;
                 public static ConfigEntryWrapper<string> Prince;
                 public static ConfigEntryWrapper<string> Princess;
                 public static ConfigEntryWrapper<string> Quarry;
@@ -426,7 +427,7 @@ namespace KingdomMod
                     CatCart            = config.Bind("Strings", "CatCart", "CatCart", "");
                     Chest              = config.Bind("Strings", "Chest", "Chest", "");
                     CitizenHouse       = config.Bind("Strings", "CitizenHouse", "CitizenHouse", "");
-                    Cliff              = config.Bind("Strings", "Cliff", "Cliff", "");
+                    PortalCliff        = config.Bind("Strings", "PortalCliff", "PortalCliff", "");
                     Coins              = config.Bind("Strings", "Coins", "Coins", "");
                     DayNight           = config.Bind("Strings", "DayNight", "DayNight", "");
                     Days               = config.Bind("Strings", "Days", "Days", "");
@@ -469,6 +470,7 @@ namespace KingdomMod
                     Peasant            = config.Bind("Strings", "Peasant", "Peasant", "");
                     Pikeman            = config.Bind("Strings", "Pikeman", "Pikeman", "");
                     Portal             = config.Bind("Strings", "Portal", "Portal", "");
+                    PortalDock         = config.Bind("Strings", "PortalDock", "PortalDock", "");
                     Prince             = config.Bind("Strings", "Prince", "Prince", "");
                     Princess           = config.Bind("Strings", "Princess", "Princess", "");
                     Quarry             = config.Bind("Strings", "Quarry", "Quarry", "");
@@ -547,6 +549,7 @@ namespace KingdomMod
                 public ConfigEntryWrapper<string> Sign;
                 public MarkerConfigColor Rebuilding;
                 public MarkerConfigColor Destroyed;
+                public MarkerConfigColor Unpaid;
                 public MarkerConfigColor Locked;
                 public MarkerConfigColor Unlocked;
                 public MarkerConfigColor Wrecked;
@@ -559,8 +562,9 @@ namespace KingdomMod
                 private static readonly ConfigFileWatcher _configFileWatcher = new();
 
                 public static MarkerConfig Portal;
-                public static MarkerConfigStated Cliff;
-                public static MarkerConfigStated Beach;
+                public static MarkerConfig PortalDock;
+                public static MarkerConfigStated PortalCliff;
+                public static MarkerConfig Beach;
                 public static MarkerConfig BeggarCamp;
                 public static MarkerConfig Beggar;
                 public static MarkerConfig Player;
@@ -605,7 +609,7 @@ namespace KingdomMod
                 public static MarkerConfig TeleExitP1;
                 public static MarkerConfig TeleExitP2;
                 public static MarkerConfig HephaestusForge;
-                public static MarkerConfig Lighthouse;
+                public static MarkerConfigStated Lighthouse;
 
                 public static void ConfigBind(ConfigFile config)
                 {
@@ -618,14 +622,16 @@ namespace KingdomMod
                     Portal.Color = config.Bind("Portal", "Color", "0.62,0,1,1", "");
                     Portal.Sign = config.Bind("Portal", "Sign", "", "");
 
-                    Cliff.Sign = config.Bind("Cliff", "Sign", "", "");
-                    Cliff.Color = config.Bind("Cliff", "Color", "1,0,0,1", "");
-                    Cliff.Rebuilding.Color = config.Bind("Cliff.Rebuilding", "Color", "0,0,1,1", "");
-                    Cliff.Destroyed.Color = config.Bind("Cliff.Destroyed", "Color", "0,1,0,1", "");
+                    PortalDock.Color = config.Bind("PortalDock", "Color", "0.62,0,1,1", "");
+                    PortalDock.Sign = config.Bind("PortalDock", "Sign", "", "");
+
+                    PortalCliff.Sign = config.Bind("PortalCliff", "Sign", "", "");
+                    PortalCliff.Color = config.Bind("PortalCliff", "Color", "1,0,0,1", "");
+                    PortalCliff.Rebuilding.Color = config.Bind("PortalCliff.Rebuilding", "Color", "0,0,1,1", "");
+                    PortalCliff.Destroyed.Color = config.Bind("PortalCliff.Destroyed", "Color", "0,1,0,1", "");
 
                     Beach.Sign = config.Bind("Beach", "Sign", "", "");
-                    Beach.Color = config.Bind("Beach", "Color", "1,0,0,1", "");
-                    Beach.Destroyed.Color = config.Bind("Beach.Destroyed", "Color", "0,1,0,1", "");
+                    Beach.Color = config.Bind("Beach", "Color", "1,1,1,1", "");
 
                     BeggarCamp.Color = config.Bind("BeggarCamp", "Color", "1,1,1,1", "");
                     BeggarCamp.Sign = config.Bind("BeggarCamp", "Sign", "", "");
@@ -769,8 +775,10 @@ namespace KingdomMod
                     HephaestusForge.Color = config.Bind("HephaestusForge", "Color", "1,1,1,1", "");
                     HephaestusForge.Sign = config.Bind("HephaestusForge", "Sign", "", "");
 
-                    Lighthouse.Color = config.Bind("Lighthouse", "Color", "1,1,1,1", "");
                     Lighthouse.Sign = config.Bind("Lighthouse", "Sign", "", "");
+                    Lighthouse.Color = config.Bind("Lighthouse", "Color", "0,1,0,1", "");
+                    Lighthouse.Locked.Color = config.Bind("Lighthouse.Locked", "Color", "0.5,0.5,0.5,1", "");
+                    Lighthouse.Unpaid.Color = config.Bind("Lighthouse.Locked", "Color", "1,0,0,1", "");
 
                     LogMessage($"Loaded config: {Path.GetFileName(ConfigFile.ConfigFilePath)}");
 
