@@ -13,7 +13,7 @@
             https://nuget.bepinex.dev/v3/index.json;
             https://nuget.samboy.dev/v3/index.json
         </RestoreAdditionalProjectSources>
-        <RootNamespace>KingdomMod</RootNamespace>
+        <RootNamespace>KingdomMod.StaminaBar</RootNamespace>
         <Configurations>Debug;BIE6_IL2CPP;BIE6_Mono</Configurations>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     </PropertyGroup>

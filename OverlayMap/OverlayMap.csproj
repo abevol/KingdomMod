@@ -12,7 +12,7 @@
             https://api.nuget.org/v3/index.json;
             https://nuget.bepinex.dev/v3/index.json
         </RestoreAdditionalProjectSources>
-        <RootNamespace>KingdomMod</RootNamespace>
+        <RootNamespace>KingdomMod.OverlayMap</RootNamespace>
         <Authors>ZMan</Authors>
         <Configurations>Debug;BIE6_IL2CPP;BIE6_Mono</Configurations>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
@@ -21,6 +21,7 @@
     <ItemGroup>
         <Compile Include="..\Shared\CachePrefabID.cs" Link="Shared\CachePrefabID.cs" />
         <Compile Include="..\Shared\GamePrefabID.cs" Link="Shared\GamePrefabID.cs" />
+        <Compile Include="..\Shared\GameExtensions.cs" Link="Shared\GameExtensions.cs" />
         <Compile Include="..\Shared\GuiHelper.cs" Link="Shared\GuiHelper.cs" />
     </ItemGroup>
 

@@ -10,23 +10,23 @@ using BepInEx.Unity.IL2CPP;
 using BepInEx.Unity.Mono;
 #endif
 
-namespace KingdomMod
-{
-    [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
-    [BepInProcess("KingdomTwoCrowns.exe")]
-    public class StaminaBarPlugin :
+namespace KingdomMod.StaminaBar;
+
+[BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
+[BepInProcess("KingdomTwoCrowns.exe")]
+public class StaminaBarPlugin :
 #if IL2CPP
         BasePlugin
 #else
-        BaseUnityPlugin
+    BaseUnityPlugin
 #endif
-    {
-        public static StaminaBarPlugin Instance;
-        public ManualLogSource LogSource
+{
+    public static StaminaBarPlugin Instance;
+    public ManualLogSource LogSource
 #if IL2CPP
             => Log;
 #else
-            => Logger;
+        => Logger;
 #endif
 
 #if IL2CPP
@@ -35,27 +35,26 @@ namespace KingdomMod
             Init();
         }
 #else
-        internal void Awake()
-        {
-            Init();
-        }
+    internal void Awake()
+    {
+        Init();
+    }
 #endif
 
-        private void Init()
+    private void Init()
+    {
+        try
         {
-            try
-            {
-                Instance = this;
+            Instance = this;
 
-                LogSource.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded!");
+            LogSource.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded!");
 
-                StaminaBar.Initialize(this);
-            }
-            catch (Exception e)
-            {
-                LogSource.LogInfo(e);
-                throw;
-            }
+            StaminaBarHolder.Initialize(this);
+        }
+        catch (Exception e)
+        {
+            LogSource.LogInfo(e);
+            throw;
         }
     }
 }

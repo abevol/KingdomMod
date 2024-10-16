@@ -13,13 +13,14 @@
             https://nuget.bepinex.dev/v3/index.json;
             https://nuget.samboy.dev/v3/index.json
         </RestoreAdditionalProjectSources>
-        <RootNamespace>KingdomMod</RootNamespace>
+        <RootNamespace>KingdomMod.DevTools</RootNamespace>
         <Configurations>Debug;BIE6_IL2CPP;BIE6_Mono</Configurations>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     </PropertyGroup>
 
     <ItemGroup>
         <Compile Include="..\Shared\TypeExtensions.cs" Link="Shared\TypeExtensions.cs" />
+        <Compile Include="..\Shared\GameObjectDetails.cs" Link="Shared\GameObjectDetails.cs" />
     </ItemGroup>
 
     <ItemGroup>
