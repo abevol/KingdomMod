@@ -26,11 +26,15 @@
     </ItemGroup>
 
     <ItemGroup>
+        <None Remove="Assets\Background.png" />
+        <None Remove="ConfigPrefabs\KingdomMod.OverlayMap.GuiStyle.cfg" />
         <None Remove="ConfigPrefabs\KingdomMod.OverlayMap.Language_en-US.cfg" />
         <None Remove="ConfigPrefabs\KingdomMod.OverlayMap.Language_zh-CN.cfg" />
         <None Remove="ConfigPrefabs\KingdomMod.OverlayMap.MarkerStyle.cfg" />
     </ItemGroup>
     <ItemGroup>
+        <EmbeddedResource Include="Assets\Background.png" />
+        <EmbeddedResource Include="ConfigPrefabs\KingdomMod.OverlayMap.GuiStyle.cfg" />
         <EmbeddedResource Include="ConfigPrefabs\KingdomMod.OverlayMap.Language_en-US.cfg" />
         <EmbeddedResource Include="ConfigPrefabs\KingdomMod.OverlayMap.Language_zh-CN.cfg" />
         <EmbeddedResource Include="ConfigPrefabs\KingdomMod.OverlayMap.MarkerStyle.cfg" />
@@ -152,6 +156,10 @@
         </Reference>
         <Reference Include="UnityEngine.IMGUIModule">
             <HintPath>..\_libs\BIE6_Mono\Managed\UnityEngine.IMGUIModule.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine.ImageConversionModule">
+            <HintPath>..\_libs\BIE6_Mono\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.InputLegacyModule">

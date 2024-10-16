@@ -20,6 +20,29 @@ public class ConfigEntryWrapper<T>
     public static implicit operator ConfigEntry<T>(ConfigEntryWrapper<T> d) => d.Entry;
     public static implicit operator ConfigEntryWrapper<T>(ConfigEntry<T> d) => new ConfigEntryWrapper<T>(d);
     public static implicit operator T(ConfigEntryWrapper<T> d) => d.Entry.Value;
+
+    public static implicit operator RectInt(ConfigEntryWrapper<T> d)
+    {
+        return d.Value switch
+        {
+            Rect rec => new RectInt((int)rec.x, (int)rec.y, (int)rec.width, (int)rec.height),
+            Vector4 vec => new RectInt((int)vec.x, (int)vec.y, (int)vec.z, (int)vec.w),
+            Quaternion qua => new RectInt((int)qua.x, (int)qua.y, (int)qua.z, (int)qua.w),
+            _ => new RectInt()
+        };
+    }
+
+    public static implicit operator RectOffset(ConfigEntryWrapper<T> d)
+    {
+        return d.Value switch
+        {
+            Rect rec => new RectOffset((int)rec.x, (int)rec.y, (int)rec.width, (int)rec.height),
+            Vector4 vec => new RectOffset((int)vec.x, (int)vec.y, (int)vec.z, (int)vec.w),
+            Quaternion qua => new RectOffset((int)qua.x, (int)qua.y, (int)qua.z, (int)qua.w),
+            _ => new RectOffset()
+        };
+    }
+
     public static implicit operator Color(ConfigEntryWrapper<T> d)
     {
         if (d._cachedColor == null)

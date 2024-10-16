@@ -49,7 +49,7 @@ public class BetterPayableUpgradeHolder : MonoBehaviour
 
                     if (currencyConfig.BagPrefab)
                     {
-                        log.LogMessage($"CoinBagInitPatcher localScale: {currencyConfig.BagPrefab.gameObject.transform.localScale}");
+                        // log.LogMessage($"CoinBagInitPatcher localScale: {currencyConfig.BagPrefab.gameObject.transform.localScale}");
 
                         currencyConfig.BagPrefab.gameObject.transform.localScale = new Vector3(0.668f, 0.668f, 0.668f);
 
