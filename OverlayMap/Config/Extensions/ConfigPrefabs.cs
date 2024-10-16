@@ -17,6 +17,11 @@ public class ConfigPrefabs
             {
                 new ConfigPrefab
                 {
+                    ResName = "KingdomMod.OverlayMap.ConfigPrefabs.KingdomMod.OverlayMap.GuiStyle.cfg",
+                    FileName = "KingdomMod.OverlayMap.GuiStyle.cfg"
+                },
+                new ConfigPrefab
+                {
                     ResName = "KingdomMod.OverlayMap.ConfigPrefabs.KingdomMod.OverlayMap.MarkerStyle.cfg",
                     FileName = "KingdomMod.OverlayMap.MarkerStyle.cfg"
                 },
@@ -29,6 +34,11 @@ public class ConfigPrefabs
                 {
                     ResName = "KingdomMod.OverlayMap.ConfigPrefabs.KingdomMod.OverlayMap.Language_zh-CN.cfg",
                     FileName = "KingdomMod.OverlayMap.Language.zh-CN.cfg"
+                },
+                new ConfigPrefab
+                {
+                    ResName = "KingdomMod.OverlayMap.Assets.Background.png",
+                    FileName = "GuiStyle\\Background.png"
                 }
             };
 
@@ -40,12 +50,15 @@ public class ConfigPrefabs
         {
             var configFile = Path.Combine(bepInExDir, "config", prefab.FileName);
             LogMessage($"Config prefab file: {configFile}");
-
             if (!File.Exists(configFile))
             {
                 LogMessage($"Config prefab file do not exist: {configFile}");
 
-                File.WriteAllText(configFile, GetEmbeddedResource(prefab.ResName));
+                var directoryPath = Path.GetDirectoryName(configFile);
+                if (directoryPath != null)
+                    Directory.CreateDirectory(directoryPath);
+
+                File.WriteAllBytes(configFile, GetEmbeddedResourceAsBytes(prefab.ResName));
             }
         }
     }
@@ -60,5 +73,18 @@ public class ConfigPrefabs
         }
 
         return string.Empty;
+    }
+
+    public static byte[] GetEmbeddedResourceAsBytes(string res)
+    {
+        using var s = Assembly.GetExecutingAssembly().GetManifestResourceStream(res);
+        if (s != null)
+        {
+            using var ms = new MemoryStream();
+            s.CopyTo(ms);
+            return ms.ToArray();
+        }
+
+        return new byte[0];
     }
 }

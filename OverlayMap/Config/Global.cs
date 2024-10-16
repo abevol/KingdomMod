@@ -13,7 +13,8 @@ public class Global
     private static readonly ConfigFileWatcher _configFileWatcher = new();
     public static ConfigEntryWrapper<string> Language;
     public static ConfigEntryWrapper<string> MarkerStyleFile;
-    public static ConfigEntryWrapper<int> GUIUpdatesPerSecond;
+    public static ConfigEntryWrapper<string> GuiStyleFile;
+    public static ConfigEntryWrapper<int> GuiUpdatesPerSecond;
 
     public static void ConfigBind(ConfigFile config)
     {
@@ -27,17 +28,20 @@ public class Global
 
         Language = config.Bind("Global", "Language", "system", "");
         MarkerStyleFile = config.Bind("Global", "MarkerStyleFile", "KingdomMod.OverlayMap.MarkerStyle.cfg", "");
-        GUIUpdatesPerSecond = config.Bind("Global", "GUIUpdatesPerSecond", 10, "Increase to be more accurate, decrease to reduce performance impact");
+        GuiStyleFile = config.Bind("Global", "GuiStyleFile", "KingdomMod.OverlayMap.GuiStyle.cfg", "");
+        GuiUpdatesPerSecond = config.Bind("Global", "GuiUpdatesPerSecond", 10, "Increase to be more accurate, decrease to reduce performance impact");
 
         LogMessage($"ConfigFilePath: {config.ConfigFilePath}");
         LogMessage($"Language: {Language.Value}");
         LogMessage($"MarkerStyleFile: {MarkerStyleFile.Value}");
-        LogMessage($"GUIUpdatesPerSecond: {GUIUpdatesPerSecond.Value}");
+        LogMessage($"GuiStyleFile: {GuiStyleFile.Value}");
+        LogMessage($"GuiUpdatesPerSecond: {GuiUpdatesPerSecond.Value}");
 
         LogMessage($"Loaded config: {Path.GetFileName(ConfigFile.ConfigFilePath)}");
 
         OnLanguageChanged();
         OnMarkerStyleFileChanged();
+        OnGuiStyleFileChanged();
 
         SetConfigDelegates();
         _configFileWatcher.Set(Path.GetFileName(config.ConfigFilePath), OnConfigFileChanged);
@@ -61,6 +65,7 @@ public class Global
     {
         Language.Entry.SettingChanged += (sender, args) => OnLanguageChanged();
         MarkerStyleFile.Entry.SettingChanged += (sender, args) => OnMarkerStyleFileChanged();
+        GuiStyleFile.Entry.SettingChanged += (sender, args) => OnGuiStyleFileChanged();
     }
 
     public static void OnLanguageChanged()
@@ -142,5 +147,35 @@ public class Global
 
         LogMessage($"Try to bind MarkerStyle file: {Path.GetFileName(styleFile)}");
         MarkerStyle.ConfigBind(new ConfigFile(styleFile, true));
+    }
+
+    public static void OnGuiStyleFileChanged()
+    {
+        LogMessage($"OnGuiStyleFileChanged: {GuiStyleFile.Value}");
+
+        var bepInExDir = GetBepInExDir();
+        var styleFile = Path.Combine(bepInExDir, "config", GuiStyleFile);
+        LogMessage($"GuiStyle file: {styleFile}");
+
+        if (!File.Exists(styleFile))
+        {
+            LogWarning($"GuiStyle file do not exist: {styleFile}");
+            if (GuiStyle.ConfigFile != null)
+                return;
+            styleFile = Path.Combine(bepInExDir, "config", "KingdomMod.OverlayMap.GuiStyle.cfg");
+            LogWarning($"Try to use the default GuiStyle file: {styleFile}");
+        }
+
+        if (GuiStyle.ConfigFile != null)
+        {
+            if (Path.GetFileName(GuiStyle.ConfigFile.ConfigFilePath) == Path.GetFileName(styleFile))
+            {
+                LogMessage("Attempt to load the same configuration file. Skip.");
+                return;
+            }
+        }
+
+        LogMessage($"Try to bind GuiStyle file: {Path.GetFileName(styleFile)}");
+        GuiStyle.ConfigBind(new ConfigFile(styleFile, true));
     }
 }

@@ -20,6 +20,8 @@ public partial class OverlayMapHolder : MonoBehaviour
     public static OverlayMapHolder Instance { get; private set; }
     private static ManualLogSource log;
     private readonly GUIStyle guiStyle = new();
+    private GUIStyle _guiBoxStyle = new();
+    public bool NeedToReloadGuiBoxStyle = true;
     private float timeSinceLastGuiUpdate = 0;
     private bool enabledOverlayMap = true;
     private System.Collections.Generic.List<MarkInfo> minimapMarkList = new();
@@ -75,7 +77,6 @@ public partial class OverlayMapHolder : MonoBehaviour
     public static void Initialize(OverlayMapPlugin plugin)
     {
         log = plugin.LogSource;
-        Global.ConfigBind(plugin.Config);
 #if IL2CPP
             ClassInjector.RegisterTypeInIl2Cpp<OverlayMapHolder>();
 #endif
@@ -83,6 +84,7 @@ public partial class OverlayMapHolder : MonoBehaviour
         DontDestroyOnLoad(obj);
         obj.hideFlags = HideFlags.HideAndDontSave;
         Instance = obj.AddComponent<OverlayMapHolder>();
+        Global.ConfigBind(plugin.Config);
     }
 
     private void Start()
@@ -154,7 +156,7 @@ public partial class OverlayMapHolder : MonoBehaviour
 
         timeSinceLastGuiUpdate += Time.deltaTime;
 
-        if (timeSinceLastGuiUpdate > (1.0 / Global.GUIUpdatesPerSecond))
+        if (timeSinceLastGuiUpdate > (1.0 / Global.GuiUpdatesPerSecond))
         {
             timeSinceLastGuiUpdate = 0;
 
@@ -181,6 +183,11 @@ public partial class OverlayMapHolder : MonoBehaviour
 
         if (enabledOverlayMap)
         {
+            if (NeedToReloadGuiBoxStyle)
+            {
+                NeedToReloadGuiBoxStyle = false;
+                ReloadGuiStyle();
+            }
             DrawGuiForPlayer(0);
             DrawGuiForPlayer(1);
         }
@@ -217,77 +224,6 @@ public partial class OverlayMapHolder : MonoBehaviour
         // OnGameStart();
     }
 
-    public class ExploredRegion
-    {
-        private float _exploredLeft;
-        private float _exploredRight;
-
-        public float ExploredLeft
-        {
-            get { return _exploredLeft; }
-            set
-            {
-                _exploredLeft = value;
-                SetExploredLeft(value);
-            }
-        }
-
-        public float ExploredRight
-        {
-            get { return _exploredRight; }
-            set
-            {
-                _exploredRight = value;
-                SetExploredRight(value);
-            }
-        }
-
-        private static void SetExploredLeft(float value)
-        {
-            ExploredRegions.ExploredLeft.Value = value;
-            ExploredRegions.Time.Value = Managers.Inst.director.currentTime;
-            ExploredRegions.Days.Value = Managers.Inst.director.CurrentDayForSpawning;
-        }
-
-        private static void SetExploredRight(float value)
-        {
-            ExploredRegions.ExploredRight.Value = value;
-            ExploredRegions.Time.Value = Managers.Inst.director.currentTime;
-            ExploredRegions.Days.Value = Managers.Inst.director.CurrentDayForSpawning;
-        }
-
-        private static bool HasAvailableConfig()
-        {
-            if (ExploredRegions.ExploredLeft == 0 && ExploredRegions.ExploredRight == 0)
-                return false;
-
-            if (ExploredRegions.Days > Managers.Inst.director.CurrentDayForSpawning)
-                return false;
-
-            if (ExploredRegions.Days == Managers.Inst.director.CurrentDayForSpawning)
-                if (ExploredRegions.Time > Managers.Inst.director.currentTime)
-                    return false;
-
-            return true;
-        }
-
-        public void Init()
-        {
-            ExploredRegions.ConfigBind(_archiveFilename);
-            if (HasAvailableConfig())
-            {
-                _exploredLeft = ExploredRegions.ExploredLeft;
-                _exploredRight = ExploredRegions.ExploredRight;
-            }
-            else
-            {
-                var player = GetLocalPlayer();
-                _exploredLeft = player.transform.localPosition.x;
-                _exploredRight = player.transform.localPosition.x;
-            }
-        }
-    }
-
     public void OnGameStart()
     {
         log.LogMessage("OnGameStart.");
@@ -303,8 +239,66 @@ public partial class OverlayMapHolder : MonoBehaviour
 
         log.LogMessage($"OnGameStart: _archiveFilename {_archiveFilename}, Campaign {_campaignIndex}, CurrentLand {_land}, currentChallenge {_challengeId}");
 
-        _exploredRegion.Init();
+        _exploredRegion.Init(GetLocalPlayer(), _archiveFilename);
     }
+
+    public void ReloadGuiStyle()
+    {
+        _guiBoxStyle = new GUIStyle(GUI.skin.box);
+        var guiStylePath = Path.Combine(GetBepInExDir(), "config", "GuiStyle");
+        var bgImageFile = Path.Combine(guiStylePath, GuiStyle.BackgroundImageFile);
+        LogMessage($"ReloadGuiStyle: \n" +
+                   $"bgImageFile={bgImageFile}\n" +
+                   $"BackgroundImageArea={GuiStyle.BackgroundImageArea.Value}\n" +
+                   $"BackgroundImageBorder={GuiStyle.BackgroundImageBorder.Value}");
+        if (File.Exists(bgImageFile))
+        {
+            byte[] imageData = File.ReadAllBytes(bgImageFile);
+            Texture2D texture = new Texture2D(2, 2);
+            texture.LoadImage(imageData);
+
+            var imageArea = (RectInt)GuiStyle.BackgroundImageArea;
+            imageArea.y = texture.height - imageArea.y - imageArea.height;
+            Texture2D subTexture = new Texture2D(imageArea.width, imageArea.height);
+            Color[] pixels = texture.GetPixels(imageArea.x, imageArea.y, imageArea.width, imageArea.height);
+            subTexture.SetPixels(pixels);
+            subTexture.Apply();
+
+            //  _guiBoxStyle.normal.background = subTexture;
+            _guiBoxStyle.normal.background = MakeColoredTexture(subTexture, GuiStyle.BackgroundColor);
+            _guiBoxStyle.stretchWidth = false;
+            _guiBoxStyle.stretchHeight = false;
+            _guiBoxStyle.border = GuiStyle.BackgroundImageBorder;
+        }
+        else
+        {
+            LogError("ReloadGuiStyle, bgImageFile not exist.");
+        }
+    }
+
+    private Texture2D MakeColoredTexture(Texture2D source, Color color)
+    {
+        Texture2D result = new Texture2D(source.width, source.height);
+
+        Color[] pixels = source.GetPixels();
+        for (int i = 0; i < pixels.Length; i++)
+        {
+            float alpha = color.a;
+
+            pixels[i] = new Color(
+                pixels[i].r * (1 - alpha) + color.r * alpha,
+                pixels[i].g * (1 - alpha) + color.g * alpha,
+                pixels[i].b * (1 - alpha) + color.b * alpha,
+                pixels[i].a * (1 - alpha) + color.a * alpha
+            );
+        }
+
+        result.SetPixels(pixels);
+        result.Apply();
+
+        return result;
+    }
+
 
     private void OnCurrentCampaignSwitch()
     {
@@ -312,7 +306,7 @@ public partial class OverlayMapHolder : MonoBehaviour
 
     }
 
-    private static Player GetLocalPlayer()
+    public static Player GetLocalPlayer()
     {
         return Managers.Inst.kingdom.GetPlayer(NetworkBigBoss.HasWorldAuth ? 0 : 1);
     }
@@ -976,12 +970,11 @@ public partial class OverlayMapHolder : MonoBehaviour
         if (Managers.COOP_ENABLED)
             boxHeight = 150 - 56;
         Rect boxRect = new Rect(5, 5, Screen.width - 10, boxHeight);
-        GUI.Box(boxRect, "");
-        GUI.Box(boxRect, "");
+        GUI.Box(boxRect, "", _guiBoxStyle);
 
         foreach (var line in drawLineList)
         {
-            GuiHelper.DrawLine(line.LineStart, line.LineEnd, line.Color);
+            GuiHelper.DrawLine(line.LineStart, line.LineEnd, line.Color, 2);
         }
 
         foreach (var markInfo in minimapMarkList)
@@ -1067,8 +1060,7 @@ public partial class OverlayMapHolder : MonoBehaviour
 
         var kingdom = Managers.Inst.kingdom;
         var boxRect = new Rect(5, boxTop, 120, 146);
-        GUI.Box(boxRect, "");
-        GUI.Box(boxRect, "");
+        GUI.Box(boxRect, "", _guiBoxStyle);
 
         GUI.Label(new Rect(14, boxTop + 6 + 20 * 0, 120, 20), Strings.Peasant + ": " + statsInfo.PeasantCount, guiStyle);
         GUI.Label(new Rect(14, boxTop + 6 + 20 * 1, 120, 20), Strings.Worker + ": " + statsInfo.WorkerCount, guiStyle);
