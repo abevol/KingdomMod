@@ -31,7 +31,11 @@ Both `IL2CPP` and `Mono` versions of the game are now supported!
 3. Download the mod of a specific version according to your game version. Download the mod file from [Releases](https://github.com/abevol/KingdomMod/releases), unzip all files to the directory `Kingdom Two Crowns\BepInEx\plugins`.
     * `IL2CPP` version, download mods with `BIE6_IL2CPP` in the file name.
     * `Mono` version, download mods with `BIE6_Mono` in the file name.
-4. Now mods are installed. After starting the game, mods can be automatically loaded.
+4. Some file path examples:
+    * `X:\SteamLibrary\steamapps\common\Kingdom Two Crowns\KingdomTwoCrowns.exe`
+    * `X:\SteamLibrary\steamapps\common\Kingdom Two Crowns\BepInEx\core\0Harmony.dll`
+    * `X:\SteamLibrary\steamapps\common\Kingdom Two Crowns\BepInEx\plugins\KingdomMod.OverlayMap\KingdomMod.OverlayMap.dll`
+5. Now mods are installed. After starting the game, mods can be automatically loaded.
 
 ## BetterPayableUpgrade
 

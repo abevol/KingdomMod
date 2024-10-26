@@ -574,6 +574,9 @@ public class DevToolsHolder : MonoBehaviour
             infoLines.Add($"ProgramDirector.IsClient: {ProgramDirector.IsClient}");
             infoLines.Add($"COOP_ENABLED: {Managers.COOP_ENABLED}");
 
+            var game = Managers.Inst.game;
+            infoLines.Add($"minLevelWidth: {game.currentLevelConfig.minLevelWidth}");
+
             var kingdom = Managers.Inst.kingdom;
             var castlePayable = kingdom.castle?._payableUpgrade;
             if (castlePayable != null)

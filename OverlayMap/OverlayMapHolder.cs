@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using BepInEx.Logging;
 using UnityEngine;
 using System.IO;
 using System.Reflection;
 using KingdomMod.OverlayMap.Config;
+using KingdomMod.OverlayMap.View;
+using UnityEngine.UI;
 
 #if IL2CPP
 using Il2CppInterop.Runtime.Injection;
@@ -15,15 +18,16 @@ using System.Collections.Generic;
 
 namespace KingdomMod.OverlayMap;
 
-public partial class OverlayMapHolder : MonoBehaviour
+public class OverlayMapHolder : MonoBehaviour
 {
     public static OverlayMapHolder Instance { get; private set; }
-    private static ManualLogSource log;
+    private static ManualLogSource _log;
+    private static BepInEx.Configuration.ConfigFile _config;
     private readonly GUIStyle guiStyle = new();
     private GUIStyle _guiBoxStyle = new();
+    private float _timeSinceLastGuiUpdate = 0;
     public bool NeedToReloadGuiBoxStyle = true;
-    private float timeSinceLastGuiUpdate = 0;
-    private bool enabledOverlayMap = true;
+    public static bool EnabledOverlayMap = true;
     private System.Collections.Generic.List<MarkInfo> minimapMarkList = new();
     private System.Collections.Generic.List<LineInfo> drawLineList = new();
     private readonly StatsInfo statsInfo = new();
@@ -36,47 +40,12 @@ public partial class OverlayMapHolder : MonoBehaviour
     private static readonly ExploredRegion _exploredRegion = new ();
     private static PersephoneCage _persephoneCage;
     private static CachePrefabID _cachePrefabID = new CachePrefabID();
-
-    public static void LogMessage(string message, 
-        [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
-        [System.Runtime.CompilerServices.CallerFilePath]   string sourceFilePath = "",
-        [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0)
-    {
-        log.LogMessage($"[{sourceLineNumber}][{memberName}] {message}");
-    }
-
-    public static void LogError(string message,
-        [System.Runtime.CompilerServices.CallerMemberName]
-        string memberName = "",
-        [System.Runtime.CompilerServices.CallerFilePath]
-        string sourceFilePath = "",
-        [System.Runtime.CompilerServices.CallerLineNumber]
-        int sourceLineNumber = 0)
-    {
-        log.LogError($"[{sourceLineNumber}][{memberName}] {message}");
-    }
-
-    public static void LogWarning(string message,
-        [System.Runtime.CompilerServices.CallerMemberName]
-        string memberName = "",
-        [System.Runtime.CompilerServices.CallerFilePath]
-        string sourceFilePath = "",
-        [System.Runtime.CompilerServices.CallerLineNumber]
-        int sourceLineNumber = 0)
-    {
-        log.LogWarning($"[{sourceLineNumber}][{memberName}] {message}");
-    }
-
-    public OverlayMapHolder()
-    {
-        guiStyle.alignment = TextAnchor.UpperLeft;
-        guiStyle.normal.textColor = Color.white;
-        guiStyle.fontSize = 12;
-    }
+    private TopMapView _topMapView;
 
     public static void Initialize(OverlayMapPlugin plugin)
     {
-        log = plugin.LogSource;
+        _log = plugin.LogSource;
+        _config = plugin.Config;
 #if IL2CPP
             ClassInjector.RegisterTypeInIl2Cpp<OverlayMapHolder>();
 #endif
@@ -84,26 +53,38 @@ public partial class OverlayMapHolder : MonoBehaviour
         DontDestroyOnLoad(obj);
         obj.hideFlags = HideFlags.HideAndDontSave;
         Instance = obj.AddComponent<OverlayMapHolder>();
-        Global.ConfigBind(plugin.Config);
+    }
+
+    private void Awake()
+    {
+        Global.ConfigBind(_config);
+        Patchers.Patcher.PatchAll();
+
+        CreateCanvas();
+        CreateTopMapView();
+
+        Game.OnGameStart += (Action)OnGameStart;
     }
 
     private void Start()
     {
-        log.LogMessage($"{this.GetType().Name} Start.");
+        LogMessage($"{this.GetType().Name} Start.");
 
-        Patchers.Patcher.PatchAll();
-        Game.OnGameStart += (Action)OnGameStart;
         NetworkBigBoss.Instance.OnClientCaughtUp += (Action)this.OnClientCaughtUp;
+
+        guiStyle.alignment = TextAnchor.UpperLeft;
+        guiStyle.normal.textColor = Color.white;
+        guiStyle.fontSize = 12;
 
         // GlobalSaveData.add_OnCurrentCampaignSwitch((Action)OnCurrentCampaignSwitch);
 
-        // log.LogMessage($"resSet test Alfred: {Strings.Alfred}");
-        // log.LogMessage($"resSet test Culture: {Strings.Culture?.Name}");
+        // LogMessage($"resSet test Alfred: {Strings.Alfred}");
+        // LogMessage($"resSet test Culture: {Strings.Culture?.Name}");
         // var resSet = Strings.ResourceManager.GetResourceSet(CultureInfo.CurrentCulture, false, true);
         // if (resSet != null)
         // {
         //     var dict = new SortedDictionary<string, string>();
-        //     log.LogMessage($"resSet: ");
+        //     LogMessage($"resSet: ");
         //     var defines = "";
         //     var binds = "";
         //     foreach (DictionaryEntry dictionaryEntry in resSet)
@@ -112,7 +93,7 @@ public partial class OverlayMapHolder : MonoBehaviour
         //         // defines += $"public static ConfigEntry<string> {dictionaryEntry.Key};\r\n";
         //         // binds += $"{dictionaryEntry.Key} = config.Bind(\"Strings\", \"{dictionaryEntry.Key}\", \"{dictionaryEntry.Value}\", \"\");\r\n";
         //         
-        //         // log.LogMessage($"resSet: {dictionaryEntry.Key}, {dictionaryEntry.Value}");
+        //         // LogMessage($"resSet: {dictionaryEntry.Key}, {dictionaryEntry.Value}");
         //     }
         //
         //     foreach (var dictionaryEntry in dict)
@@ -121,8 +102,8 @@ public partial class OverlayMapHolder : MonoBehaviour
         //         binds += $"{dictionaryEntry.Key} = config.Bind(\"Strings\", \"{dictionaryEntry.Key}\", \"{dictionaryEntry.Value}\", \"\");\r\n";
         //
         //     }
-        //     // log.LogMessage($"defines: {defines}");
-        //     // log.LogMessage($"binds: {binds}");
+        //     // LogMessage($"defines: {defines}");
+        //     // LogMessage($"binds: {binds}");
         // }
     }
 
@@ -130,39 +111,39 @@ public partial class OverlayMapHolder : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.M))
         {
-            log.LogMessage("M key pressed.");
-            enabledOverlayMap = !enabledOverlayMap;
+            LogMessage("M key pressed.");
+            EnabledOverlayMap = !EnabledOverlayMap;
         }
 
         if (Input.GetKeyDown(KeyCode.F))
         {
-            log.LogMessage("F key pressed.");
+            LogMessage("F key pressed.");
             showFullMap = !showFullMap;
         }
 
         if (Input.GetKeyDown(KeyCode.F5))
         {
-            log.LogMessage($"Try to reload game.");
+            LogMessage($"Try to reload game.");
 
             Managers.Inst.game.Reload();
         }
 
         if (Input.GetKeyDown(KeyCode.F8))
         {
-            log.LogMessage($"Try to save game.");
+            LogMessage($"Try to save game.");
 
             Managers.Inst.game.TriggerSave();
         }
 
-        timeSinceLastGuiUpdate += Time.deltaTime;
+        _timeSinceLastGuiUpdate += Time.deltaTime;
 
-        if (timeSinceLastGuiUpdate > (1.0 / Global.GuiUpdatesPerSecond))
+        if (_timeSinceLastGuiUpdate > (1.0 / Global.GuiUpdatesPerSecond))
         {
-            timeSinceLastGuiUpdate = 0;
+            _timeSinceLastGuiUpdate = 0;
 
             if (!IsPlaying()) return;
 
-            if (enabledOverlayMap)
+            if (EnabledOverlayMap)
             {
                 UpdateMinimapMarkList();
                 UpdateStatsInfo();
@@ -170,7 +151,7 @@ public partial class OverlayMapHolder : MonoBehaviour
         }
     }
 
-    private static bool IsPlaying()
+    public static bool IsPlaying()
     {
         var game = Managers.Inst?.game;
         if (game == null) return false;
@@ -181,7 +162,7 @@ public partial class OverlayMapHolder : MonoBehaviour
     {
         if (!IsPlaying()) return;
 
-        if (enabledOverlayMap)
+        if (EnabledOverlayMap)
         {
             if (NeedToReloadGuiBoxStyle)
             {
@@ -219,14 +200,14 @@ public partial class OverlayMapHolder : MonoBehaviour
 
     private void OnClientCaughtUp()
     {
-        log.LogMessage("host_OnClientCaughtUp.");
+        LogMessage("host_OnClientCaughtUp.");
 
         // OnGameStart();
     }
 
     public void OnGameStart()
     {
-        log.LogMessage("OnGameStart.");
+        LogMessage("OnGameStart.");
 
         gameLayer = GameObject.FindGameObjectWithTag(Tags.GameLayer);
         _persephoneCage = UnityEngine.Object.FindAnyObjectByType<PersephoneCage>();
@@ -237,7 +218,7 @@ public partial class OverlayMapHolder : MonoBehaviour
         _challengeId = GlobalSaveData.loaded.currentChallenge;
         _archiveFilename = IslandSaveData.GetFilePropsForLand(_campaignIndex, _land, _challengeId).filename;
 
-        log.LogMessage($"OnGameStart: _archiveFilename {_archiveFilename}, Campaign {_campaignIndex}, CurrentLand {_land}, currentChallenge {_challengeId}");
+        LogMessage($"OnGameStart: _archiveFilename {_archiveFilename}, Campaign {_campaignIndex}, CurrentLand {_land}, currentChallenge {_challengeId}");
 
         _exploredRegion.Init(GetLocalPlayer(), _archiveFilename);
     }
@@ -276,7 +257,7 @@ public partial class OverlayMapHolder : MonoBehaviour
         }
     }
 
-    private Texture2D MakeColoredTexture(Texture2D source, Color color)
+    public static Texture2D MakeColoredTexture(Texture2D source, Color color)
     {
         Texture2D result = new Texture2D(source.width, source.height);
 
@@ -302,7 +283,7 @@ public partial class OverlayMapHolder : MonoBehaviour
 
     private void OnCurrentCampaignSwitch()
     {
-        log.LogMessage($"OnCurrentCampaignSwitch: {GlobalSaveData.loaded.currentCampaign}");
+        LogMessage($"OnCurrentCampaignSwitch: {GlobalSaveData.loaded.currentCampaign}");
 
     }
 
@@ -656,7 +637,7 @@ public partial class OverlayMapHolder : MonoBehaviour
 
         string LogUnknownHermitType(Hermit.HermitType hermitType)
         {
-            log.LogWarning($"Unknown hermit type: {hermitType}");
+            LogWarning($"Unknown hermit type: {hermitType}");
             return hermitType.ToString();
         }
 
@@ -858,7 +839,7 @@ public partial class OverlayMapHolder : MonoBehaviour
         // if (mine)
         // {
         //     poiList.Add(new MarkInfo(mine.transform.position, Color.red, Strings.Mine));
-        //     log.LogMessage($"mine prefabID: {mine.GetComponent<PrefabID>().prefabID}");
+        //     LogMessage($"mine prefabID: {mine.GetComponent<PrefabID>().prefabID}");
         // }
             
         // explored area
@@ -964,6 +945,34 @@ public partial class OverlayMapHolder : MonoBehaviour
         return false;
     }
 
+    // OverlayMapUI
+
+    private Canvas _canvas;
+
+    // 创建 Canvas 并设置 DPI 缩放
+    private void CreateCanvas()
+    {
+        GameObject canvasObj = new GameObject("UICanvas");
+        canvasObj.transform.SetParent(this.transform, false);
+        _canvas = canvasObj.AddComponent<Canvas>();
+        _canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+
+        CanvasScaler scaler = canvasObj.AddComponent<CanvasScaler>();
+        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        scaler.referenceResolution = new Vector2(1920, 1080);
+        scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
+        scaler.matchWidthOrHeight = 0.5f;
+
+        canvasObj.AddComponent<GraphicRaycaster>();
+    }
+
+    private void CreateTopMapView()
+    {
+        var viewObj = new GameObject(nameof(TopMapView));
+        viewObj.transform.SetParent(_canvas.transform, false);
+        _topMapView = viewObj.AddComponent<TopMapView>();
+    }
+
     private void DrawMinimap(int playerId)
     {
         float boxHeight = 150;
@@ -990,6 +999,10 @@ public partial class OverlayMapHolder : MonoBehaviour
                 {
                     markName = Strings.You.Value;
                     color = MarkerStyle.PlayerSelf.Color;
+
+                    // draw self vec.x
+
+                    // GUI.Label(new Rect(markInfo.Pos, 60, 0, 20), ((int)markInfo.WorldPosX).ToString(), guiStyle);
                 }
             }
 
@@ -1012,14 +1025,8 @@ public partial class OverlayMapHolder : MonoBehaviour
             if (markInfo.Count != 0)
                 GUI.Label(new Rect(markInfo.Pos, namePosY + 16, 0, 20), markInfo.Count.ToString(), guiStyle);
 
-            // draw self vec.x
-
-            // if (markInfo.pos.y == 50.0f)
-            // {
-            //     Rect pos = markInfo.pos;
-            //     pos.y = pos.y + 20;
-            //     GUI.Label(pos, markInfo.vec.x.ToString(), SpotMarkGUIStyle);
-            // }
+            // if (markInfo.Name != "")
+            // GUI.Label(new Rect(markInfo.Pos, namePosY + 36, 0, 20), ((int)markInfo.WorldPosX).ToString(), guiStyle);
         }
     }
 
@@ -1122,7 +1129,7 @@ public partial class OverlayMapHolder : MonoBehaviour
         Movable = 1
     }
 
-    private class MarkInfo
+    public class MarkInfo
     {
         public float WorldPosX;
         public float Pos;
@@ -1157,9 +1164,43 @@ public partial class OverlayMapHolder : MonoBehaviour
     {
         var baseDir = Assembly.GetExecutingAssembly().Location;
         var bepInExDir = Directory.GetParent(baseDir)?.Parent?.Parent?.FullName;
+        if (bepInExDir == null || !bepInExDir.EndsWith("BepInEx"))
+            throw new DirectoryNotFoundException("BepInEx directory not found. The plugin was placed in the wrong directory.");
 
-        bepInExDir ??= "BepInEx\\";
         return bepInExDir;
+    }
+
+    public static void LogMessage(string message,
+        [System.Runtime.CompilerServices.CallerMemberName]
+        string memberName = "",
+        [System.Runtime.CompilerServices.CallerFilePath]
+        string sourceFilePath = "",
+        [System.Runtime.CompilerServices.CallerLineNumber]
+        int sourceLineNumber = 0)
+    {
+        _log.LogMessage($"[{sourceLineNumber}][{memberName}] {message}");
+    }
+
+    public static void LogError(string message,
+        [System.Runtime.CompilerServices.CallerMemberName]
+        string memberName = "",
+        [System.Runtime.CompilerServices.CallerFilePath]
+        string sourceFilePath = "",
+        [System.Runtime.CompilerServices.CallerLineNumber]
+        int sourceLineNumber = 0)
+    {
+        _log.LogError($"[{sourceLineNumber}][{memberName}] {message}");
+    }
+
+    public static void LogWarning(string message,
+        [System.Runtime.CompilerServices.CallerMemberName]
+        string memberName = "",
+        [System.Runtime.CompilerServices.CallerFilePath]
+        string sourceFilePath = "",
+        [System.Runtime.CompilerServices.CallerLineNumber]
+        int sourceLineNumber = 0)
+    {
+        _log.LogWarning($"[{sourceLineNumber}][{memberName}] {message}");
     }
 }
 
