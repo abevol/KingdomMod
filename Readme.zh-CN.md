@@ -30,7 +30,11 @@
 3. 根据您的游戏版本，下载特定版本的模组。从 [Releases](https://github.com/abevol/KingdomMod/releases) 下载模组文件，将所有文件解压至 `Kingdom Two Crowns\BepInEx\plugins` 目录。
    * `IL2CPP`版，下载文件名中包含`BIE6_IL2CPP`的模组。
    * `Mono`版，下载文件名中包含`BIE6_Mono`的模组。
-4. 现在已完成模组的安装，启动游戏后即可自动加载模组。
+4. 部分文件路径示例：
+   * `X:\SteamLibrary\steamapps\common\Kingdom Two Crowns\KingdomTwoCrowns.exe`
+   * `X:\SteamLibrary\steamapps\common\Kingdom Two Crowns\BepInEx\core\0Harmony.dll`
+   * `X:\SteamLibrary\steamapps\common\Kingdom Two Crowns\BepInEx\plugins\KingdomMod.OverlayMap\KingdomMod.OverlayMap.dll`
+5. 现在已完成模组的安装，启动游戏后即可自动加载模组。
 
 ## BetterPayableUpgrade
 

@@ -10,6 +10,7 @@ public class GuiStyle
 {
     public static ConfigFile ConfigFile;
     private static readonly ConfigFileWatcher _configFileWatcher = new();
+    public static event FileSystemEventHandler OnChangedEvent;
 
     public static ConfigEntryWrapper<string> BackgroundColor;
     public static ConfigEntryWrapper<string> BackgroundImageFile;
@@ -40,6 +41,7 @@ public class GuiStyle
         {
             LogMessage($"OnConfigFileChanged: {e.Name}, {e.ChangeType}");
             ConfigFile.Reload();
+            OnChangedEvent?.Invoke(source, e);
             OverlayMapHolder.Instance.NeedToReloadGuiBoxStyle = true;
         }
         catch (Exception exception)

@@ -12,6 +12,7 @@ public class NetworkBigBossPatcher
         {
             LogMessage("NetworkBigBoss.Client_OnCaughtUp.");
             OverlayMapHolder.Instance.OnGameStart();
+            View.TopMapView.OnGameStart();
         }
     }
 }
