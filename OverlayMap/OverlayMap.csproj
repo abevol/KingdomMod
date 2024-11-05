@@ -190,6 +190,14 @@
             <HintPath>..\_libs\BIE6_Mono\Managed\UnityEngine.UIModule.dll</HintPath>
             <Private>False</Private>
         </Reference>
+        <Reference Include="Unity.TextMeshPro">
+            <HintPath>..\_libs\BIE6_Mono\Managed\Unity.TextMeshPro.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine.TextCoreFontEngineModule">
+            <HintPath>..\_libs\BIE6_Mono\Managed\UnityEngine.TextCoreFontEngineModule.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
     </ItemGroup>
 
     <Target Name="CopyOutput" AfterTargets="Build">

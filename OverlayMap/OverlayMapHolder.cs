@@ -5,9 +5,11 @@ using BepInEx.Logging;
 using UnityEngine;
 using System.IO;
 using System.Reflection;
+using KingdomMod.OverlayMap.Assets;
 using KingdomMod.OverlayMap.Config;
-using KingdomMod.OverlayMap.View;
+using KingdomMod.OverlayMap.Gui;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 #if IL2CPP
 using Il2CppInterop.Runtime.Injection;
@@ -20,6 +22,10 @@ namespace KingdomMod.OverlayMap;
 
 public class OverlayMapHolder : MonoBehaviour
 {
+    public delegate void GameStateEventHandler(Game.State state);
+
+    public delegate void DirectorStateEventHandler(ProgramDirector.State state);
+
     public static OverlayMapHolder Instance { get; private set; }
     private static ManualLogSource _log;
     private static BepInEx.Configuration.ConfigFile _config;
@@ -40,19 +46,30 @@ public class OverlayMapHolder : MonoBehaviour
     private static readonly ExploredRegion _exploredRegion = new ();
     private static PersephoneCage _persephoneCage;
     private static CachePrefabID _cachePrefabID = new CachePrefabID();
-    private TopMapView _topMapView;
+    private Canvas _canvas;
+    public (PlayerOverlay P1, PlayerOverlay P2) PlayerOverlays = (null, null);
+    private ProgramDirector.State _directorState;
+    public static event GameStateEventHandler OnGameStateChanged;
+    public static event DirectorStateEventHandler OnDirectorStateChanged;
+    public static string BepInExDir;
+    public static string AssetsDir;
+    public static FontManager FontManager;
 
     public static void Initialize(OverlayMapPlugin plugin)
     {
         _log = plugin.LogSource;
         _config = plugin.Config;
+
+        BepInExDir = GetBepInExDir();
+        AssetsDir = Path.Combine(BepInExDir, "config", "KingdomMod.OverlayMap.Assets");
+
 #if IL2CPP
-            ClassInjector.RegisterTypeInIl2Cpp<OverlayMapHolder>();
+        ClassInjector.RegisterTypeInIl2Cpp<OverlayMapHolder>();
 #endif
         GameObject obj = new(nameof(OverlayMapHolder));
         DontDestroyOnLoad(obj);
         obj.hideFlags = HideFlags.HideAndDontSave;
-        Instance = obj.AddComponent<OverlayMapHolder>();
+        Instance = obj.AddComponent<OverlayMapHolder>(); // Call "Awake" inside.
     }
 
     private void Awake()
@@ -61,14 +78,105 @@ public class OverlayMapHolder : MonoBehaviour
         Patchers.Patcher.PatchAll();
 
         CreateCanvas();
-        CreateTopMapView();
+        FontManager = CreateFontManager();
+        PlayerOverlays.P1 = CreatePlayerOverlay(PlayerId.P1);
+        PlayerOverlays.P2 = CreatePlayerOverlay(PlayerId.P2);
 
-        Game.OnGameStart += (Action)OnGameStart;
+        Game.OnGameStart += OnGameStart;
+        Game.OnGameEnd += OnGameEnd;
+
+#if IL2CPP
+        SceneManager.add_sceneLoaded(new System.Action<Scene, LoadSceneMode>(OnSceneLoaded));
+#else
+        SceneManager.sceneLoaded += OnSceneLoaded;
+#endif
+    }
+
+    private void OnDestroy()
+    {
+        Game.OnGameStart -= OnGameStart;
+        Game.OnGameEnd -= OnGameEnd;
+        Managers.Inst.game.run.onGoto -= OnGameGoto;
+
+#if IL2CPP
+        SceneManager.remove_sceneLoaded(new System.Action<Scene, LoadSceneMode>(OnSceneLoaded));
+#else
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+#endif
+    }
+
+    // 创建 Canvas 并设置 DPI 缩放
+    private void CreateCanvas()
+    {
+        GameObject canvasObj = new GameObject("UICanvas");
+        canvasObj.transform.SetParent(this.transform, false);
+        _canvas = canvasObj.AddComponent<Canvas>();
+        _canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+
+        CanvasScaler scaler = canvasObj.AddComponent<CanvasScaler>();
+        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        scaler.referenceResolution = new Vector2(1920, 1080);
+        scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
+        scaler.matchWidthOrHeight = 0.5f;
+
+        canvasObj.AddComponent<GraphicRaycaster>();
+    }
+
+    private PlayerOverlay CreatePlayerOverlay(PlayerId playerId)
+    {
+        LogMessage($"CreatePlayerOverlay, playerId: {playerId}");
+
+        var guiObj = new GameObject(nameof(PlayerOverlay));
+        guiObj.transform.SetParent(_canvas.transform, false);
+        var guiComp = guiObj.AddComponent<PlayerOverlay>();
+        guiComp.Init(playerId);
+
+        return guiComp;
+    }
+
+    private FontManager CreateFontManager()
+    {
+        var obj = new GameObject(nameof(FontManager));
+        obj.transform.SetParent(_canvas.transform, false);
+        var comp = obj.AddComponent<FontManager>();
+        return comp;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        LogMessage($"Scene: {scene.name}, {scene.buildIndex}");
+
+    }
+
+    private void OnGamePlaying()
+    {
+    }
+
+    private void OnGameQuitting()
+    {
+    }
+
+    private void OnGameGoto(int pre, int next)
+    {
+        LogMessage($"OnGameGoto: pre:{pre},{(Game.State)pre}, {next},{(Game.State)next}");
+
+        var state = (Game.State)next;
+        switch (state)
+        {
+            case Game.State.Playing:
+                OnGamePlaying();
+                break;
+            case Game.State.Quitting:
+                OnGameQuitting();
+                break;
+        }
+
+        OnGameStateChanged?.Invoke(state);
     }
 
     private void Start()
     {
-        LogMessage($"{this.GetType().Name} Start.");
+        LogMessage($"{this.GetType().Name}.Start");
 
         NetworkBigBoss.Instance.OnClientCaughtUp += (Action)this.OnClientCaughtUp;
 
@@ -109,6 +217,12 @@ public class OverlayMapHolder : MonoBehaviour
 
     private void Update()
     {
+        if (_directorState != ProgramDirector.state)
+        {
+            _directorState = ProgramDirector.state;
+            OnDirectorStateChanged?.Invoke(_directorState);
+        }
+
         if (Input.GetKeyDown(KeyCode.M))
         {
             LogMessage("M key pressed.");
@@ -205,9 +319,21 @@ public class OverlayMapHolder : MonoBehaviour
         // OnGameStart();
     }
 
+    public void OnP2StateChanged(Game game, bool joined)
+    {
+        PlayerOverlays.P1?.OnP2StateChanged(game, joined);
+        PlayerOverlays.P2?.OnP2StateChanged(game, joined);
+    }
+
+    public void OnGameInit(Game game)
+    {
+        LogMessage("OverlayMapHolder.OnGameInit");
+        game.run.onGoto += OnGameGoto;
+    }
+
     public void OnGameStart()
     {
-        LogMessage("OnGameStart.");
+        LogMessage("OverlayMapHolder.OnGameStart");
 
         gameLayer = GameObject.FindGameObjectWithTag(Tags.GameLayer);
         _persephoneCage = UnityEngine.Object.FindAnyObjectByType<PersephoneCage>();
@@ -223,22 +349,29 @@ public class OverlayMapHolder : MonoBehaviour
         _exploredRegion.Init(GetLocalPlayer(), _archiveFilename);
     }
 
+    public void OnGameEnd()
+    {
+        LogMessage("OverlayMapHolder.OnGameEnd");
+
+
+    }
+
     public void ReloadGuiStyle()
     {
         _guiBoxStyle = new GUIStyle(GUI.skin.box);
         var guiStylePath = Path.Combine(GetBepInExDir(), "config", "GuiStyle");
-        var bgImageFile = Path.Combine(guiStylePath, GuiStyle.BackgroundImageFile);
+        var bgImageFile = Path.Combine(guiStylePath, GuiStyle.TopMap.BackgroundImageFile);
         LogMessage($"ReloadGuiStyle: \n" +
                    $"bgImageFile={bgImageFile}\n" +
-                   $"BackgroundImageArea={GuiStyle.BackgroundImageArea.Value}\n" +
-                   $"BackgroundImageBorder={GuiStyle.BackgroundImageBorder.Value}");
+                   $"BackgroundImageArea={GuiStyle.TopMap.BackgroundImageArea.Value}\n" +
+                   $"BackgroundImageBorder={GuiStyle.TopMap.BackgroundImageBorder.Value}");
         if (File.Exists(bgImageFile))
         {
             byte[] imageData = File.ReadAllBytes(bgImageFile);
             Texture2D texture = new Texture2D(2, 2);
             texture.LoadImage(imageData);
 
-            var imageArea = (RectInt)GuiStyle.BackgroundImageArea;
+            var imageArea = (RectInt)GuiStyle.TopMap.BackgroundImageArea;
             imageArea.y = texture.height - imageArea.y - imageArea.height;
             Texture2D subTexture = new Texture2D(imageArea.width, imageArea.height);
             Color[] pixels = texture.GetPixels(imageArea.x, imageArea.y, imageArea.width, imageArea.height);
@@ -246,10 +379,10 @@ public class OverlayMapHolder : MonoBehaviour
             subTexture.Apply();
 
             //  _guiBoxStyle.normal.background = subTexture;
-            _guiBoxStyle.normal.background = MakeColoredTexture(subTexture, GuiStyle.BackgroundColor);
+            _guiBoxStyle.normal.background = MakeColoredTexture(subTexture, GuiStyle.TopMap.BackgroundColor);
             _guiBoxStyle.stretchWidth = false;
             _guiBoxStyle.stretchHeight = false;
-            _guiBoxStyle.border = GuiStyle.BackgroundImageBorder;
+            _guiBoxStyle.border = GuiStyle.TopMap.BackgroundImageBorder;
         }
         else
         {
@@ -945,34 +1078,6 @@ public class OverlayMapHolder : MonoBehaviour
         return false;
     }
 
-    // OverlayMapUI
-
-    private Canvas _canvas;
-
-    // 创建 Canvas 并设置 DPI 缩放
-    private void CreateCanvas()
-    {
-        GameObject canvasObj = new GameObject("UICanvas");
-        canvasObj.transform.SetParent(this.transform, false);
-        _canvas = canvasObj.AddComponent<Canvas>();
-        _canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-
-        CanvasScaler scaler = canvasObj.AddComponent<CanvasScaler>();
-        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920, 1080);
-        scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
-        scaler.matchWidthOrHeight = 0.5f;
-
-        canvasObj.AddComponent<GraphicRaycaster>();
-    }
-
-    private void CreateTopMapView()
-    {
-        var viewObj = new GameObject(nameof(TopMapView));
-        viewObj.transform.SetParent(_canvas.transform, false);
-        _topMapView = viewObj.AddComponent<TopMapView>();
-    }
-
     private void DrawMinimap(int playerId)
     {
         float boxHeight = 150;
@@ -1160,7 +1265,13 @@ public class OverlayMapHolder : MonoBehaviour
         public int MaxFarmlands;
     }
 
-    public static string GetBepInExDir()
+    public enum PlayerId
+    {
+        P1,
+        P2
+    }
+
+    private static string GetBepInExDir()
     {
         var baseDir = Assembly.GetExecutingAssembly().Location;
         var bepInExDir = Directory.GetParent(baseDir)?.Parent?.Parent?.FullName;
@@ -1178,7 +1289,7 @@ public class OverlayMapHolder : MonoBehaviour
         [System.Runtime.CompilerServices.CallerLineNumber]
         int sourceLineNumber = 0)
     {
-        _log.LogMessage($"[{sourceLineNumber}][{memberName}] {message}");
+        _log.LogMessage($"[{Path.GetFileName(sourceFilePath)}][{sourceLineNumber.ToString("0000")}][{memberName}] {message}");
     }
 
     public static void LogError(string message,
@@ -1189,7 +1300,7 @@ public class OverlayMapHolder : MonoBehaviour
         [System.Runtime.CompilerServices.CallerLineNumber]
         int sourceLineNumber = 0)
     {
-        _log.LogError($"[{sourceLineNumber}][{memberName}] {message}");
+        _log.LogError($"[{Path.GetFileName(sourceFilePath)}][{sourceLineNumber.ToString("0000")}][{memberName}] {message}");
     }
 
     public static void LogWarning(string message,
@@ -1200,7 +1311,7 @@ public class OverlayMapHolder : MonoBehaviour
         [System.Runtime.CompilerServices.CallerLineNumber]
         int sourceLineNumber = 0)
     {
-        _log.LogWarning($"[{sourceLineNumber}][{memberName}] {message}");
+        _log.LogWarning($"[{Path.GetFileName(sourceFilePath)}][{sourceLineNumber.ToString("0000")}][{memberName}] {message}");
     }
 }
 

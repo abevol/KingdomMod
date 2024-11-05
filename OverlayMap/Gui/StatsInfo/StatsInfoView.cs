@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 
-namespace KingdomMod.OverlayMap.View;
+namespace KingdomMod.OverlayMap.Gui.StatsInfo;
 
 public class StatsInfoView : MonoBehaviour
 {
-    
+
 }

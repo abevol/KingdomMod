@@ -38,17 +38,15 @@ public class ConfigPrefabs
                 new ConfigPrefab
                 {
                     ResName = "KingdomMod.OverlayMap.Assets.Background.png",
-                    FileName = "GuiStyle\\Background.png"
+                    FileName = "KingdomMod.OverlayMap.Assets\\Background.png"
                 }
             };
 
     public static void Initialize()
     {
-        var bepInExDir = GetBepInExDir();
-
         foreach (var prefab in _prefabs)
         {
-            var configFile = Path.Combine(bepInExDir, "config", prefab.FileName);
+            var configFile = Path.Combine(BepInExDir, "config", prefab.FileName);
             LogMessage($"Config prefab file: {configFile}");
             if (!File.Exists(configFile))
             {

@@ -10,12 +10,39 @@ public class GuiStyle
 {
     public static ConfigFile ConfigFile;
     private static readonly ConfigFileWatcher _configFileWatcher = new();
-    public static event FileSystemEventHandler OnChangedEvent;
 
-    public static ConfigEntryWrapper<string> BackgroundColor;
-    public static ConfigEntryWrapper<string> BackgroundImageFile;
-    public static ConfigEntryWrapper<UnityEngine.Rect> BackgroundImageArea;
-    public static ConfigEntryWrapper<UnityEngine.Vector4> BackgroundImageBorder;
+    public static class PlayerOverlay
+    {
+    }
+
+    public static class TopMap
+    {
+        public static ConfigEntryWrapper<string> BackgroundColor;
+        public static ConfigEntryWrapper<string> BackgroundImageFile;
+        public static ConfigEntryWrapper<UnityEngine.Rect> BackgroundImageArea;
+        public static ConfigEntryWrapper<UnityEngine.Vector4> BackgroundImageBorder;
+
+        public static class Sign
+        {
+            public static ConfigEntryWrapper<string> Font;
+            public static ConfigEntryWrapper<float> FontSize;
+            public static ConfigEntryWrapper<string> FallbackFonts;
+        }
+
+        public static class Title
+        {
+            public static ConfigEntryWrapper<string> Font;
+            public static ConfigEntryWrapper<float> FontSize;
+            public static ConfigEntryWrapper<string> FallbackFonts;
+        }
+
+        public static class Count
+        {
+            public static ConfigEntryWrapper<string> Font;
+            public static ConfigEntryWrapper<float> FontSize;
+            public static ConfigEntryWrapper<string> FallbackFonts;
+        }
+    }
 
     public static void ConfigBind(ConfigFile config)
     {
@@ -25,10 +52,22 @@ public class GuiStyle
         config.SaveOnConfigSet = false;
         config.Clear();
 
-        BackgroundColor = config.Bind("GuiStyle", "BackgroundColor", "0,0,0,0", "");
-        BackgroundImageFile = config.Bind("GuiStyle", "BackgroundImageFile", "Background.png", "");
-        BackgroundImageArea = config.Bind("GuiStyle", "BackgroundImageArea", new UnityEngine.Rect(17, 17, 94, 94), "");
-        BackgroundImageBorder = config.Bind("GuiStyle", "BackgroundImageBorder", new UnityEngine.Vector4(17, 17, 17, 17), "");
+        TopMap.BackgroundColor = config.Bind("TopMap", "BackgroundColor", "0,0,0,0", "");
+        TopMap.BackgroundImageFile = config.Bind("TopMap", "BackgroundImageFile", "Background.png", "");
+        TopMap.BackgroundImageArea = config.Bind("TopMap", "BackgroundImageArea", new UnityEngine.Rect(17, 17, 94, 94), "");
+        TopMap.BackgroundImageBorder = config.Bind("TopMap", "BackgroundImageBorder", new UnityEngine.Vector4(17, 17, 17, 17), "");
+
+        TopMap.Sign.Font = config.Bind("TopMap.Sign", "Font", "msgothic.ttc", "");
+        TopMap.Sign.FontSize = config.Bind("TopMap.Sign", "FontSize", 12.0f, "");
+        TopMap.Sign.FallbackFonts = config.Bind("TopMap.Sign", "FallbackFonts", "", "");
+
+        TopMap.Title.Font = config.Bind("TopMap.Title", "Font", "msyh.ttc", "");
+        TopMap.Title.FontSize = config.Bind("TopMap.Title", "FontSize", 12.0f, "");
+        TopMap.Title.FallbackFonts = config.Bind("TopMap.Title", "FallbackFonts", "", "");
+
+        TopMap.Count.Font = config.Bind("TopMap.Count", "Font", "arial.ttf", "");
+        TopMap.Count.FontSize = config.Bind("TopMap.Count", "FontSize", 12.0f, "");
+        TopMap.Count.FallbackFonts = config.Bind("TopMap.Count", "FallbackFonts", "", "");
 
         LogMessage($"Loaded config: {Path.GetFileName(ConfigFile.ConfigFilePath)}");
 
@@ -41,7 +80,6 @@ public class GuiStyle
         {
             LogMessage($"OnConfigFileChanged: {e.Name}, {e.ChangeType}");
             ConfigFile.Reload();
-            OnChangedEvent?.Invoke(source, e);
             OverlayMapHolder.Instance.NeedToReloadGuiBoxStyle = true;
         }
         catch (Exception exception)

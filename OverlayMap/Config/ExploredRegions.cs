@@ -16,8 +16,7 @@ public class ExploredRegions
 
     public static void ConfigBind(string archiveFilename)
     {
-        var bepInExDir = GetBepInExDir();
-        var configFilePath = Path.Combine(bepInExDir, "config", "KingdomMod.OverlayMap.ExploredRegions.cfg");
+        var configFilePath = Path.Combine(BepInExDir, "config", "KingdomMod.OverlayMap.ExploredRegions.cfg");
         LogMessage($"ExploredRegions file: {configFilePath}");
 
         ConfigFile = new ConfigFile(configFilePath, true);
