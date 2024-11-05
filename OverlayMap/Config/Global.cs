@@ -76,15 +76,14 @@ public class Global
         if (lang is "" or "system")
             lang = CultureInfo.CurrentCulture.Name;
 
-        var bepInExDir = GetBepInExDir();
-        var langFile = Path.Combine(bepInExDir, "config", $"KingdomMod.OverlayMap.Language.{lang}.cfg");
+        var langFile = Path.Combine(BepInExDir, "config", $"KingdomMod.OverlayMap.Language.{lang}.cfg");
         LogMessage($"Language file: {langFile}");
 
         if (!File.Exists(langFile))
         {
             LogWarning($"Language file do not exist: {langFile}");
             lang = lang.Split('-')[0];
-            var files = Directory.GetFiles(Path.Combine(bepInExDir, "config"), $"KingdomMod.OverlayMap.Language.{lang}*.cfg");
+            var files = Directory.GetFiles(Path.Combine(BepInExDir, "config"), $"KingdomMod.OverlayMap.Language.{lang}*.cfg");
             foreach (var file in files)
             {
                 if (File.Exists(file))
@@ -102,7 +101,7 @@ public class Global
             if (Strings.ConfigFile != null)
                 return;
             lang = "en-US";
-            langFile = Path.Combine(bepInExDir, "config", $"KingdomMod.OverlayMap.Language.{lang}.cfg");
+            langFile = Path.Combine(BepInExDir, "config", $"KingdomMod.OverlayMap.Language.{lang}.cfg");
             LogWarning($"Try to use the default english language file: {langFile}");
         }
 
@@ -123,8 +122,7 @@ public class Global
     {
         LogMessage($"OnMarkerStyleFileChanged: {MarkerStyleFile.Value}");
 
-        var bepInExDir = GetBepInExDir();
-        var styleFile = Path.Combine(bepInExDir, "config", MarkerStyleFile);
+        var styleFile = Path.Combine(BepInExDir, "config", MarkerStyleFile);
         LogMessage($"MarkerStyle file: {styleFile}");
 
         if (!File.Exists(styleFile))
@@ -132,7 +130,7 @@ public class Global
             LogWarning($"MarkerStyle file do not exist: {styleFile}");
             if (MarkerStyle.ConfigFile != null)
                 return;
-            styleFile = Path.Combine(bepInExDir, "config", "KingdomMod.OverlayMap.MarkerStyle.cfg");
+            styleFile = Path.Combine(BepInExDir, "config", "KingdomMod.OverlayMap.MarkerStyle.cfg");
             LogWarning($"Try to use the default MarkerStyle file: {styleFile}");
         }
 
@@ -153,8 +151,7 @@ public class Global
     {
         LogMessage($"OnGuiStyleFileChanged: {GuiStyleFile.Value}");
 
-        var bepInExDir = GetBepInExDir();
-        var styleFile = Path.Combine(bepInExDir, "config", GuiStyleFile);
+        var styleFile = Path.Combine(BepInExDir, "config", GuiStyleFile);
         LogMessage($"GuiStyle file: {styleFile}");
 
         if (!File.Exists(styleFile))
@@ -162,7 +159,7 @@ public class Global
             LogWarning($"GuiStyle file do not exist: {styleFile}");
             if (GuiStyle.ConfigFile != null)
                 return;
-            styleFile = Path.Combine(bepInExDir, "config", "KingdomMod.OverlayMap.GuiStyle.cfg");
+            styleFile = Path.Combine(BepInExDir, "config", "KingdomMod.OverlayMap.GuiStyle.cfg");
             LogWarning($"Try to use the default GuiStyle file: {styleFile}");
         }
 

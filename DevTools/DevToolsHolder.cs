@@ -67,7 +67,7 @@ public class DevToolsHolder : MonoBehaviour
             }
         }
 
-#if DEBUG
+// #if DEBUG
             [HarmonyPatch(typeof(UnityEngine.Debug), "get_isDebugBuild")]
             public class DebugIsDebugBuildPatcher
             {
@@ -76,7 +76,7 @@ public class DevToolsHolder : MonoBehaviour
                     __result = true;
                 }
             }
-#endif
+// #endif
 
         // [HarmonyPatch(typeof(UnityEngine.DebugLogHandler), nameof(DebugLogHandler.Internal_Log))]
         // public class DebugLogHandlerPatcher
@@ -183,7 +183,10 @@ public class DevToolsHolder : MonoBehaviour
 
     private static Player GetLocalPlayer()
     {
-        return Managers.Inst.kingdom.GetPlayer(NetworkBigBoss.HasWorldAuth ? 0 : 1);
+        var kingdom = Managers.Inst.kingdom;
+        if (kingdom == null)
+            return null;
+        return kingdom.GetPlayer(NetworkBigBoss.HasWorldAuth ? 0 : 1);
     }
 
     private void Update()

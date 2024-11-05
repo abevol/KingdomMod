@@ -6,12 +6,14 @@ namespace KingdomMod.OverlayMap.Patchers;
 
 public class Patcher
 {
+    public static Harmony HarmonyInst;
+
     public static void PatchAll()
     {
         try
         {
-            var harmony = new Harmony("KingdomMod.OverlayMap.Patcher");
-            harmony.PatchAll();
+            HarmonyInst = new Harmony("KingdomMod.OverlayMap.Patcher");
+            HarmonyInst.PatchAll();
         }
         catch (Exception ex)
         {

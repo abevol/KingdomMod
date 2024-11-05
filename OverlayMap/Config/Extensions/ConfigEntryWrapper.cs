@@ -84,4 +84,24 @@ public class ConfigEntryWrapper<T>
 
         return Color.white;
     }
+
+    public string[] AsStringArray
+    {
+        get
+        {
+            if (Entry is ConfigEntry<string> stringEntry)
+            {
+                return stringEntry.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            }
+
+            return Array.Empty<string>();
+        }
+        set
+        {
+            if (Entry is ConfigEntry<string> stringEntry && value != null)
+            {
+                stringEntry.Value = string.Join(",", value);
+            }
+        }
+    }
 }

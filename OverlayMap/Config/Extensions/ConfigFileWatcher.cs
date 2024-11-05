@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.IO;
 using System.Security.Cryptography;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
@@ -13,7 +14,7 @@ public class ConfigFileWatcher
 
     public void Set(string fileName, FileSystemEventHandler changed)
     {
-        _watcher.Path = Path.Combine(GetBepInExDir(), "config");
+        _watcher.Path = Path.Combine(BepInExDir, "config");
         _watcher.NotifyFilter = NotifyFilters.LastWrite;
         _watcher.Filter = fileName ?? "*.cfg";
         _watcher.Changed += OnConfigFileChanged;
@@ -30,12 +31,20 @@ public class ConfigFileWatcher
             if (hash == "") return;
             if (hash == _configFileHash) return;
             _configFileHash = hash;
-            _changedEventHandler?.Invoke(source, e);
+            Instance.StartCoroutine(OnConfigFileChangedCoroutine(source, e));
         }
         catch (Exception exception)
         {
             LogMessage($"HResult: {exception.HResult:X}, {exception.Message}");
         }
+    }
+
+    private IEnumerator OnConfigFileChangedCoroutine(object source, FileSystemEventArgs e)
+    {
+        // 等待到下一帧，确保在主线程中执行
+        yield return null;
+
+        _changedEventHandler?.Invoke(source, e);
     }
 
     public static string GetFileHash(string filename)
