@@ -5,11 +5,11 @@ using UnityEngine;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
-    public class CampfireMapper(TopMapView view) : IComponentMapper
+    public class FarmhouseMapper(TopMapView view) : IComponentMapper
     {
         public void Map(Component component)
         {
-            view.TryAddMapMarker(component, MarkerStyle.Campfire.Color, MarkerStyle.Campfire.Sign, Strings.Campfire);
+            view.TryAddMapMarker(component, MarkerStyle.Farmhouse.Color, MarkerStyle.Farmhouse.Sign, Strings.Farmhouse);
         }
     }
 }

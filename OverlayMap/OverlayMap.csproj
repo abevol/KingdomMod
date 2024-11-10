@@ -22,7 +22,9 @@
         <Compile Include="..\Shared\CachePrefabID.cs" Link="Shared\CachePrefabID.cs" />
         <Compile Include="..\Shared\GamePrefabID.cs" Link="Shared\GamePrefabID.cs" />
         <Compile Include="..\Shared\GameExtensions.cs" Link="Shared\GameExtensions.cs" />
+        <Compile Include="..\Shared\GameObjectDetails.cs" Link="Shared\GameObjectDetails.cs" />
         <Compile Include="..\Shared\GuiHelper.cs" Link="Shared\GuiHelper.cs" />
+        <Compile Include="..\Shared\TypeExtensions.cs" Link="Shared\TypeExtensions.cs" />
     </ItemGroup>
 
     <ItemGroup>

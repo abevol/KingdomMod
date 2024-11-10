@@ -779,10 +779,10 @@ public class OverlayMapHolder : MonoBehaviour
         {
             var info = obj.hermitType switch
             {
-                Hermit.HermitType.Baker => Strings.HermitBaker,
-                Hermit.HermitType.Ballista => Strings.HermitBallista,
-                Hermit.HermitType.Horn => Strings.HermitHorn,
                 Hermit.HermitType.Horse => Strings.HermitHorse,
+                Hermit.HermitType.Horn => Strings.HermitHorn,
+                Hermit.HermitType.Ballista => Strings.HermitBallista,
+                Hermit.HermitType.Baker => Strings.HermitBaker,
                 Hermit.HermitType.Knight => Strings.HermitKnight,
                 Hermit.HermitType.Persephone => Strings.HermitPersephone,
                 Hermit.HermitType.Fire => Strings.HermitFire,
@@ -1014,7 +1014,7 @@ public class OverlayMapHolder : MonoBehaviour
         {
             poi.Pos = (poi.WorldPosX - startPos) * scale + 16;
         }
-            
+
         minimapMarkList = poiList;
 
         // Make wall lines

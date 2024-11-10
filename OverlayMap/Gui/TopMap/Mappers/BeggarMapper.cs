@@ -1,18 +1,14 @@
-﻿using System.Collections.Generic;
-using KingdomMod.OverlayMap.Config;
-using KingdomMod.OverlayMap.Patchers;
+﻿using KingdomMod.OverlayMap.Config;
 using UnityEngine;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
     public class BeggarMapper(TopMapView view) : IComponentMapper
     {
-        public void Map(Component component, HashSet<ObjectPatcher.SourceFlag> sources)
+        public void Map(Component component)
         {
-            view.TryAddMapMarker(component, sources, MarkerStyle.Beggar.Sign, Strings.Beggar,
-                _ => MarkerStyle.Beggar.Color, null,
-                comp => ((Beggar)comp).hasFoundBaker,
-                MarkerRow.Movable);
+            view.TryAddMapMarker(component, MarkerStyle.Beggar.Color, MarkerStyle.Beggar.Sign, Strings.Beggar, null, null,
+                comp => ((Beggar)comp).hasFoundBaker, MarkerRow.Movable);
         }
     }
 }
