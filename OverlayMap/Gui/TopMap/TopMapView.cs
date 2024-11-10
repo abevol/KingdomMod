@@ -21,6 +21,8 @@ public class TopMapView : MonoBehaviour
     private float _timeSinceLastGuiUpdate = 0;
 
     public static float MappingScale;
+    // public static float ZoomScale;
+    // public static float MapOffset;
     public PlayerId PlayerId;
     public TopMapStyle Style = new();
     public Dictionary<Component, MapMarker> MapMarkers => _mapMarkers;
@@ -28,17 +30,44 @@ public class TopMapView : MonoBehaviour
 
     public TopMapView()
     {
+        LogMessage("TopMapView.Constructor");
+
         _componentMappers = new Dictionary<Type, IComponentMapper>
         {
-            { typeof(Beach), new Mappers.BeachMapper(this) },
-            { typeof(BeggarCamp), new Mappers.BeggarCampMapper(this) },
-            { typeof(Beggar), new Mappers.BeggarMapper(this) },
-            { typeof(Campfire), new Mappers.CampfireMapper(this) },
-            { typeof(Castle), new Mappers.CastleMapper(this) },
-            { typeof(Deer), new Mappers.DeerMapper(this) },
-            { typeof(Player), new Mappers.PlayerMapper(this) },
-            { typeof(Portal), new Mappers.PortalMapper(this) },
-            { typeof(TeleporterExit), new Mappers.TeleporterExitMapper(this) },
+            { typeof(Beach),                new Mappers.BeachMapper(this) },
+            { typeof(BeggarCamp),           new Mappers.BeggarCampMapper(this) },
+            { typeof(Beggar),               new Mappers.BeggarMapper(this) },
+            { typeof(BoarSpawnGroup),       new Mappers.BoarSpawnGroupMapper(this) },
+            { typeof(Boat),                 new Mappers.BoatMapper(this) },
+            { typeof(BoatSummoningBell),    new Mappers.BoatSummoningBellMapper(this) },
+            { typeof(Bomb),                 new Mappers.BombMapper(this) },
+            { typeof(Cabin),                new Mappers.CabinMapper(this) },
+            { typeof(Campfire),             new Mappers.CampfireMapper(this) },
+            { typeof(Castle),               new Mappers.CastleMapper(this) },
+            { typeof(Chest),                new Mappers.ChestMapper(this) },
+            { typeof(CitizenHousePayable),  new Mappers.CitizenHousePayableMapper(this) },
+            { typeof(Deer),                 new Mappers.DeerMapper(this) },
+            { typeof(DogSpawn),             new Mappers.DogSpawnMapper(this) },
+            { typeof(Farmhouse),            new Mappers.FarmhouseMapper(this) },
+            { typeof(HelPuzzleController),  new Mappers.HelPuzzleControllerMapper(this) },
+            { typeof(HephaestusForge),      new Mappers.HephaestusForgeMapper(this) },
+            { typeof(MerchantSpawner),      new Mappers.MerchantSpawnerMapper(this) },
+            { typeof(PayableBush),          new Mappers.PayableBushMapper(this) },
+            { typeof(PayableGemChest),      new Mappers.PayableGemChestMapper(this) },
+            { typeof(PayableShop),          new Mappers.PayableShopMapper(this) },
+            { typeof(PayableUpgrade),       new Mappers.PayableUpgradeMapper(this) },
+            { typeof(PersephoneCage),       new Mappers.PersephoneCageMapper(this) },
+            { typeof(Player),               new Mappers.PlayerMapper(this) },
+            { typeof(Portal),               new Mappers.PortalMapper(this) },
+            { typeof(River),                new Mappers.RiverMapper(this) },
+            { typeof(Statue),               new Mappers.StatueMapper(this) },
+            { typeof(Steed),                new Mappers.SteedMapper(this) },
+            { typeof(SteedSpawn),           new Mappers.SteedSpawnMapper(this) },
+            { typeof(TeleporterExit),       new Mappers.TeleporterExitMapper(this) },
+            { typeof(ThorPuzzleController), new Mappers.ThorPuzzleControllerMapper(this) },
+            { typeof(TimeStatue),           new Mappers.TimeStatueMapper(this) },
+            { typeof(UnlockNewRulerStatue), new Mappers.UnlockNewRulerStatueMapper(this) },
+            { typeof(WreckPlaceholder),     new Mappers.WreckPlaceholderMapper(this) },
         };
     }
 
@@ -52,8 +81,8 @@ public class TopMapView : MonoBehaviour
         Style.Init(this);
         UpdateLayout();
         UpdateBackgroundImage();
-        CreateText();
-        DrawLine(new Vector2(0, 0), new Vector2(300, 0), Color.red, 2);
+        // CreateText();
+        // DrawLine(new Vector2(0, 0), new Vector2(300, 0), Color.red, 2);
 
         ObjectPatcher.OnComponentCreated += OnComponentCreated;
         ObjectPatcher.OnComponentDestroyed += OnComponentDestroyed;
@@ -202,7 +231,8 @@ public class TopMapView : MonoBehaviour
     {
         if (_componentMappers.TryGetValue(component.GetType(), out var mapper))
         {
-            mapper.Map(component, sources);
+            LogMessage($"TopMapView.OnComponentCreated, component: {component}, sources: [{string.Join(", ", sources)}]");
+            mapper.Map(component);
         }
     }
 
@@ -232,17 +262,17 @@ public class TopMapView : MonoBehaviour
 
     public MapMarker TryAddMapMarker(
         Component target,
-        HashSet<SourceFlag> sources,
+        ConfigEntryWrapper<string> color,
         ConfigEntryWrapper<string> sign,
         ConfigEntryWrapper<string> title,
-        ColorUpdaterFn colorUpdater = null,
         CountUpdaterFn countUpdater = null,
+        ColorUpdaterFn colorUpdater = null,
         VisibleUpdaterFn visibleUpdater = null,
         MarkerRow row = MarkerRow.Settled)
     {
         try
         {
-            LogMessage($"TopMapView.TryAddMapMarker, title: {title.Value}, target: {target}, sources: [{string.Join(", ", sources)}]");
+            LogMessage($"TopMapView.TryAddMapMarker, title: {title?.Value}, target: {target}");
 
             if (target.gameObject == null)
                 return null;
@@ -263,7 +293,7 @@ public class TopMapView : MonoBehaviour
                 Self = mapMarker,
                 Target = target,
                 Row = row,
-                Color = null,
+                Color = color,
                 Sign = sign,
                 Title = title,
                 Icon = null,

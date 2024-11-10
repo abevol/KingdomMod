@@ -23,7 +23,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
         private ConfigEntryWrapper<string> _color;
         private ConfigEntryWrapper<string> _sign;
         private ConfigEntryWrapper<string> _title;
-        private ConfigEntryWrapper<string> _icon;
+        // private ConfigEntryWrapper<string> _icon;
 
         private int _count;
         private bool _visible;
@@ -137,7 +137,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
 
         protected virtual void Dispose(bool disposing)
         {
-            LogMessage($"Disposing MapMarkerData for {Title.Value}, disposing: {disposing}");
+            LogMessage($"Disposing MapMarkerData for {Title?.Value}, disposing: {disposing}");
             if (!_disposed)
             {
                 if (disposing)

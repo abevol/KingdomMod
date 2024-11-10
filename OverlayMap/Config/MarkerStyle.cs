@@ -29,7 +29,7 @@ public class MarkerStyle
     public static MarkerConfig GemChest;
     public static MarkerConfigStated Wall;
     public static MarkerConfig ShopForge;
-    public static MarkerConfig CitizenHouse;
+    public static MarkerConfigStated CitizenHouse;
     public static MarkerConfig WallFoundation;
     public static MarkerConfig River;
     public static MarkerConfig BerryBush;
@@ -124,8 +124,9 @@ public class MarkerStyle
         ShopForge.Color = config.Bind("ShopForge", "Color", "1,1,1,1", "");
         ShopForge.Sign = config.Bind("ShopForge", "Sign", "", "");
 
-        CitizenHouse.Color = config.Bind("CitizenHouse", "Color", "1,1,1,1", "");
         CitizenHouse.Sign = config.Bind("CitizenHouse", "Sign", "", "");
+        CitizenHouse.Color = config.Bind("CitizenHouse", "Color", "1,1,1,1", "");
+        CitizenHouse.Building.Color = config.Bind("CitizenHouse.Building", "Color", "0,0,1,1", "");
 
         WallFoundation.Color = config.Bind("WallFoundation", "Color", "0.5,0.5,0.5,1", "");
         WallFoundation.Sign = config.Bind("WallFoundation", "Sign", "∧", "");
@@ -229,6 +230,7 @@ public class MarkerStyle
         Lighthouse.Color = config.Bind("Lighthouse", "Color", "0,1,0,1", "");
         Lighthouse.Locked.Color = config.Bind("Lighthouse.Locked", "Color", "0.5,0.5,0.5,1", "");
         Lighthouse.Unpaid.Color = config.Bind("Lighthouse.Locked", "Color", "1,0,0,1", "");
+        Lighthouse.Building.Color = config.Bind("Lighthouse.Building", "Color", "0,0,1,1", "");
 
         LogMessage($"Loaded config: {Path.GetFileName(ConfigFile.ConfigFilePath)}");
 

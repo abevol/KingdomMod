@@ -6,6 +6,6 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
 {
     public interface IComponentMapper
     {
-        void Map(Component component, HashSet<SourceFlag> sources);
+        void Map(Component component);
     }
 }

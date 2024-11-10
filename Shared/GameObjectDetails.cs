@@ -173,6 +173,13 @@ namespace KingdomMod
             return xml;
         }
 
+        public static string JsonSerialize(GameObjectDetails obj)
+        {
+            string json = CreateJsonGameObject(obj);
+            json = json.TrimEnd(',');
+            return json;
+        }
+
         public static string JsonSerialize(System.Collections.Generic.List<GameObjectDetails> objectTree)
         {
             string json = "{";

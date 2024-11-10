@@ -3,6 +3,7 @@ using System.IO;
 using System;
 using KingdomMod.OverlayMap.Config.Extensions;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
+using System.Collections.Generic;
 
 namespace KingdomMod.OverlayMap.Config;
 
@@ -10,6 +11,8 @@ public class Strings
 {
     public static ConfigFile ConfigFile;
     private static readonly ConfigFileWatcher _configFileWatcher = new();
+    public static Dictionary<SteedType, ConfigEntryWrapper<string>> SteedNames;
+    public static Dictionary<MonarchType, ConfigEntryWrapper<string>> MonarchNames;
 
     public static ConfigEntryWrapper<string> Alfred;
     public static ConfigEntryWrapper<string> Archer;
@@ -67,6 +70,22 @@ public class Strings
     public static ConfigEntryWrapper<string> MerchantHouse;
     public static ConfigEntryWrapper<string> Mine;
     public static ConfigEntryWrapper<string> Miriam;
+    public static ConfigEntryWrapper<string> BambooKing;
+    public static ConfigEntryWrapper<string> BambooQueen;
+    public static ConfigEntryWrapper<string> BambooHooded;
+    public static ConfigEntryWrapper<string> NorselandsKing;
+    public static ConfigEntryWrapper<string> NorselandsQueen;
+    public static ConfigEntryWrapper<string> NorselandsHooded;
+    public static ConfigEntryWrapper<string> GreeceKing;
+    public static ConfigEntryWrapper<string> GreeceQueen;
+    public static ConfigEntryWrapper<string> GreeceHooded;
+    public static ConfigEntryWrapper<string> DarkTemplarKing;
+    public static ConfigEntryWrapper<string> EloquentQueen;
+    public static ConfigEntryWrapper<string> MyceliumMonarch;
+    public static ConfigEntryWrapper<string> MinotaurKing;
+    public static ConfigEntryWrapper<string> CelestialQueen;
+    public static ConfigEntryWrapper<string> TrojanMonarch;
+    public static ConfigEntryWrapper<string> Hoodie;
     public static ConfigEntryWrapper<string> P1;
     public static ConfigEntryWrapper<string> P2;
     public static ConfigEntryWrapper<string> Peasant;
@@ -176,6 +195,22 @@ public class Strings
         MerchantHouse = config.Bind("Strings", "MerchantHouse", "Merchant", "");
         Mine = config.Bind("Strings", "Mine", "Mine", "");
         Miriam = config.Bind("Strings", "Miriam", "Miriam", "");
+        BambooKing = config.Bind("Strings", "BambooKing", "BambooKing", "");
+        BambooQueen = config.Bind("Strings", "BambooQueen", "BambooQueen", "");
+        BambooHooded = config.Bind("Strings", "BambooHooded", "BambooHooded", "");
+        NorselandsKing = config.Bind("Strings", "NorselandsKing", "NorselandsKing", "");
+        NorselandsQueen = config.Bind("Strings", "NorselandsQueen", "NorselandsQueen", "");
+        NorselandsHooded = config.Bind("Strings", "NorselandsHooded", "NorselandsHooded", "");
+        GreeceKing = config.Bind("Strings", "GreeceKing", "GreeceKing", "");
+        GreeceQueen = config.Bind("Strings", "GreeceQueen", "GreeceQueen", "");
+        GreeceHooded = config.Bind("Strings", "GreeceHooded", "GreeceHooded", "");
+        DarkTemplarKing = config.Bind("Strings", "DarkTemplarKing", "DarkTemplarKing", "");
+        EloquentQueen = config.Bind("Strings", "EloquentQueen", "EloquentQueen", "");
+        MyceliumMonarch = config.Bind("Strings", "MyceliumMonarch", "MyceliumMonarch", "");
+        MinotaurKing = config.Bind("Strings", "MinotaurKing", "MinotaurKing", "");
+        CelestialQueen = config.Bind("Strings", "CelestialQueen", "CelestialQueen", "");
+        TrojanMonarch = config.Bind("Strings", "TrojanMonarch", "TrojanMonarch", "");
+        Hoodie = config.Bind("Strings", "Hoodie", "Hoodie", "");
         P1 = config.Bind("Strings", "P1", "P1", "");
         P2 = config.Bind("Strings", "P2", "P2", "");
         Peasant = config.Bind("Strings", "Peasant", "Peasant", "");
@@ -225,7 +260,90 @@ public class Strings
 
         LogMessage($"Loaded config: {Path.GetFileName(ConfigFile.ConfigFilePath)}");
 
+        InitSteedNames();
+        InitMonarchNames();
         _configFileWatcher.Set(Path.GetFileName(config.ConfigFilePath), OnConfigFileChanged);
+    }
+
+    private static void InitSteedNames()
+    {
+        SteedNames = new()
+        {
+            { SteedType.INVALID,               Strings.Invalid },
+            { SteedType.Bear,                  Strings.Bear },
+            { SteedType.P1Griffin,             Strings.Griffin },
+            { SteedType.Lizard,                Strings.Lizard },
+            { SteedType.Reindeer,              Strings.Reindeer },
+            { SteedType.Spookyhorse,           Strings.Spookyhorse },
+            { SteedType.Stag,                  Strings.Stag },
+            { SteedType.Unicorn,               Strings.Unicorn },
+            { SteedType.P1Warhorse,            Strings.Warhorse },
+            { SteedType.P1Default,             Strings.DefaultSteed },
+            { SteedType.P2Default,             Strings.DefaultSteed },
+            { SteedType.HorseStamina,          Strings.HorseStamina },
+            { SteedType.HorseBurst,            Strings.HorseBurst },
+            { SteedType.HorseFast,             Strings.HorseFast },
+            { SteedType.P1Wolf,                Strings.Wolf },
+            { SteedType.Trap,                  Strings.Trap },
+            { SteedType.Barrier,               Strings.Barrier },
+            { SteedType.Bloodstained,          Strings.Bloodstained },
+            { SteedType.P2Wolf,                Strings.Wolf },
+            { SteedType.P2Griffin,             Strings.Griffin },
+            { SteedType.P2Warhorse,            Strings.Warhorse },
+            { SteedType.P2Stag,                Strings.Stag },
+            { SteedType.Gullinbursti,          Strings.Gullinbursti },
+            { SteedType.Sleipnir,              Strings.Sleipnir },
+            { SteedType.Reindeer_Norselands,   Strings.Reindeer },
+            { SteedType.CatCart,               Strings.CatCart },
+            { SteedType.Kelpie,                Strings.Kelpie },
+            { SteedType.DayNight,              Strings.DayNight },
+            { SteedType.P2Kelpie,              Strings.Kelpie },
+            { SteedType.P2Reindeer_Norselands, Strings.Reindeer },
+            { SteedType.Hippocampus,           Strings.Hippocampus },
+            { SteedType.Cerberus,              Strings.Cerberus },
+            { SteedType.Spider,                Strings.Spider },
+            { SteedType.TheChariotDay,         Strings.TheChariotDay },
+            { SteedType.TheChariotNight,       Strings.TheChariotNight },
+            { SteedType.Pegasus,               Strings.Pegasus },
+            { SteedType.Donkey,                Strings.Donkey },
+            { SteedType.MolossianHound,        Strings.MolossianHound },
+            { SteedType.Chimera,               Strings.Chimera },
+            { SteedType.Total,                 Strings.Total }
+        };
+    }
+
+    private static void InitMonarchNames()
+    {
+        MonarchNames = new()
+        {
+            { MonarchType.Error, Strings.Invalid },
+            { MonarchType.King, Strings.King },
+            { MonarchType.Queen, Strings.Queen },
+            { MonarchType.Prince, Strings.Prince },
+            { MonarchType.Princess, Strings.Princess },
+            { MonarchType.Hooded, Strings.Hooded },
+            { MonarchType.Zangetsu, Strings.Zangetsu },
+            { MonarchType.Alfred, Strings.Alfred },
+            { MonarchType.Gebel, Strings.Gebel },
+            { MonarchType.Miriam, Strings.Miriam },
+            { MonarchType.BambooKing, Strings.BambooKing },
+            { MonarchType.BambooQueen, Strings.BambooQueen },
+            { MonarchType.BambooHooded, Strings.BambooHooded },
+            { MonarchType.NorselandsKing, Strings.NorselandsKing },
+            { MonarchType.NorselandsQueen, Strings.NorselandsQueen },
+            { MonarchType.NorselandsHooded, Strings.NorselandsHooded },
+            { MonarchType.GreeceKing, Strings.GreeceKing },
+            { MonarchType.GreeceQueen, Strings.GreeceQueen },
+            { MonarchType.GreeceHooded, Strings.GreeceHooded },
+            { MonarchType.DarkTemplarKing, Strings.DarkTemplarKing },
+            { MonarchType.EloquentQueen, Strings.EloquentQueen },
+            { MonarchType.MyceliumMonarch, Strings.MyceliumMonarch },
+            { MonarchType.MinotaurKing, Strings.MinotaurKing },
+            { MonarchType.CelestialQueen, Strings.CelestialQueen },
+            { MonarchType.TrojanMonarch, Strings.TrojanMonarch },
+            { MonarchType.Hoodie, Strings.Hoodie },
+            { MonarchType.Total, Strings.Total }
+        };
     }
 
     private static void OnConfigFileChanged(object source, FileSystemEventArgs e)

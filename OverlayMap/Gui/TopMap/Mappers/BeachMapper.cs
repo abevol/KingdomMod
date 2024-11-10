@@ -1,15 +1,13 @@
-﻿using System.Collections.Generic;
-using KingdomMod.OverlayMap.Config;
-using KingdomMod.OverlayMap.Patchers;
+﻿using KingdomMod.OverlayMap.Config;
 using UnityEngine;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
     public class BeachMapper(TopMapView view) : IComponentMapper
     {
-        public void Map(Component component, HashSet<ObjectPatcher.SourceFlag> sources)
+        public void Map(Component component)
         {
-            view.TryAddMapMarker(component, sources, MarkerStyle.Beach.Sign, Strings.Beach, _ => MarkerStyle.Beach.Color);
+            view.TryAddMapMarker(component, MarkerStyle.Beach.Color, MarkerStyle.Beach.Sign, Strings.Beach);
         }
     }
 }

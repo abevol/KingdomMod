@@ -1,6 +1,5 @@
 ﻿using System;
 using KingdomMod.OverlayMap.Config;
-using KingdomMod.OverlayMap.Config.Extensions;
 using TMPro;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
 
@@ -22,10 +21,15 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
             _view = view;
             SignFont = FontManager.GetFont(GuiStyle.TopMap.Sign.Font, SignFont);
             SignFontSize = GuiStyle.TopMap.Sign.FontSize;
+            FontManager.AddFallbackFonts(SignFont, GuiStyle.TopMap.Sign.FallbackFonts.AsStringArray, true);
+
             TitleFont = FontManager.GetFont(GuiStyle.TopMap.Title.Font, TitleFont);
             TitleFontSize = GuiStyle.TopMap.Title.FontSize;
+            FontManager.AddFallbackFonts(TitleFont, GuiStyle.TopMap.Title.FallbackFonts.AsStringArray, true);
+
             CountFont = FontManager.GetFont(GuiStyle.TopMap.Count.Font, CountFont);
             CountFontSize = GuiStyle.TopMap.Count.FontSize;
+            FontManager.AddFallbackFonts(CountFont, GuiStyle.TopMap.Count.FallbackFonts.AsStringArray, true);
 
             GuiStyle.TopMap.BackgroundImageFile.Entry.SettingChanged += OnBackgroundConfigChanged;
             GuiStyle.TopMap.BackgroundColor.Entry.SettingChanged += OnBackgroundConfigChanged;
@@ -74,6 +78,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
         private void OnSignFontConfigChanged(object sender, EventArgs e)
         {
             SignFont = FontManager.GetFont(GuiStyle.TopMap.Sign.Font, SignFont);
+            FontManager.AddFallbackFonts(SignFont, GuiStyle.TopMap.Sign.FallbackFonts.AsStringArray, true);
 
             foreach (var pair in _view.MapMarkers)
             {
@@ -99,6 +104,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
         private void OnTitleFontConfigChanged(object sender, EventArgs e)
         {
             TitleFont = FontManager.GetFont(GuiStyle.TopMap.Title.Font, TitleFont);
+            FontManager.AddFallbackFonts(TitleFont, GuiStyle.TopMap.Title.FallbackFonts.AsStringArray, true);
 
             foreach (var pair in _view.MapMarkers)
             {
@@ -124,6 +130,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
         private void OnCountFontConfigChanged(object sender, EventArgs e)
         {
             CountFont = FontManager.GetFont(GuiStyle.TopMap.Count.Font, CountFont);
+            FontManager.AddFallbackFonts(CountFont, GuiStyle.TopMap.Count.FallbackFonts.AsStringArray, true);
 
             foreach (var pair in _view.MapMarkers)
             {
