@@ -10,7 +10,7 @@ namespace KingdomMod.OverlayMap.Patchers
         {
             public static void Postfix(Game __instance)
             {
-                LogMessage("GamePatcher.Init");
+                LogDebug("GamePatcher.Init");
                 OverlayMapHolder.Instance.OnGameInit(__instance);
             }
         }
@@ -20,7 +20,7 @@ namespace KingdomMod.OverlayMap.Patchers
         {
             public static void Postfix(Game __instance, bool joined)
             {
-                LogMessage($"GamePatcher.P2StateChanged, joined: {joined}");
+                LogDebug($"GamePatcher.P2StateChanged, joined: {joined}");
                 OverlayMapHolder.Instance.OnP2StateChanged(__instance, joined);
             }
         }

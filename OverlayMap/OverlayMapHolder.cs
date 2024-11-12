@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Globalization;
 using System.Linq;
 using BepInEx.Logging;
 using UnityEngine;
 using System.IO;
 using System.Reflection;
-using KingdomMod.OverlayMap.Assets;
 using KingdomMod.OverlayMap.Config;
 using KingdomMod.OverlayMap.Gui;
 using UnityEngine.UI;
@@ -29,23 +27,19 @@ public class OverlayMapHolder : MonoBehaviour
     public static OverlayMapHolder Instance { get; private set; }
     private static ManualLogSource _log;
     private static BepInEx.Configuration.ConfigFile _config;
-    private readonly GUIStyle guiStyle = new();
+    private readonly GUIStyle _guiStyle = new();
     private GUIStyle _guiBoxStyle = new();
     private float _timeSinceLastGuiUpdate = 0;
     public bool NeedToReloadGuiBoxStyle = true;
     public static bool EnabledOverlayMap = true;
-    private System.Collections.Generic.List<MarkInfo> minimapMarkList = new();
-    private System.Collections.Generic.List<LineInfo> drawLineList = new();
-    private readonly StatsInfo statsInfo = new();
-    private bool showFullMap = false;
-    private GameObject gameLayer = null;
-    private static int _campaignIndex = 0;
-    private static int _land = 0;
-    private static int _challengeId = 0;
-    private static string _archiveFilename;
+    private System.Collections.Generic.List<MarkInfo> _minimapMarkList = new();
+    private System.Collections.Generic.List<LineInfo> _drawLineList = new();
+    private readonly StatsInfo _statsInfo = new();
+    public static bool ShowFullMap = false;
+    private GameObject _gameLayer = null;
     private static readonly ExploredRegion _exploredRegion = new ();
     private static PersephoneCage _persephoneCage;
-    private static CachePrefabID _cachePrefabID = new CachePrefabID();
+    private static readonly CachePrefabID _cachePrefabID = new CachePrefabID();
     private Canvas _canvas;
     public (PlayerOverlay P1, PlayerOverlay P2) PlayerOverlays = (null, null);
     private ProgramDirector.State _directorState;
@@ -53,7 +47,6 @@ public class OverlayMapHolder : MonoBehaviour
     public static event DirectorStateEventHandler OnDirectorStateChanged;
     public static string BepInExDir;
     public static string AssetsDir;
-    public static FontManager FontManager;
 
     public static void Initialize(OverlayMapPlugin plugin)
     {
@@ -78,7 +71,6 @@ public class OverlayMapHolder : MonoBehaviour
         Patchers.Patcher.PatchAll();
 
         CreateCanvas();
-        FontManager = CreateFontManager();
         PlayerOverlays.P1 = CreatePlayerOverlay(PlayerId.P1);
         PlayerOverlays.P2 = CreatePlayerOverlay(PlayerId.P2);
 
@@ -124,7 +116,7 @@ public class OverlayMapHolder : MonoBehaviour
 
     private PlayerOverlay CreatePlayerOverlay(PlayerId playerId)
     {
-        LogMessage($"CreatePlayerOverlay, playerId: {playerId}");
+        LogDebug($"CreatePlayerOverlay, playerId: {playerId}");
 
         var guiObj = new GameObject(nameof(PlayerOverlay));
         guiObj.transform.SetParent(_canvas.transform, false);
@@ -134,17 +126,9 @@ public class OverlayMapHolder : MonoBehaviour
         return guiComp;
     }
 
-    private FontManager CreateFontManager()
-    {
-        var obj = new GameObject(nameof(FontManager));
-        obj.transform.SetParent(_canvas.transform, false);
-        var comp = obj.AddComponent<FontManager>();
-        return comp;
-    }
-
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        LogMessage($"Scene: {scene.name}, {scene.buildIndex}");
+        LogDebug($"Scene: {scene.name}, {scene.buildIndex}");
 
     }
 
@@ -158,7 +142,7 @@ public class OverlayMapHolder : MonoBehaviour
 
     private void OnGameGoto(int pre, int next)
     {
-        LogMessage($"OnGameGoto: pre:{pre},{(Game.State)pre}, {next},{(Game.State)next}");
+        LogDebug($"OnGameGoto: pre:{pre},{(Game.State)pre}, {next},{(Game.State)next}");
 
         var state = (Game.State)next;
         switch (state)
@@ -176,13 +160,13 @@ public class OverlayMapHolder : MonoBehaviour
 
     private void Start()
     {
-        LogMessage($"{this.GetType().Name}.Start");
+        LogDebug($"{this.GetType().Name}.Start");
 
         NetworkBigBoss.Instance.OnClientCaughtUp += (Action)this.OnClientCaughtUp;
 
-        guiStyle.alignment = TextAnchor.UpperLeft;
-        guiStyle.normal.textColor = Color.white;
-        guiStyle.fontSize = 12;
+        _guiStyle.alignment = TextAnchor.UpperLeft;
+        _guiStyle.normal.textColor = Color.white;
+        _guiStyle.fontSize = 12;
 
         // GlobalSaveData.add_OnCurrentCampaignSwitch((Action)OnCurrentCampaignSwitch);
 
@@ -225,26 +209,26 @@ public class OverlayMapHolder : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.M))
         {
-            LogMessage("M key pressed.");
+            LogDebug("M key pressed.");
             EnabledOverlayMap = !EnabledOverlayMap;
         }
 
         if (Input.GetKeyDown(KeyCode.F))
         {
-            LogMessage("F key pressed.");
-            showFullMap = !showFullMap;
+            LogDebug("F key pressed.");
+            ShowFullMap = !ShowFullMap;
         }
 
         if (Input.GetKeyDown(KeyCode.F5))
         {
-            LogMessage($"Try to reload game.");
+            LogDebug($"Try to reload game.");
 
             Managers.Inst.game.Reload();
         }
 
         if (Input.GetKeyDown(KeyCode.F8))
         {
-            LogMessage($"Try to save game.");
+            LogDebug($"Try to save game.");
 
             Managers.Inst.game.TriggerSave();
         }
@@ -314,7 +298,7 @@ public class OverlayMapHolder : MonoBehaviour
 
     private void OnClientCaughtUp()
     {
-        LogMessage("host_OnClientCaughtUp.");
+        LogDebug("host_OnClientCaughtUp.");
 
         // OnGameStart();
     }
@@ -327,33 +311,33 @@ public class OverlayMapHolder : MonoBehaviour
 
     public void OnGameInit(Game game)
     {
-        LogMessage("OverlayMapHolder.OnGameInit");
+        LogDebug("OverlayMapHolder.OnGameInit");
         game.run.onGoto += OnGameGoto;
     }
 
     public void OnGameStart()
     {
-        LogMessage("OverlayMapHolder.OnGameStart");
+        LogDebug("OverlayMapHolder.OnGameStart");
 
-        gameLayer = GameObject.FindGameObjectWithTag(Tags.GameLayer);
+        _gameLayer = GameObject.FindGameObjectWithTag(Tags.GameLayer);
         _persephoneCage = UnityEngine.Object.FindAnyObjectByType<PersephoneCage>();
         _cachePrefabID.CachePrefabIDs();
 
-        _campaignIndex = GlobalSaveData.loaded.currentCampaign;
-        _land = CampaignSaveData.current.CurrentLand;
-        _challengeId = GlobalSaveData.loaded.currentChallenge;
-        _archiveFilename = IslandSaveData.GetFilePropsForLand(_campaignIndex, _land, _challengeId).filename;
-
-        LogMessage($"OnGameStart: _archiveFilename {_archiveFilename}, Campaign {_campaignIndex}, CurrentLand {_land}, currentChallenge {_challengeId}");
-
-        _exploredRegion.Init(GetLocalPlayer(), _archiveFilename);
+        _exploredRegion.Init();
     }
 
     public void OnGameEnd()
     {
-        LogMessage("OverlayMapHolder.OnGameEnd");
+        LogDebug("OverlayMapHolder.OnGameEnd");
 
 
+    }
+
+    public void OnGameSaved()
+    {
+        LogDebug("OverlayMapHolder.OnGameSaved");
+
+        SaveDataExtras.Save();
     }
 
     public void ReloadGuiStyle()
@@ -361,10 +345,10 @@ public class OverlayMapHolder : MonoBehaviour
         _guiBoxStyle = new GUIStyle(GUI.skin.box);
         var guiStylePath = Path.Combine(GetBepInExDir(), "config", "GuiStyle");
         var bgImageFile = Path.Combine(guiStylePath, GuiStyle.TopMap.BackgroundImageFile);
-        LogMessage($"ReloadGuiStyle: \n" +
-                   $"bgImageFile={bgImageFile}\n" +
-                   $"BackgroundImageArea={GuiStyle.TopMap.BackgroundImageArea.Value}\n" +
-                   $"BackgroundImageBorder={GuiStyle.TopMap.BackgroundImageBorder.Value}");
+        LogDebug($"ReloadGuiStyle: \n" +
+                 $"bgImageFile={bgImageFile}\n" +
+                 $"BackgroundImageArea={GuiStyle.TopMap.BackgroundImageArea.Value}\n" +
+                 $"BackgroundImageBorder={GuiStyle.TopMap.BackgroundImageBorder.Value}");
         if (File.Exists(bgImageFile))
         {
             byte[] imageData = File.ReadAllBytes(bgImageFile);
@@ -416,7 +400,7 @@ public class OverlayMapHolder : MonoBehaviour
 
     private void OnCurrentCampaignSwitch()
     {
-        LogMessage($"OnCurrentCampaignSwitch: {GlobalSaveData.loaded.currentCampaign}");
+        LogDebug($"OnCurrentCampaignSwitch: {GlobalSaveData.loaded.currentCampaign}");
 
     }
 
@@ -436,7 +420,7 @@ public class OverlayMapHolder : MonoBehaviour
         var payables = Managers.Inst.payables;
         if (payables == null) return;
 
-        minimapMarkList.Clear();
+        _minimapMarkList.Clear();
         var poiList = new System.Collections.Generic.List<MarkInfo>();
         var leftWalls = new System.Collections.Generic.List<WallPoint>();
         var rightWalls = new System.Collections.Generic.List<WallPoint>();
@@ -451,7 +435,7 @@ public class OverlayMapHolder : MonoBehaviour
                 poiList.Add(new MarkInfo(obj.transform.position.x, MarkerStyle.PortalDock.Color, MarkerStyle.PortalDock.Sign, Strings.PortalDock));
         }
 
-        var beach = gameLayer.GetComponentInChildren<Beach>();
+        var beach = _gameLayer.GetComponentInChildren<Beach>();
         if (beach != null)
             poiList.Add(new MarkInfo(beach.transform.position.x, MarkerStyle.Beach.Color, MarkerStyle.Beach.Sign, Strings.Beach));
 
@@ -486,10 +470,8 @@ public class OverlayMapHolder : MonoBehaviour
             poiList.Add(new MarkInfo(mover.transform.position.x, MarkerStyle.Player.Color, MarkerStyle.Player.Sign, player.playerId == 0 ? Strings.P1 : Strings.P2, 0, MarkRow.Movable));
             float l = mover.transform.position.x - 12;
             float r = mover.transform.position.x + 12;
-            if (l < _exploredRegion.ExploredLeft)
-                _exploredRegion.ExploredLeft = l;
-            if (r > _exploredRegion.ExploredRight)
-                _exploredRegion.ExploredRight = r;
+            _exploredRegion.ExploredLeft = Math.Min(_exploredRegion.ExploredLeft, l);
+            _exploredRegion.ExploredRight = Math.Max(_exploredRegion.ExploredRight, r);
         }
 
         if (kingdom.teleExitP1)
@@ -589,7 +571,7 @@ public class OverlayMapHolder : MonoBehaviour
             poiList.Add(new MarkInfo(campfire.transform.position.x, MarkerStyle.Campfire.Color, MarkerStyle.Campfire.Sign, Strings.Campfire));
         }
 
-        var chestList = gameLayer.GetComponentsInChildren<Chest>();
+        var chestList = _gameLayer.GetComponentsInChildren<Chest>();
         foreach (var obj in chestList)
         {
             if (obj.currencyAmount == 0) continue;
@@ -653,7 +635,7 @@ public class OverlayMapHolder : MonoBehaviour
             poiList.Add(new MarkInfo(obj.transform.position.x, MarkerStyle.WallFoundation.Color, MarkerStyle.WallFoundation.Sign, ""));
         }
 
-        var riverList = gameLayer.GetComponentsInChildren<River>();
+        var riverList = _gameLayer.GetComponentsInChildren<River>();
         foreach (var obj in riverList)
         {
             poiList.Add(new MarkInfo(obj.transform.position.x, MarkerStyle.River.Color, MarkerStyle.River.Sign, ""));
@@ -839,7 +821,7 @@ public class OverlayMapHolder : MonoBehaviour
         if (summonBell)
             poiList.Add(new MarkInfo(summonBell.transform.position.x, MarkerStyle.SummonBell.Color, MarkerStyle.SummonBell.Sign, Strings.SummonBell));
 
-        var hephaestusForge = gameLayer.GetComponentInChildren<HephaestusForge>();
+        var hephaestusForge = _gameLayer.GetComponentInChildren<HephaestusForge>();
         if (hephaestusForge)
             poiList.Add(new MarkInfo(hephaestusForge.transform.position.x, MarkerStyle.HephaestusForge.Color, MarkerStyle.HephaestusForge.Sign, Strings.HephaestusForge));
 
@@ -982,7 +964,7 @@ public class OverlayMapHolder : MonoBehaviour
 
         foreach (var poi in poiList)
         {
-            if (showFullMap)
+            if (ShowFullMap)
                 poi.Visible = true;
             else if(poi.WorldPosX >= _exploredRegion.ExploredLeft && poi.WorldPosX <= _exploredRegion.ExploredRight)
                 poi.Visible = true;
@@ -1015,7 +997,7 @@ public class OverlayMapHolder : MonoBehaviour
             poi.Pos = (poi.WorldPosX - startPos) * scale + 16;
         }
 
-        minimapMarkList = poiList;
+        _minimapMarkList = poiList;
 
         // Make wall lines
 
@@ -1056,7 +1038,7 @@ public class OverlayMapHolder : MonoBehaviour
             }
         }
 
-        drawLineList = lineList;
+        _drawLineList = lineList;
     }
 
     private static bool IsYourSelf(int playerId, string name)
@@ -1086,12 +1068,12 @@ public class OverlayMapHolder : MonoBehaviour
         Rect boxRect = new Rect(5, 5, Screen.width - 10, boxHeight);
         GUI.Box(boxRect, "", _guiBoxStyle);
 
-        foreach (var line in drawLineList)
+        foreach (var line in _drawLineList)
         {
             GuiHelper.DrawLine(line.LineStart, line.LineEnd, line.Color, 2);
         }
 
-        foreach (var markInfo in minimapMarkList)
+        foreach (var markInfo in _minimapMarkList)
         {
             if (!markInfo.Visible)
                 continue;
@@ -1111,11 +1093,11 @@ public class OverlayMapHolder : MonoBehaviour
                 }
             }
 
-            guiStyle.alignment = TextAnchor.UpperCenter;
-            guiStyle.normal.textColor = color;
+            _guiStyle.alignment = TextAnchor.UpperCenter;
+            _guiStyle.normal.textColor = color;
 
             if (markInfo.Sign != "")
-                GUI.Label(new Rect(markInfo.Pos, 8, 0, 20), markInfo.Sign, guiStyle);
+                GUI.Label(new Rect(markInfo.Pos, 8, 0, 20), markInfo.Sign, _guiStyle);
 
             float namePosY = markInfo.NameRow switch
             {
@@ -1125,10 +1107,10 @@ public class OverlayMapHolder : MonoBehaviour
             };
 
             if (markInfo.Name != "")
-                GUI.Label(new Rect(markInfo.Pos, namePosY, 0, 20), markName, guiStyle);
+                GUI.Label(new Rect(markInfo.Pos, namePosY, 0, 20), markName, _guiStyle);
 
             if (markInfo.Count != 0)
-                GUI.Label(new Rect(markInfo.Pos, namePosY + 16, 0, 20), markInfo.Count.ToString(), guiStyle);
+                GUI.Label(new Rect(markInfo.Pos, namePosY + 16, 0, 20), markInfo.Count.ToString(), _guiStyle);
 
             // if (markInfo.Name != "")
             // GUI.Label(new Rect(markInfo.Pos, namePosY + 36, 0, 20), ((int)markInfo.WorldPosX).ToString(), guiStyle);
@@ -1141,16 +1123,16 @@ public class OverlayMapHolder : MonoBehaviour
         if (kingdom == null) return;
 
         var peasantList = GameObject.FindGameObjectsWithTag(Tags.Peasant);
-        statsInfo.PeasantCount = peasantList.Length;
+        _statsInfo.PeasantCount = peasantList.Length;
 
         var workerList = kingdom._workers;
-        statsInfo.WorkerCount = workerList.Count;
+        _statsInfo.WorkerCount = workerList.Count;
 
         var archerList = kingdom._archers;
-        statsInfo.ArcherCount = archerList.Count;
+        _statsInfo.ArcherCount = archerList.Count;
 
         var farmerList = kingdom.Farmers;
-        statsInfo.FarmerCount = farmerList.Count;
+        _statsInfo.FarmerCount = farmerList.Count;
 
         var farmhouseList = kingdom.GetFarmHouses();
         int maxFarmlands = 0;
@@ -1158,13 +1140,13 @@ public class OverlayMapHolder : MonoBehaviour
         {
             maxFarmlands += obj.CurrentMaxFarmlands();
         }
-        statsInfo.MaxFarmlands = maxFarmlands;
+        _statsInfo.MaxFarmlands = maxFarmlands;
     }
 
     private void DrawStatsInfo(int playerId)
     {
-        guiStyle.normal.textColor = MarkerStyle.StatsInfo.Color;
-        guiStyle.alignment = TextAnchor.UpperLeft;
+        _guiStyle.normal.textColor = MarkerStyle.StatsInfo.Color;
+        _guiStyle.alignment = TextAnchor.UpperLeft;
 
         float boxTop = 160;
         if (Managers.COOP_ENABLED)
@@ -1174,38 +1156,38 @@ public class OverlayMapHolder : MonoBehaviour
         var boxRect = new Rect(5, boxTop, 120, 146);
         GUI.Box(boxRect, "", _guiBoxStyle);
 
-        GUI.Label(new Rect(14, boxTop + 6 + 20 * 0, 120, 20), Strings.Peasant + ": " + statsInfo.PeasantCount, guiStyle);
-        GUI.Label(new Rect(14, boxTop + 6 + 20 * 1, 120, 20), Strings.Worker + ": " + statsInfo.WorkerCount, guiStyle);
-        GUI.Label(new Rect(14, boxTop + 6 + 20 * 2, 120, 20), $"{Strings.Archer.Value}: {statsInfo.ArcherCount} ({GameExtensions.GetArcherCount(GameExtensions.ArcherType.Free)}|{GameExtensions.GetArcherCount(GameExtensions.ArcherType.GuardSlot)}|{GameExtensions.GetArcherCount(GameExtensions.ArcherType.KnightSoldier)})", guiStyle);
-        GUI.Label(new Rect(14, boxTop + 6 + 20 * 3, 120, 20), Strings.Pikeman + ": " + kingdom.Pikemen.Count, guiStyle);
-        GUI.Label(new Rect(14, boxTop + 6 + 20 * 4, 120, 20), $"{Strings.Knight.Value}: {kingdom.Knights.Count} ({GameExtensions.GetKnightCount(true)})", guiStyle);
-        GUI.Label(new Rect(14, boxTop + 6 + 20 * 5, 120, 20), Strings.Farmer + ": " + statsInfo.FarmerCount, guiStyle);
-        GUI.Label(new Rect(14, boxTop + 6 + 20 * 6, 120, 20), Strings.Farmlands + ": " + statsInfo.MaxFarmlands, guiStyle);
+        GUI.Label(new Rect(14, boxTop + 6 + 20 * 0, 120, 20), Strings.Peasant + ": " + _statsInfo.PeasantCount, _guiStyle);
+        GUI.Label(new Rect(14, boxTop + 6 + 20 * 1, 120, 20), Strings.Worker + ": " + _statsInfo.WorkerCount, _guiStyle);
+        GUI.Label(new Rect(14, boxTop + 6 + 20 * 2, 120, 20), $"{Strings.Archer.Value}: {_statsInfo.ArcherCount} ({GameExtensions.GetArcherCount(GameExtensions.ArcherType.Free)}|{GameExtensions.GetArcherCount(GameExtensions.ArcherType.GuardSlot)}|{GameExtensions.GetArcherCount(GameExtensions.ArcherType.KnightSoldier)})", _guiStyle);
+        GUI.Label(new Rect(14, boxTop + 6 + 20 * 3, 120, 20), Strings.Pikeman + ": " + kingdom.Pikemen.Count, _guiStyle);
+        GUI.Label(new Rect(14, boxTop + 6 + 20 * 4, 120, 20), $"{Strings.Knight.Value}: {kingdom.Knights.Count} ({GameExtensions.GetKnightCount(true)})", _guiStyle);
+        GUI.Label(new Rect(14, boxTop + 6 + 20 * 5, 120, 20), Strings.Farmer + ": " + _statsInfo.FarmerCount, _guiStyle);
+        GUI.Label(new Rect(14, boxTop + 6 + 20 * 6, 120, 20), Strings.Farmlands + ": " + _statsInfo.MaxFarmlands, _guiStyle);
     }
 
     private void DrawExtraInfo(int playerId)
     {
-        guiStyle.normal.textColor = MarkerStyle.ExtraInfo.Color;
-        guiStyle.alignment = TextAnchor.UpperLeft;
+        _guiStyle.normal.textColor = MarkerStyle.ExtraInfo.Color;
+        _guiStyle.alignment = TextAnchor.UpperLeft;
 
         var left = Screen.width / 2 - 20;
         var top = 136;
         if (Managers.COOP_ENABLED)
             top = 136 - 56;
 
-        GUI.Label(new Rect(14, top, 60, 20),  Strings.Land + ": " + (Managers.Inst.game.currentLand + 1), guiStyle);
-        GUI.Label(new Rect(14 + 60, top, 60, 20), Strings.Days + ": " + (Managers.Inst.director.CurrentDayForSpawning), guiStyle);
+        GUI.Label(new Rect(14, top, 60, 20),  Strings.Land + ": " + (Managers.Inst.game.currentLand + 1), _guiStyle);
+        GUI.Label(new Rect(14 + 60, top, 60, 20), Strings.Days + ": " + (Managers.Inst.director.CurrentDayForSpawning), _guiStyle);
 
         float currentTime = Managers.Inst.director.currentTime;
         var currentHour = Math.Truncate(currentTime);
         var currentMints = Math.Truncate((currentTime - currentHour) * 60);
-        GUI.Label(new Rect(left, top + 22, 40, 20), $"{currentHour:00.}:{currentMints:00.}", guiStyle);
+        GUI.Label(new Rect(left, top + 22, 40, 20), $"{currentHour:00.}:{currentMints:00.}", _guiStyle);
 
         var player = Managers.Inst.kingdom.GetPlayer(playerId);
         if (player != null)
         {
-            GUI.Label(new Rect(Screen.width - 126, 136 + 22, 60, 20), Strings.Gems + ": " + player.gems, guiStyle);
-            GUI.Label(new Rect(Screen.width - 66, 136 + 22, 60, 20), Strings.Coins + ": " + player.coins, guiStyle);
+            GUI.Label(new Rect(Screen.width - 126, 136 + 22, 60, 20), Strings.Gems + ": " + player.gems, _guiStyle);
+            GUI.Label(new Rect(Screen.width - 66, 136 + 22, 60, 20), Strings.Coins + ": " + player.coins, _guiStyle);
         }
     }
 
@@ -1281,6 +1263,28 @@ public class OverlayMapHolder : MonoBehaviour
         return bepInExDir;
     }
 
+    public static void LogDebug(string message,
+        [System.Runtime.CompilerServices.CallerMemberName]
+        string memberName = "",
+        [System.Runtime.CompilerServices.CallerFilePath]
+        string sourceFilePath = "",
+        [System.Runtime.CompilerServices.CallerLineNumber]
+        int sourceLineNumber = 0)
+    {
+        _log.LogDebug($"[{Path.GetFileName(sourceFilePath)}][{sourceLineNumber.ToString("0000")}][{memberName}] {message}");
+    }
+
+    public static void LogTrace(string message,
+        [System.Runtime.CompilerServices.CallerMemberName]
+        string memberName = "",
+        [System.Runtime.CompilerServices.CallerFilePath]
+        string sourceFilePath = "",
+        [System.Runtime.CompilerServices.CallerLineNumber]
+        int sourceLineNumber = 0)
+    {
+        _log.LogInfo($"[{Path.GetFileName(sourceFilePath)}][{sourceLineNumber.ToString("0000")}][{memberName}] {message}");
+    }
+
     public static void LogMessage(string message,
         [System.Runtime.CompilerServices.CallerMemberName]
         string memberName = "",
@@ -1292,17 +1296,6 @@ public class OverlayMapHolder : MonoBehaviour
         _log.LogMessage($"[{Path.GetFileName(sourceFilePath)}][{sourceLineNumber.ToString("0000")}][{memberName}] {message}");
     }
 
-    public static void LogError(string message,
-        [System.Runtime.CompilerServices.CallerMemberName]
-        string memberName = "",
-        [System.Runtime.CompilerServices.CallerFilePath]
-        string sourceFilePath = "",
-        [System.Runtime.CompilerServices.CallerLineNumber]
-        int sourceLineNumber = 0)
-    {
-        _log.LogError($"[{Path.GetFileName(sourceFilePath)}][{sourceLineNumber.ToString("0000")}][{memberName}] {message}");
-    }
-
     public static void LogWarning(string message,
         [System.Runtime.CompilerServices.CallerMemberName]
         string memberName = "",
@@ -1312,6 +1305,17 @@ public class OverlayMapHolder : MonoBehaviour
         int sourceLineNumber = 0)
     {
         _log.LogWarning($"[{Path.GetFileName(sourceFilePath)}][{sourceLineNumber.ToString("0000")}][{memberName}] {message}");
+    }
+
+    public static void LogError(string message,
+        [System.Runtime.CompilerServices.CallerMemberName]
+        string memberName = "",
+        [System.Runtime.CompilerServices.CallerFilePath]
+        string sourceFilePath = "",
+        [System.Runtime.CompilerServices.CallerLineNumber]
+        int sourceLineNumber = 0)
+    {
+        _log.LogError($"[{Path.GetFileName(sourceFilePath)}][{sourceLineNumber.ToString("0000")}][{memberName}] {message}");
     }
 }
 

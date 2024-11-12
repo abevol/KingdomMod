@@ -32,7 +32,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                     view.PlayerMarkers.Add(marker);
                 }
 
-                LogMessage($"player.playerId: {((Player)component).playerId}, _playerMarkers.Count: {view.PlayerMarkers.Count}");
+                LogDebug($"player.playerId: {((Player)component).playerId}, _playerMarkers.Count: {view.PlayerMarkers.Count}");
             }
         }
     }

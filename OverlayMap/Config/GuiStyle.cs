@@ -46,7 +46,7 @@ public class GuiStyle
 
     public static void ConfigBind(ConfigFile config)
     {
-        LogMessage($"ConfigBind: {Path.GetFileName(config.ConfigFilePath)}");
+        LogDebug($"ConfigBind: {Path.GetFileName(config.ConfigFilePath)}");
 
         ConfigFile = config;
         config.SaveOnConfigSet = false;
@@ -69,7 +69,7 @@ public class GuiStyle
         TopMap.Count.FontSize = config.Bind("TopMap.Count", "FontSize", 12.0f, "");
         TopMap.Count.FallbackFonts = config.Bind("TopMap.Count", "FallbackFonts", "", "");
 
-        LogMessage($"Loaded config: {Path.GetFileName(ConfigFile.ConfigFilePath)}");
+        LogDebug($"Loaded config: {Path.GetFileName(ConfigFile.ConfigFilePath)}");
 
         _configFileWatcher.Set(Path.GetFileName(config.ConfigFilePath), OnConfigFileChanged);
     }
@@ -78,13 +78,13 @@ public class GuiStyle
     {
         try
         {
-            LogMessage($"OnConfigFileChanged: {e.Name}, {e.ChangeType}");
+            LogDebug($"OnConfigFileChanged: {e.Name}, {e.ChangeType}");
             ConfigFile.Reload();
             OverlayMapHolder.Instance.NeedToReloadGuiBoxStyle = true;
         }
         catch (Exception exception)
         {
-            LogMessage($"HResult: {exception.HResult:X}, {exception.Message}");
+            LogError($"HResult: {exception.HResult:X}, {exception.Message}");
         }
     }
 }

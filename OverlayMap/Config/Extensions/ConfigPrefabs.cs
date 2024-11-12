@@ -47,10 +47,10 @@ public class ConfigPrefabs
         foreach (var prefab in _prefabs)
         {
             var configFile = Path.Combine(BepInExDir, "config", prefab.FileName);
-            LogMessage($"Config prefab file: {configFile}");
+            LogDebug($"Config prefab file: {configFile}");
             if (!File.Exists(configFile))
             {
-                LogMessage($"Config prefab file do not exist: {configFile}");
+                LogDebug($"Config prefab file do not exist: {configFile}");
 
                 var directoryPath = Path.GetDirectoryName(configFile);
                 if (directoryPath != null)

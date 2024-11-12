@@ -18,7 +18,7 @@ public class Global
 
     public static void ConfigBind(ConfigFile config)
     {
-        LogMessage($"ConfigBind: {Path.GetFileName(config.ConfigFilePath)}");
+        LogDebug($"ConfigBind: {Path.GetFileName(config.ConfigFilePath)}");
 
         ConfigPrefabs.Initialize();
 
@@ -31,13 +31,13 @@ public class Global
         GuiStyleFile = config.Bind("Global", "GuiStyleFile", "KingdomMod.OverlayMap.GuiStyle.cfg", "");
         GuiUpdatesPerSecond = config.Bind("Global", "GuiUpdatesPerSecond", 10, "Increase to be more accurate, decrease to reduce performance impact");
 
-        LogMessage($"ConfigFilePath: {config.ConfigFilePath}");
-        LogMessage($"Language: {Language.Value}");
-        LogMessage($"MarkerStyleFile: {MarkerStyleFile.Value}");
-        LogMessage($"GuiStyleFile: {GuiStyleFile.Value}");
-        LogMessage($"GuiUpdatesPerSecond: {GuiUpdatesPerSecond.Value}");
+        LogDebug($"ConfigFilePath: {config.ConfigFilePath}");
+        LogDebug($"Language: {Language.Value}");
+        LogDebug($"MarkerStyleFile: {MarkerStyleFile.Value}");
+        LogDebug($"GuiStyleFile: {GuiStyleFile.Value}");
+        LogDebug($"GuiUpdatesPerSecond: {GuiUpdatesPerSecond.Value}");
 
-        LogMessage($"Loaded config: {Path.GetFileName(ConfigFile.ConfigFilePath)}");
+        LogDebug($"Loaded config: {Path.GetFileName(ConfigFile.ConfigFilePath)}");
 
         OnLanguageChanged();
         OnMarkerStyleFileChanged();
@@ -51,13 +51,13 @@ public class Global
     {
         try
         {
-            // LogMessage($"OnConfigFileChanged: {e.Name}, {e.ChangeType}");
+            // LogDebug($"OnConfigFileChanged: {e.Name}, {e.ChangeType}");
 
             ConfigFile.Reload();
         }
         catch (Exception exception)
         {
-            LogMessage($"HResult: {exception.HResult:X}, {exception.Message}");
+            LogError($"HResult: {exception.HResult:X}, {exception.Message}");
         }
     }
 
@@ -70,14 +70,14 @@ public class Global
 
     public static void OnLanguageChanged()
     {
-        LogMessage($"OnLanguageChanged: {Language.Entry.Value}");
+        LogDebug($"OnLanguageChanged: {Language.Entry.Value}");
 
         var lang = Language.Value;
         if (lang is "" or "system")
             lang = CultureInfo.CurrentCulture.Name;
 
         var langFile = Path.Combine(BepInExDir, "config", $"KingdomMod.OverlayMap.Language.{lang}.cfg");
-        LogMessage($"Language file: {langFile}");
+        LogDebug($"Language file: {langFile}");
 
         if (!File.Exists(langFile))
         {
@@ -109,21 +109,21 @@ public class Global
         {
             if (Path.GetFileName(Strings.ConfigFile.ConfigFilePath) == Path.GetFileName(langFile))
             {
-                LogMessage("Attempt to load the same configuration file. Skip.");
+                LogDebug("Attempt to load the same configuration file. Skip.");
                 return;
             }
         }
 
-        LogMessage($"Try to bind Language file: {Path.GetFileName(langFile)}");
+        LogDebug($"Try to bind Language file: {Path.GetFileName(langFile)}");
         Strings.ConfigBind(new ConfigFile(langFile, true));
     }
 
     public static void OnMarkerStyleFileChanged()
     {
-        LogMessage($"OnMarkerStyleFileChanged: {MarkerStyleFile.Value}");
+        LogDebug($"OnMarkerStyleFileChanged: {MarkerStyleFile.Value}");
 
         var styleFile = Path.Combine(BepInExDir, "config", MarkerStyleFile);
-        LogMessage($"MarkerStyle file: {styleFile}");
+        LogDebug($"MarkerStyle file: {styleFile}");
 
         if (!File.Exists(styleFile))
         {
@@ -138,21 +138,21 @@ public class Global
         {
             if (Path.GetFileName(MarkerStyle.ConfigFile.ConfigFilePath) == Path.GetFileName(styleFile))
             {
-                LogMessage("Attempt to load the same configuration file. Skip.");
+                LogDebug("Attempt to load the same configuration file. Skip.");
                 return;
             }
         }
 
-        LogMessage($"Try to bind MarkerStyle file: {Path.GetFileName(styleFile)}");
+        LogDebug($"Try to bind MarkerStyle file: {Path.GetFileName(styleFile)}");
         MarkerStyle.ConfigBind(new ConfigFile(styleFile, true));
     }
 
     public static void OnGuiStyleFileChanged()
     {
-        LogMessage($"OnGuiStyleFileChanged: {GuiStyleFile.Value}");
+        LogDebug($"OnGuiStyleFileChanged: {GuiStyleFile.Value}");
 
         var styleFile = Path.Combine(BepInExDir, "config", GuiStyleFile);
-        LogMessage($"GuiStyle file: {styleFile}");
+        LogDebug($"GuiStyle file: {styleFile}");
 
         if (!File.Exists(styleFile))
         {
@@ -167,12 +167,12 @@ public class Global
         {
             if (Path.GetFileName(GuiStyle.ConfigFile.ConfigFilePath) == Path.GetFileName(styleFile))
             {
-                LogMessage("Attempt to load the same configuration file. Skip.");
+                LogDebug("Attempt to load the same configuration file. Skip.");
                 return;
             }
         }
 
-        LogMessage($"Try to bind GuiStyle file: {Path.GetFileName(styleFile)}");
+        LogDebug($"Try to bind GuiStyle file: {Path.GetFileName(styleFile)}");
         GuiStyle.ConfigBind(new ConfigFile(styleFile, true));
     }
 }

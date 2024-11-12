@@ -1,6 +1,5 @@
 ﻿using System;
 using UnityEngine;
-using UnityEngine.UI;
 using KingdomMod.OverlayMap.Config;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
 using TMPro;
@@ -32,9 +31,9 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
             _rectTransform.pivot = new Vector2(0.5f, 0.5f); // 以顶部中心为支点
 
             // _icon = this.gameObject.AddComponent<Image>();
-            _sign = CreateTextObject("Sign", -10, _owner.Style.SignFont, _owner.Style.SignFontSize);
-            _title = CreateTextObject("Title", -26, _owner.Style.TitleFont, _owner.Style.TitleFontSize);
-            _count = CreateTextObject("Count", -26 - 16, _owner.Style.CountFont, _owner.Style.CountFontSize);
+            _sign = CreateTextObject("Sign", -10, _owner.Style.SignFont.Font, _owner.Style.SignFontSize);
+            _title = CreateTextObject("Title", -26, _owner.Style.TitleFont.Font, _owner.Style.TitleFontSize);
+            _count = CreateTextObject("Count", -26 - 16, _owner.Style.CountFont.Font, _owner.Style.CountFontSize);
 
         }
 
@@ -144,7 +143,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
 
         public void UpdateSign(string text)
         {
-            FontManager.TryAddCharacters(_sign.font, text);
+            _owner.Style.SignFont.TryAddCharacters(text);
             _sign.text = text;
         }
 
@@ -158,9 +157,14 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
             _sign.fontSize = fontSize;
         }
 
+        public void ForceSignMeshUpdate()
+        {
+            _sign.ForceMeshUpdate();
+        }
+
         public void UpdateTitle(string text)
         {
-            FontManager.TryAddCharacters(_title.font, text);
+            _owner.Style.TitleFont.TryAddCharacters(text);
             _title.text = text;
         }
 
@@ -174,8 +178,14 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
             _title.fontSize = fontSize;
         }
 
+        public void ForceTitleMeshUpdate()
+        {
+            _title.ForceMeshUpdate();
+        }
+
         public void UpdateCount(int count)
         {
+            _owner.Style.CountFont.TryAddCharacters(count.ToString());
             _count.text = count == 0 ? "" : count.ToString();
         }
 
@@ -187,6 +197,11 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
         public void UpdateCountFontSize(float fontSize)
         {
             _count.fontSize = fontSize;
+        }
+
+        public void ForceCountMeshUpdate()
+        {
+            _count.ForceMeshUpdate();
         }
 
         public void UpdateVisible(bool visible)

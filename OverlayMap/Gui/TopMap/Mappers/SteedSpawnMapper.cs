@@ -17,7 +17,8 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                 return;
 
             view.TryAddMapMarker(component, MarkerStyle.SteedSpawns.Color, MarkerStyle.SteedSpawns.Sign, steedName,
-                comp => ((SteedSpawn)comp).Price);
+                comp => ((SteedSpawn)comp).Price, null,
+                comp => !((SteedSpawn)comp).HasSpawned);
         }
     }
 }
