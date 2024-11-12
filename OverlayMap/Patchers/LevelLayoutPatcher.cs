@@ -20,11 +20,11 @@ public class LevelLayoutPatcher
         public static void Postfix(LevelLayout __instance)
         {
 
-            LogMessage($"LevelLayout.Constructor, TotalWidth: {__instance.TotalWidth()}, " +
-                       $"minLevelWidth: {Managers.Inst.game.currentLevelConfig.minLevelWidth}, " +
-                       $"levelWidth: {Managers.Inst.level.levelWidth}, " +
-                       $"GroundCollider: {Managers.Inst.level.GroundCollider.size.x}, " +
-                       $"TotalWidth: {TotalWidth()}");
+            LogDebug($"LevelLayout.Constructor, TotalWidth: {__instance.TotalWidth()}, " +
+                     $"minLevelWidth: {Managers.Inst.game.currentLevelConfig.minLevelWidth}, " +
+                     $"levelWidth: {Managers.Inst.level.levelWidth}, " +
+                     $"GroundCollider: {Managers.Inst.level.GroundCollider.size.x}, " +
+                     $"TotalWidth: {TotalWidth()}");
         }
 
         public static int TotalWidth()

@@ -134,7 +134,7 @@ public class Strings
 
     public static void ConfigBind(ConfigFile config)
     {
-        LogMessage($"ConfigBind: {Path.GetFileName(config.ConfigFilePath)}");
+        LogDebug($"ConfigBind: {Path.GetFileName(config.ConfigFilePath)}");
 
         ConfigFile = config;
         config.SaveOnConfigSet = false;
@@ -258,7 +258,7 @@ public class Strings
         HephaestusForge = config.Bind("Strings", "HephaestusForge", "HephaestusForge", "");
         Lighthouse = config.Bind("Strings", "Lighthouse", "Lighthouse", "");
 
-        LogMessage($"Loaded config: {Path.GetFileName(ConfigFile.ConfigFilePath)}");
+        LogDebug($"Loaded config: {Path.GetFileName(ConfigFile.ConfigFilePath)}");
 
         InitSteedNames();
         InitMonarchNames();
@@ -350,13 +350,13 @@ public class Strings
     {
         try
         {
-            LogMessage($"OnConfigFileChanged: {e.Name}, {e.ChangeType}");
+            LogDebug($"OnConfigFileChanged: {e.Name}, {e.ChangeType}");
 
             ConfigFile.Reload();
         }
         catch (Exception exception)
         {
-            LogMessage($"HResult: {exception.HResult:X}, {exception.Message}");
+            LogError($"HResult: {exception.HResult:X}, {exception.Message}");
         }
     }
 }

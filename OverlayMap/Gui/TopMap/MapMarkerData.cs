@@ -27,6 +27,8 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
 
         private int _count;
         private bool _visible;
+        private bool _visibleBeforeFow;
+        private bool _isInFogOfWar;
 
         public TopMapView Owner;
         public MapMarker Self;
@@ -42,7 +44,6 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
                 {
                     if (_color != null)
                     {
-                        LogMessage($"old color: {_color.Value}, PlayerId: {Owner.PlayerId}, Target: {Target.name}");
                         _color.Entry.SettingChanged -= Self.OnColorConfigChanged;
                     }
 
@@ -51,7 +52,6 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
                     {
                         _color.Entry.SettingChanged += Self.OnColorConfigChanged;
                         Self.UpdateColor(_color);
-                        LogMessage($"update color: {_color.Value}, PlayerId: {Owner.PlayerId}, Target: {Target.name}");
                     }
                 }
             }
@@ -125,6 +125,27 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
             }
         }
 
+        public bool IsInFogOfWar
+        {
+            get => _isInFogOfWar;
+            set
+            {
+                if (_isInFogOfWar != value)
+                {
+                    _isInFogOfWar = value;
+                    if (_isInFogOfWar)
+                    {
+                        _visibleBeforeFow = Visible;
+                        Visible = false;
+                    }
+                    else
+                    {
+                        Visible = _visibleBeforeFow;
+                    }
+                }
+            }
+        }
+
         public ColorUpdaterFn ColorUpdater;
         public CountUpdaterFn CountUpdater;
         public VisibleUpdaterFn VisibleUpdater;
@@ -137,7 +158,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
 
         protected virtual void Dispose(bool disposing)
         {
-            LogMessage($"Disposing MapMarkerData for {Title?.Value}, disposing: {disposing}");
+            LogDebug($"Disposing MapMarkerData for {Title?.Value}, disposing: {disposing}");
             if (!_disposed)
             {
                 if (disposing)

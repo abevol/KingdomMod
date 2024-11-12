@@ -10,7 +10,7 @@ namespace KingdomMod.OverlayMap.Patchers
         {
             public static void Postfix(Player __instance, int id)
             {
-                LogMessage($"PlayerPatcher.SetupAsPlayer, id: {id}");
+                LogDebug($"PlayerPatcher.SetupAsPlayer, id: {id}");
                 OverlayMapHolder.Instance.PlayerOverlays.P1?.TopMapView?.OnSetupPlayerId(__instance, id);
                 OverlayMapHolder.Instance.PlayerOverlays.P2?.TopMapView?.OnSetupPlayerId(__instance, id);
             }

@@ -21,8 +21,9 @@ public class TopMapView : MonoBehaviour
     private float _timeSinceLastGuiUpdate = 0;
 
     public static float MappingScale;
-    // public static float ZoomScale;
     // public static float MapOffset;
+    // public static float ZoomScale;
+    public static readonly ExploredRegion ExploredRegion = new();
     public PlayerId PlayerId;
     public TopMapStyle Style = new();
     public Dictionary<Component, MapMarker> MapMarkers => _mapMarkers;
@@ -30,7 +31,7 @@ public class TopMapView : MonoBehaviour
 
     public TopMapView()
     {
-        LogMessage("TopMapView.Constructor");
+        LogTrace("TopMapView.Constructor");
 
         _componentMappers = new Dictionary<Type, IComponentMapper>
         {
@@ -73,7 +74,7 @@ public class TopMapView : MonoBehaviour
 
     private void Awake()
     {
-        LogMessage("TopMapView.Awake");
+        LogTrace("TopMapView.Awake");
 
         _rectTransform = this.gameObject.AddComponent<RectTransform>();
         _backgroundImage = this.gameObject.AddComponent<Image>();
@@ -108,7 +109,8 @@ public class TopMapView : MonoBehaviour
 
     private void Start()
     {
-        LogMessage("TopMapView.Start");
+        LogTrace("TopMapView.Start");
+
     }
 
     public void UpdateLayout()
@@ -131,7 +133,7 @@ public class TopMapView : MonoBehaviour
 
     private void OnGameStateChanged(Game.State state)
     {
-        LogMessage($"OnGameStateChanged.state changed to {state}");
+        LogTrace($"OnGameStateChanged.state changed to {state}");
 
         switch (state)
         {
@@ -149,14 +151,15 @@ public class TopMapView : MonoBehaviour
 
     public void OnP2StateChanged(Game game, bool joined)
     {
-        LogMessage("TopMapView.OnP2StateChanged");
+        LogDebug("TopMapView.OnP2StateChanged");
+
         UpdateLayout();
         UpdatePlayerMarker();
     }
 
     public void OnSetupPlayerId(Player player, int id)
     {
-        LogMessage($"TopMapView.OnSetupPlayerId: {player.playerId}, id: {id}");
+        LogDebug($"TopMapView.OnSetupPlayerId: {player.playerId}, id: {id}");
 
     }
 
@@ -167,19 +170,19 @@ public class TopMapView : MonoBehaviour
             var player = (Player)playerMarker.Data.Target;
             if (IsYourSelf(player))
             {
-                LogMessage($"IsYourSelf, PlayerId: {PlayerId}, player.playerId: {player.playerId}");
+                LogDebug($"IsYourSelf, PlayerId: {PlayerId}, player.playerId: {player.playerId}");
                 playerMarker.Data.Title = Strings.You;
                 playerMarker.Data.Color = MarkerStyle.PlayerSelf.Color;
             }
             else if (player.playerId == (int)PlayerId.P1)
             {
-                LogMessage($"IsP1, PlayerId: {PlayerId}, player.playerId: {player.playerId}");
+                LogDebug($"IsP1, PlayerId: {PlayerId}, player.playerId: {player.playerId}");
                 playerMarker.Data.Title = Strings.P1;
                 playerMarker.Data.Color = MarkerStyle.Player.Color;
             }
             else if (player.playerId == (int)PlayerId.P2)
             {
-                LogMessage($"IsP2, PlayerId: {PlayerId}, player.playerId: {player.playerId}");
+                LogDebug($"IsP2, PlayerId: {PlayerId}, player.playerId: {player.playerId}");
                 playerMarker.Data.Title = Strings.P2;
                 playerMarker.Data.Color = MarkerStyle.Player.Color;
             }
@@ -208,7 +211,7 @@ public class TopMapView : MonoBehaviour
 
     private void OnDirectorStateChanged(ProgramDirector.State state)
     {
-        LogMessage($"ProgramDirector.state changed to {state}");
+        LogTrace($"ProgramDirector.state changed to {state}");
 
         if (state == ProgramDirector.State.LoadingMainScene)
         {
@@ -217,12 +220,14 @@ public class TopMapView : MonoBehaviour
 
     public void OnGameStart()
     {
-        LogMessage("TopMapView.OnGameStart");
+        LogTrace("TopMapView.OnGameStart");
+
+        ExploredRegion.Init();
 
         var clientWidth = Screen.width - 40f;
         var minLevelWidth = Managers.Inst.game.currentLevelConfig.minLevelWidth;
         MappingScale = clientWidth / minLevelWidth;
-        LogMessage($"MappingScale: {MappingScale}, minLevelWidth: {minLevelWidth}");
+        LogTrace($"MappingScale: {MappingScale}, minLevelWidth: {minLevelWidth}");
 
         UpdatePlayerMarker();
     }
@@ -231,7 +236,7 @@ public class TopMapView : MonoBehaviour
     {
         if (_componentMappers.TryGetValue(component.GetType(), out var mapper))
         {
-            LogMessage($"TopMapView.OnComponentCreated, component: {component}, sources: [{string.Join(", ", sources)}]");
+            LogTrace($"TopMapView.OnComponentCreated, component: {component}, sources: [{string.Join(", ", sources)}]");
             mapper.Map(component);
         }
     }
@@ -239,6 +244,29 @@ public class TopMapView : MonoBehaviour
     private void OnComponentDestroyed(Component component, HashSet<SourceFlag> sources)
     {
         TryRemoveMapMarker(component, sources);
+    }
+
+    private void UpdateExploredRegion()
+    {
+        foreach (var playerMarker in PlayerMarkers)
+        {
+            var player = playerMarker.Data.Target as Player;
+            if (player == null) continue;
+            if (player.isActiveAndEnabled == false) continue;
+            var mover = player.mover;
+            if (mover == null) continue;
+
+            float l = mover.transform.position.x - 12;
+            float r = mover.transform.position.x + 12;
+            ExploredRegion.ExploredLeft = Math.Min(ExploredRegion.ExploredLeft, l);
+            ExploredRegion.ExploredRight = Math.Max(ExploredRegion.ExploredRight, r);
+        }
+
+        float wallLeft = Managers.Inst.kingdom.GetBorderSide(Side.Left);
+        float wallRight = Managers.Inst.kingdom.GetBorderSide(Side.Right);
+
+        ExploredRegion.ExploredLeft = Math.Min(ExploredRegion.ExploredLeft, wallLeft);
+        ExploredRegion.ExploredRight = Math.Max(ExploredRegion.ExploredRight, wallRight);
     }
 
     private void Update()
@@ -251,9 +279,17 @@ public class TopMapView : MonoBehaviour
 
             if (!IsPlaying()) return;
 
+            UpdateExploredRegion();
+
             foreach (var pair in _mapMarkers)
             {
                 var markerData = pair.Value.Data;
+                var worldPosX = markerData.Target.transform.position.x;
+                markerData.IsInFogOfWar = !(ShowFullMap || (worldPosX >= ExploredRegion.ExploredLeft && worldPosX <= ExploredRegion.ExploredRight));
+
+                if (markerData.IsInFogOfWar)
+                    continue;
+
                 if (markerData.VisibleUpdater != null)
                     markerData.Visible = markerData.VisibleUpdater(markerData.Target);
             }
@@ -272,7 +308,7 @@ public class TopMapView : MonoBehaviour
     {
         try
         {
-            LogMessage($"TopMapView.TryAddMapMarker, title: {title?.Value}, target: {target}");
+            LogDebug($"TopMapView.TryAddMapMarker, title: {title?.Value}, target: {target}");
 
             if (target.gameObject == null)
                 return null;
@@ -322,7 +358,7 @@ public class TopMapView : MonoBehaviour
     {
         if (_mapMarkers.TryGetValue(target, out var marker))
         {
-            LogMessage($"TopMapView.TryRemoveMapMarker, target: {target}, sources: [{string.Join(", ", sources)}]");
+            LogDebug($"TopMapView.TryRemoveMapMarker, target: {target}, sources: [{string.Join(", ", sources)}]");
 
             // 从列表中移除
             _mapMarkers.Remove(target);
@@ -333,7 +369,7 @@ public class TopMapView : MonoBehaviour
 
     public void ClearMapMarkers()
     {
-        LogMessage($"TopMapView.ClearMapMarkers");
+        LogDebug($"TopMapView.ClearMapMarkers");
         foreach (var pair in _mapMarkers)
         {
             Destroy(pair.Value.gameObject);

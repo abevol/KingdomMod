@@ -47,7 +47,7 @@ public class ObjectPatcher
 
     private static void HandleInstantiate(Object __result, HashSet<SourceFlag> sources)
     {
-        // LogMessage($"Object.Instantiate: {__result.GetType()}");
+        // LogDebug($"Object.Instantiate: {__result.GetType()}");
         if (__result is GameObject go)
         {
             sources.Add(SourceFlag.Create6);
@@ -61,7 +61,7 @@ public class ObjectPatcher
 
     private static void HandleDestroy(Object obj, HashSet<SourceFlag> sources)
     {
-        // LogMessage($"Object.Destroy: {obj.GetType()}");
+        // LogDebug($"Object.Destroy: {obj.GetType()}");
 
         if (obj is GameObject go)
         {
@@ -74,7 +74,7 @@ public class ObjectPatcher
         }
         else if (obj is Component comp)
         {
-            // LogMessage($"Object.Destroy: {comp.GetType()}");
+            // LogDebug($"Object.Destroy: {comp.GetType()}");
 
             sources.Add(SourceFlag.Destroy4);
             HandleComponentDestroy(comp, sources);

@@ -12,7 +12,7 @@ namespace KingdomMod.OverlayMap.Gui
 
         private void Awake()
         {
-            LogMessage("PlayerOverlay.Awake");
+            LogDebug("PlayerOverlay.Awake");
 
             _rectTransform = this.gameObject.AddComponent<RectTransform>();
             TopMapView = CreateTopMapView();
@@ -35,7 +35,7 @@ namespace KingdomMod.OverlayMap.Gui
 
         private void Start()
         {
-            LogMessage("PlayerOverlay.Start");
+            LogDebug("PlayerOverlay.Start");
 
             UpdateLayout();
         }
@@ -91,7 +91,7 @@ namespace KingdomMod.OverlayMap.Gui
 
         private void OnGameStateChanged(Game.State state)
         {
-            LogMessage($"OnGameStateChanged.state changed to {state}");
+            LogDebug($"OnGameStateChanged.state changed to {state}");
 
             switch (state)
             {
@@ -112,7 +112,7 @@ namespace KingdomMod.OverlayMap.Gui
 
         private TopMapView CreateTopMapView()
         {
-            LogMessage($"CreateTopMapView");
+            LogDebug($"CreateTopMapView");
 
             var viewObj = new GameObject(nameof(TopMap.TopMapView));
             viewObj.transform.SetParent(this.transform, false);
@@ -122,7 +122,7 @@ namespace KingdomMod.OverlayMap.Gui
 
         private void DestroyTopMapView()
         {
-            LogMessage($"DestroyTopMapView, _topMapView: {TopMapView}");
+            LogDebug($"DestroyTopMapView, _topMapView: {TopMapView}");
             if (TopMapView == null)
                 return;
 
