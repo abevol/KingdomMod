@@ -16,6 +16,24 @@ public class SaveDataExtras
     public static ConfigEntryWrapper<float> Time;
     public static ConfigEntryWrapper<int> Days;
 
+
+    public static void Init()
+    {
+        ConfigInit();
+        Save();
+        ConfigBind(GetArchiveFilename());
+
+        if (!HasAvailableConfig())
+        {
+            var player = GetLocalPlayer();
+            ExploredLeft.Value = player.transform.localPosition.x;
+            ExploredRight.Value = player.transform.localPosition.x;
+        }
+
+        if (ZoomScale <= 0)
+            ZoomScale.Value = 1.0f;
+    }
+
     public static void ConfigInit()
     {
         if (ConfigFile != null)
@@ -32,7 +50,7 @@ public class SaveDataExtras
     public static void ConfigBind(string archiveFilename)
     {
         MapOffset = ConfigFile.Bind(archiveFilename, "MapOffset", 0f);
-        ZoomScale = ConfigFile.Bind(archiveFilename, "ZoomScale", 0f);
+        ZoomScale = ConfigFile.Bind(archiveFilename, "ZoomScale", 1.0f);
         ExploredLeft = ConfigFile.Bind(archiveFilename, "ExploredLeft", 0f);
         ExploredRight = ConfigFile.Bind(archiveFilename, "ExploredRight", 0f);
         Time = ConfigFile.Bind(archiveFilename, "Time", 0f);
@@ -54,51 +72,25 @@ public class SaveDataExtras
         Days.Value = Managers.Inst.director.CurrentDayForSpawning;
         ConfigFile.Save();
 
-        LogDebug("ConfigFile Saved.");
-    }
-}
-
-public class ExploredRegion
-{
-    private float _exploredLeft;
-    private float _exploredRight;
-
-    public float ExploredLeft
-    {
-        get { return _exploredLeft; }
-        set
-        {
-            _exploredLeft = value;
-            SaveDataExtras.ExploredLeft.Value = value;
-        }
-    }
-
-    public float ExploredRight
-    {
-        get { return _exploredRight; }
-        set
-        {
-            _exploredRight = value;
-            SaveDataExtras.ExploredRight.Value = value;
-        }
+        LogTrace("ConfigFile Saved.");
     }
 
     private static bool HasAvailableConfig()
     {
-        if (SaveDataExtras.ExploredLeft == 0 && SaveDataExtras.ExploredRight == 0)
+        if (ExploredLeft == 0 && ExploredRight == 0)
             return false;
 
-        if (SaveDataExtras.Days > Managers.Inst.director.CurrentDayForSpawning)
+        if (Days > Managers.Inst.director.CurrentDayForSpawning)
             return false;
 
-        if (SaveDataExtras.Days == Managers.Inst.director.CurrentDayForSpawning)
-            if (SaveDataExtras.Time > Managers.Inst.director.currentTime)
+        if (Days == Managers.Inst.director.CurrentDayForSpawning)
+            if (Time > Managers.Inst.director.currentTime)
                 return false;
 
         return true;
     }
 
-    public string GetArchiveFilename()
+    public static string GetArchiveFilename()
     {
         var campaignIndex = GlobalSaveData.loaded.currentCampaign;
         var land = CampaignSaveData.current != null ? CampaignSaveData.current.CurrentLand : (-1);
@@ -108,23 +100,5 @@ public class ExploredRegion
         LogDebug($"OnGameStart: _archiveFilename {archiveFilename}, Campaign {campaignIndex}, CurrentLand {land}, currentChallenge {challengeId}");
 
         return archiveFilename;
-    }
-
-    public void Init()
-    {
-        SaveDataExtras.ConfigInit();
-        SaveDataExtras.Save();
-        SaveDataExtras.ConfigBind(GetArchiveFilename());
-        if (HasAvailableConfig())
-        {
-            _exploredLeft = SaveDataExtras.ExploredLeft;
-            _exploredRight = SaveDataExtras.ExploredRight;
-        }
-        else
-        {
-            var player = GetLocalPlayer();
-            _exploredLeft = player.transform.localPosition.x;
-            _exploredRight = player.transform.localPosition.x;
-        }
     }
 }

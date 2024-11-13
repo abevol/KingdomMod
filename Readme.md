@@ -104,6 +104,8 @@ A map mod. It marks points of interest, along with some extra details. There's a
 2. `F` Show the full map (Not recommended, it will reduce the fun of the game)
 3. `F5` Reload saved game (without exiting game)
 4. `F8` Save game (without exiting game)
+5. `Ctrl + ← / →` Adjust the offset of the map marker
+6. `Ctrl + ↑ / ↓` Adjust the zoom scale of the map
 
 ## Signs and Colors
 
