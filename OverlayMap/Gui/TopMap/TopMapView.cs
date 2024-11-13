@@ -21,9 +21,8 @@ public class TopMapView : MonoBehaviour
     private float _timeSinceLastGuiUpdate = 0;
 
     public static float MappingScale;
-    // public static float MapOffset;
-    // public static float ZoomScale;
-    public static readonly ExploredRegion ExploredRegion = new();
+    public static float MapOffset;
+    public static float ZoomScale;
     public PlayerId PlayerId;
     public TopMapStyle Style = new();
     public Dictionary<Component, MapMarker> MapMarkers => _mapMarkers;
@@ -222,8 +221,6 @@ public class TopMapView : MonoBehaviour
     {
         LogTrace("TopMapView.OnGameStart");
 
-        ExploredRegion.Init();
-
         var clientWidth = Screen.width - 40f;
         var minLevelWidth = Managers.Inst.game.currentLevelConfig.minLevelWidth;
         MappingScale = clientWidth / minLevelWidth;
@@ -258,15 +255,15 @@ public class TopMapView : MonoBehaviour
 
             float l = mover.transform.position.x - 12;
             float r = mover.transform.position.x + 12;
-            ExploredRegion.ExploredLeft = Math.Min(ExploredRegion.ExploredLeft, l);
-            ExploredRegion.ExploredRight = Math.Max(ExploredRegion.ExploredRight, r);
+            SaveDataExtras.ExploredLeft.Value = Math.Min(SaveDataExtras.ExploredLeft, l);
+            SaveDataExtras.ExploredRight.Value = Math.Max(SaveDataExtras.ExploredRight, r);
         }
 
         float wallLeft = Managers.Inst.kingdom.GetBorderSide(Side.Left);
         float wallRight = Managers.Inst.kingdom.GetBorderSide(Side.Right);
 
-        ExploredRegion.ExploredLeft = Math.Min(ExploredRegion.ExploredLeft, wallLeft);
-        ExploredRegion.ExploredRight = Math.Max(ExploredRegion.ExploredRight, wallRight);
+        SaveDataExtras.ExploredLeft.Value = Math.Min(SaveDataExtras.ExploredLeft, wallLeft);
+        SaveDataExtras.ExploredRight.Value = Math.Max(SaveDataExtras.ExploredRight, wallRight);
     }
 
     private void Update()
@@ -285,7 +282,7 @@ public class TopMapView : MonoBehaviour
             {
                 var markerData = pair.Value.Data;
                 var worldPosX = markerData.Target.transform.position.x;
-                markerData.IsInFogOfWar = !(ShowFullMap || (worldPosX >= ExploredRegion.ExploredLeft && worldPosX <= ExploredRegion.ExploredRight));
+                markerData.IsInFogOfWar = !(ShowFullMap || (worldPosX >= SaveDataExtras.ExploredLeft && worldPosX <= SaveDataExtras.ExploredRight));
 
                 if (markerData.IsInFogOfWar)
                     continue;

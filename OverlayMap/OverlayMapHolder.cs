@@ -8,6 +8,8 @@ using KingdomMod.OverlayMap.Config;
 using KingdomMod.OverlayMap.Gui;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using KingdomMod.OverlayMap.Gui.TopMap;
+
 
 #if IL2CPP
 using Il2CppInterop.Runtime.Injection;
@@ -37,7 +39,6 @@ public class OverlayMapHolder : MonoBehaviour
     private readonly StatsInfo _statsInfo = new();
     public static bool ShowFullMap = false;
     private GameObject _gameLayer = null;
-    private static readonly ExploredRegion _exploredRegion = new ();
     private static PersephoneCage _persephoneCage;
     private static readonly CachePrefabID _cachePrefabID = new CachePrefabID();
     private Canvas _canvas;
@@ -199,6 +200,56 @@ public class OverlayMapHolder : MonoBehaviour
         // }
     }
 
+    private void DetectHotkeys()
+    {
+        if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
+        {
+            bool changed = false;
+            if (Input.GetKeyDown(KeyCode.UpArrow))
+            {
+                LogTrace("UpArrow");
+                SaveDataExtras.ZoomScale.Value += 0.01f;
+                changed = true;
+            }
+
+            if (Input.GetKeyDown(KeyCode.DownArrow))
+            {
+                LogTrace("DownArrow");
+                SaveDataExtras.ZoomScale.Value -= 0.01f;
+                changed = true;
+            }
+
+            if (Input.GetKeyDown(KeyCode.LeftArrow))
+            {
+                LogTrace("LeftArrow");
+                SaveDataExtras.MapOffset.Value -= 1.0f;
+                changed = true;
+            }
+
+            if (Input.GetKeyDown(KeyCode.RightArrow))
+            {
+                LogTrace("RightArrow");
+                SaveDataExtras.MapOffset.Value += 1.0f;
+                changed = true;
+            }
+
+            if (changed)
+            {
+                if (PlayerOverlays.P1.gameObject.activeSelf)
+                    foreach (var pair in PlayerOverlays.P1.TopMapView.MapMarkers)
+                    {
+                        pair.Value.UpdatePosition(true);
+                    }
+
+                if (PlayerOverlays.P2.gameObject.activeSelf)
+                    foreach (var pair in PlayerOverlays.P2.TopMapView.MapMarkers)
+                    {
+                        pair.Value.UpdatePosition(true);
+                    }
+            }
+        }
+    }
+
     private void Update()
     {
         if (_directorState != ProgramDirector.state)
@@ -206,6 +257,8 @@ public class OverlayMapHolder : MonoBehaviour
             _directorState = ProgramDirector.state;
             OnDirectorStateChanged?.Invoke(_directorState);
         }
+
+        DetectHotkeys();
 
         if (Input.GetKeyDown(KeyCode.M))
         {
@@ -323,7 +376,7 @@ public class OverlayMapHolder : MonoBehaviour
         _persephoneCage = UnityEngine.Object.FindAnyObjectByType<PersephoneCage>();
         _cachePrefabID.CachePrefabIDs();
 
-        _exploredRegion.Init();
+        SaveDataExtras.Init();
     }
 
     public void OnGameEnd()
@@ -335,7 +388,7 @@ public class OverlayMapHolder : MonoBehaviour
 
     public void OnGameSaved()
     {
-        LogDebug("OverlayMapHolder.OnGameSaved");
+        LogTrace("OverlayMapHolder.OnGameSaved");
 
         SaveDataExtras.Save();
     }
@@ -343,8 +396,7 @@ public class OverlayMapHolder : MonoBehaviour
     public void ReloadGuiStyle()
     {
         _guiBoxStyle = new GUIStyle(GUI.skin.box);
-        var guiStylePath = Path.Combine(GetBepInExDir(), "config", "GuiStyle");
-        var bgImageFile = Path.Combine(guiStylePath, GuiStyle.TopMap.BackgroundImageFile);
+        var bgImageFile = Path.Combine(AssetsDir, GuiStyle.TopMap.BackgroundImageFile);
         LogDebug($"ReloadGuiStyle: \n" +
                  $"bgImageFile={bgImageFile}\n" +
                  $"BackgroundImageArea={GuiStyle.TopMap.BackgroundImageArea.Value}\n" +
@@ -470,8 +522,8 @@ public class OverlayMapHolder : MonoBehaviour
             poiList.Add(new MarkInfo(mover.transform.position.x, MarkerStyle.Player.Color, MarkerStyle.Player.Sign, player.playerId == 0 ? Strings.P1 : Strings.P2, 0, MarkRow.Movable));
             float l = mover.transform.position.x - 12;
             float r = mover.transform.position.x + 12;
-            _exploredRegion.ExploredLeft = Math.Min(_exploredRegion.ExploredLeft, l);
-            _exploredRegion.ExploredRight = Math.Max(_exploredRegion.ExploredRight, r);
+            SaveDataExtras.ExploredLeft.Value = Math.Min(SaveDataExtras.ExploredLeft, l);
+            SaveDataExtras.ExploredRight.Value = Math.Max(SaveDataExtras.ExploredRight, r);
         }
 
         if (kingdom.teleExitP1)
@@ -966,7 +1018,7 @@ public class OverlayMapHolder : MonoBehaviour
         {
             if (ShowFullMap)
                 poi.Visible = true;
-            else if(poi.WorldPosX >= _exploredRegion.ExploredLeft && poi.WorldPosX <= _exploredRegion.ExploredRight)
+            else if(poi.WorldPosX >= SaveDataExtras.ExploredLeft && poi.WorldPosX <= SaveDataExtras.ExploredRight)
                 poi.Visible = true;
             else if (poi.WorldPosX >= wallLeft && poi.WorldPosX <= wallRight)
                 poi.Visible = true;
@@ -1163,6 +1215,8 @@ public class OverlayMapHolder : MonoBehaviour
         GUI.Label(new Rect(14, boxTop + 6 + 20 * 4, 120, 20), $"{Strings.Knight.Value}: {kingdom.Knights.Count} ({GameExtensions.GetKnightCount(true)})", _guiStyle);
         GUI.Label(new Rect(14, boxTop + 6 + 20 * 5, 120, 20), Strings.Farmer + ": " + _statsInfo.FarmerCount, _guiStyle);
         GUI.Label(new Rect(14, boxTop + 6 + 20 * 6, 120, 20), Strings.Farmlands + ": " + _statsInfo.MaxFarmlands, _guiStyle);
+        GUI.Label(new Rect(14, boxTop + 6 + 20 * 7, 120, 20), "ZoomScale" + ": " + SaveDataExtras.ZoomScale.Value, _guiStyle);
+        GUI.Label(new Rect(14, boxTop + 6 + 20 * 8, 120, 20), "MapOffset" + ": " + SaveDataExtras.MapOffset.Value, _guiStyle);
     }
 
     private void DrawExtraInfo(int playerId)

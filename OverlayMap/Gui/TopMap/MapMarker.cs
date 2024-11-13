@@ -216,7 +216,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
             _count.color = color;
         }
 
-        public void UpdatePosition()
+        public void UpdatePosition(bool force = false)
         {
             // 从中心到两边分布
 
@@ -238,11 +238,11 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
                 return;
             }
 
-            if (Math.Abs(_worldPosX - _data.Target.transform.position.x) > 0.1f)
+            if (force || Math.Abs(_worldPosX - _data.Target.transform.position.x) > 0f)
             {
                 _worldPosX = _data.Target.transform.position.x;
                 _rectTransform.anchoredPosition = new Vector2(
-                    _worldPosX * TopMapView.MappingScale,
+                    (_worldPosX + +SaveDataExtras.MapOffset) * TopMapView.MappingScale * SaveDataExtras.ZoomScale,
                     _rectTransform.anchoredPosition.y
                 );
             }
