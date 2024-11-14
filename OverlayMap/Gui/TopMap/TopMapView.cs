@@ -86,7 +86,6 @@ public class TopMapView : MonoBehaviour
 
         ObjectPatcher.OnComponentCreated += OnComponentCreated;
         ObjectPatcher.OnComponentDestroyed += OnComponentDestroyed;
-        OverlayMapHolder.OnDirectorStateChanged += OnDirectorStateChanged;
         OverlayMapHolder.OnGameStateChanged += OnGameStateChanged;
         Game.OnGameStart += OnGameStart;
     }
@@ -100,7 +99,6 @@ public class TopMapView : MonoBehaviour
     {
         ObjectPatcher.OnComponentCreated -= OnComponentCreated;
         ObjectPatcher.OnComponentDestroyed -= OnComponentDestroyed;
-        OverlayMapHolder.OnDirectorStateChanged -= OnDirectorStateChanged;
         OverlayMapHolder.OnGameStateChanged -= OnGameStateChanged;
         Game.OnGameStart -= OnGameStart;
         Style.Destroy();
@@ -206,15 +204,6 @@ public class TopMapView : MonoBehaviour
         }
 
         return false;
-    }
-
-    private void OnDirectorStateChanged(ProgramDirector.State state)
-    {
-        LogTrace($"ProgramDirector.state changed to {state}");
-
-        if (state == ProgramDirector.State.LoadingMainScene)
-        {
-        }
     }
 
     public void OnGameStart()

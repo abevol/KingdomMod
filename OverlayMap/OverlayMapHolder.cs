@@ -24,7 +24,7 @@ public class OverlayMapHolder : MonoBehaviour
 {
     public delegate void GameStateEventHandler(Game.State state);
 
-    public delegate void DirectorStateEventHandler(ProgramDirector.State state);
+    public delegate void ProgramDirectorStateEventHandler(ProgramDirector.State state);
 
     public static OverlayMapHolder Instance { get; private set; }
     private static ManualLogSource _log;
@@ -45,7 +45,7 @@ public class OverlayMapHolder : MonoBehaviour
     public (PlayerOverlay P1, PlayerOverlay P2) PlayerOverlays = (null, null);
     private ProgramDirector.State _directorState;
     public static event GameStateEventHandler OnGameStateChanged;
-    public static event DirectorStateEventHandler OnDirectorStateChanged;
+    public static event ProgramDirectorStateEventHandler OnProgramDirectorStateChanged;
     public static string BepInExDir;
     public static string AssetsDir;
 
@@ -90,6 +90,7 @@ public class OverlayMapHolder : MonoBehaviour
         Game.OnGameStart -= OnGameStart;
         Game.OnGameEnd -= OnGameEnd;
         Managers.Inst.game.run.onGoto -= OnGameGoto;
+        ProgramDirector.run.onGoto -= OnProgramDirectorGoto;
 
 #if IL2CPP
         SceneManager.remove_sceneLoaded(new System.Action<Scene, LoadSceneMode>(OnSceneLoaded));
@@ -129,7 +130,7 @@ public class OverlayMapHolder : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        LogDebug($"Scene: {scene.name}, {scene.buildIndex}");
+        LogTrace($"Scene: {scene.name}, {scene.buildIndex}");
 
     }
 
@@ -143,7 +144,7 @@ public class OverlayMapHolder : MonoBehaviour
 
     private void OnGameGoto(int pre, int next)
     {
-        LogDebug($"OnGameGoto: pre:{pre},{(Game.State)pre}, {next},{(Game.State)next}");
+        LogTrace($"OnGameGoto: pre:{pre}({(Game.State)pre}), {next}({(Game.State)next})");
 
         var state = (Game.State)next;
         switch (state)
@@ -159,9 +160,16 @@ public class OverlayMapHolder : MonoBehaviour
         OnGameStateChanged?.Invoke(state);
     }
 
+    private void OnProgramDirectorGoto(int pre, int next)
+    {
+        LogTrace($"OnProgramDirectorGoto: pre:{pre}({(ProgramDirector.State)pre}), {next}({(ProgramDirector.State)next})");
+
+        OnProgramDirectorStateChanged?.Invoke(_directorState);
+    }
+
     private void Start()
     {
-        LogDebug($"{this.GetType().Name}.Start");
+        LogTrace($"{this.GetType().Name}.Start");
 
         NetworkBigBoss.Instance.OnClientCaughtUp += (Action)this.OnClientCaughtUp;
 
@@ -252,12 +260,6 @@ public class OverlayMapHolder : MonoBehaviour
 
     private void Update()
     {
-        if (_directorState != ProgramDirector.state)
-        {
-            _directorState = ProgramDirector.state;
-            OnDirectorStateChanged?.Invoke(_directorState);
-        }
-
         DetectHotkeys();
 
         if (Input.GetKeyDown(KeyCode.M))
@@ -364,8 +366,17 @@ public class OverlayMapHolder : MonoBehaviour
 
     public void OnGameInit(Game game)
     {
-        LogDebug("OverlayMapHolder.OnGameInit");
+        LogTrace("OverlayMapHolder.OnGameInit");
+
         game.run.onGoto += OnGameGoto;
+    }
+
+    public void OnProgramDirectorRun()
+    {
+        LogTrace("OverlayMapHolder.OnProgramDirectorRun");
+
+        ProgramDirector.run.onGoto += OnProgramDirectorGoto;
+
     }
 
     public void OnGameStart()
