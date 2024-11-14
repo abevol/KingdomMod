@@ -14,6 +14,11 @@ public class Patcher
         {
             HarmonyInst = new Harmony("KingdomMod.OverlayMap.Patcher");
             HarmonyInst.PatchAll();
+
+            foreach (var patchedMethod in HarmonyInst.GetPatchedMethods())
+            {
+                LogTrace($"Patched method: {patchedMethod.DeclaringType?.FullName}.{patchedMethod.Name}");
+            }
         }
         catch (Exception ex)
         {
