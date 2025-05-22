@@ -14,7 +14,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
             switch ((GamePrefabID)prefabId.prefabID)
             {
                 case GamePrefabID.Wall0:
-                    view.TryAddMapMarker(component, MarkerStyle.WallFoundation.Color, MarkerStyle.WallFoundation.Sign, null);
+                    // view.TryAddMapMarker(component, MarkerStyle.WallFoundation.Color, MarkerStyle.WallFoundation.Sign, null);
                     break;
                 case GamePrefabID.Wall1:
                 case GamePrefabID.Wall2:
@@ -22,8 +22,10 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                 case GamePrefabID.Wall4:
                 case GamePrefabID.Wall5:
                     // LogMessage($"Wall: InstanceID: {component.GetInstanceID()}, {GameObjectDetails.JsonSerialize(new GameObjectDetails(component.gameObject))}");
-                    view.TryAddMapMarker(component, MarkerStyle.Wall.Building.Color, MarkerStyle.Wall.Sign, null, null,
-                        comp => comp.gameObject.activeSelf ? MarkerStyle.Wall.Color : MarkerStyle.Wall.Building.Color);
+                    var marker = view.TryAddMapMarker(component, MarkerStyle.Wall.Building.Color, MarkerStyle.Wall.Sign, null);
+                    if (marker != null)
+                        view.AddWallNode(marker);
+                    ConstructionEventHandler.Create(marker, MarkerStyle.Wall.Color);
                     break;
                 case GamePrefabID.Wall1_Wreck:
                 case GamePrefabID.Wall2_Wreck:

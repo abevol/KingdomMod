@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using KingdomMod.OverlayMap.Config;
-using KingdomMod.OverlayMap.Patchers;
+﻿using KingdomMod.OverlayMap.Config;
 using UnityEngine;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
 
@@ -10,7 +8,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
     {
         public void Map(Component component)
         {
-            view.TryAddMapMarker(component, MarkerStyle.Castle.Color, MarkerStyle.Castle.Sign, Strings.Castle, (comp) =>
+            var marker = view.TryAddMapMarker(component, MarkerStyle.Castle.Color, MarkerStyle.Castle.Sign, Strings.Castle, (comp) =>
             {
                 var payable = ((Castle)comp)._payableUpgrade;
                 bool canPay = !payable.IsLocked(GetLocalPlayer(), out var reason);
@@ -25,6 +23,9 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                 var color = isLocked ? MarkerStyle.Castle.Locked.Color : MarkerStyle.Castle.Color;
                 return color;
             });
+
+            if (marker != null)
+                view.CastleMarker = marker;
         }
     }
 }

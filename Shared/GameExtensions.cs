@@ -7,8 +7,13 @@ using UnityEngine;
 
 namespace KingdomMod
 {
-    public class GameExtensions
+    public static class GameExtensions
     {
+        public static Color WithAlpha(this Color color, float alpha)
+        {
+            return new Color(color.r, color.g, color.b, alpha);
+        }
+
         public static T GetPayableOfType<T>() where T : Component
         {
             var payables = Managers.Inst.payables;
