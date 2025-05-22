@@ -9,6 +9,8 @@ using KingdomMod.OverlayMap.Gui;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using KingdomMod.OverlayMap.Gui.TopMap;
+using UnityEngine.UIElements;
+
 
 
 #if IL2CPP
@@ -43,7 +45,6 @@ public class OverlayMapHolder : MonoBehaviour
     private static readonly CachePrefabID _cachePrefabID = new CachePrefabID();
     private Canvas _canvas;
     public (PlayerOverlay P1, PlayerOverlay P2) PlayerOverlays = (null, null);
-    private ProgramDirector.State _directorState;
     public static event GameStateEventHandler OnGameStateChanged;
     public static event ProgramDirectorStateEventHandler OnProgramDirectorStateChanged;
     public static string BepInExDir;
@@ -164,7 +165,7 @@ public class OverlayMapHolder : MonoBehaviour
     {
         LogTrace($"OnProgramDirectorGoto: pre:{pre}({(ProgramDirector.State)pre}), {next}({(ProgramDirector.State)next})");
 
-        OnProgramDirectorStateChanged?.Invoke(_directorState);
+        OnProgramDirectorStateChanged?.Invoke((ProgramDirector.State)next);
     }
 
     private void Start()
@@ -1219,15 +1220,25 @@ public class OverlayMapHolder : MonoBehaviour
         var boxRect = new Rect(5, boxTop, 120, 146);
         GUI.Box(boxRect, "", _guiBoxStyle);
 
-        GUI.Label(new Rect(14, boxTop + 6 + 20 * 0, 120, 20), Strings.Peasant + ": " + _statsInfo.PeasantCount, _guiStyle);
-        GUI.Label(new Rect(14, boxTop + 6 + 20 * 1, 120, 20), Strings.Worker + ": " + _statsInfo.WorkerCount, _guiStyle);
-        GUI.Label(new Rect(14, boxTop + 6 + 20 * 2, 120, 20), $"{Strings.Archer.Value}: {_statsInfo.ArcherCount} ({GameExtensions.GetArcherCount(GameExtensions.ArcherType.Free)}|{GameExtensions.GetArcherCount(GameExtensions.ArcherType.GuardSlot)}|{GameExtensions.GetArcherCount(GameExtensions.ArcherType.KnightSoldier)})", _guiStyle);
-        GUI.Label(new Rect(14, boxTop + 6 + 20 * 3, 120, 20), Strings.Pikeman + ": " + kingdom.Pikemen.Count, _guiStyle);
-        GUI.Label(new Rect(14, boxTop + 6 + 20 * 4, 120, 20), $"{Strings.Knight.Value}: {kingdom.Knights.Count} ({GameExtensions.GetKnightCount(true)})", _guiStyle);
-        GUI.Label(new Rect(14, boxTop + 6 + 20 * 5, 120, 20), Strings.Farmer + ": " + _statsInfo.FarmerCount, _guiStyle);
-        GUI.Label(new Rect(14, boxTop + 6 + 20 * 6, 120, 20), Strings.Farmlands + ": " + _statsInfo.MaxFarmlands, _guiStyle);
-        GUI.Label(new Rect(14, boxTop + 6 + 20 * 7, 120, 20), "ZoomScale" + ": " + SaveDataExtras.ZoomScale.Value, _guiStyle);
-        GUI.Label(new Rect(14, boxTop + 6 + 20 * 8, 120, 20), "MapOffset" + ": " + SaveDataExtras.MapOffset.Value, _guiStyle);
+        var infoLines = new List<string>();
+        infoLines.Add(Strings.Peasant + ": " + _statsInfo.PeasantCount);
+        infoLines.Add(Strings.Worker + ": " + _statsInfo.WorkerCount);
+        infoLines.Add($"{Strings.Archer.Value}: {_statsInfo.ArcherCount} ({GameExtensions.GetArcherCount(GameExtensions.ArcherType.Free)}|{GameExtensions.GetArcherCount(GameExtensions.ArcherType.GuardSlot)}|{GameExtensions.GetArcherCount(GameExtensions.ArcherType.KnightSoldier)})");
+        infoLines.Add(Strings.Pikeman + ": " + kingdom.Pikemen.Count);
+        infoLines.Add($"{Strings.Knight.Value}: {kingdom.Knights.Count} ({GameExtensions.GetKnightCount(true)})");
+        infoLines.Add(Strings.Farmer + ": " + _statsInfo.FarmerCount);
+        infoLines.Add(Strings.Farmlands + ": " + _statsInfo.MaxFarmlands);
+        infoLines.Add("ZoomScale" + ": " + SaveDataExtras.ZoomScale.Value);
+        infoLines.Add("MapOffset" + ": " + SaveDataExtras.MapOffset.Value);
+        infoLines.Add("BorderSide" + ": " + kingdom.GetBorderSide(Side.Left) + ", " + kingdom.GetBorderSide(Side.Right));
+        infoLines.Add("BorderSideIntact" + ": " + kingdom.GetBorderSideIntact(Side.Left) + ", " + kingdom.GetBorderSideIntact(Side.Right));
+        infoLines.Add("outerWall" + ": " + kingdom.outerWall?.left?.transform?.position.x + ", " + kingdom.outerWall?.right?.transform?.position.x);
+        infoLines.Add("intactWall" + ": " + kingdom.intactWall?.left?.transform?.position.x + ", " + kingdom.intactWall?.right?.transform?.position.x);
+
+        for (int i = 0; i < infoLines.Count; i++)
+        {
+            GUI.Label(new Rect(14, boxTop + 6 + 20 * i, 120, 20), infoLines[i], _guiStyle);
+        }
     }
 
     private void DrawExtraInfo(int playerId)

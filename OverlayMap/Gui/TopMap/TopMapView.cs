@@ -16,17 +16,21 @@ public class TopMapView : MonoBehaviour
     private RectTransform _rectTransform;
     private Image _backgroundImage;
     private Text _groupText;
-    private readonly Dictionary<Component, MapMarker> _mapMarkers = new();
-    public readonly List<MapMarker> PlayerMarkers = new();
-    private float _timeSinceLastGuiUpdate = 0;
+    private float _timeSinceLastGuiUpdate;
+    private readonly Dictionary<Type, IComponentMapper> _componentMappers;
 
     public static float MappingScale;
-    public static float MapOffset;
-    public static float ZoomScale;
     public PlayerId PlayerId;
     public TopMapStyle Style = new();
-    public Dictionary<Component, MapMarker> MapMarkers => _mapMarkers;
-    private readonly Dictionary<Type, IComponentMapper> _componentMappers;
+
+    public MapMarker CastleMarker;
+    public List<MapMarker> PlayerMarkers { get; } = new();
+    public Sided<LinkedList<MapMarker>> SidedWalls { get; } = new()
+    {
+        left = new LinkedList<MapMarker>(),
+        right = new LinkedList<MapMarker>()
+    };
+    public Dictionary<Component, MapMarker> MapMarkers { get; } = new();
 
     public TopMapView()
     {
@@ -34,40 +38,40 @@ public class TopMapView : MonoBehaviour
 
         _componentMappers = new Dictionary<Type, IComponentMapper>
         {
-            { typeof(Beach),                new Mappers.BeachMapper(this) },
-            { typeof(BeggarCamp),           new Mappers.BeggarCampMapper(this) },
-            { typeof(Beggar),               new Mappers.BeggarMapper(this) },
-            { typeof(BoarSpawnGroup),       new Mappers.BoarSpawnGroupMapper(this) },
-            { typeof(Boat),                 new Mappers.BoatMapper(this) },
-            { typeof(BoatSummoningBell),    new Mappers.BoatSummoningBellMapper(this) },
-            { typeof(Bomb),                 new Mappers.BombMapper(this) },
-            { typeof(Cabin),                new Mappers.CabinMapper(this) },
+            // { typeof(Beach),                new Mappers.BeachMapper(this) },
+            // { typeof(BeggarCamp),           new Mappers.BeggarCampMapper(this) },
+            // { typeof(Beggar),               new Mappers.BeggarMapper(this) },
+            // { typeof(BoarSpawnGroup),       new Mappers.BoarSpawnGroupMapper(this) },
+            // { typeof(Boat),                 new Mappers.BoatMapper(this) },
+            // { typeof(BoatSummoningBell),    new Mappers.BoatSummoningBellMapper(this) },
+            // { typeof(Bomb),                 new Mappers.BombMapper(this) },
+            // { typeof(Cabin),                new Mappers.CabinMapper(this) },
             { typeof(Campfire),             new Mappers.CampfireMapper(this) },
             { typeof(Castle),               new Mappers.CastleMapper(this) },
-            { typeof(Chest),                new Mappers.ChestMapper(this) },
-            { typeof(CitizenHousePayable),  new Mappers.CitizenHousePayableMapper(this) },
-            { typeof(Deer),                 new Mappers.DeerMapper(this) },
-            { typeof(DogSpawn),             new Mappers.DogSpawnMapper(this) },
-            { typeof(Farmhouse),            new Mappers.FarmhouseMapper(this) },
-            { typeof(HelPuzzleController),  new Mappers.HelPuzzleControllerMapper(this) },
-            { typeof(HephaestusForge),      new Mappers.HephaestusForgeMapper(this) },
-            { typeof(MerchantSpawner),      new Mappers.MerchantSpawnerMapper(this) },
-            { typeof(PayableBush),          new Mappers.PayableBushMapper(this) },
-            { typeof(PayableGemChest),      new Mappers.PayableGemChestMapper(this) },
-            { typeof(PayableShop),          new Mappers.PayableShopMapper(this) },
+            // { typeof(Chest),                new Mappers.ChestMapper(this) },
+            // { typeof(CitizenHousePayable),  new Mappers.CitizenHousePayableMapper(this) },
+            // { typeof(Deer),                 new Mappers.DeerMapper(this) },
+            // { typeof(DogSpawn),             new Mappers.DogSpawnMapper(this) },
+            // { typeof(Farmhouse),            new Mappers.FarmhouseMapper(this) },
+            // { typeof(HelPuzzleController),  new Mappers.HelPuzzleControllerMapper(this) },
+            // { typeof(HephaestusForge),      new Mappers.HephaestusForgeMapper(this) },
+            // { typeof(MerchantSpawner),      new Mappers.MerchantSpawnerMapper(this) },
+            // { typeof(PayableBush),          new Mappers.PayableBushMapper(this) },
+            // { typeof(PayableGemChest),      new Mappers.PayableGemChestMapper(this) },
+            // { typeof(PayableShop),          new Mappers.PayableShopMapper(this) },
             { typeof(PayableUpgrade),       new Mappers.PayableUpgradeMapper(this) },
-            { typeof(PersephoneCage),       new Mappers.PersephoneCageMapper(this) },
+            // { typeof(PersephoneCage),       new Mappers.PersephoneCageMapper(this) },
             { typeof(Player),               new Mappers.PlayerMapper(this) },
-            { typeof(Portal),               new Mappers.PortalMapper(this) },
-            { typeof(River),                new Mappers.RiverMapper(this) },
-            { typeof(Statue),               new Mappers.StatueMapper(this) },
-            { typeof(Steed),                new Mappers.SteedMapper(this) },
-            { typeof(SteedSpawn),           new Mappers.SteedSpawnMapper(this) },
-            { typeof(TeleporterExit),       new Mappers.TeleporterExitMapper(this) },
-            { typeof(ThorPuzzleController), new Mappers.ThorPuzzleControllerMapper(this) },
-            { typeof(TimeStatue),           new Mappers.TimeStatueMapper(this) },
-            { typeof(UnlockNewRulerStatue), new Mappers.UnlockNewRulerStatueMapper(this) },
-            { typeof(WreckPlaceholder),     new Mappers.WreckPlaceholderMapper(this) },
+            // { typeof(Portal),               new Mappers.PortalMapper(this) },
+            // { typeof(River),                new Mappers.RiverMapper(this) },
+            // { typeof(Statue),               new Mappers.StatueMapper(this) },
+            // { typeof(Steed),                new Mappers.SteedMapper(this) },
+            // { typeof(SteedSpawn),           new Mappers.SteedSpawnMapper(this) },
+            // { typeof(TeleporterExit),       new Mappers.TeleporterExitMapper(this) },
+            // { typeof(ThorPuzzleController), new Mappers.ThorPuzzleControllerMapper(this) },
+            // { typeof(TimeStatue),           new Mappers.TimeStatueMapper(this) },
+            // { typeof(UnlockNewRulerStatue), new Mappers.UnlockNewRulerStatueMapper(this) },
+            // { typeof(WreckPlaceholder),     new Mappers.WreckPlaceholderMapper(this) },
         };
     }
 
@@ -141,6 +145,7 @@ public class TopMapView : MonoBehaviour
                 break;
             case Game.State.Quitting:
                 PlayerMarkers.Clear();
+                ClearWallNodes();
                 ClearMapMarkers();
                 break;
         }
@@ -267,7 +272,7 @@ public class TopMapView : MonoBehaviour
 
             UpdateExploredRegion();
 
-            foreach (var pair in _mapMarkers)
+            foreach (var pair in MapMarkers)
             {
                 var markerData = pair.Value.Data;
                 var worldPosX = markerData.Target.transform.position.x;
@@ -299,7 +304,7 @@ public class TopMapView : MonoBehaviour
             if (target.gameObject == null)
                 return null;
 
-            if (_mapMarkers.TryGetValue(target, out var marker))
+            if (MapMarkers.TryGetValue(target, out var marker))
                 return marker;
 
             // 创建一个新的 GameObject 并添加 MapMarker 组件
@@ -329,7 +334,7 @@ public class TopMapView : MonoBehaviour
             // 设置 MapMarker 的配置
             mapMarker.SetData(data);
 
-            _mapMarkers.Add(target, mapMarker);
+            MapMarkers.Add(target, mapMarker);
 
             return mapMarker;
         }
@@ -342,13 +347,12 @@ public class TopMapView : MonoBehaviour
 
     public void TryRemoveMapMarker(Component target, HashSet<SourceFlag> sources)
     {
-        if (_mapMarkers.TryGetValue(target, out var marker))
+        if (MapMarkers.TryGetValue(target, out var marker))
         {
             LogDebug($"TopMapView.TryRemoveMapMarker, target: {target}, sources: [{string.Join(", ", sources)}]");
 
-            // 从列表中移除
-            _mapMarkers.Remove(target);
-            // 销毁 GameObject
+            RemoveWallNode(marker);
+            MapMarkers.Remove(target);
             Destroy(marker.gameObject);
         }
     }
@@ -356,12 +360,12 @@ public class TopMapView : MonoBehaviour
     public void ClearMapMarkers()
     {
         LogDebug($"TopMapView.ClearMapMarkers");
-        foreach (var pair in _mapMarkers)
+        foreach (var pair in MapMarkers)
         {
             Destroy(pair.Value.gameObject);
         }
 
-        _mapMarkers.Clear();
+        MapMarkers.Clear();
     }
 
     public void UpdateBackgroundImage()
@@ -390,8 +394,6 @@ public class TopMapView : MonoBehaviour
         _backgroundImage.sprite = sprite; // 将png图片放在Resources文件夹下
         _backgroundImage.type = Image.Type.Sliced;
     }
-
-    // 在 Group 中添加文本控件
     private void CreateText()
     {
         GameObject textObj = new GameObject("GroupText");
@@ -421,7 +423,6 @@ public class TopMapView : MonoBehaviour
         textRect.sizeDelta = new Vector2(0, 0); // 填充整个 Group
     }
 
-    // 在 Group 上绘制一条直线
     private void DrawLine(Vector2 lineStart, Vector2 lineEnd, Color color, uint thickness)
     {
         GameObject lineObj = new GameObject("Line");
@@ -437,5 +438,104 @@ public class TopMapView : MonoBehaviour
         lineRect.sizeDelta = new Vector2(distance, thickness);
         lineRect.anchoredPosition = lineStart;
         lineRect.localRotation = Quaternion.Euler(0, 0, Mathf.Atan2(lineDelta.y, lineDelta.x) * Mathf.Rad2Deg);
+    }
+
+    //
+    // Wall lines controller
+    //
+
+    // public void AddWallLine(MapMarker wallMarker, bool isCastle = false)
+    // {
+    //     LinkedListNode<WallLine> node;
+    //     var wallLine = WallLine.Create(wallMarker);
+    //     var kingdom = Managers.Inst.kingdom;
+    //     var worldPosX = wallMarker.Data.Target.transform.position.x;
+    //     var wallLines = kingdom.GetBorderSideForPosition(worldPosX) == Side.Left ? SidedWalls.left : SidedWalls.right;
+    //     if (wallLines.Count == 0 || worldPosX <= wallLines.First.Value.Owner.Data.Target.transform.position.x)
+    //     {
+    //         node = wallLines.AddFirst(wallLine);
+    //     }
+    //     else if (worldPosX >= wallLines.Last.Value.Owner.Data.Target.transform.position.x)
+    //     {
+    //         node = wallLines.AddLast(wallLine);
+    //     }
+    //     else
+    //     {
+    //         var current = wallLines.First;
+    //         while (current != null && current.Value.Owner.Data.Target.transform.position.x < worldPosX)
+    //         {
+    //             current = current.Next;
+    //         }
+    //
+    //         if (current != null)
+    //             node = wallLines.AddBefore(current, wallLine);
+    //         else
+    //             node = wallLines.AddLast(wallLine);
+    //     }
+    //
+    //     wallLine.Init(node);
+    // }
+
+    private LinkedList<MapMarker> GetLinkedWalls(MapMarker wallMarker)
+    {
+        var kingdom = Managers.Inst.kingdom;
+        var worldPosX = wallMarker.Data.Target.transform.position.x;
+        var linkedWalls = kingdom.GetBorderSideForPosition(worldPosX) == Side.Left ? SidedWalls.left : SidedWalls.right;
+        return linkedWalls;
+    }
+
+    public void AddWallNode(MapMarker wallMarker)
+    {
+        LinkedListNode<MapMarker> wallNode;
+        var linkedWalls = GetLinkedWalls(wallMarker);
+        var worldPosX = Math.Abs(wallMarker.Data.Target.transform.position.x);
+        var current = linkedWalls.First;
+        while (current != null && Math.Abs(current.Value.Data.Target.transform.position.x) < worldPosX)
+        {
+            current = current.Next;
+        }
+
+        if (current != null)
+            wallNode = linkedWalls.AddBefore(current, wallMarker);
+        else
+            wallNode = linkedWalls.AddLast(wallMarker);
+
+        AddWallLine(wallNode);
+    }
+
+    public void AddWallLine(LinkedListNode<MapMarker> wallNode)
+    {
+        var currentWall = wallNode.Value;
+
+        // 获取上一个城墙或城堡
+        MapMarker previousWall;
+        if (wallNode.Previous != null && wallNode.Previous.Value != null)
+            previousWall = wallNode.Previous.Value;
+        else
+            previousWall = CastleMarker; // 如果是第一个城墙，则从城堡开始
+
+        // 创建新的 WallLine 组件
+        var wallLine = WallLine.Create(currentWall);
+        wallLine.Init(wallNode);
+    }
+
+    public void UpdateWallLinePosition(MapMarker wallMarker)
+    {
+        var wallLineRect = wallMarker.transform.Find("WallLine");
+        var wallLineObject = wallLineRect.gameObject;
+
+
+    }
+
+    public void RemoveWallNode(MapMarker wallMarker)
+    {
+        var linkedWalls = GetLinkedWalls(wallMarker);
+        linkedWalls.Remove(wallMarker);
+    }
+
+    public void ClearWallNodes()
+    {
+        SidedWalls.left.Clear();
+        SidedWalls.right.Clear();
     }
 }

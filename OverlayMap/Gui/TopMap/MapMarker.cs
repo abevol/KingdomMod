@@ -20,6 +20,10 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
 
         public MapMarkerData Data => _data;
 
+        public delegate void PositionEventHandler(MapMarker mapMarker, Vector2 position);
+
+        public event PositionEventHandler OnPositionChanged;
+
         public void Init()
         {
             _rectTransform = this.gameObject.AddComponent<RectTransform>();
@@ -49,7 +53,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
 
         private void Start()
         {
-            UpdatePosition();
+            // UpdatePosition();
         }
 
         private void Update()
@@ -74,8 +78,9 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
         private TextMeshProUGUI CreateTextObject(string objName, float yPos, TMP_FontAsset font, float fontSize)
         {
             GameObject textObject = new GameObject(objName);
-            textObject.transform.SetParent(this.transform);
             var textComponent = textObject.AddComponent<TextMeshProUGUI>();
+            var textRect = textObject.GetComponent<RectTransform>();
+            textRect.SetParent(_rectTransform, false);
 
             // 设置文本的其他属性（如字体、颜色等）
             textComponent.font = font;
@@ -92,8 +97,9 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
         // private Text CreateTextObject(string objName, float yPos)
         // {
         //     GameObject textObject = new GameObject(objName);
-        //     textObject.transform.SetParent(this.transform);
         //     var textComponent = textObject.AddComponent<Text>();
+        //     var textRect = textObject.GetComponent<RectTransform>();
+        //     textRect.SetParent(_rectTransform, false);
         //
         //     // 设置文本的其他属性（如字体、颜色等）
         //     textComponent.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
@@ -242,9 +248,11 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
             {
                 _worldPosX = _data.Target.transform.position.x;
                 _rectTransform.anchoredPosition = new Vector2(
-                    (_worldPosX + +SaveDataExtras.MapOffset) * TopMapView.MappingScale * SaveDataExtras.ZoomScale,
+                    (_worldPosX + SaveDataExtras.MapOffset) * TopMapView.MappingScale * SaveDataExtras.ZoomScale,
                     _rectTransform.anchoredPosition.y
                 );
+
+                OnPositionChanged?.Invoke(this, _rectTransform.anchoredPosition);
             }
         }
     }
