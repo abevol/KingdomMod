@@ -11,6 +11,9 @@ public class ConfigEntryWrapper<T>
     public ConfigEntry<T> Entry { get; set; }
     public T Value { get => Entry.Value; set => Entry.Value = value; }
     private Color? _cachedColor;
+    private Rect? _cachedRect;
+    private RectInt? _cachedRectInt;
+    private RectOffset _cachedRectOffset;
 
     public ConfigEntryWrapper(ConfigEntry<T> entry)
     {
@@ -21,39 +24,17 @@ public class ConfigEntryWrapper<T>
     public static implicit operator ConfigEntryWrapper<T>(ConfigEntry<T> d) => new ConfigEntryWrapper<T>(d);
     public static implicit operator T(ConfigEntryWrapper<T> d) => d.Entry.Value;
 
-    public static implicit operator RectInt(ConfigEntryWrapper<T> d)
-    {
-        return d.Value switch
-        {
-            Rect rec => new RectInt((int)rec.x, (int)rec.y, (int)rec.width, (int)rec.height),
-            Vector4 vec => new RectInt((int)vec.x, (int)vec.y, (int)vec.z, (int)vec.w),
-            Quaternion qua => new RectInt((int)qua.x, (int)qua.y, (int)qua.z, (int)qua.w),
-            _ => new RectInt()
-        };
-    }
-
-    public static implicit operator RectOffset(ConfigEntryWrapper<T> d)
-    {
-        return d.Value switch
-        {
-            Rect rec => new RectOffset((int)rec.x, (int)rec.y, (int)rec.width, (int)rec.height),
-            Vector4 vec => new RectOffset((int)vec.x, (int)vec.y, (int)vec.z, (int)vec.w),
-            Quaternion qua => new RectOffset((int)qua.x, (int)qua.y, (int)qua.z, (int)qua.w),
-            _ => new RectOffset()
-        };
-    }
-
     public static implicit operator Color(ConfigEntryWrapper<T> d)
     {
         if (d._cachedColor == null)
         {
-            d.Entry.SettingChanged += (sender, args) => OnValueChanged(d, args);
+            d.Entry.SettingChanged += (sender, args) => OnColorValueChanged(d, args);
             d._cachedColor = StrToColor(d.Entry as ConfigEntry<string>);
         }
         return d._cachedColor.Value;
     }
 
-    private static void OnValueChanged(object sender, EventArgs e)
+    private static void OnColorValueChanged(object sender, EventArgs e)
     {
         if (sender is ConfigEntryWrapper<string> entryWrapper)
         {
@@ -83,5 +64,144 @@ public class ConfigEntryWrapper<T>
         }
 
         return Color.white;
+    }
+
+    public static implicit operator Rect(ConfigEntryWrapper<T> d)
+    {
+        if (d._cachedRect == null)
+        {
+            d.Entry.SettingChanged += (sender, args) => OnRectValueChanged(d, args);
+            d._cachedRect = StrToRect(d.Entry as ConfigEntry<string>);
+        }
+
+        return d._cachedRect.Value;
+    }
+
+    private static void OnRectValueChanged(object sender, EventArgs e)
+    {
+        if (sender is ConfigEntryWrapper<string> entryWrapper)
+        {
+            entryWrapper._cachedRect = StrToRect(entryWrapper.Entry);
+        }
+    }
+
+    private static Rect StrToRect(ConfigEntry<string> entry)
+    {
+        try
+        {
+            var str = entry.Value;
+            if (str != null)
+            {
+                var values = str.Split(',');
+                if (values.Length == 4)
+                    return new Rect(
+                        float.Parse(values[0], CultureInfo.InvariantCulture.NumberFormat),
+                        float.Parse(values[1], CultureInfo.InvariantCulture.NumberFormat),
+                        float.Parse(values[2], CultureInfo.InvariantCulture.NumberFormat),
+                        float.Parse(values[3], CultureInfo.InvariantCulture.NumberFormat));
+            }
+        }
+        catch (Exception e)
+        {
+            LogError($"Parse UnityEngine.Rect failed: ConfigEntry: [{entry.Definition.Section}].{entry.Definition.Key}, ConfigValue: {entry.Value}\nException: {e}");
+        }
+
+        return Rect.zero;
+    }
+
+    /// <summary>
+    /// Returns a RectInt from the ConfigEntryWrapper.
+    /// </summary>
+    /// <param name="d"></param>
+
+    public static implicit operator RectInt(ConfigEntryWrapper<T> d)
+    {
+        if (d._cachedRectInt == null)
+        {
+            d.Entry.SettingChanged += (sender, args) => OnRectIntValueChanged(d, args);
+            d._cachedRectInt = StrToRectInt(d.Entry as ConfigEntry<string>);
+        }
+
+        return d._cachedRectInt.Value;
+    }
+
+    private static void OnRectIntValueChanged(object sender, EventArgs e)
+    {
+        if (sender is ConfigEntryWrapper<string> entryWrapper)
+        {
+            entryWrapper._cachedRectInt = StrToRectInt(entryWrapper.Entry);
+        }
+    }
+
+    private static RectInt StrToRectInt(ConfigEntry<string> entry)
+    {
+        try
+        {
+            var str = entry.Value;
+            if (str != null)
+            {
+                var values = str.Split(',');
+                if (values.Length == 4)
+                    return new RectInt(
+                        int.Parse(values[0], CultureInfo.InvariantCulture.NumberFormat),
+                        int.Parse(values[1], CultureInfo.InvariantCulture.NumberFormat),
+                        int.Parse(values[2], CultureInfo.InvariantCulture.NumberFormat),
+                        int.Parse(values[3], CultureInfo.InvariantCulture.NumberFormat));
+            }
+        }
+        catch (Exception e)
+        {
+            LogError($"Parse UnityEngine.Rect failed: ConfigEntry: [{entry.Definition.Section}].{entry.Definition.Key}, ConfigValue: {entry.Value}\nException: {e}");
+        }
+
+        return new RectInt();
+    }
+
+    /// <summary>
+    /// Returns a RectOffset from the ConfigEntryWrapper.
+    /// </summary>
+    /// <param name="d"></param>
+
+    public static implicit operator RectOffset(ConfigEntryWrapper<T> d)
+    {
+        if (d._cachedRectOffset == null)
+        {
+            d.Entry.SettingChanged += (sender, args) => OnRectOffsetValueChanged(d, args);
+            d._cachedRectOffset = StrToRectOffset(d.Entry as ConfigEntry<string>);
+        }
+
+        return d._cachedRectOffset;
+    }
+
+    private static void OnRectOffsetValueChanged(object sender, EventArgs e)
+    {
+        if (sender is ConfigEntryWrapper<string> entryWrapper)
+        {
+            entryWrapper._cachedRectOffset = StrToRectOffset(entryWrapper.Entry);
+        }
+    }
+
+    private static RectOffset StrToRectOffset(ConfigEntry<string> entry)
+    {
+        try
+        {
+            var str = entry.Value;
+            if (str != null)
+            {
+                var values = str.Split(',');
+                if (values.Length == 4)
+                    return new RectOffset(
+                        int.Parse(values[0], CultureInfo.InvariantCulture.NumberFormat),
+                        int.Parse(values[1], CultureInfo.InvariantCulture.NumberFormat),
+                        int.Parse(values[2], CultureInfo.InvariantCulture.NumberFormat),
+                        int.Parse(values[3], CultureInfo.InvariantCulture.NumberFormat));
+            }
+        }
+        catch (Exception e)
+        {
+            LogError($"Parse UnityEngine.Rect failed: ConfigEntry: [{entry.Definition.Section}].{entry.Definition.Key}, ConfigValue: {entry.Value}\nException: {e}");
+        }
+
+        return new RectOffset();
     }
 }
