@@ -254,21 +254,27 @@ public partial class OverlayMapHolder : MonoBehaviour
         if (File.Exists(bgImageFile))
         {
             byte[] imageData = File.ReadAllBytes(bgImageFile);
-            Texture2D texture = new Texture2D(2, 2);
+            Texture2D texture = new Texture2D(2, 2, TextureFormat.RGBA32, false);
             texture.LoadImage(imageData);
 
             var imageArea = (RectInt)GuiStyle.BackgroundImageArea;
             imageArea.y = texture.height - imageArea.y - imageArea.height;
-            Texture2D subTexture = new Texture2D(imageArea.width, imageArea.height);
+            Texture2D subTexture = new Texture2D(imageArea.width, imageArea.height, TextureFormat.RGBA32, false);
             Color[] pixels = texture.GetPixels(imageArea.x, imageArea.y, imageArea.width, imageArea.height);
-            subTexture.SetPixels(pixels);
-            subTexture.Apply();
+            if (pixels != null)
+            {
+                subTexture.SetPixels(pixels);
+                subTexture.Apply();
 
-            //  _guiBoxStyle.normal.background = subTexture;
-            _guiBoxStyle.normal.background = MakeColoredTexture(subTexture, GuiStyle.BackgroundColor);
-            _guiBoxStyle.stretchWidth = false;
-            _guiBoxStyle.stretchHeight = false;
-            _guiBoxStyle.border = GuiStyle.BackgroundImageBorder;
+                _guiBoxStyle.normal.background = MakeColoredTexture(subTexture, GuiStyle.BackgroundColor);
+                _guiBoxStyle.stretchWidth = false;
+                _guiBoxStyle.stretchHeight = false;
+                _guiBoxStyle.border = GuiStyle.BackgroundImageBorder;
+            }
+            else
+            {
+                LogError("ReloadGuiStyle, failed to get pixels from texture.");
+            }
         }
         else
         {
