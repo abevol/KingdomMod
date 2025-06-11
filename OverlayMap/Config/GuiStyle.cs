@@ -13,8 +13,8 @@ public class GuiStyle
 
     public static ConfigEntryWrapper<string> BackgroundColor;
     public static ConfigEntryWrapper<string> BackgroundImageFile;
-    public static ConfigEntryWrapper<UnityEngine.Rect> BackgroundImageArea;
-    public static ConfigEntryWrapper<UnityEngine.Vector4> BackgroundImageBorder;
+    public static ConfigEntryWrapper<string> BackgroundImageArea;
+    public static ConfigEntryWrapper<string> BackgroundImageBorder;
 
     public static void ConfigBind(ConfigFile config)
     {
@@ -26,8 +26,8 @@ public class GuiStyle
 
         BackgroundColor = config.Bind("GuiStyle", "BackgroundColor", "0,0,0,0", "");
         BackgroundImageFile = config.Bind("GuiStyle", "BackgroundImageFile", "Background.png", "");
-        BackgroundImageArea = config.Bind("GuiStyle", "BackgroundImageArea", new UnityEngine.Rect(17, 17, 94, 94), "");
-        BackgroundImageBorder = config.Bind("GuiStyle", "BackgroundImageBorder", new UnityEngine.Vector4(17, 17, 17, 17), "");
+        BackgroundImageArea = config.Bind("GuiStyle", "BackgroundImageArea", "17, 17, 94, 94", "");
+        BackgroundImageBorder = config.Bind("GuiStyle", "BackgroundImageBorder", "17, 17, 17, 17", "");
 
         LogMessage($"Loaded config: {Path.GetFileName(ConfigFile.ConfigFilePath)}");
 
