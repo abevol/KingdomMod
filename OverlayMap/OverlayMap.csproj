@@ -5,7 +5,7 @@
     <PropertyGroup>
         <AssemblyName>KingdomMod.OverlayMap</AssemblyName>
         <Description>Kingdom map mod</Description>
-        <Version>2.3.2</Version>
+        <Version>2.4.0</Version>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <LangVersion>latest</LangVersion>
         <RestoreAdditionalProjectSources>
@@ -84,6 +84,10 @@
         </Reference>
         <Reference Include="UnityEngine.CoreModule">
             <HintPath>..\_libs\BIE6_IL2CPP\interop\UnityEngine.CoreModule.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine.ImageConversionModule">
+            <HintPath>..\_libs\BIE6_IL2CPP\interop\UnityEngine.ImageConversionModule.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.IMGUIModule">
