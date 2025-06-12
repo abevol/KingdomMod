@@ -634,6 +634,9 @@ public class DevToolsHolder : MonoBehaviour
                 infoLines.Add($"runStaminaRate: {steed.runStaminaRate}");
                 infoLines.Add($"standStaminaRate: {steed.standStaminaRate}");
                 infoLines.Add($"walkStaminaRate: {steed.walkStaminaRate}");
+                infoLines.Add("time" + ": " + Time.time);
+                infoLines.Add($"IsTired: {steed.IsTired}");
+                infoLines.Add($"TiredTime: {steed.TiredTime}");
                 infoLines.Add($"tiredTimer: {steed._tiredTimer}");
                 infoLines.Add($"tiredDuration: {steed.tiredDuration}");
                 infoLines.Add($"wellFedTimer: {steed.WellFedTimer}");

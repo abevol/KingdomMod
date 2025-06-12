@@ -72,6 +72,7 @@ public class StaminaBarHolder : MonoBehaviour
         float baseWidth = 60.0f * runConsumeScale * widthScale;
         float baseHeight = 14.0f * heightScale;
         float baseLeft = uiPos.Value.x - baseWidth / 2;
+        float middleHeight = baseHeight / 2.0f - 2;
         float durationMax = 60.0f;
 
         var boxRect = new Rect(baseLeft, uiPos.Value.y, baseWidth + 4, baseHeight);
@@ -80,26 +81,30 @@ public class StaminaBarHolder : MonoBehaviour
 
         GUI.BeginGroup(new Rect(baseLeft + 2, uiPos.Value.y + 2, baseWidth, baseHeight));
 
-        var tiredTimer = steed._tiredTimer;
-        if (tiredTimer > 0)
+        if (steed.IsTired)
         {
-            var lineStart = new Vector2(0, 0);
-            var lineEnd = new Vector2(baseWidth * tiredTimer / durationMax, 0);
-            GuiHelper.DrawLine(lineStart, lineEnd, Color.red, (uint)baseHeight - 4);
+            var tiredTimer = steed._tiredTimer - Time.time;
+            if (tiredTimer > 0)
+            {
+                var lineStart = new Vector2(0, middleHeight);
+                var lineEnd = new Vector2(baseWidth * tiredTimer / durationMax, middleHeight);
+                GuiHelper.DrawLine(lineStart, lineEnd, Color.red, baseHeight - 4);
+            }
         }
-
+        
         if (steed.WellFedTimer > 0)
         {
-            var lineStart = new Vector2(0, 0);
-            var lineEnd = new Vector2(baseWidth * steed.WellFedTimer / durationMax, 0);
-            GuiHelper.DrawLine(lineStart, lineEnd, new Color(1.0f, 0.84f, 0.0f), (uint)baseHeight - 4);
+            var lineStart = new Vector2(0, middleHeight);
+            var lineEnd = new Vector2(baseWidth * steed.WellFedTimer / durationMax, middleHeight);
+            GuiHelper.DrawLine(lineStart, lineEnd, new Color(1.0f, 0.84f, 0.0f), baseHeight - 4);
         }
 
         if (steed.Stamina > 0)
         {
-            var lineStart = new Vector2(0, 2);
-            var lineEnd = new Vector2(baseWidth * steed.Stamina, 2);
-            GuiHelper.DrawLine(lineStart, lineEnd, new Color(0.46f, 0.84f, 0.92f), (uint)baseHeight - 8);
+            var lineStart = new Vector2(0, middleHeight);
+            var lineEnd = new Vector2(baseWidth * steed.Stamina, middleHeight);
+            var staminaColor = steed.IsTired ? Color.gray : new Color(0.46f, 0.84f, 0.92f);
+            GuiHelper.DrawLine(lineStart, lineEnd, staminaColor, baseHeight - 8);
         }
 
         GUI.EndGroup();

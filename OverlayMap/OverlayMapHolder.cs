@@ -921,8 +921,8 @@ public partial class OverlayMapHolder : MonoBehaviour
                 var endPoint = leftWalls[i];
                 var info = new LineInfo
                 {
-                    LineStart = new Vector2((beginPoint.Pos.x - startPos) * scale + 16, 6),
-                    LineEnd = new Vector2((endPoint.Pos.x - startPos) * scale + 16, 6),
+                    LineStart = new Vector2((beginPoint.Pos.x - startPos) * scale + 16, 7),
+                    LineEnd = new Vector2((endPoint.Pos.x - startPos) * scale + 16, 7),
                     Color = endPoint.Color
                 };
                 lineList.Add(info);
@@ -939,8 +939,8 @@ public partial class OverlayMapHolder : MonoBehaviour
                 var endPoint = rightWalls[i];
                 var info = new LineInfo
                 {
-                    LineStart = new Vector2((beginPoint.Pos.x - startPos) * scale + 16, 6),
-                    LineEnd = new Vector2((endPoint.Pos.x - startPos) * scale + 16, 6),
+                    LineStart = new Vector2((beginPoint.Pos.x - startPos) * scale + 16, 7),
+                    LineEnd = new Vector2((endPoint.Pos.x - startPos) * scale + 16, 7),
                     Color = endPoint.Color
                 };
                 lineList.Add(info);
