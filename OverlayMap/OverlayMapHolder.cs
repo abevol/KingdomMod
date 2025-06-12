@@ -134,7 +134,7 @@ public partial class OverlayMapHolder : MonoBehaviour
             enabledOverlayMap = !enabledOverlayMap;
         }
 
-        if (Input.GetKeyDown(KeyCode.F))
+        if (Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.F))
         {
             log.LogMessage("F key pressed.");
             showFullMap = !showFullMap;

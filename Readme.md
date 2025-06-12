@@ -26,8 +26,9 @@ Both `IL2CPP` and `Mono` versions of the game are now supported!
     * `IL2CPP` version, the game directory contains the folder `KingdomTwoCrowns_Data\il2cpp_data`
     * `Mono` version, the game directory contains the folder `KingdomTwoCrowns_Data\Managed`
 2. According to your game version, download the mod loader of a specific version. Unzip all files to the root directory of the game, and ensure that the `BepInEx` folder and `winhttp.dll` file are in the same directory with the game main program `KingdomTwoCrowns.exe`.
-    * `IL2CPP` version, download [BepInEx-Unity.IL2CPP-win-x64-6.0.0-be.725](https://builds.bepinex.dev/projects/bepinex_be/725/BepInEx-Unity.IL2CPP-win-x64-6.0.0-be.725%2Be1974e2.zip)
-    * `Mono` version, download [BepInEx-Unity.Mono-win-x64-6.0.0-be.725](https://builds.bepinex.dev/projects/bepinex_be/725/BepInEx-Unity.Mono-win-x64-6.0.0-be.725%2Be1974e2.zip)
+    * `IL2CPP` version, download [BepInEx-Unity.IL2CPP-win-x64-6.0.0-be.735](https://builds.bepinex.dev/projects/bepinex_be/735/BepInEx-Unity.IL2CPP-win-x64-6.0.0-be.735%2B5fef357.zip)
+    Due to incompatibility caused by game updates, for `IL2CPP` version you also need to download [Cpp2IL.Patch](https://github.com/abevol/KingdomMod/releases/download/2.4.0/Cpp2IL.Patch.zip), extract it to the game root directory, and overwrite the files with the same name in the BepInEx mod loader.
+    * `Mono` version, download [BepInEx-Unity.Mono-win-x64-6.0.0-be.735](https://builds.bepinex.dev/projects/bepinex_be/735/BepInEx-Unity.Mono-win-x64-6.0.0-be.735%2B5fef357.zip)
 3. Download the mod of a specific version according to your game version. Download the mod file from [Releases](https://github.com/abevol/KingdomMod/releases), unzip all files to the directory `Kingdom Two Crowns\BepInEx\plugins`.
     * `IL2CPP` version, download mods with `BIE6_IL2CPP` in the file name.
     * `Mono` version, download mods with `BIE6_Mono` in the file name.
@@ -68,18 +69,19 @@ Developer tools mod. Contains some functions that are convenient for making MODs
 
 ### Hotkeys
 
-1. `Home` Displays debug information
-2. `End` Displays objects information
-3. `Insert` Tests some interesting features
-4. `X` Dumps game objects to JSON file
-5. `P` Print presets to console
-6. `L` Prints the level module to the console
-7. `Delete` Cut down the currently selected tree
-8. `F1` Add vagrant
-9. `F2` Add Griffin
-10. `F9` Activate the Game Developer Debug Toolkit
-11. `F10` Set coin limit to 1000
-12. `Space` Throws a boulder
+1. `Ctrl + D` Enable DevTools
+2. `Home` Displays debug information
+3. `End` Displays objects information
+4. `Insert` Tests some interesting features
+5. `X` Dumps game objects to JSON file
+6. `P` Print presets to console
+7. `L` Prints the level module to the console
+8. `Delete` Cut down the currently selected tree
+9. `F1` Add vagrant
+10. `F2` Add Griffin
+11. `F9` Activate the Game Developer Debug Toolkit
+12. `F10` Set coin limit to 1000
+13. `Space` Throws a boulder
 
 ## OverlayMap
 
@@ -88,7 +90,7 @@ A map mod. It marks points of interest, along with some extra details. There's a
 ## Features
 
 1. Add a map floating layer on the top of the screen, and marks points of interest in the game on it, including castles, slums, docks, cliffs, etc.
-2. By default, only the markers in the area you have explored are displayed, of course you can also show the full map immediately by pressing the `F` key (Not recommended).
+2. By default, only the markers in the area you have explored are displayed, of course you can also show the full map immediately by pressing the `Ctrl + F` key (Not recommended).
 3. Displays some useful stats, including the number of idle villagers, workers, archers, farmers and farmland.
 4. Display additional useful information, such as current time, current island, number of gems and coins, etc.
 5. Some shortcut features, such as quick save or reload the game without exiting the game.
@@ -97,7 +99,7 @@ A map mod. It marks points of interest, along with some extra details. There's a
 ## Hotkeys
 
 1. `M` Display the map overlay
-2. `F` Show the full map (Not recommended, it will reduce the fun of the game)
+2. `Ctrl + F` Show the full map (Not recommended, it will reduce the fun of the game)
 3. `F5` Reload saved game (without exiting game)
 4. `F8` Save game (without exiting game)
 
