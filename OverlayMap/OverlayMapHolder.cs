@@ -240,6 +240,9 @@ public partial class OverlayMapHolder : MonoBehaviour
         log.LogMessage($"OnGameStart: _archiveFilename {_archiveFilename}, Campaign {_campaignIndex}, CurrentLand {_land}, currentChallenge {_challengeId}");
 
         _exploredRegion.Init(GetLocalPlayer(), _archiveFilename);
+        
+        // 在场景切换后重新加载GUI样式
+        NeedToReloadGuiBoxStyle = true;
     }
 
     public void ReloadGuiStyle()
