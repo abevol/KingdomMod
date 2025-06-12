@@ -26,7 +26,7 @@
    * `Mono`版，游戏目录中含有文件夹`KingdomTwoCrowns_Data\Managed`
 2. 根据您的游戏版本，下载特定版本的模组加载器。将所有文件解压至游戏根目录，确保 `BepInEx` 文件夹和 `winhttp.dll` 等文件与游戏主程序 `KingdomTwoCrowns.exe` 处在同一目录。
    * `IL2CPP`版，下载 [BepInEx-Unity.IL2CPP-win-x64-6.0.0-be.735](https://builds.bepinex.dev/projects/bepinex_be/735/BepInEx-Unity.IL2CPP-win-x64-6.0.0-be.735%2B5fef357.zip)
-   由于游戏更新导致的不兼容，`IL2CPP`版还需下载 [Cpp2IL.Patch](https://github.com/abevol/KingdomMod/releases/download/2.4.0/Cpp2IL.Patch.zip)，解压至游戏根目录，覆盖 BepInEx 模组加载器的同名文件。
+   * 由于游戏更新导致的不兼容，`IL2CPP`版还需下载 [Cpp2IL.Patch](https://github.com/abevol/KingdomMod/releases/download/2.4.0/Cpp2IL.Patch.zip)，解压至游戏根目录，覆盖 BepInEx 模组加载器的同名文件。
    * `Mono`版，下载 [BepInEx-Unity.Mono-win-x64-6.0.0-be.735](https://builds.bepinex.dev/projects/bepinex_be/735/BepInEx-Unity.Mono-win-x64-6.0.0-be.735%2B5fef357.zip)
 3. 根据您的游戏版本，下载特定版本的模组。从 [Releases](https://github.com/abevol/KingdomMod/releases) 下载模组文件，将所有文件解压至 `Kingdom Two Crowns\BepInEx\plugins` 目录。
    * `IL2CPP`版，下载文件名中包含`BIE6_IL2CPP`的模组。
