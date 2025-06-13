@@ -16,8 +16,9 @@ public class DevToolsHolder : MonoBehaviour
 {
     public static DevToolsHolder Instance { get; private set; }
     private static ManualLogSource log;
-    private bool enabledDebugInfo =false;
+    private bool enabledDebugInfo = false;
     private bool enabledObjectsInfo = false;
+    private bool enableDevTools = false;
     private readonly GUIStyle guiStyle = new();
     private int tick = 0;
     private readonly List<ObjectsInfo> objectsInfoList = new();
@@ -67,7 +68,7 @@ public class DevToolsHolder : MonoBehaviour
             }
         }
 
-// #if DEBUG
+#if DEBUG
             [HarmonyPatch(typeof(UnityEngine.Debug), "get_isDebugBuild")]
             public class DebugIsDebugBuildPatcher
             {
@@ -76,7 +77,7 @@ public class DevToolsHolder : MonoBehaviour
                     __result = true;
                 }
             }
-// #endif
+#endif
 
         // [HarmonyPatch(typeof(UnityEngine.DebugLogHandler), nameof(DebugLogHandler.Internal_Log))]
         // public class DebugLogHandlerPatcher
@@ -191,7 +192,16 @@ public class DevToolsHolder : MonoBehaviour
 
     private void Update()
     {
-// #if DEBUG
+        // 检测Ctrl+D组合键
+        if (Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.D))
+        {
+            enableDevTools = !enableDevTools;
+            log.LogMessage($"DevTools {(enableDevTools ? "enabled" : "disabled")}.");
+        }
+
+        // 只有在DevTools启用时才处理其他热键
+        if (!enableDevTools) return;
+
         if (Input.GetKeyDown(KeyCode.Home))
         {
             log.LogMessage("Home key pressed.");
@@ -448,7 +458,6 @@ public class DevToolsHolder : MonoBehaviour
                 Pool.Despawn(boulder, 5f);
             }
         }
-// #endif
 
         tick = tick + 1;
         if (tick > 60)
@@ -466,6 +475,13 @@ public class DevToolsHolder : MonoBehaviour
     private void OnGUI()
     {
         if (!IsPlaying()) return;
+
+        // 只有在DevTools启用时才显示其他信息
+        if (!enableDevTools) return;
+
+        // 显示DevTools状态
+        guiStyle.normal.textColor = Color.green;
+        GUI.Label(new Rect(10, Screen.height - 20, 200, 20), "DevTools Enabled", guiStyle);
 
         if (enabledObjectsInfo)
             DrawObjectsInfo();
@@ -640,6 +656,9 @@ public class DevToolsHolder : MonoBehaviour
                 infoLines.Add($"runStaminaRate: {steed.runStaminaRate}");
                 infoLines.Add($"standStaminaRate: {steed.standStaminaRate}");
                 infoLines.Add($"walkStaminaRate: {steed.walkStaminaRate}");
+                infoLines.Add("time" + ": " + Time.time);
+                infoLines.Add($"IsTired: {steed.IsTired}");
+                infoLines.Add($"TiredTime: {steed.TiredTime}");
                 infoLines.Add($"tiredTimer: {steed._tiredTimer}");
                 infoLines.Add($"tiredDuration: {steed.tiredDuration}");
                 infoLines.Add($"wellFedTimer: {steed.WellFedTimer}");

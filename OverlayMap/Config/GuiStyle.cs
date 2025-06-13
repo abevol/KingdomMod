@@ -19,8 +19,8 @@ public class GuiStyle
     {
         public static ConfigEntryWrapper<string> BackgroundColor;
         public static ConfigEntryWrapper<string> BackgroundImageFile;
-        public static ConfigEntryWrapper<UnityEngine.Rect> BackgroundImageArea;
-        public static ConfigEntryWrapper<UnityEngine.Vector4> BackgroundImageBorder;
+        public static ConfigEntryWrapper<string> BackgroundImageArea;
+        public static ConfigEntryWrapper<string> BackgroundImageBorder;
 
         public static class Sign
         {
@@ -54,8 +54,8 @@ public class GuiStyle
 
         TopMap.BackgroundColor = config.Bind("TopMap", "BackgroundColor", "0,0,0,0", "");
         TopMap.BackgroundImageFile = config.Bind("TopMap", "BackgroundImageFile", "Background.png", "");
-        TopMap.BackgroundImageArea = config.Bind("TopMap", "BackgroundImageArea", new UnityEngine.Rect(17, 17, 94, 94), "");
-        TopMap.BackgroundImageBorder = config.Bind("TopMap", "BackgroundImageBorder", new UnityEngine.Vector4(17, 17, 17, 17), "");
+        TopMap.BackgroundImageArea = config.Bind("TopMap", "BackgroundImageArea", "17, 17, 94, 94", "");
+        TopMap.BackgroundImageBorder = config.Bind("TopMap", "BackgroundImageBorder", "17, 17, 17, 17", "");
 
         TopMap.Sign.Font = config.Bind("TopMap.Sign", "Font", "msgothic.ttc", "");
         TopMap.Sign.FontSize = config.Bind("TopMap.Sign", "FontSize", 12.0f, "");

@@ -25,8 +25,9 @@
    * `IL2CPP`版，游戏目录中含有文件夹`KingdomTwoCrowns_Data\il2cpp_data`
    * `Mono`版，游戏目录中含有文件夹`KingdomTwoCrowns_Data\Managed`
 2. 根据您的游戏版本，下载特定版本的模组加载器。将所有文件解压至游戏根目录，确保 `BepInEx` 文件夹和 `winhttp.dll` 等文件与游戏主程序 `KingdomTwoCrowns.exe` 处在同一目录。
-   * `IL2CPP`版，下载 [BepInEx-Unity.IL2CPP-win-x64-6.0.0-be.725](https://builds.bepinex.dev/projects/bepinex_be/725/BepInEx-Unity.IL2CPP-win-x64-6.0.0-be.725%2Be1974e2.zip)
-   * `Mono`版，下载 [BepInEx-Unity.Mono-win-x64-6.0.0-be.725](https://builds.bepinex.dev/projects/bepinex_be/725/BepInEx-Unity.Mono-win-x64-6.0.0-be.725%2Be1974e2.zip)
+   * `IL2CPP`版，下载 [BepInEx-Unity.IL2CPP-win-x64-6.0.0-be.735](https://builds.bepinex.dev/projects/bepinex_be/735/BepInEx-Unity.IL2CPP-win-x64-6.0.0-be.735%2B5fef357.zip)
+   * 由于游戏更新导致的不兼容，`IL2CPP`版还需下载 [Cpp2IL.Patch](https://github.com/abevol/KingdomMod/releases/download/2.4.0/Cpp2IL.Patch.zip)，解压至游戏根目录，覆盖 BepInEx 模组加载器的同名文件。
+   * `Mono`版，下载 [BepInEx-Unity.Mono-win-x64-6.0.0-be.735](https://builds.bepinex.dev/projects/bepinex_be/735/BepInEx-Unity.Mono-win-x64-6.0.0-be.735%2B5fef357.zip)
 3. 根据您的游戏版本，下载特定版本的模组。从 [Releases](https://github.com/abevol/KingdomMod/releases) 下载模组文件，将所有文件解压至 `Kingdom Two Crowns\BepInEx\plugins` 目录。
    * `IL2CPP`版，下载文件名中包含`BIE6_IL2CPP`的模组。
    * `Mono`版，下载文件名中包含`BIE6_Mono`的模组。
@@ -71,18 +72,19 @@
 
 ### 热键
 
-1. `Home` 显示调试信息
-2. `End` 显示对象信息
-3. `Insert` 测试一些有趣的功能
-4. `X` 转储游戏对象到 JSON 文件
-5. `P` 打印预设件到控制台
-6. `L` 打印关卡模块到控制台
-7. `Delete` 砍伐当前选中的树木
-8. `F1` 添加游民
-9. `F2` 添加格里芬
-10. `F9` 激活游戏开发者调试工具箱
-11. `F10` 将硬币上限设置为1000
-12. `Space` 扔出巨石
+1. `Ctrl + D` 激活 DevTools
+2. `Home` 显示调试信息
+3. `End` 显示对象信息
+4. `Insert` 测试一些有趣的功能
+5. `X` 转储游戏对象到 JSON 文件
+6. `P` 打印预设件到控制台
+7. `L` 打印关卡模块到控制台
+8. `Delete` 砍伐当前选中的树木
+9. `F1` 添加游民
+10. `F2` 添加格里芬
+11. `F9` 激活游戏开发者调试工具箱
+12. `F10` 将硬币上限设置为1000
+13. `Space` 扔出巨石
 
 ## OverlayMap
 
@@ -91,7 +93,7 @@
 ### 功能
 
 1. 在屏幕上方添加一个地图浮层，并在上面标识游戏内的兴趣点，包括城堡、贫民窟、码头、悬崖等。
-2. 默认情况下，只显示你已探索的区域内的标识，当然你也可以通过按下`F`键立即显示完整地图（不建议）。
+2. 默认情况下，只显示你已探索的区域内的标识，当然你也可以通过按下`Ctrl + F`键立即显示完整地图（不建议）。
 3. 显示一些有用的统计信息，包括闲置的村民、工人、弓箭手、农民和农田的数量。
 4. 显示额外的有用信息，比如当前时间、当前小岛、宝石数和金币数等等。
 5. 一些快捷功能，比如快速保存或重载游戏，而不用退出游戏。
@@ -100,7 +102,7 @@
 ### 热键
 
 1. `M` 显示地图浮层
-2. `F` 显示完整地图（不建议使用，会降低游戏乐趣）
+2. `Ctrl + F` 显示完整地图（不建议使用，会降低游戏乐趣）
 3. `F5` 重新加载已保存的游戏 (不用退出游戏): 体验电影蝴蝶效应的乐趣，直到有一天，你把F5错按成了F8(> <)
 4. `F8` 保存游戏 (不用退出游戏)
 5. `Ctrl + ← / →` 调整地图标识的偏移
