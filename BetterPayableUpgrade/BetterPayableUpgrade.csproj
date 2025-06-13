@@ -5,7 +5,7 @@
     <PropertyGroup>
         <AssemblyName>KingdomMod.BetterPayableUpgrade</AssemblyName>
         <Description>KingdomMod.BetterPayableUpgrade</Description>
-        <Version>2.3.2</Version>
+        <Version>2.4.0</Version>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <LangVersion>latest</LangVersion>
         <RestoreAdditionalProjectSources>

@@ -269,7 +269,7 @@ public class OverlayMapHolder : MonoBehaviour
             EnabledOverlayMap = !EnabledOverlayMap;
         }
 
-        if (Input.GetKeyDown(KeyCode.F))
+        if (Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.F))
         {
             LogDebug("F key pressed.");
             ShowFullMap = !ShowFullMap;
@@ -389,6 +389,9 @@ public class OverlayMapHolder : MonoBehaviour
         _cachePrefabID.CachePrefabIDs();
 
         SaveDataExtras.Init();
+
+        // 在场景切换后重新加载GUI样式
+        NeedToReloadGuiBoxStyle = true;
     }
 
     public void OnGameEnd()
@@ -416,21 +419,28 @@ public class OverlayMapHolder : MonoBehaviour
         if (File.Exists(bgImageFile))
         {
             byte[] imageData = File.ReadAllBytes(bgImageFile);
-            Texture2D texture = new Texture2D(2, 2);
+            Texture2D texture = new Texture2D(2, 2, TextureFormat.RGBA32, false);
             texture.LoadImage(imageData);
 
             var imageArea = (RectInt)GuiStyle.TopMap.BackgroundImageArea;
             imageArea.y = texture.height - imageArea.y - imageArea.height;
-            Texture2D subTexture = new Texture2D(imageArea.width, imageArea.height);
+            Texture2D subTexture = new Texture2D(imageArea.width, imageArea.height, TextureFormat.RGBA32, false);
             Color[] pixels = texture.GetPixels(imageArea.x, imageArea.y, imageArea.width, imageArea.height);
-            subTexture.SetPixels(pixels);
-            subTexture.Apply();
+            if (pixels != null)
+            {
+                subTexture.SetPixels(pixels);
+                subTexture.Apply();
 
-            //  _guiBoxStyle.normal.background = subTexture;
-            _guiBoxStyle.normal.background = MakeColoredTexture(subTexture, GuiStyle.TopMap.BackgroundColor);
-            _guiBoxStyle.stretchWidth = false;
-            _guiBoxStyle.stretchHeight = false;
-            _guiBoxStyle.border = GuiStyle.TopMap.BackgroundImageBorder;
+                //  _guiBoxStyle.normal.background = subTexture;
+                _guiBoxStyle.normal.background = MakeColoredTexture(subTexture, GuiStyle.TopMap.BackgroundColor);
+                _guiBoxStyle.stretchWidth = false;
+                _guiBoxStyle.stretchHeight = false;
+                _guiBoxStyle.border = GuiStyle.TopMap.BackgroundImageBorder;
+            }
+            else
+            {
+                LogError("ReloadGuiStyle, failed to get pixels from texture.");
+            }
         }
         else
         {
@@ -1075,8 +1085,8 @@ public class OverlayMapHolder : MonoBehaviour
                 var endPoint = leftWalls[i];
                 var info = new LineInfo
                 {
-                    LineStart = new Vector2((beginPoint.Pos.x - startPos) * scale + 16, 6),
-                    LineEnd = new Vector2((endPoint.Pos.x - startPos) * scale + 16, 6),
+                    LineStart = new Vector2((beginPoint.Pos.x - startPos) * scale + 16, 7),
+                    LineEnd = new Vector2((endPoint.Pos.x - startPos) * scale + 16, 7),
                     Color = endPoint.Color
                 };
                 lineList.Add(info);
@@ -1093,8 +1103,8 @@ public class OverlayMapHolder : MonoBehaviour
                 var endPoint = rightWalls[i];
                 var info = new LineInfo
                 {
-                    LineStart = new Vector2((beginPoint.Pos.x - startPos) * scale + 16, 6),
-                    LineEnd = new Vector2((endPoint.Pos.x - startPos) * scale + 16, 6),
+                    LineStart = new Vector2((beginPoint.Pos.x - startPos) * scale + 16, 7),
+                    LineEnd = new Vector2((endPoint.Pos.x - startPos) * scale + 16, 7),
                     Color = endPoint.Color
                 };
                 lineList.Add(info);
