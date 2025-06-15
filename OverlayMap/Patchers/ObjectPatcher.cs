@@ -1,9 +1,12 @@
 ﻿using HarmonyLib;
+#if IL2CPP
+using Il2CppSystem.Collections.Generic;
+#else
 using System.Collections.Generic;
-using System.IO;
+#endif
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using static KingdomMod.OverlayMap.OverlayMapHolder;
+using KingdomMod.Shared;
 
 namespace KingdomMod.OverlayMap.Patchers;
 
@@ -86,7 +89,7 @@ public class ObjectPatcher
     {
         public static void Postfix(Object __result)
         {
-            HandleInstantiate(__result, [SourceFlag.Create1]);
+            HandleInstantiate(__result, CompatCollections.CreateHashSet(SourceFlag.Create1));
         }
     }
 
@@ -95,7 +98,7 @@ public class ObjectPatcher
     {
         public static void Postfix(Object __result)
         {
-            HandleInstantiate(__result, [SourceFlag.Create2]);
+            HandleInstantiate(__result, CompatCollections.CreateHashSet(SourceFlag.Create2));
         }
     }
 
@@ -104,7 +107,7 @@ public class ObjectPatcher
     {
         public static void Postfix(Object __result)
         {
-            HandleInstantiate(__result, [SourceFlag.Create3]);
+            HandleInstantiate(__result, CompatCollections.CreateHashSet(SourceFlag.Create3));
         }
     }
 
@@ -113,7 +116,7 @@ public class ObjectPatcher
     {
         public static void Postfix(Object __result)
         {
-            HandleInstantiate(__result, [SourceFlag.Create4]);
+            HandleInstantiate(__result, CompatCollections.CreateHashSet(SourceFlag.Create4));
         }
     }
 
@@ -122,7 +125,7 @@ public class ObjectPatcher
     {
         public static void Postfix(Object __result)
         {
-            HandleInstantiate(__result, [SourceFlag.Create5]);
+            HandleInstantiate(__result, CompatCollections.CreateHashSet(SourceFlag.Create5));
         }
     }
 
@@ -131,7 +134,7 @@ public class ObjectPatcher
     {
         public static void Prefix(Object obj)
         {
-            HandleDestroy(obj, [SourceFlag.Destroy1]);
+            HandleDestroy(obj, CompatCollections.CreateHashSet(SourceFlag.Destroy1));
         }
     }
 
@@ -140,7 +143,7 @@ public class ObjectPatcher
     {
         public static void Prefix(Object obj)
         {
-            HandleDestroy(obj, [SourceFlag.Destroy2]);
+            HandleDestroy(obj, CompatCollections.CreateHashSet(SourceFlag.Destroy2));
         }
     }
 }

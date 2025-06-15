@@ -6,7 +6,6 @@ using HarmonyLib;
 #if IL2CPP
 using Il2CppInterop.Runtime.Injection;
 using Il2CppSystem.Collections.Generic;
-
 #else
 using System.Collections.Generic;
 #endif
@@ -18,6 +17,10 @@ public class BetterPayableUpgradeHolder : MonoBehaviour
     public static BetterPayableUpgradeHolder Instance { get; private set; }
     private static ManualLogSource log;
     private static System.Collections.Generic.Dictionary<GamePrefabID, ModifyData> _modifyDataDict;
+
+#if IL2CPP
+    public BetterPayableUpgradeHolder(IntPtr ptr) : base(ptr) { }
+#endif
 
     public class Patcher
     {

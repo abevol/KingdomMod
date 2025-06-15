@@ -1,13 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
+using UnityEngine;
+using UnityEngine.UI;
 using KingdomMod.OverlayMap.Config;
 using KingdomMod.OverlayMap.Config.Extensions;
 using KingdomMod.OverlayMap.Patchers;
-using UnityEngine;
-using UnityEngine.UI;
+using KingdomMod.Shared;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
 using static KingdomMod.OverlayMap.Patchers.ObjectPatcher;
+
+#if IL2CPP
+using Il2CppInterop.Runtime.Attributes;
+using Il2CppInterop.Runtime.Injection;
+using Il2CppSystem.Collections.Generic;
+#else
+using System.Collections.Generic;
+#endif
 
 namespace KingdomMod.OverlayMap.Gui.TopMap;
 
@@ -17,27 +25,46 @@ public class TopMapView : MonoBehaviour
     private Image _backgroundImage;
     private Text _groupText;
     private float _timeSinceLastGuiUpdate;
-    private readonly Dictionary<Type, IComponentMapper> _componentMappers;
+    private Dictionary<Type, IComponentMapper> _componentMappers;
 
     public static float MappingScale;
     public PlayerId PlayerId;
-    public TopMapStyle Style = new();
+#if IL2CPP
+    [HideFromIl2Cpp]
+#endif
+    public TopMapStyle Style { get; set; }
+#if IL2CPP
+    [HideFromIl2Cpp]
+#endif
+    public MapMarker CastleMarker { get; set; }
+#if IL2CPP
+    [HideFromIl2Cpp]
+#endif
+    public List<MapMarker> PlayerMarkers { get; set; }
+#if IL2CPP
+    [HideFromIl2Cpp]
+#endif
+    public Sided<LinkedList<MapMarker>> SidedWalls { get; set; }
+#if IL2CPP
+    [HideFromIl2Cpp]
+#endif
+    public Dictionary<Component, MapMarker> MapMarkers { get; set; }
 
-    public MapMarker CastleMarker;
-    public List<MapMarker> PlayerMarkers { get; } = new();
-    public Sided<LinkedList<MapMarker>> SidedWalls { get; } = new()
-    {
-        left = new LinkedList<MapMarker>(),
-        right = new LinkedList<MapMarker>()
-    };
-    public Dictionary<Component, MapMarker> MapMarkers { get; } = new();
+#if IL2CPP
+    public TopMapView(IntPtr ptr) : base(ptr) { }
+#endif
 
     public TopMapView()
     {
         LogTrace("TopMapView.Constructor");
+    }
 
-        _componentMappers = new Dictionary<Type, IComponentMapper>
-        {
+    private void Awake()
+    {
+        LogTrace("TopMapView.Awake");
+
+        _componentMappers = CompatCollections.CreateDictionary<Type, IComponentMapper>
+        (
             // { typeof(Beach),                new Mappers.BeachMapper(this) },
             // { typeof(BeggarCamp),           new Mappers.BeggarCampMapper(this) },
             // { typeof(Beggar),               new Mappers.BeggarMapper(this) },
@@ -46,8 +73,8 @@ public class TopMapView : MonoBehaviour
             // { typeof(BoatSummoningBell),    new Mappers.BoatSummoningBellMapper(this) },
             // { typeof(Bomb),                 new Mappers.BombMapper(this) },
             // { typeof(Cabin),                new Mappers.CabinMapper(this) },
-            { typeof(Campfire),             new Mappers.CampfireMapper(this) },
-            { typeof(Castle),               new Mappers.CastleMapper(this) },
+            (typeof(Campfire), new Mappers.CampfireMapper(this)),
+            (typeof(Castle), new Mappers.CastleMapper(this)),
             // { typeof(Chest),                new Mappers.ChestMapper(this) },
             // { typeof(CitizenHousePayable),  new Mappers.CitizenHousePayableMapper(this) },
             // { typeof(Deer),                 new Mappers.DeerMapper(this) },
@@ -59,9 +86,9 @@ public class TopMapView : MonoBehaviour
             // { typeof(PayableBush),          new Mappers.PayableBushMapper(this) },
             // { typeof(PayableGemChest),      new Mappers.PayableGemChestMapper(this) },
             // { typeof(PayableShop),          new Mappers.PayableShopMapper(this) },
-            { typeof(PayableUpgrade),       new Mappers.PayableUpgradeMapper(this) },
+            (typeof(PayableUpgrade), new Mappers.PayableUpgradeMapper(this)),
             // { typeof(PersephoneCage),       new Mappers.PersephoneCageMapper(this) },
-            { typeof(Player),               new Mappers.PlayerMapper(this) },
+            (typeof(Player), new Mappers.PlayerMapper(this))
             // { typeof(Portal),               new Mappers.PortalMapper(this) },
             // { typeof(River),                new Mappers.RiverMapper(this) },
             // { typeof(Statue),               new Mappers.StatueMapper(this) },
@@ -72,12 +99,16 @@ public class TopMapView : MonoBehaviour
             // { typeof(TimeStatue),           new Mappers.TimeStatueMapper(this) },
             // { typeof(UnlockNewRulerStatue), new Mappers.UnlockNewRulerStatueMapper(this) },
             // { typeof(WreckPlaceholder),     new Mappers.WreckPlaceholderMapper(this) },
-        };
-    }
+            );
 
-    private void Awake()
-    {
-        LogTrace("TopMapView.Awake");
+        Style = new TopMapStyle();
+        PlayerMarkers = new List<MapMarker>();
+        SidedWalls = new Sided<LinkedList<MapMarker>>
+        {
+            left = new LinkedList<MapMarker>(),
+            right = new LinkedList<MapMarker>()
+        };
+        MapMarkers = new Dictionary<Component, MapMarker>();
 
         _rectTransform = this.gameObject.AddComponent<RectTransform>();
         _backgroundImage = this.gameObject.AddComponent<Image>();
@@ -91,7 +122,7 @@ public class TopMapView : MonoBehaviour
         ObjectPatcher.OnComponentCreated += OnComponentCreated;
         ObjectPatcher.OnComponentDestroyed += OnComponentDestroyed;
         OverlayMapHolder.OnGameStateChanged += OnGameStateChanged;
-        Game.OnGameStart += OnGameStart;
+        Game.OnGameStart += (System.Action)OnGameStart;
     }
 
     public void Init(PlayerId playerId)
@@ -104,7 +135,7 @@ public class TopMapView : MonoBehaviour
         ObjectPatcher.OnComponentCreated -= OnComponentCreated;
         ObjectPatcher.OnComponentDestroyed -= OnComponentDestroyed;
         OverlayMapHolder.OnGameStateChanged -= OnGameStateChanged;
-        Game.OnGameStart -= OnGameStart;
+        Game.OnGameStart -= (System.Action)OnGameStart;
         Style.Destroy();
     }
 
@@ -287,6 +318,9 @@ public class TopMapView : MonoBehaviour
         }
     }
 
+#if IL2CPP
+    [HideFromIl2Cpp]
+#endif
     public MapMarker TryAddMapMarker(
         Component target,
         ConfigEntryWrapper<string> color,
@@ -308,6 +342,9 @@ public class TopMapView : MonoBehaviour
                 return marker;
 
             // 创建一个新的 GameObject 并添加 MapMarker 组件
+#if IL2CPP
+            ClassInjector.RegisterTypeInIl2Cpp<MapMarker>();
+#endif
             var mapMarkerObject = new GameObject(nameof(MapMarker));
             mapMarkerObject.transform.SetParent(this.gameObject.transform, false);
             var mapMarker = mapMarkerObject.AddComponent<MapMarker>();

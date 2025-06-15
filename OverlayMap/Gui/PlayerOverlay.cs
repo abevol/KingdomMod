@@ -1,4 +1,8 @@
-﻿using KingdomMod.OverlayMap.Gui.TopMap;
+﻿#if IL2CPP
+using Il2CppInterop.Runtime.Injection;
+#endif
+using System;
+using KingdomMod.OverlayMap.Gui.TopMap;
 using UnityEngine;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
 
@@ -9,6 +13,10 @@ namespace KingdomMod.OverlayMap.Gui
         private RectTransform _rectTransform;
         private PlayerId _playerId;
         public TopMapView TopMapView;
+
+#if IL2CPP
+        public PlayerOverlay(IntPtr ptr) : base(ptr) { }
+#endif
 
         private void Awake()
         {
@@ -114,6 +122,9 @@ namespace KingdomMod.OverlayMap.Gui
         {
             LogDebug($"CreateTopMapView");
 
+#if IL2CPP
+            ClassInjector.RegisterTypeInIl2Cpp<TopMapView>();
+#endif
             var viewObj = new GameObject(nameof(TopMap.TopMapView));
             viewObj.transform.SetParent(this.transform, false);
             var view = viewObj.AddComponent<TopMapView>();

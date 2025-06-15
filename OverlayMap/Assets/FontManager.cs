@@ -1,19 +1,19 @@
-﻿using KingdomMod.OverlayMap.Config;
-using System;
-using System.Collections;
+﻿#if IL2CPP
+using Il2CppSystem.Collections.Generic;
+#else
 using System.Collections.Generic;
+#endif
+using System;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
 using TMPro;
 using UnityEngine;
 using UnityEngine.TextCore.LowLevel;
+using KingdomMod.Shared;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
 
 namespace KingdomMod.OverlayMap.Assets
 {
-    public class FontManager : MonoBehaviour
+    public class FontManager
     {
         private static string GetSystemFontFile(string fontName)
         {
@@ -52,7 +52,7 @@ namespace KingdomMod.OverlayMap.Assets
                 return null;
             }
 
-            return new FontData {FontName = fontName, Font = font, Chars = [], MissingChars = [] };
+            return new FontData {FontName = fontName, Font = font, Chars = new HashSet<char>(), MissingChars = new HashSet<char>() };
         }
 
         public static TMP_FontAsset CreateFont(string fontName)
@@ -68,7 +68,15 @@ namespace KingdomMod.OverlayMap.Assets
             {
                 LogTrace($"fontFilePath: {fontFilePath}");
 
+#if IL2CPP
+                font = new Font();
+                if (string.IsNullOrEmpty(Path.GetDirectoryName(fontFilePath)))
+                    Font.Internal_CreateFont(font, fontFilePath);
+                else
+                    Font.Internal_CreateFontFromPath(font, fontFilePath);
+#else
                 font = new Font(fontFilePath);
+#endif
             }
             else
             {

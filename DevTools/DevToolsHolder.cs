@@ -25,6 +25,10 @@ public class DevToolsHolder : MonoBehaviour
     private static Texture2D ColoredTexture2D = null;
     private static readonly GUIStyle boxGuiStyle = new();
 
+#if IL2CPP
+    public DevToolsHolder(IntPtr ptr) : base(ptr) { }
+#endif
+
     public static void Initialize(DevToolsPlugin plugin)
     {
         log = plugin.LogSource;

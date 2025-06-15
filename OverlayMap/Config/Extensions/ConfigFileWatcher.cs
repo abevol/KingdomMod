@@ -2,6 +2,9 @@
 using System.Collections;
 using System.IO;
 using System.Security.Cryptography;
+#if IL2CPP
+using BepInEx.Unity.IL2CPP.Utils.Collections;
+#endif
 using static KingdomMod.OverlayMap.OverlayMapHolder;
 
 namespace KingdomMod.OverlayMap.Config.Extensions;
@@ -31,7 +34,11 @@ public class ConfigFileWatcher
             if (hash == "") return;
             if (hash == _configFileHash) return;
             _configFileHash = hash;
+#if IL2CPP
+            Instance.StartCoroutine(OnConfigFileChangedCoroutine(source, e).WrapToIl2Cpp());
+#else
             Instance.StartCoroutine(OnConfigFileChangedCoroutine(source, e));
+#endif
         }
         catch (Exception exception)
         {

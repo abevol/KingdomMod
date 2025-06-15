@@ -1,9 +1,14 @@
-﻿using System;
-using UnityEngine;
-using KingdomMod.OverlayMap.Config;
-using static KingdomMod.OverlayMap.OverlayMapHolder;
-using UnityEngine.UI;
+﻿#if IL2CPP
+using Il2CppInterop.Runtime.Injection;
+using Il2CppSystem.Collections.Generic;
+#else
 using System.Collections.Generic;
+#endif
+using KingdomMod.OverlayMap.Config;
+using System;
+using UnityEngine;
+using UnityEngine.UI;
+using static KingdomMod.OverlayMap.OverlayMapHolder;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap
 {
@@ -17,8 +22,15 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
         private float _timeSinceLastGuiUpdate = 0;
         private LinkedListNode<MapMarker> _node;
 
+#if IL2CPP
+        public WallLine(IntPtr ptr) : base(ptr) { }
+#endif
+
         public static WallLine Create(MapMarker wallMarker)
         {
+#if IL2CPP
+            ClassInjector.RegisterTypeInIl2Cpp<WallLine>();
+#endif
             var obj = new GameObject(nameof(WallLine));
             obj.transform.SetParent(wallMarker.transform, false);
             var comp = obj.AddComponent<WallLine>();

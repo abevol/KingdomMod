@@ -1,5 +1,9 @@
 ﻿using System;
+#if IL2CPP
+using Il2CppSystem.Collections.Generic;
+#else
 using System.Collections.Generic;
+#endif
 using HarmonyLib;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
 
@@ -7,19 +11,11 @@ namespace KingdomMod.OverlayMap.Patchers;
 
 public class LevelLayoutPatcher
 {
-    [HarmonyPatch(typeof(LevelLayout), MethodType.Constructor, new Type[]
-    {
-        typeof(List<LevelBlock>),
-        typeof(LevelConfig),
-        typeof(Dictionary<LevelBlockGroup, SharedBlockCampaignData>),
-        typeof(Dictionary<LevelBlockGroup, IntRange>),
-        typeof(int)
-    })]
+    [HarmonyPatch(typeof(LevelLayout), "Generate")]
     public class ConstructorPatcher
     {
         public static void Postfix(LevelLayout __instance)
         {
-
             LogDebug($"LevelLayout.Constructor, TotalWidth: {__instance.TotalWidth()}, " +
                      $"minLevelWidth: {Managers.Inst.game.currentLevelConfig.minLevelWidth}, " +
                      $"levelWidth: {Managers.Inst.level.levelWidth}, " +

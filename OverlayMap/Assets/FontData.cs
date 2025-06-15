@@ -1,6 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿#if IL2CPP
+using Il2CppSystem.Collections.Generic;
+#else
+using System.Collections.Generic;
+#endif
 using TMPro;
+using KingdomMod.Shared;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
 
 namespace KingdomMod.OverlayMap.Assets
@@ -20,7 +24,7 @@ namespace KingdomMod.OverlayMap.Assets
                 return;
             }
 
-            Font.fallbackFontAssetTable = new List<TMP_FontAsset>();
+            Font.fallbackFontAssetTable = new ();
 
             foreach (var fontName in fontNames)
             {
@@ -59,7 +63,7 @@ namespace KingdomMod.OverlayMap.Assets
         private static void AddFallbackFont(TMP_FontAsset mainFont, TMP_FontAsset fontAsset)
         {
             if (mainFont.fallbackFontAssetTable == null)
-                mainFont.fallbackFontAssetTable = new List<TMP_FontAsset>();
+                mainFont.fallbackFontAssetTable = new ();
 
             if (!mainFont.fallbackFontAssetTable.Contains(fontAsset))
             {
