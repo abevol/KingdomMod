@@ -37,6 +37,7 @@ public class ConfigEntryWrapper<T>
     public static implicit operator Rect(ConfigEntryWrapper<T> d) => d.GetOrCreateCachedValue<Rect>(ParseRect);
     public static implicit operator RectInt(ConfigEntryWrapper<T> d) => d.GetOrCreateCachedValue<RectInt>(ParseRectInt);
     public static implicit operator RectOffset(ConfigEntryWrapper<T> d) => d.GetOrCreateCachedValue<RectOffset>(ParseRectOffset);
+    public static implicit operator Vector4(ConfigEntryWrapper<T> d) => d.GetOrCreateCachedValue<Vector4>(ParseVector4);
 
     private TResult GetOrCreateCachedValue<TResult>(Func<ConfigEntry<string>, TResult> parser)
     {
@@ -93,6 +94,16 @@ public class ConfigEntryWrapper<T>
                 ParseInt(values[3])),
             new RectOffset());
 
+    private static Vector4 ParseVector4(ConfigEntry<string> entry) =>
+        ParseFourComponents(
+            entry,
+            values => new Vector4(
+                ParseFloat(values[0]),
+                ParseFloat(values[1]),
+                ParseFloat(values[2]),
+                ParseFloat(values[3])),
+            Vector4.zero);
+
     private static TResult ParseFourComponents<TResult>(
         ConfigEntry<string> entry,
         Func<string[], TResult> constructor,
@@ -132,4 +143,24 @@ public class ConfigEntryWrapper<T>
 
     private static int ParseInt(string value) => 
         int.Parse(value.Trim(), CultureInfo.InvariantCulture);
+
+    public string[] AsStringArray
+    {
+        get
+        {
+            if (Entry is ConfigEntry<string> stringEntry)
+            {
+                return stringEntry.Value.Split([','], StringSplitOptions.RemoveEmptyEntries);
+            }
+
+            return [];
+        }
+        set
+        {
+            if (Entry is ConfigEntry<string> stringEntry && value != null)
+            {
+                stringEntry.Value = string.Join(",", value);
+            }
+        }
+    }
 }

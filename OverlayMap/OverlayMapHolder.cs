@@ -8,10 +8,7 @@ using KingdomMod.OverlayMap.Config;
 using KingdomMod.OverlayMap.Gui;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
-using KingdomMod.OverlayMap.Gui.TopMap;
-using UnityEngine.UIElements;
-
-
+using Coatsink.Common;
 
 #if IL2CPP
 using Il2CppInterop.Runtime.Injection;
@@ -50,6 +47,10 @@ public class OverlayMapHolder : MonoBehaviour
     public static string BepInExDir;
     public static string AssetsDir;
 
+#if IL2CPP
+    public OverlayMapHolder(IntPtr ptr) : base(ptr) { }
+#endif
+
     public static void Initialize(OverlayMapPlugin plugin)
     {
         _log = plugin.LogSource;
@@ -76,8 +77,8 @@ public class OverlayMapHolder : MonoBehaviour
         PlayerOverlays.P1 = CreatePlayerOverlay(PlayerId.P1);
         PlayerOverlays.P2 = CreatePlayerOverlay(PlayerId.P2);
 
-        Game.OnGameStart += OnGameStart;
-        Game.OnGameEnd += OnGameEnd;
+        Game.OnGameStart += (Action)OnGameStart;
+        Game.OnGameEnd += (Action)OnGameEnd;
 
 #if IL2CPP
         SceneManager.add_sceneLoaded(new System.Action<Scene, LoadSceneMode>(OnSceneLoaded));
@@ -88,14 +89,18 @@ public class OverlayMapHolder : MonoBehaviour
 
     private void OnDestroy()
     {
-        Game.OnGameStart -= OnGameStart;
-        Game.OnGameEnd -= OnGameEnd;
-        Managers.Inst.game.run.onGoto -= OnGameGoto;
-        ProgramDirector.run.onGoto -= OnProgramDirectorGoto;
+        Game.OnGameStart -= (Action)OnGameStart;
+        Game.OnGameEnd -= (Action)OnGameEnd;
 
 #if IL2CPP
+        Managers.Inst.game.run.GetOverrideMethodDelegate<IHagletCallable, System.Action<Il2CppSystem.Action<int, int>>>("remove_onGoto")
+            .Invoke(new System.Action<int, int>(OnGameGoto));
+        ProgramDirector.run.GetOverrideMethodDelegate<IHagletCallable, System.Action<Il2CppSystem.Action<int, int>>>("remove_onGoto")
+            .Invoke(new System.Action<int, int>(OnProgramDirectorGoto));
         SceneManager.remove_sceneLoaded(new System.Action<Scene, LoadSceneMode>(OnSceneLoaded));
 #else
+        Managers.Inst.game.run.onGoto -= OnGameGoto;
+        ProgramDirector.run.onGoto -= OnProgramDirectorGoto;
         SceneManager.sceneLoaded -= OnSceneLoaded;
 #endif
     }
@@ -121,6 +126,9 @@ public class OverlayMapHolder : MonoBehaviour
     {
         LogDebug($"CreatePlayerOverlay, playerId: {playerId}");
 
+#if IL2CPP
+        ClassInjector.RegisterTypeInIl2Cpp<PlayerOverlay>();
+#endif
         var guiObj = new GameObject(nameof(PlayerOverlay));
         guiObj.transform.SetParent(_canvas.transform, false);
         var guiComp = guiObj.AddComponent<PlayerOverlay>();
@@ -369,15 +377,22 @@ public class OverlayMapHolder : MonoBehaviour
     {
         LogTrace("OverlayMapHolder.OnGameInit");
 
+#if IL2CPP
+        game.run.GetOverrideMethodDelegate<IHagletCallable, System.Action<Il2CppSystem.Action<int, int>>>("add_onGoto").Invoke(new System.Action<int, int>(OnGameGoto));
+#else
         game.run.onGoto += OnGameGoto;
+#endif
     }
 
     public void OnProgramDirectorRun()
     {
         LogTrace("OverlayMapHolder.OnProgramDirectorRun");
 
+#if IL2CPP
+        ProgramDirector.run.GetOverrideMethodDelegate<IHagletCallable, System.Action<Il2CppSystem.Action<int, int>>>("add_onGoto").Invoke(new System.Action<int, int>(OnProgramDirectorGoto));
+#else
         ProgramDirector.run.onGoto += OnProgramDirectorGoto;
-
+#endif
     }
 
     public void OnGameStart()

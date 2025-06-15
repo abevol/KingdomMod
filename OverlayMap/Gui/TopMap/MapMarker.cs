@@ -24,6 +24,10 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
 
         public event PositionEventHandler OnPositionChanged;
 
+#if IL2CPP
+        public MapMarker(IntPtr ptr) : base(ptr) { }
+#endif
+
         public void Init()
         {
             _rectTransform = this.gameObject.AddComponent<RectTransform>();

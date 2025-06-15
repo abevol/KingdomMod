@@ -184,6 +184,30 @@ namespace KingdomMod
             return (TR)f.CreateDelegate(typeof(TR), @this);
         }
 
+        public static TR GetMethodDelegate<TR>(this Type @this, string method) where TR : Delegate
+        {
+            if (@this == null)
+                throw new NullReferenceException("inst is null.");
+
+            var f = @this.GetMethod(method, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+            if (f == null)
+                throw new NullReferenceException("method not exist.");
+
+            return (TR)f.CreateDelegate(typeof(TR));
+        }
+
+        public static TR GetMethodDelegate<TR>(this Type @this, object caller, string method) where TR : Delegate
+        {
+            if (@this == null)
+                throw new NullReferenceException("inst is null.");
+
+            var f = @this.GetMethod(method, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+            if (f == null)
+                throw new NullReferenceException("method not exist.");
+
+            return (TR)f.CreateDelegate(typeof(TR), caller);
+        }
+
         public static TR GetMethodDelegate<TR>(this object @this, string method) where TR : Delegate
         {
             if (@this == null)
@@ -193,6 +217,8 @@ namespace KingdomMod
             if (f == null)
                 throw new NullReferenceException("method not exist.");
 
+            if (f.IsStatic)
+                return (TR)f.CreateDelegate(typeof(TR));
             return (TR)f.CreateDelegate(typeof(TR), @this);
         }
 

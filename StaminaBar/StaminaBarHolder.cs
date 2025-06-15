@@ -25,10 +25,9 @@ public class StaminaBarHolder : MonoBehaviour
         Instance = obj.AddComponent<StaminaBarHolder>();
     }
 
-    public StaminaBarHolder()
-    {
-
-    }
+#if IL2CPP
+    public StaminaBarHolder(IntPtr ptr) : base(ptr) { }
+#endif
 
     private void Start()
     {

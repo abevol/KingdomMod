@@ -27,7 +27,7 @@
     </ItemGroup>
 
     <!-- BIE6_IL2CPP -->
-    <ItemGroup Condition="'$(Configuration)'=='BIE6_IL2CPP'">
+    <ItemGroup Condition="'$(Configuration)'=='BIE6_IL2CPP' or '$(Configuration)'=='Debug'">
         <Reference Include="0Harmony">
             <HintPath>..\_libs\BIE6_IL2CPP\core\0Harmony.dll</HintPath>
             <Private>False</Private>
@@ -71,7 +71,7 @@
     </ItemGroup>
 
     <!-- BIE6_Mono -->
-    <ItemGroup Condition="'$(Configuration)'=='BIE6_Mono' or '$(Configuration)'=='Debug'">
+    <ItemGroup Condition="'$(Configuration)'=='BIE6_Mono'">
         <Reference Include="0Harmony">
             <HintPath>..\_libs\BIE6_Mono\core\0Harmony.dll</HintPath>
             <Private>False</Private>

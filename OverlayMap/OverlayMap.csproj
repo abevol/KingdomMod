@@ -24,6 +24,8 @@
         <Compile Include="..\Shared\GameExtensions.cs" Link="Shared\GameExtensions.cs" />
         <Compile Include="..\Shared\GameObjectDetails.cs" Link="Shared\GameObjectDetails.cs" />
         <Compile Include="..\Shared\GuiHelper.cs" Link="Shared\GuiHelper.cs" />
+        <Compile Include="..\Shared\CompatCollections.cs" Link="Shared\CompatCollections.cs" />
+        <Compile Include="..\Shared\ObjectExtensions.cs" Link="Shared\ObjectExtensions.cs" />
         <Compile Include="..\Shared\TypeExtensions.cs" Link="Shared\TypeExtensions.cs" />
     </ItemGroup>
 
@@ -46,8 +48,10 @@
         <PackageReference Include="BepInEx.PluginInfoProps" Version="2.*" />
     </ItemGroup>
 
-    <!-- BIE6_IL2CPP -->
-    <ItemGroup Condition="'$(Configuration)'=='BIE6_IL2CPP'">
+    <!-- BIE6_IL2CPP || Debug -->
+    <ItemGroup Condition="'$(Configuration)'=='BIE6_IL2CPP' or '$(Configuration)'=='Debug'">
+        <Compile Include="..\Shared\Attributes\RegisterTypeInIl2Cpp.cs"
+                 Link="Shared\Attributes\RegisterTypeInIl2Cpp.cs" />
         <Reference Include="0Harmony">
             <HintPath>..\_libs\BIE6_IL2CPP\core\0Harmony.dll</HintPath>
             <Private>False</Private>
@@ -70,6 +74,10 @@
         </Reference>
         <Reference Include="Il2Cppmscorlib">
             <HintPath>..\_libs\BIE6_IL2CPP\interop\Il2Cppmscorlib.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="Il2CppSystem">
+            <HintPath>..\_libs\BIE6_IL2CPP\interop\Il2CppSystem.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="Il2CppSystem.Core">
@@ -124,10 +132,18 @@
             <HintPath>..\_libs\BIE6_IL2CPP\interop\UnityEngine.UIModule.dll</HintPath>
             <Private>False</Private>
         </Reference>
+        <Reference Include="Unity.TextMeshPro">
+            <HintPath>..\_libs\BIE6_IL2CPP\interop\Unity.TextMeshPro.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine.TextCoreFontEngineModule">
+            <HintPath>..\_libs\BIE6_IL2CPP\interop\UnityEngine.TextCoreFontEngineModule.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
     </ItemGroup>
 
     <!-- BIE6_Mono -->
-    <ItemGroup Condition="'$(Configuration)'=='BIE6_Mono' or '$(Configuration)'=='Debug'">
+    <ItemGroup Condition="'$(Configuration)'=='BIE6_Mono'">
         <Reference Include="0Harmony">
             <HintPath>..\_libs\BIE6_Mono\core\0Harmony.dll</HintPath>
             <Private>False</Private>
