@@ -717,7 +717,7 @@ public partial class OverlayMapHolder : MonoBehaviour
 
         var timeStatue = kingdom.timeStatue;
         if (timeStatue)
-            poiList.Add(new MarkInfo(timeStatue.transform.position.x, MarkerStyle.StatueTime.Color, MarkerStyle.StatueTime.Sign, Strings.StatueTime, timeStatue.daysRemaining));
+            poiList.Add(new MarkInfo(timeStatue.transform.position.x, MarkerStyle.StatueTime.Color, MarkerStyle.StatueTime.Sign, Strings.StatueTime, timeStatue._daysRemaining));
 
         // var wharf = kingdom.wharf;
         var boat = kingdom.boat;
