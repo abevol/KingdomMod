@@ -17,7 +17,7 @@ REM 复制文件
 XCOPY /Y /S "..\%MODULE%\bin\%BIE%" ".\packages\KingdomMod.%MODULE%\"
 
 REM 读取版本号
-for /f "tokens=3 delims=><" %%A in ('findstr "<Version>" "..\%MODULE%\%MODULE%.csproj"') do (
+for /f "tokens=3 delims=><" %%A in ('findstr "<Version>" "..\ProjectSettings.shared.props"') do (
     set "version=%%A"
 )
 
