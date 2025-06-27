@@ -25,7 +25,11 @@ public class TopMapView : MonoBehaviour
     private Image _backgroundImage;
     private Text _groupText;
     private float _timeSinceLastGuiUpdate;
-    private Dictionary<Type, IComponentMapper> _componentMappers;
+
+#if IL2CPP
+    [HideFromIl2Cpp]
+#endif
+    private Dictionary<Type, IComponentMapper> _componentMappers { get; set; }
 
     public static float MappingScale;
     public PlayerId PlayerId;
@@ -254,6 +258,9 @@ public class TopMapView : MonoBehaviour
         UpdatePlayerMarker();
     }
 
+#if IL2CPP
+    [HideFromIl2Cpp]
+#endif
     private void OnComponentCreated(Component component, HashSet<SourceFlag> sources)
     {
         if (_componentMappers.TryGetValue(component.GetType(), out var mapper))
@@ -263,6 +270,9 @@ public class TopMapView : MonoBehaviour
         }
     }
 
+#if IL2CPP
+    [HideFromIl2Cpp]
+#endif
     private void OnComponentDestroyed(Component component, HashSet<SourceFlag> sources)
     {
         TryRemoveMapMarker(component, sources);
@@ -382,6 +392,9 @@ public class TopMapView : MonoBehaviour
         }
     }
 
+#if IL2CPP
+    [HideFromIl2Cpp]
+#endif
     public void TryRemoveMapMarker(Component target, HashSet<SourceFlag> sources)
     {
         if (MapMarkers.TryGetValue(target, out var marker))
@@ -513,6 +526,9 @@ public class TopMapView : MonoBehaviour
     //     wallLine.Init(node);
     // }
 
+#if IL2CPP
+    [HideFromIl2Cpp]
+#endif
     private LinkedList<MapMarker> GetLinkedWalls(MapMarker wallMarker)
     {
         var kingdom = Managers.Inst.kingdom;
@@ -521,6 +537,9 @@ public class TopMapView : MonoBehaviour
         return linkedWalls;
     }
 
+#if IL2CPP
+    [HideFromIl2Cpp]
+#endif
     public void AddWallNode(MapMarker wallMarker)
     {
         LinkedListNode<MapMarker> wallNode;
@@ -540,6 +559,9 @@ public class TopMapView : MonoBehaviour
         AddWallLine(wallNode);
     }
 
+#if IL2CPP
+    [HideFromIl2Cpp]
+#endif
     public void AddWallLine(LinkedListNode<MapMarker> wallNode)
     {
         var currentWall = wallNode.Value;
@@ -556,6 +578,9 @@ public class TopMapView : MonoBehaviour
         wallLine.Init(wallNode);
     }
 
+#if IL2CPP
+    [HideFromIl2Cpp]
+#endif
     public void UpdateWallLinePosition(MapMarker wallMarker)
     {
         var wallLineRect = wallMarker.transform.Find("WallLine");
@@ -564,6 +589,9 @@ public class TopMapView : MonoBehaviour
 
     }
 
+#if IL2CPP
+    [HideFromIl2Cpp]
+#endif
     public void RemoveWallNode(MapMarker wallMarker)
     {
         var linkedWalls = GetLinkedWalls(wallMarker);
@@ -574,5 +602,16 @@ public class TopMapView : MonoBehaviour
     {
         SidedWalls.left.Clear();
         SidedWalls.right.Clear();
+    }
+
+    private WallLine CreateWallLine()
+    {
+#if IL2CPP
+        ClassInjector.RegisterTypeInIl2Cpp<WallLine>();
+#endif
+        var wallLineObject = new GameObject(nameof(WallLine));
+        wallLineObject.transform.SetParent(this.gameObject.transform, false);
+        var wallLine = wallLineObject.AddComponent<WallLine>();
+        return wallLine;
     }
 }
