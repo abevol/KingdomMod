@@ -11,7 +11,7 @@ call handle_module.bat OverlayMap %BIE%
 call handle_module.bat StaminaBar %BIE%
 
 REM 打包所有模块为一个综合包
-for /f "tokens=3 delims=><" %%A in ('findstr "<Version>" "..\OverlayMap\OverlayMap.csproj"') do (
+for /f "tokens=3 delims=><" %%A in ('findstr "<Version>" "..\ProjectSettings.shared.props"') do (
     set "version=%%A"
 )
 set "filename=.\packages\%version%\KingdomMod.All-%BIE%-v%version%.zip"
