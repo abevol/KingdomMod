@@ -5,7 +5,6 @@
     <PropertyGroup>
         <AssemblyName>KingdomMod.OverlayMap</AssemblyName>
         <Description>Kingdom map mod</Description>
-        <Version>2.4.0</Version>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <LangVersion>latest</LangVersion>
         <RestoreAdditionalProjectSources>
