@@ -759,7 +759,7 @@ public class OverlayMapHolder : MonoBehaviour
         var caveHelper = Managers.Inst.caveHelper;
         if (caveHelper != null && caveHelper.CurrentlyBombingPortal != null)
         {
-            var bomb = caveHelper.Getbomb(caveHelper.CurrentlyBombingPortal.side);
+            var bomb = caveHelper.Getbomb(caveHelper.CurrentlyBombingPortal.Side);
             if (bomb != null)
             {
                 poiList.Add(new MarkInfo(bomb.transform.position.x, MarkerStyle.Bomb.Color, MarkerStyle.Bomb.Sign, Strings.Bomb, 0, MarkRow.Movable));
