@@ -5,9 +5,6 @@ using UnityEngine;
 using HarmonyLib;
 #if IL2CPP
 using Il2CppInterop.Runtime.Injection;
-using Il2CppSystem.Collections.Generic;
-#else
-using System.Collections.Generic;
 #endif
 
 namespace KingdomMod.BetterPayableUpgrade;

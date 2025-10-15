@@ -1,11 +1,9 @@
 ﻿#if IL2CPP
 using Il2CppInterop.Runtime.Injection;
-using Il2CppSystem.Collections.Generic;
-#else
-using System.Collections.Generic;
 #endif
 using KingdomMod.OverlayMap.Config;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using static KingdomMod.OverlayMap.OverlayMapHolder;

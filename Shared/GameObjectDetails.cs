@@ -1,12 +1,6 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-#if IL2CPP
-using Il2CppInterop.Runtime;
-using Il2CppSystem.Collections.Generic;
-#else
-using System.Collections.Generic;
-#endif
 
 namespace KingdomMod
 {
@@ -96,7 +90,7 @@ namespace KingdomMod
             foreach (var scene in array)
             {
 #if IL2CPP
-                var list = new List<GameObject>(scene.rootCount);
+                var list = new Il2CppSystem.Collections.Generic.List<GameObject>(scene.rootCount);
                 Scene.GetRootGameObjectsInternal(scene.handle, list);
 #else
                 var list = new System.Collections.Generic.List<GameObject>(scene.rootCount);

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using BepInEx.Logging;
 using UnityEngine;
@@ -12,9 +13,6 @@ using Coatsink.Common;
 
 #if IL2CPP
 using Il2CppInterop.Runtime.Injection;
-using Il2CppSystem.Collections.Generic;
-#else
-using System.Collections.Generic;
 #endif
 
 namespace KingdomMod.OverlayMap;

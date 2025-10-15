@@ -1,8 +1,4 @@
-﻿#if IL2CPP
-using Il2CppSystem.Collections.Generic;
-#else
-using System.Collections.Generic;
-#endif
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace KingdomMod
@@ -19,8 +15,7 @@ namespace KingdomMod
             var payables = Managers.Inst.payables;
             if (!payables) return null;
 
-            foreach (var obj in payables.AllPayables
-                    )
+            foreach (var obj in payables.AllPayables)
             {
                 if (obj == null) continue;
                 var comp = obj.GetComponent<T>();
@@ -37,8 +32,7 @@ namespace KingdomMod
             var payables = Managers.Inst.payables;
             if (!payables) return result;
 
-            foreach (var obj in payables.AllPayables
-                    )
+            foreach (var obj in payables.AllPayables)
             {
                 if (obj == null) continue;
                 var comp = obj.GetComponent<T>();
