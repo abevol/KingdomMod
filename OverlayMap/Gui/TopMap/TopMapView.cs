@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using KingdomMod.OverlayMap.Config;
@@ -12,9 +13,6 @@ using static KingdomMod.OverlayMap.Patchers.ObjectPatcher;
 #if IL2CPP
 using Il2CppInterop.Runtime.Attributes;
 using Il2CppInterop.Runtime.Injection;
-using Il2CppSystem.Collections.Generic;
-#else
-using System.Collections.Generic;
 #endif
 
 namespace KingdomMod.OverlayMap.Gui.TopMap;
@@ -48,7 +46,11 @@ public class TopMapView : MonoBehaviour
 #if IL2CPP
     [HideFromIl2Cpp]
 #endif
-    public Sided<LinkedList<MapMarker>> SidedWalls { get; set; }
+    public LinkedList<MapMarker> LeftWalls { get; set; }
+#if IL2CPP
+    [HideFromIl2Cpp]
+#endif
+    public LinkedList<MapMarker> RightWalls { get; set; }
 #if IL2CPP
     [HideFromIl2Cpp]
 #endif
@@ -67,8 +69,8 @@ public class TopMapView : MonoBehaviour
     {
         LogTrace("TopMapView.Awake");
 
-        _componentMappers = CompatCollections.CreateDictionary<Type, IComponentMapper>
-        (
+        _componentMappers = new Dictionary<Type, IComponentMapper>()
+        {
             // { typeof(Beach),                new Mappers.BeachMapper(this) },
             // { typeof(BeggarCamp),           new Mappers.BeggarCampMapper(this) },
             // { typeof(Beggar),               new Mappers.BeggarMapper(this) },
@@ -77,11 +79,11 @@ public class TopMapView : MonoBehaviour
             // { typeof(BoatSummoningBell),    new Mappers.BoatSummoningBellMapper(this) },
             // { typeof(Bomb),                 new Mappers.BombMapper(this) },
             // { typeof(Cabin),                new Mappers.CabinMapper(this) },
-            (typeof(Campfire), new Mappers.CampfireMapper(this)),
-            (typeof(Castle), new Mappers.CastleMapper(this)),
+            { typeof(Campfire), new Mappers.CampfireMapper(this) },
+            { typeof(Castle), new Mappers.CastleMapper(this) },
             // { typeof(Chest),                new Mappers.ChestMapper(this) },
             // { typeof(CitizenHousePayable),  new Mappers.CitizenHousePayableMapper(this) },
-            // { typeof(Deer),                 new Mappers.DeerMapper(this) },
+            { typeof(Deer),                 new Mappers.DeerMapper(this) },
             // { typeof(DogSpawn),             new Mappers.DogSpawnMapper(this) },
             // { typeof(Farmhouse),            new Mappers.FarmhouseMapper(this) },
             // { typeof(HelPuzzleController),  new Mappers.HelPuzzleControllerMapper(this) },
@@ -90,9 +92,9 @@ public class TopMapView : MonoBehaviour
             // { typeof(PayableBush),          new Mappers.PayableBushMapper(this) },
             // { typeof(PayableGemChest),      new Mappers.PayableGemChestMapper(this) },
             // { typeof(PayableShop),          new Mappers.PayableShopMapper(this) },
-            (typeof(PayableUpgrade), new Mappers.PayableUpgradeMapper(this)),
+            { typeof(PayableUpgrade), new Mappers.PayableUpgradeMapper(this) },
             // { typeof(PersephoneCage),       new Mappers.PersephoneCageMapper(this) },
-            (typeof(Player), new Mappers.PlayerMapper(this))
+            { typeof(Player), new Mappers.PlayerMapper(this) }
             // { typeof(Portal),               new Mappers.PortalMapper(this) },
             // { typeof(River),                new Mappers.RiverMapper(this) },
             // { typeof(Statue),               new Mappers.StatueMapper(this) },
@@ -103,15 +105,12 @@ public class TopMapView : MonoBehaviour
             // { typeof(TimeStatue),           new Mappers.TimeStatueMapper(this) },
             // { typeof(UnlockNewRulerStatue), new Mappers.UnlockNewRulerStatueMapper(this) },
             // { typeof(WreckPlaceholder),     new Mappers.WreckPlaceholderMapper(this) },
-            );
+        };
 
         Style = new TopMapStyle();
         PlayerMarkers = new List<MapMarker>();
-        SidedWalls = new Sided<LinkedList<MapMarker>>
-        {
-            left = new LinkedList<MapMarker>(),
-            right = new LinkedList<MapMarker>()
-        };
+        LeftWalls = new LinkedList<MapMarker>();
+        RightWalls = new LinkedList<MapMarker>();
         MapMarkers = new Dictionary<Component, MapMarker>();
 
         _rectTransform = this.gameObject.AddComponent<RectTransform>();
@@ -533,7 +532,7 @@ public class TopMapView : MonoBehaviour
     {
         var kingdom = Managers.Inst.kingdom;
         var worldPosX = wallMarker.Data.Target.transform.position.x;
-        var linkedWalls = kingdom.GetBorderSideForPosition(worldPosX) == Side.Left ? SidedWalls.left : SidedWalls.right;
+        var linkedWalls = kingdom.GetBorderSideForPosition(worldPosX) == Side.Left ? LeftWalls : RightWalls;
         return linkedWalls;
     }
 
@@ -600,8 +599,8 @@ public class TopMapView : MonoBehaviour
 
     public void ClearWallNodes()
     {
-        SidedWalls.left.Clear();
-        SidedWalls.right.Clear();
+        LeftWalls.Clear();
+        RightWalls.Clear();
     }
 
     private WallLine CreateWallLine()

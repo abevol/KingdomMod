@@ -1,14 +1,10 @@
-﻿#if IL2CPP
-using Il2CppSystem.Collections.Generic;
-#else
+﻿using System;
 using System.Collections.Generic;
-#endif
-using System;
+using System.Linq;
 using System.IO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.TextCore.LowLevel;
-using KingdomMod.Shared;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
 
 namespace KingdomMod.OverlayMap.Assets

@@ -1,7 +1,7 @@
 ﻿using System;
-using Il2CppInterop.Runtime.InteropTypes.Arrays;
 #if IL2CPP
 using Il2CppSystem.Collections.Generic;
+using Il2CppInterop.Runtime.InteropTypes.Arrays;
 #else
 using System.Collections.Generic;
 #endif

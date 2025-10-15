@@ -1,10 +1,6 @@
-﻿#if IL2CPP
-using Il2CppSystem.Collections.Generic;
-#else
-using System.Collections.Generic;
-#endif
+﻿using System.Collections.Generic;
+using System.Linq;
 using TMPro;
-using KingdomMod.Shared;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
 
 namespace KingdomMod.OverlayMap.Assets

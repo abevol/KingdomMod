@@ -1,10 +1,4 @@
-﻿using System;
-#if IL2CPP
-using Il2CppSystem.Collections.Generic;
-#else
-using System.Collections.Generic;
-#endif
-using HarmonyLib;
+﻿using HarmonyLib;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
 
 namespace KingdomMod.OverlayMap.Patchers;
