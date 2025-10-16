@@ -4,7 +4,7 @@
         <WarningsAsErrors>$(WarningsAsErrors);NU1605</WarningsAsErrors>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-        <TargetFramework>net472</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <DefineConstants>IL2CPP,BIE,BIE6</DefineConstants>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='BIE6_IL2CPP|AnyCPU'">

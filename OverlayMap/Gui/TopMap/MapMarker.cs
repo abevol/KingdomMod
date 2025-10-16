@@ -1,8 +1,9 @@
-﻿using System;
-using UnityEngine;
+﻿using Il2CppInterop.Runtime.Attributes;
 using KingdomMod.OverlayMap.Config;
-using static KingdomMod.OverlayMap.OverlayMapHolder;
+using System;
 using TMPro;
+using UnityEngine;
+using static KingdomMod.OverlayMap.OverlayMapHolder;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap
 {
@@ -18,10 +19,16 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
         private MapMarkerData _data;
         private float _timeSinceLastGuiUpdate = 0;
 
+#if IL2CPP
+        [HideFromIl2Cpp]
+#endif
         public MapMarkerData Data => _data;
 
         public delegate void PositionEventHandler(MapMarker mapMarker, Vector2 position);
 
+#if IL2CPP
+        [HideFromIl2Cpp]
+#endif
         public event PositionEventHandler OnPositionChanged;
 
 #if IL2CPP
@@ -117,6 +124,9 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
         //     return textComponent;
         // }
 
+#if IL2CPP
+        [HideFromIl2Cpp]
+#endif
         public void SetData(MapMarkerData data)
         {
             _data = data;
@@ -136,16 +146,25 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
             _count.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, titlePosY - 16);
         }
 
+#if IL2CPP
+        [HideFromIl2Cpp]
+#endif
         public void OnSignConfigChanged(object sender, EventArgs e)
         {
             UpdateSign(_data.Sign);
         }
 
+#if IL2CPP
+        [HideFromIl2Cpp]
+#endif
         public void OnTitleConfigChanged(object sender, EventArgs e)
         {
             UpdateTitle(_data.Title);
         }
 
+#if IL2CPP
+        [HideFromIl2Cpp]
+#endif
         public void OnColorConfigChanged(object sender, EventArgs e)
         {
             UpdateColor(_data.Color);

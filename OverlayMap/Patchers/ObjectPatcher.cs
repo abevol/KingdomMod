@@ -23,6 +23,7 @@ public class ObjectPatcher
         Create7,
         Create8,
         Create9,
+        Create10,
         Destroy1,
         Destroy2,
         Destroy3,
@@ -31,7 +32,8 @@ public class ObjectPatcher
         Destroy6,
         Destroy7,
         Destroy8,
-        Destroy9
+        Destroy9,
+        Destroy10
     }
 
     private static void HandleComponentInstantiate(Component comp, HashSet<SourceFlag> sources)
@@ -80,66 +82,66 @@ public class ObjectPatcher
         }
     }
 
-    [HarmonyPatch(typeof(Object), nameof(Object.Instantiate), new[] { typeof(Object) })]
-    public class InstantiatePatcher
-    {
-        public static void Postfix(Object __result)
-        {
-            HandleInstantiate(__result, [SourceFlag.Create1]);
-        }
-    }
+    // [HarmonyPatch(typeof(Object), nameof(Object.Instantiate), new[] { typeof(Object) })]
+    // public class InstantiatePatcher
+    // {
+    //     public static void Postfix(Object __result)
+    //     {
+    //         HandleInstantiate(__result, [SourceFlag.Create1]);
+    //     }
+    // }
 
-    [HarmonyPatch(typeof(Object), nameof(Object.Instantiate), new[] { typeof(Object), typeof(Scene) })]
-    public class InstantiatePatcher1
-    {
-        public static void Postfix(Object __result)
-        {
-            HandleInstantiate(__result, [SourceFlag.Create2]);
-        }
-    }
+    // [HarmonyPatch(typeof(Object), nameof(Object.Instantiate), new[] { typeof(Object), typeof(Scene) })]
+    // public class InstantiatePatcher1
+    // {
+    //     public static void Postfix(Object __result)
+    //     {
+    //         HandleInstantiate(__result, [SourceFlag.Create2]);
+    //     }
+    // }
 
-    [HarmonyPatch(typeof(Object), nameof(Object.Instantiate), new[] { typeof(Object), typeof(Transform), typeof(bool) })]
-    public class InstantiatePatcher2
-    {
-        public static void Postfix(Object __result)
-        {
-            HandleInstantiate(__result, [SourceFlag.Create3]);
-        }
-    }
+    // [HarmonyPatch(typeof(Object), nameof(Object.Instantiate), new[] { typeof(Object), typeof(Transform), typeof(bool) })]
+    // public class InstantiatePatcher2
+    // {
+    //     public static void Postfix(Object __result)
+    //     {
+    //         HandleInstantiate(__result, [SourceFlag.Create3]);
+    //     }
+    // }
 
-    [HarmonyPatch(typeof(Object), nameof(Object.Instantiate), new[] { typeof(Object), typeof(Vector3), typeof(Quaternion) })]
-    public class InstantiatePatcher3
-    {
-        public static void Postfix(Object __result)
-        {
-            HandleInstantiate(__result, [SourceFlag.Create4]);
-        }
-    }
+    // [HarmonyPatch(typeof(Object), nameof(Object.Instantiate), new[] { typeof(Object), typeof(Vector3), typeof(Quaternion) })]
+    // public class InstantiatePatcher3
+    // {
+    //     public static void Postfix(Object __result)
+    //     {
+    //         HandleInstantiate(__result, [SourceFlag.Create4]);
+    //     }
+    // }
 
-    [HarmonyPatch(typeof(Object), nameof(Object.Instantiate), new[] { typeof(Object), typeof(Vector3), typeof(Quaternion), typeof(Transform) })]
-    public class InstantiatePatcher4
-    {
-        public static void Postfix(Object __result)
-        {
-            HandleInstantiate(__result, [SourceFlag.Create5]);
-        }
-    }
+    // [HarmonyPatch(typeof(Object), nameof(Object.Instantiate), new[] { typeof(Object), typeof(Vector3), typeof(Quaternion), typeof(Transform) })]
+    // public class InstantiatePatcher4
+    // {
+    //     public static void Postfix(Object __result)
+    //     {
+    //         HandleInstantiate(__result, [SourceFlag.Create5]);
+    //     }
+    // }
 
-    [HarmonyPatch(typeof(Object), nameof(Object.Destroy), new[] { typeof(Object), typeof(float) })]
-    public class DestroyPatcher
-    {
-        public static void Prefix(Object obj)
-        {
-            HandleDestroy(obj, [SourceFlag.Destroy1]);
-        }
-    }
+    // [HarmonyPatch(typeof(Object), nameof(Object.Destroy), new[] { typeof(Object), typeof(float) })]
+    // public class DestroyPatcher
+    // {
+    //     public static void Prefix(Object obj)
+    //     {
+    //         HandleDestroy(obj, [SourceFlag.Destroy1]);
+    //     }
+    // }
 
-    [HarmonyPatch(typeof(Object), nameof(Object.DestroyImmediate), new[] { typeof(Object), typeof(bool) })]
-    public class DestroyImmediatePatcher
-    {
-        public static void Prefix(Object obj)
-        {
-            HandleDestroy(obj, [SourceFlag.Destroy2]);
-        }
-    }
+    // [HarmonyPatch(typeof(Object), nameof(Object.DestroyImmediate), new[] { typeof(Object), typeof(bool) })]
+    // public class DestroyImmediatePatcher
+    // {
+    //     public static void Prefix(Object obj)
+    //     {
+    //         HandleDestroy(obj, [SourceFlag.Destroy2]);
+    //     }
+    // }
 }
