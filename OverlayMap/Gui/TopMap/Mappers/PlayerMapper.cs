@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using HarmonyLib;
 using KingdomMod.OverlayMap.Config;
 using KingdomMod.OverlayMap.Patchers;
 using UnityEngine;
@@ -33,6 +34,24 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                 }
 
                 LogDebug($"player.playerId: {((Player)component).playerId}, _playerMarkers.Count: {view.PlayerMarkers.Count}");
+            }
+        }
+
+        [HarmonyPatch(typeof(Player), nameof(Player.Awake))]
+        private class Player_Awake_Patch
+        {
+            public static void Postfix(Player __instance)
+            {
+                TopMapView.ForEachTopMapView(view => view.OnComponentCreated(__instance, [ObjectPatcher.SourceFlag.Create10]));
+            }
+        }
+        
+        [HarmonyPatch(typeof(Player), nameof(Player.OnDestroy))]
+        private class Player_OnDestroy_Patch
+        {
+            public static void Prefix(Player __instance)
+            {
+                TopMapView.ForEachTopMapView(view => view.OnComponentDestroyed(__instance, [ObjectPatcher.SourceFlag.Destroy10]));
             }
         }
     }

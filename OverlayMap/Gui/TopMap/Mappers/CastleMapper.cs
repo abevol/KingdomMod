@@ -1,4 +1,6 @@
-﻿using KingdomMod.OverlayMap.Config;
+﻿using HarmonyLib;
+using KingdomMod.OverlayMap.Config;
+using KingdomMod.OverlayMap.Patchers;
 using UnityEngine;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
 
@@ -26,6 +28,24 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 
             if (marker != null)
                 view.CastleMarker = marker;
+        }
+
+        [HarmonyPatch(typeof(Castle), nameof(Castle.Awake))]
+        private class Deer_Awake_Patch
+        {
+            public static void Postfix(Castle __instance)
+            {
+                TopMapView.ForEachTopMapView(view => view.OnComponentCreated(__instance, [ObjectPatcher.SourceFlag.Create10]));
+            }
+        }
+        
+        [HarmonyPatch(typeof(Castle), nameof(Castle.OnDestroy))]
+        private class Deer_OnDestroy_Patch
+        {
+            public static void Prefix(Castle __instance)
+            {
+                TopMapView.ForEachTopMapView(view => view.OnComponentDestroyed(__instance, [ObjectPatcher.SourceFlag.Destroy10]));
+            }
         }
     }
 }

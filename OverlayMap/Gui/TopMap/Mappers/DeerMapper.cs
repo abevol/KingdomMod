@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using HarmonyLib;
 using KingdomMod.OverlayMap.Config;
 using KingdomMod.OverlayMap.Patchers;
 using UnityEngine;
@@ -16,6 +17,24 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                 var state = ((Deer)comp)._fsm.Current;
                 return state == 5 ? MarkerStyle.DeerFollowing.Color : MarkerStyle.Deer.Color;
             }, comp => comp.gameObject.activeSelf && !((Deer)comp)._damageable.isDead, MarkerRow.Movable);
+        }
+
+        [HarmonyPatch(typeof(Deer), nameof(Deer.Awake))]
+        private class Deer_Awake_Patch
+        {
+            public static void Postfix(Deer __instance)
+            {
+                TopMapView.ForEachTopMapView(view => view.OnComponentCreated(__instance, [ObjectPatcher.SourceFlag.Create10]));
+            }
+        }
+        
+        [HarmonyPatch(typeof(Deer), nameof(Deer.OnDestroy))]
+        private class Deer_OnDestroy_Patch
+        {
+            public static void Prefix(Deer __instance)
+            {
+                TopMapView.ForEachTopMapView(view => view.OnComponentDestroyed(__instance, [ObjectPatcher.SourceFlag.Destroy10]));
+            }
         }
     }
 }
