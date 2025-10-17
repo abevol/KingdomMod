@@ -16,6 +16,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DevTools", "DevTools\DevToo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BetterPayableUpgrade", "BetterPayableUpgrade\BetterPayableUpgrade.csproj", "{18F60A34-6683-4950-ADA2-2C3B464D8B7B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedLib", "SharedLib\SharedLib.csproj", "{1AF0E9D6-6D76-455B-BEA5-91C79302E48D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		BIE6_IL2CPP|Any CPU = BIE6_IL2CPP|Any CPU
@@ -47,6 +49,12 @@ Global
 		{18F60A34-6683-4950-ADA2-2C3B464D8B7B}.BIE6_Mono|Any CPU.Build.0 = BIE6_Mono|Any CPU
 		{18F60A34-6683-4950-ADA2-2C3B464D8B7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{18F60A34-6683-4950-ADA2-2C3B464D8B7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1AF0E9D6-6D76-455B-BEA5-91C79302E48D}.BIE6_IL2CPP|Any CPU.ActiveCfg = BIE6_IL2CPP|Any CPU
+		{1AF0E9D6-6D76-455B-BEA5-91C79302E48D}.BIE6_IL2CPP|Any CPU.Build.0 = BIE6_IL2CPP|Any CPU
+		{1AF0E9D6-6D76-455B-BEA5-91C79302E48D}.BIE6_Mono|Any CPU.ActiveCfg = BIE6_Mono|Any CPU
+		{1AF0E9D6-6D76-455B-BEA5-91C79302E48D}.BIE6_Mono|Any CPU.Build.0 = BIE6_Mono|Any CPU
+		{1AF0E9D6-6D76-455B-BEA5-91C79302E48D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1AF0E9D6-6D76-455B-BEA5-91C79302E48D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

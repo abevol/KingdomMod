@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace KingdomMod
+namespace KingdomMod.SharedLib
 {
     public static class GuiHelper
     {

@@ -2,7 +2,7 @@
 using System.Linq;
 using UnityEngine;
 
-namespace KingdomMod;
+namespace KingdomMod.SharedLib;
 
 public class CachePrefabID
 {

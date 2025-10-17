@@ -1,5 +1,6 @@
 ﻿using Il2CppInterop.Runtime.Attributes;
 using KingdomMod.OverlayMap.Config;
+using KingdomMod.Shared.Attributes;
 using System;
 using TMPro;
 using UnityEngine;
@@ -7,6 +8,7 @@ using static KingdomMod.OverlayMap.OverlayMapHolder;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap
 {
+    [RegisterTypeInIl2Cpp]
     public class MapMarker : MonoBehaviour
     {
         private TopMapView _owner;

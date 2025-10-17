@@ -4,8 +4,6 @@ using System.Linq;
 using System.Reflection;
 using Il2CppInterop.Runtime.Injection;
 
-// TODO: 将 Shared 提取为一个独立的库，避免与其他项目冲突
-
 // TODO: 将 RegisterTypeInIl2Cpp 属性应用到所有需要注册的类型上，确保它们在 IL2CPP 中正确注册
 
 // TODO: 用 Cursor 检测 Unity 事件函数 Awake 和 Start 中的代码是否需要调整位置，确保它们在正确的时机执行
@@ -54,7 +52,7 @@ namespace KingdomMod.Shared.Attributes
             }
         }
 
-        internal static void SetReady()
+        public static void SetReady()
         {
             ready = true;
 

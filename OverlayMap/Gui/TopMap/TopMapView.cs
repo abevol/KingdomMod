@@ -9,6 +9,8 @@ using KingdomMod.OverlayMap.Patchers;
 using KingdomMod.Shared;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
 using static KingdomMod.OverlayMap.Patchers.ObjectPatcher;
+using KingdomMod.Shared.Attributes;
+
 
 #if IL2CPP
 using Il2CppInterop.Runtime.Attributes;
@@ -17,6 +19,7 @@ using Il2CppInterop.Runtime.Injection;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap;
 
+[RegisterTypeInIl2Cpp]
 public class TopMapView : MonoBehaviour
 {
     private RectTransform _rectTransform;
@@ -367,9 +370,6 @@ public class TopMapView : MonoBehaviour
                 return marker;
 
             // 创建一个新的 GameObject 并添加 MapMarker 组件
-#if IL2CPP
-            ClassInjector.RegisterTypeInIl2Cpp<MapMarker>();
-#endif
             var mapMarkerObject = new GameObject(nameof(MapMarker));
             mapMarkerObject.transform.SetParent(this.gameObject.transform, false);
             var mapMarker = mapMarkerObject.AddComponent<MapMarker>();
@@ -621,9 +621,6 @@ public class TopMapView : MonoBehaviour
 
     private WallLine CreateWallLine()
     {
-#if IL2CPP
-        ClassInjector.RegisterTypeInIl2Cpp<WallLine>();
-#endif
         var wallLineObject = new GameObject(nameof(WallLine));
         wallLineObject.transform.SetParent(this.gameObject.transform, false);
         var wallLine = wallLineObject.AddComponent<WallLine>();

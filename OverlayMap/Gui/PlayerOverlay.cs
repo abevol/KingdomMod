@@ -5,9 +5,11 @@ using System;
 using KingdomMod.OverlayMap.Gui.TopMap;
 using UnityEngine;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
+using KingdomMod.Shared.Attributes;
 
 namespace KingdomMod.OverlayMap.Gui
 {
+    [RegisterTypeInIl2Cpp]
     public class PlayerOverlay : MonoBehaviour
     {
         private RectTransform _rectTransform;
@@ -122,9 +124,6 @@ namespace KingdomMod.OverlayMap.Gui
         {
             LogDebug($"CreateTopMapView");
 
-#if IL2CPP
-            ClassInjector.RegisterTypeInIl2Cpp<TopMapView>();
-#endif
             var viewObj = new GameObject(nameof(TopMap.TopMapView));
             viewObj.transform.SetParent(this.transform, false);
             var view = viewObj.AddComponent<TopMapView>();

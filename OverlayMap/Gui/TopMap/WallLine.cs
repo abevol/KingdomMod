@@ -4,12 +4,16 @@ using Il2CppInterop.Runtime.Injection;
 using KingdomMod.OverlayMap.Config;
 using System;
 using System.Collections.Generic;
+using KingdomMod.SharedLib;
 using UnityEngine;
 using UnityEngine.UI;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
+using KingdomMod.Shared.Attributes;
+using Il2CppInterop.Runtime.Attributes;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap
 {
+    [RegisterTypeInIl2Cpp]
     public class WallLine : MonoBehaviour
     {
         public MapMarker Owner;
@@ -26,9 +30,6 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
 
         public static WallLine Create(MapMarker wallMarker)
         {
-#if IL2CPP
-            ClassInjector.RegisterTypeInIl2Cpp<WallLine>();
-#endif
             var obj = new GameObject(nameof(WallLine));
             obj.transform.SetParent(wallMarker.transform, false);
             var comp = obj.AddComponent<WallLine>();
@@ -36,6 +37,9 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
             return comp;
         }
 
+#if IL2CPP
+        [HideFromIl2Cpp]
+#endif
         public void Init(LinkedListNode<MapMarker> node)
         {
             _rectTransform = this.gameObject.AddComponent<RectTransform>();

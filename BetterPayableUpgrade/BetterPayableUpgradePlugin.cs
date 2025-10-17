@@ -3,7 +3,9 @@ using BepInEx;
 using BepInEx.Logging;
 
 #if IL2CPP
+using System.Reflection;
 using BepInEx.Unity.IL2CPP;
+using KingdomMod.Shared.Attributes;
 #endif
 
 #if MONO
@@ -16,7 +18,7 @@ namespace KingdomMod.BetterPayableUpgrade;
 [BepInProcess("KingdomTwoCrowns.exe")]
 public class BetterPayableUpgradePlugin :
 #if IL2CPP
-        BasePlugin
+    BasePlugin
 #else
     BaseUnityPlugin
 #endif
@@ -24,16 +26,18 @@ public class BetterPayableUpgradePlugin :
     public static BetterPayableUpgradePlugin Instance;
     public ManualLogSource LogSource
 #if IL2CPP
-            => Log;
+        => Log;
 #else
         => Logger;
 #endif
 
 #if IL2CPP
-        public override void Load()
-        {
-            Init();
-        }
+    public override void Load()
+    {
+        RegisterTypeInIl2Cpp.RegisterAssembly(Assembly.GetExecutingAssembly());
+
+        Init();
+    }
 #else
     internal void Awake()
     {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace KingdomMod
+namespace KingdomMod.SharedLib
 {
     public static class GameExtensions
     {

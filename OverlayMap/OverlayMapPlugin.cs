@@ -2,8 +2,10 @@
 using System.Globalization;
 using BepInEx;
 using BepInEx.Logging;
+using KingdomMod.Shared.Attributes;
 
 #if IL2CPP
+using System.Reflection;
 using BepInEx.Unity.IL2CPP;
 #endif
 
@@ -17,7 +19,7 @@ namespace KingdomMod.OverlayMap;
 [BepInProcess("KingdomTwoCrowns.exe")]
 public class OverlayMapPlugin :
 #if IL2CPP
-        BasePlugin
+    BasePlugin
 #else
     BaseUnityPlugin
 #endif
@@ -25,16 +27,18 @@ public class OverlayMapPlugin :
     public static OverlayMapPlugin Instance;
     public ManualLogSource LogSource
 #if IL2CPP
-            => Log;
+        => Log;
 #else
         => Logger;
 #endif
 
 #if IL2CPP
-        public override void Load()
-        {
-            Init();
-        }
+    public override void Load()
+    {
+        RegisterTypeInIl2Cpp.RegisterAssembly(Assembly.GetExecutingAssembly());
+
+        Init();
+    }
 #else
     internal void Awake()
     {

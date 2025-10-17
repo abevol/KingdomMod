@@ -2,7 +2,7 @@
 using System.Reflection;
 using System.Reflection.Emit;
 
-namespace KingdomMod
+namespace KingdomMod.SharedLib
 {
     public static class ObjectExtensions
     {

@@ -1,12 +1,16 @@
 ﻿using BepInEx.Logging;
 using System;
+using KingdomMod.SharedLib;
 using UnityEngine;
+using KingdomMod.Shared.Attributes;
+
 #if IL2CPP
 using Il2CppInterop.Runtime.Injection;
 #endif
 
 namespace KingdomMod.StaminaBar;
 
+[RegisterTypeInIl2Cpp]
 public class StaminaBarHolder : MonoBehaviour
 {
     public static StaminaBarHolder Instance { get; private set; }
@@ -16,9 +20,7 @@ public class StaminaBarHolder : MonoBehaviour
     public static void Initialize(StaminaBarPlugin plugin)
     {
         log = plugin.LogSource;
-#if IL2CPP
-            ClassInjector.RegisterTypeInIl2Cpp<StaminaBarHolder>();
-#endif
+
         GameObject obj = new(nameof(StaminaBarHolder));
         DontDestroyOnLoad(obj);
         obj.hideFlags = HideFlags.HideAndDontSave;
