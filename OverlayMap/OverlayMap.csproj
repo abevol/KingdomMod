@@ -18,17 +18,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="..\Shared\CachePrefabID.cs" Link="Shared\CachePrefabID.cs" />
-        <Compile Include="..\Shared\GamePrefabID.cs" Link="Shared\GamePrefabID.cs" />
-        <Compile Include="..\Shared\GameExtensions.cs" Link="Shared\GameExtensions.cs" />
-        <Compile Include="..\Shared\GameObjectDetails.cs" Link="Shared\GameObjectDetails.cs" />
-        <Compile Include="..\Shared\GuiHelper.cs" Link="Shared\GuiHelper.cs" />
-        <Compile Include="..\Shared\CompatCollections.cs" Link="Shared\CompatCollections.cs" />
-        <Compile Include="..\Shared\ObjectExtensions.cs" Link="Shared\ObjectExtensions.cs" />
-        <Compile Include="..\Shared\TypeExtensions.cs" Link="Shared\TypeExtensions.cs" />
-    </ItemGroup>
-
-    <ItemGroup>
         <None Remove="Assets\Background.png" />
         <None Remove="ConfigPrefabs\KingdomMod.OverlayMap.GuiStyle.cfg" />
         <None Remove="ConfigPrefabs\KingdomMod.OverlayMap.Language_en-US.cfg" />
@@ -49,8 +38,6 @@
 
     <!-- BIE6_IL2CPP || Debug -->
     <ItemGroup Condition="'$(Configuration)'=='BIE6_IL2CPP' or '$(Configuration)'=='Debug'">
-        <Compile Include="..\Shared\Attributes\RegisterTypeInIl2Cpp.cs"
-                 Link="Shared\Attributes\RegisterTypeInIl2Cpp.cs" />
         <Reference Include="0Harmony">
             <HintPath>..\_libs\BIE6_IL2CPP\core\0Harmony.dll</HintPath>
             <Private>False</Private>
@@ -219,6 +206,9 @@
             <HintPath>..\_libs\BIE6_Mono\Managed\UnityEngine.TextCoreFontEngineModule.dll</HintPath>
             <Private>False</Private>
         </Reference>
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\SharedLib\SharedLib.csproj" />
     </ItemGroup>
 
     <Target Name="CopyOutput" AfterTargets="Build">

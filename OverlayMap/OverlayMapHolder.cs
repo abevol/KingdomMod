@@ -10,6 +10,9 @@ using KingdomMod.OverlayMap.Gui;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Coatsink.Common;
+using KingdomMod.SharedLib;
+using KingdomMod.Shared.Attributes;
+
 
 #if IL2CPP
 using Il2CppInterop.Runtime.Injection;
@@ -17,6 +20,7 @@ using Il2CppInterop.Runtime.Injection;
 
 namespace KingdomMod.OverlayMap;
 
+[RegisterTypeInIl2Cpp]
 public class OverlayMapHolder : MonoBehaviour
 {
     public delegate void GameStateEventHandler(Game.State state);
@@ -57,9 +61,6 @@ public class OverlayMapHolder : MonoBehaviour
         BepInExDir = GetBepInExDir();
         AssetsDir = Path.Combine(BepInExDir, "config", "KingdomMod.OverlayMap.Assets");
 
-#if IL2CPP
-        ClassInjector.RegisterTypeInIl2Cpp<OverlayMapHolder>();
-#endif
         GameObject obj = new(nameof(OverlayMapHolder));
         DontDestroyOnLoad(obj);
         obj.hideFlags = HideFlags.HideAndDontSave;
@@ -124,9 +125,6 @@ public class OverlayMapHolder : MonoBehaviour
     {
         LogDebug($"CreatePlayerOverlay, playerId: {playerId}");
 
-#if IL2CPP
-        ClassInjector.RegisterTypeInIl2Cpp<PlayerOverlay>();
-#endif
         var guiObj = new GameObject(nameof(PlayerOverlay));
         guiObj.transform.SetParent(_canvas.transform, false);
         var guiComp = guiObj.AddComponent<PlayerOverlay>();
@@ -1255,8 +1253,8 @@ public class OverlayMapHolder : MonoBehaviour
         infoLines.Add("MapOffset" + ": " + SaveDataExtras.MapOffset.Value);
         infoLines.Add("BorderSide" + ": " + kingdom.GetBorderSide(Side.Left) + ", " + kingdom.GetBorderSide(Side.Right));
         infoLines.Add("BorderSideIntact" + ": " + kingdom.GetBorderSideIntact(Side.Left) + ", " + kingdom.GetBorderSideIntact(Side.Right));
-        infoLines.Add("outerWall" + ": " + kingdom.outerWall?.left?.transform?.position.x + ", " + kingdom.outerWall?.right?.transform?.position.x);
-        infoLines.Add("intactWall" + ": " + kingdom.intactWall?.left?.transform?.position.x + ", " + kingdom.intactWall?.right?.transform?.position.x);
+        // infoLines.Add("outerWall" + ": " + kingdom.outerWall?.left?.transform?.position.x + ", " + kingdom.outerWall?.right?.transform?.position.x);
+        // infoLines.Add("intactWall" + ": " + kingdom.intactWall?.left?.transform?.position.x + ", " + kingdom.intactWall?.right?.transform?.position.x);
 
         for (int i = 0; i < infoLines.Count; i++)
         {

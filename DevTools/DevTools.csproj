@@ -18,11 +18,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="..\Shared\TypeExtensions.cs" Link="Shared\TypeExtensions.cs" />
-        <Compile Include="..\Shared\GameObjectDetails.cs" Link="Shared\GameObjectDetails.cs" />
-    </ItemGroup>
-
-    <ItemGroup>
         <PackageReference Include="BepInEx.PluginInfoProps" Version="2.*" />
     </ItemGroup>
 
@@ -140,6 +135,9 @@
             <HintPath>..\_libs\BIE6_Mono\Managed\UnityEngine.UIModule.dll</HintPath>
             <Private>False</Private>
         </Reference>
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\SharedLib\SharedLib.csproj" />
     </ItemGroup>
 
     <Target Name="CopyOutput" AfterTargets="Build">

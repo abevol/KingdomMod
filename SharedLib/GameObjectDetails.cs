@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace KingdomMod
+namespace KingdomMod.SharedLib
 {
     [Serializable]
     public class GameObjectDetails

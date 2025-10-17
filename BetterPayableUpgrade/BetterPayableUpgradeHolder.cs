@@ -3,12 +3,16 @@ using BepInEx.Logging;
 using Coatsink.Common;
 using UnityEngine;
 using HarmonyLib;
+using KingdomMod.SharedLib;
+using KingdomMod.Shared.Attributes;
+
 #if IL2CPP
 using Il2CppInterop.Runtime.Injection;
 #endif
 
 namespace KingdomMod.BetterPayableUpgrade;
 
+[RegisterTypeInIl2Cpp]
 public class BetterPayableUpgradeHolder : MonoBehaviour
 {
     public static BetterPayableUpgradeHolder Instance { get; private set; }
@@ -64,9 +68,6 @@ public class BetterPayableUpgradeHolder : MonoBehaviour
     public static void Initialize(BetterPayableUpgradePlugin plugin)
     {
         log = plugin.LogSource;
-#if IL2CPP
-            ClassInjector.RegisterTypeInIl2Cpp<BetterPayableUpgradeHolder>();
-#endif
         GameObject obj = new(nameof(BetterPayableUpgradeHolder));
         DontDestroyOnLoad(obj);
         obj.hideFlags = HideFlags.HideAndDontSave;

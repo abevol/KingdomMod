@@ -1,11 +1,14 @@
 ﻿#if IL2CPP
 using Il2CppInterop.Runtime.Injection;
+using KingdomMod.Shared.Attributes;
+
 #endif
 using System;
 using UnityEngine;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap
 {
+    [RegisterTypeInIl2Cpp]
     public class ConstructionEventHandler : MonoBehaviour
     {
         private MapMarker _owner;
@@ -19,9 +22,6 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
 
         public static void Create(MapMarker marker, Color color)
         {
-#if IL2CPP
-            ClassInjector.RegisterTypeInIl2Cpp<ConstructionEventHandler>();
-#endif
             GameObject obj = new GameObject(nameof(ConstructionEventHandler));
             obj.transform.SetParent(marker.transform, false);
             var comp = obj.AddComponent<ConstructionEventHandler>();

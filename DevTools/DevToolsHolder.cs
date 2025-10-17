@@ -6,12 +6,16 @@ using File = System.IO.File;
 using HarmonyLib;
 using Coatsink.Common;
 using System.Reflection;
+using KingdomMod.SharedLib;
+using KingdomMod.Shared.Attributes;
+
 #if IL2CPP
 using Il2CppInterop.Runtime.Injection;
 #endif
 
 namespace KingdomMod.DevTools;
 
+[RegisterTypeInIl2Cpp]
 public class DevToolsHolder : MonoBehaviour
 {
     public static DevToolsHolder Instance { get; private set; }
@@ -32,9 +36,6 @@ public class DevToolsHolder : MonoBehaviour
     public static void Initialize(DevToolsPlugin plugin)
     {
         log = plugin.LogSource;
-#if IL2CPP
-            ClassInjector.RegisterTypeInIl2Cpp<DevToolsHolder>();
-#endif
         GameObject obj = new(nameof(DevToolsHolder));
         DontDestroyOnLoad(obj);
         obj.hideFlags = HideFlags.HideAndDontSave;

@@ -1,4 +1,4 @@
-﻿namespace KingdomMod;
+﻿namespace KingdomMod.SharedLib;
 
 public enum GamePrefabID
 {
