@@ -158,6 +158,17 @@ public class TopMapView : MonoBehaviour
     {
         LogTrace("TopMapView.Start");
 
+        foreach (var kv in _componentMappers)
+        {
+            var mapper = kv.Value;
+            var components = mapper.GetComponents();
+            foreach (var component in components)
+            {
+                if (component != null)
+                    mapper.Map(component);
+            }
+        }
+
         _isStarted = true;
     }
 
@@ -361,7 +372,7 @@ public class TopMapView : MonoBehaviour
     {
         try
         {
-            LogDebug($"TopMapView.TryAddMapMarker, title: {title?.Value}, target: {target}");
+            LogTrace($"TopMapView.TryAddMapMarker, title: {title?.Value}, target: {target}");
 
             if (target.gameObject == null)
                 return null;
