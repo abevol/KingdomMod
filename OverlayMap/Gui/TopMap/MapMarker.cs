@@ -135,6 +135,9 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
             SetRow(_data.Row);
         }
 
+#if IL2CPP
+        [HideFromIl2Cpp]
+#endif
         private void SetRow(MarkerRow row)
         {
             float titlePosY = _data.Row switch

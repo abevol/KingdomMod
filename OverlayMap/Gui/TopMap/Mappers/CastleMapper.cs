@@ -8,6 +8,11 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
     public class CastleMapper(TopMapView view) : IComponentMapper
     {
+        public Component[] GetComponents()
+        {
+            return [Managers.Inst.kingdom.castle];
+        }
+
         public void Map(Component component)
         {
             var marker = view.TryAddMapMarker(component, MarkerStyle.Castle.Color, MarkerStyle.Castle.Sign, Strings.Castle, (comp) =>
@@ -30,22 +35,22 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                 view.CastleMarker = marker;
         }
 
-        [HarmonyPatch(typeof(Castle), nameof(Castle.Awake))]
-        private class Deer_Awake_Patch
-        {
-            public static void Postfix(Castle __instance)
-            {
-                TopMapView.ForEachTopMapView(view => view.OnComponentCreated(__instance, [ObjectPatcher.SourceFlag.Create10]));
-            }
-        }
-        
-        [HarmonyPatch(typeof(Castle), nameof(Castle.OnDestroy))]
-        private class Deer_OnDestroy_Patch
-        {
-            public static void Prefix(Castle __instance)
-            {
-                TopMapView.ForEachTopMapView(view => view.OnComponentDestroyed(__instance, [ObjectPatcher.SourceFlag.Destroy10]));
-            }
-        }
+        // [HarmonyPatch(typeof(Castle), nameof(Castle.Awake))]
+        // private class Deer_Awake_Patch
+        // {
+        //     public static void Postfix(Castle __instance)
+        //     {
+        //         TopMapView.ForEachTopMapView(view => view.OnComponentCreated(__instance, [ObjectPatcher.SourceFlag.Create10]));
+        //     }
+        // }
+        //
+        // [HarmonyPatch(typeof(Castle), nameof(Castle.OnDestroy))]
+        // private class Deer_OnDestroy_Patch
+        // {
+        //     public static void Prefix(Castle __instance)
+        //     {
+        //         TopMapView.ForEachTopMapView(view => view.OnComponentDestroyed(__instance, [ObjectPatcher.SourceFlag.Destroy10]));
+        //     }
+        // }
     }
 }
