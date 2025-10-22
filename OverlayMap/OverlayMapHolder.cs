@@ -10,6 +10,7 @@ using KingdomMod.OverlayMap.Gui;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Coatsink.Common;
+using KingdomMod.OverlayMap.Gui.Debugging;
 using KingdomMod.SharedLib;
 using KingdomMod.Shared.Attributes;
 
@@ -48,6 +49,10 @@ public class OverlayMapHolder : MonoBehaviour
     public static event ProgramDirectorStateEventHandler OnProgramDirectorStateChanged;
     public static string BepInExDir;
     public static string AssetsDir;
+    
+    // 字体调试面板
+    private SimpleFontDebugPanel _fontDebugPanel;
+    private static bool _showFontDebugPanel = false;
 
 #if IL2CPP
     public OverlayMapHolder(IntPtr ptr) : base(ptr) { }
@@ -73,6 +78,7 @@ public class OverlayMapHolder : MonoBehaviour
         Patchers.Patcher.PatchAll();
 
         CreateCanvas();
+        CreateFontDebugPanel();
         PlayerOverlays.P1 = CreatePlayerOverlay(PlayerId.P1);
         PlayerOverlays.P2 = CreatePlayerOverlay(PlayerId.P2);
 
@@ -119,6 +125,19 @@ public class OverlayMapHolder : MonoBehaviour
         scaler.matchWidthOrHeight = 0.5f;
 
         canvasObj.AddComponent<GraphicRaycaster>();
+    }
+
+    /// <summary>
+    /// 创建字体调试面板
+    /// </summary>
+    private void CreateFontDebugPanel()
+    {
+        LogDebug("CreateFontDebugPanel");
+
+        var debugPanelObj = new GameObject(nameof(SimpleFontDebugPanel));
+        debugPanelObj.transform.SetParent(_canvas.transform, false);
+        _fontDebugPanel = debugPanelObj.AddComponent<SimpleFontDebugPanel>();
+        _fontDebugPanel.Initialize(_canvas);
     }
 
     private PlayerOverlay CreatePlayerOverlay(PlayerId playerId)
@@ -277,6 +296,16 @@ public class OverlayMapHolder : MonoBehaviour
         {
             LogDebug("F key pressed.");
             ShowFullMap = !ShowFullMap;
+        }
+
+        if (Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.T))
+        {
+            LogDebug("T key pressed.");
+            _showFontDebugPanel = !_showFontDebugPanel;
+            if (_fontDebugPanel != null)
+            {
+                _fontDebugPanel.SetVisible(_showFontDebugPanel);
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.F5))
