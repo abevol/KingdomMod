@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using KingdomMod.OverlayMap.Assets;
 using KingdomMod.OverlayMap.Config;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
@@ -19,6 +19,9 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
         public void Init(TopMapView view)
         {
             LogTrace("TopMapStyle.Init");
+            LogTrace($"TopMapStyle.Init, GuiStyle.TopMap.Sign.Font: {GuiStyle.TopMap.Sign.Font.Value}");
+            LogTrace($"TopMapStyle.Init, GuiStyle.TopMap.Title.Font: {GuiStyle.TopMap.Title.Font.Value}");
+            LogTrace($"TopMapStyle.Init, GuiStyle.TopMap.Count.Font: {GuiStyle.TopMap.Count.Font.Value}");
 
             _view = view;
             SignFont = FontManager.CreateMainFont(GuiStyle.TopMap.Sign.Font, null);

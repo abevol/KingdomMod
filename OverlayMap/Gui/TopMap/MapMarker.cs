@@ -52,6 +52,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
             _title = CreateTextObject("Title", -26, _owner.Style.TitleFont.Font, _owner.Style.TitleFontSize);
             _count = CreateTextObject("Count", -26 - 16, _owner.Style.CountFont.Font, _owner.Style.CountFontSize);
 
+            LogTrace($"MapMarker.Init, _title.font: {_title.font.faceInfo.familyName}");
         }
 
         private void Awake()
@@ -90,16 +91,24 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
 
         private TextMeshProUGUI CreateTextObject(string objName, float yPos, TMP_FontAsset font, float fontSize)
         {
+            LogTrace($"CreateTextObject, objName: {objName}, font: {font.faceInfo.familyName}");
+
             GameObject textObject = new GameObject(objName);
             var textComponent = textObject.AddComponent<TextMeshProUGUI>();
             var textRect = textObject.GetComponent<RectTransform>();
             textRect.SetParent(_rectTransform, false);
+
+            // 记录设置字体前的状态
+            LogTrace($"Before setting font, textComponent.font: {textComponent.font?.faceInfo.familyName ?? "null"}");
 
             // 设置文本的其他属性（如字体、颜色等）
             textComponent.font = font;
             textComponent.fontSize = fontSize;
             textComponent.color = Color.white;
             textComponent.alignment = TextAlignmentOptions.Center;
+
+            // 记录设置字体后的状态
+            LogTrace($"After setting font, textComponent.font: {textComponent.font.faceInfo.familyName}");
 
             var rectTrans = textObject.GetComponent<RectTransform>();
             rectTrans.anchoredPosition = new Vector2(0, yPos);

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using UnityEngine;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
 
 namespace KingdomMod.OverlayMap.Assets
@@ -9,6 +10,7 @@ namespace KingdomMod.OverlayMap.Assets
     {
         public string FontName;
         public TMP_FontAsset Font;
+        public Font SourceFont;
         public HashSet<char> Chars;
         public HashSet<char> MissingChars;
 
@@ -36,7 +38,14 @@ namespace KingdomMod.OverlayMap.Assets
                 return;
             }
 
-            var fallbackFont = FontManager.CreateFont(fontName);
+            var sourceFont = FontManager.CreateSourceFont(fontName);
+            if (sourceFont == null)
+            {
+                LogError($"Failed to create source font: {fontName}");
+                return;
+            }
+
+            var fallbackFont = FontManager.CreateFont(sourceFont);
             if (fallbackFont == null)
             {
                 LogError($"Failed to get fallback font: {fontName}");
@@ -77,7 +86,7 @@ namespace KingdomMod.OverlayMap.Assets
             if (string.IsNullOrEmpty(characters))
                 return;
 
-            LogTrace($"TryAddCharacters: {FontName}, chars: {characters}");
+            LogTrace($"TryAddCharacters: {FontName}, {Font.faceInfo.familyName}, chars: {characters}");
 
             if (Font.HasCharacters(characters, out var notOwnedChars))
                 return;
@@ -94,8 +103,8 @@ namespace KingdomMod.OverlayMap.Assets
                 {
                     LogTrace($"Try add missing chars to fallbackFont: {fallbackFont.faceInfo.familyName}, chars: {missingChars}");
                     missingChars = TryAddCharacters(fallbackFont, missingChars);
-                    if (!string.IsNullOrEmpty(missingChars))
-                        LogError($"failed to add chars to fallbackFont: {fallbackFont.faceInfo.familyName}, missing chars: {missingChars}");
+                    if (string.IsNullOrEmpty(missingChars))
+                        break;
                 }
             }
         }
@@ -105,12 +114,13 @@ namespace KingdomMod.OverlayMap.Assets
             if (string.IsNullOrEmpty(chars))
                 return string.Empty;
 
-            if (fontAsset.HasCharacters(chars, out var notOwnedChars))
-                return string.Empty;
+            fontAsset.TryAddCharacters(chars, out var missingChars, true);
 
-            var charsToAdd = new string(notOwnedChars.ToArray());
-
-            fontAsset.TryAddCharacters(charsToAdd, out var missingChars, false);
+            if (!string.IsNullOrEmpty(missingChars))
+            {
+                LogWarning($"Font '{fontAsset.faceInfo.familyName}' is missing characters: {missingChars}");
+                LogWarning($"sourceFontFile '{fontAsset.sourceFontFile == null}' '{!fontAsset.sourceFontFile}'");
+            }
 
             return missingChars;
         }
