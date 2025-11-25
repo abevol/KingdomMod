@@ -10,6 +10,8 @@ using KingdomMod.Shared;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
 using static KingdomMod.OverlayMap.Patchers.ObjectPatcher;
 using KingdomMod.Shared.Attributes;
+using Il2CppInterop.Runtime;
+
 
 
 #if IL2CPP
@@ -32,6 +34,8 @@ public class TopMapView : MonoBehaviour
     [HideFromIl2Cpp]
 #endif
     private Dictionary<Type, IComponentMapper> _componentMappers { get; set; }
+
+    private Dictionary<IntPtr, IComponentMapper> _fastLookup;
 
     public static float MappingScale;
     public PlayerId PlayerId;
@@ -108,6 +112,8 @@ public class TopMapView : MonoBehaviour
             { typeof(WreckPlaceholder),     new Mappers.WreckPlaceholderMapper(this) },
         };
 
+        BuildFastLookup();
+
         PlayerMarkers = new List<MapMarker>();
         LeftWalls = new LinkedList<MapMarker>();
         RightWalls = new LinkedList<MapMarker>();
@@ -121,10 +127,21 @@ public class TopMapView : MonoBehaviour
         // CreateText();
         // DrawLine(new Vector2(0, 0), new Vector2(300, 0), Color.red, 2);
 
-        ObjectPatcher.OnComponentCreated += OnComponentCreated;
-        ObjectPatcher.OnComponentDestroyed += OnComponentDestroyed;
+        ObjectPatcher.OnGameObjectCreated += OnGameObjectCreated;
+        ObjectPatcher.OnGameObjectDestroyed += OnGameObjectDestroyed;
         OverlayMapHolder.OnGameStateChanged += OnGameStateChanged;
         Game.OnGameStart += (System.Action)OnGameStart;
+    }
+
+    private void BuildFastLookup()
+    {
+        _fastLookup = new Dictionary<IntPtr, IComponentMapper>();
+        foreach (var kvp in _componentMappers)
+        {
+            // 获取 System.Type 对应的 IL2CPP 类型指针
+            var il2cppType = Il2CppType.From(kvp.Key);
+            _fastLookup[il2cppType.Pointer] = kvp.Value;
+        }
     }
 
     public void Init(PlayerId playerId)
@@ -134,8 +151,8 @@ public class TopMapView : MonoBehaviour
 
     private void OnDestroy()
     {
-        ObjectPatcher.OnComponentCreated -= OnComponentCreated;
-        ObjectPatcher.OnComponentDestroyed -= OnComponentDestroyed;
+        ObjectPatcher.OnGameObjectCreated -= OnGameObjectCreated;
+        ObjectPatcher.OnGameObjectDestroyed -= OnGameObjectDestroyed;
         OverlayMapHolder.OnGameStateChanged -= OnGameStateChanged;
         Game.OnGameStart -= (System.Action)OnGameStart;
     }
@@ -144,16 +161,16 @@ public class TopMapView : MonoBehaviour
     {
         LogTrace("TopMapView.Start");
 
-        foreach (var kv in _componentMappers)
-        {
-            var mapper = kv.Value;
-            var components = mapper.GetComponents();
-            foreach (var component in components)
-            {
-                if (component != null)
-                    mapper.Map(component);
-            }
-        }
+        // foreach (var kv in _componentMappers)
+        // {
+        //     var mapper = kv.Value;
+        //     var components = mapper.GetComponents();
+        //     foreach (var component in components)
+        //     {
+        //         if (component != null)
+        //             mapper.Map(component);
+        //     }
+        // }
 
         _isStarted = true;
     }
@@ -270,27 +287,41 @@ public class TopMapView : MonoBehaviour
 #if IL2CPP
     [HideFromIl2Cpp]
 #endif
-    public void OnComponentCreated(Component component, HashSet<SourceFlag> sources)
+    public void OnGameObjectCreated(GameObject go, HashSet<SourceFlag> sources)
     {
         // if (!_isStarted)
         // {
         //     return;
         // }
 
-        if (_componentMappers.TryGetValue(component.GetType(), out var mapper))
+        foreach (var type in _componentMappers.Keys)
         {
-            LogTrace($"TopMapView.OnComponentCreated, component: {component}, sources: [{string.Join(", ", sources)}]");
-            // LogTrace($"TopMapView.OnComponentCreated, StackTrace: {System.Environment.StackTrace}");
-            mapper.Map(component);
+            // 1. 只调用一次 API，获取所有 Component
+            var allComponents = go.GetComponentsInChildren<Component>(true);
+
+            foreach (var comp in allComponents)
+            {
+                // 2. 获取组件底层的真实类型指针
+                var typePtr = comp.GetIl2CppType().Pointer;
+
+                // 3. 指针碰撞，极速查找
+                if (_fastLookup.TryGetValue(typePtr, out var mapper))
+                {
+                    LogTrace($"OnGameObjectCreated Found {comp.GetIl2CppType().Name} on {go.name}");
+                    mapper.Map(comp);
+                }
+            }
         }
     }
 
 #if IL2CPP
     [HideFromIl2Cpp]
 #endif
-    public void OnComponentDestroyed(Component component, HashSet<SourceFlag> sources)
+    public void OnGameObjectDestroyed(GameObject go, HashSet<SourceFlag> sources)
     {
-        TryRemoveMapMarker(component, sources);
+        var allComponents = go.GetComponentsInChildren<Component>(true);
+        foreach (var comp in allComponents)
+            TryRemoveMapMarker(comp, sources);
     }
 
     private void UpdateExploredRegion()
