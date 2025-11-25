@@ -1,14 +1,15 @@
+﻿using KingdomMod.OverlayMap.Assets;
+using KingdomMod.OverlayMap.Patchers;
+using KingdomMod.Shared.Attributes;
 using System;
-using KingdomMod.OverlayMap.Assets;
-using KingdomMod.OverlayMap.Config;
+using UnityEngine;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap
 {
-    public class TopMapStyle
+    [RegisterTypeInIl2Cpp]
+    public class TopMapStyle : MonoBehaviour
     {
-        private TopMapView _view;
-
         public FontData SignFont;
         public float SignFontSize;
         public FontData TitleFont;
@@ -16,161 +17,190 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
         public FontData CountFont;
         public float CountFontSize;
 
-        public void Init(TopMapView view)
+        private void Awake()
         {
             LogTrace("TopMapStyle.Init");
-            LogTrace($"TopMapStyle.Init, GuiStyle.TopMap.Sign.Font: {GuiStyle.TopMap.Sign.Font.Value}");
-            LogTrace($"TopMapStyle.Init, GuiStyle.TopMap.Title.Font: {GuiStyle.TopMap.Title.Font.Value}");
-            LogTrace($"TopMapStyle.Init, GuiStyle.TopMap.Count.Font: {GuiStyle.TopMap.Count.Font.Value}");
+            LogTrace($"TopMapStyle.Init, Config.GuiStyle.TopMap.Sign.Font: {Config.GuiStyle.TopMap.Sign.Font.Value}");
+            LogTrace($"TopMapStyle.Init, Config.GuiStyle.TopMap.Title.Font: {Config.GuiStyle.TopMap.Title.Font.Value}");
+            LogTrace($"TopMapStyle.Init, Config.GuiStyle.TopMap.Count.Font: {Config.GuiStyle.TopMap.Count.Font.Value}");
 
-            _view = view;
-            SignFont = FontManager.CreateMainFont(GuiStyle.TopMap.Sign.Font, null);
-            SignFontSize = GuiStyle.TopMap.Sign.FontSize;
-            SignFont.AssignFallbackFonts(GuiStyle.TopMap.Sign.FallbackFonts.AsStringArray);
+            SignFont = FontManager.CreateMainFont(Config.GuiStyle.TopMap.Sign.Font, null);
+            SignFontSize = Config.GuiStyle.TopMap.Sign.FontSize;
+            SignFont.AssignFallbackFonts(Config.GuiStyle.TopMap.Sign.FallbackFonts.AsStringArray);
 
-            TitleFont = FontManager.CreateMainFont(GuiStyle.TopMap.Title.Font, null);
-            TitleFontSize = GuiStyle.TopMap.Title.FontSize;
-            TitleFont.AssignFallbackFonts(GuiStyle.TopMap.Title.FallbackFonts.AsStringArray);
+            TitleFont = FontManager.CreateMainFont(Config.GuiStyle.TopMap.Title.Font, null);
+            TitleFontSize = Config.GuiStyle.TopMap.Title.FontSize;
+            TitleFont.AssignFallbackFonts(Config.GuiStyle.TopMap.Title.FallbackFonts.AsStringArray);
 
-            CountFont = FontManager.CreateMainFont(GuiStyle.TopMap.Count.Font, null);
-            CountFontSize = GuiStyle.TopMap.Count.FontSize;
-            CountFont.AssignFallbackFonts(GuiStyle.TopMap.Count.FallbackFonts.AsStringArray);
+            CountFont = FontManager.CreateMainFont(Config.GuiStyle.TopMap.Count.Font, null);
+            CountFontSize = Config.GuiStyle.TopMap.Count.FontSize;
+            CountFont.AssignFallbackFonts(Config.GuiStyle.TopMap.Count.FallbackFonts.AsStringArray);
 
-            GuiStyle.TopMap.BackgroundImageFile.Entry.SettingChanged += OnBackgroundConfigChanged;
-            GuiStyle.TopMap.BackgroundColor.Entry.SettingChanged += OnBackgroundConfigChanged;
-            GuiStyle.TopMap.BackgroundImageArea.Entry.SettingChanged += OnBackgroundConfigChanged;
-            GuiStyle.TopMap.BackgroundImageBorder.Entry.SettingChanged += OnBackgroundConfigChanged;
+            Config.GuiStyle.TopMap.BackgroundImageFile.Entry.SettingChanged += OnBackgroundConfigChanged;
+            Config.GuiStyle.TopMap.BackgroundColor.Entry.SettingChanged += OnBackgroundConfigChanged;
+            Config.GuiStyle.TopMap.BackgroundImageArea.Entry.SettingChanged += OnBackgroundConfigChanged;
+            Config.GuiStyle.TopMap.BackgroundImageBorder.Entry.SettingChanged += OnBackgroundConfigChanged;
 
-            GuiStyle.TopMap.Sign.Font.Entry.SettingChanged += OnSignFontConfigChanged;
-            GuiStyle.TopMap.Sign.FontSize.Entry.SettingChanged += OnSignFontSizeConfigChanged;
-            GuiStyle.TopMap.Sign.FallbackFonts.Entry.SettingChanged += OnSignFallbackFontsConfigChanged;
+            Config.GuiStyle.TopMap.Sign.Font.Entry.SettingChanged += OnSignFontConfigChanged;
+            Config.GuiStyle.TopMap.Sign.FontSize.Entry.SettingChanged += OnSignFontSizeConfigChanged;
+            Config.GuiStyle.TopMap.Sign.FallbackFonts.Entry.SettingChanged += OnSignFallbackFontsConfigChanged;
 
-            GuiStyle.TopMap.Title.Font.Entry.SettingChanged += OnTitleFontConfigChanged;
-            GuiStyle.TopMap.Title.FontSize.Entry.SettingChanged += OnTitleFontSizeConfigChanged;
-            GuiStyle.TopMap.Title.FallbackFonts.Entry.SettingChanged += OnTitleFallbackFontsConfigChanged;
+            Config.GuiStyle.TopMap.Title.Font.Entry.SettingChanged += OnTitleFontConfigChanged;
+            Config.GuiStyle.TopMap.Title.FontSize.Entry.SettingChanged += OnTitleFontSizeConfigChanged;
+            Config.GuiStyle.TopMap.Title.FallbackFonts.Entry.SettingChanged += OnTitleFallbackFontsConfigChanged;
 
-            GuiStyle.TopMap.Count.Font.Entry.SettingChanged += OnCountFontConfigChanged;
-            GuiStyle.TopMap.Count.FontSize.Entry.SettingChanged += OnCountFontSizeConfigChanged;
-            GuiStyle.TopMap.Count.FallbackFonts.Entry.SettingChanged += OnCountFallbackFontsConfigChanged;
+            Config.GuiStyle.TopMap.Count.Font.Entry.SettingChanged += OnCountFontConfigChanged;
+            Config.GuiStyle.TopMap.Count.FontSize.Entry.SettingChanged += OnCountFontSizeConfigChanged;
+            Config.GuiStyle.TopMap.Count.FallbackFonts.Entry.SettingChanged += OnCountFallbackFontsConfigChanged;
         }
 
-        public void Destroy()
+        private void OnDestroy()
         {
-            GuiStyle.TopMap.BackgroundImageFile.Entry.SettingChanged -= OnBackgroundConfigChanged;
-            GuiStyle.TopMap.BackgroundColor.Entry.SettingChanged -= OnBackgroundConfigChanged;
-            GuiStyle.TopMap.BackgroundImageArea.Entry.SettingChanged -= OnBackgroundConfigChanged;
-            GuiStyle.TopMap.BackgroundImageBorder.Entry.SettingChanged -= OnBackgroundConfigChanged;
+            Config.GuiStyle.TopMap.BackgroundImageFile.Entry.SettingChanged -= OnBackgroundConfigChanged;
+            Config.GuiStyle.TopMap.BackgroundColor.Entry.SettingChanged -= OnBackgroundConfigChanged;
+            Config.GuiStyle.TopMap.BackgroundImageArea.Entry.SettingChanged -= OnBackgroundConfigChanged;
+            Config.GuiStyle.TopMap.BackgroundImageBorder.Entry.SettingChanged -= OnBackgroundConfigChanged;
 
-            GuiStyle.TopMap.Sign.Font.Entry.SettingChanged -= OnSignFontConfigChanged;
-            GuiStyle.TopMap.Sign.FontSize.Entry.SettingChanged -= OnSignFontSizeConfigChanged;
-            GuiStyle.TopMap.Sign.FallbackFonts.Entry.SettingChanged -= OnSignFallbackFontsConfigChanged;
+            Config.GuiStyle.TopMap.Sign.Font.Entry.SettingChanged -= OnSignFontConfigChanged;
+            Config.GuiStyle.TopMap.Sign.FontSize.Entry.SettingChanged -= OnSignFontSizeConfigChanged;
+            Config.GuiStyle.TopMap.Sign.FallbackFonts.Entry.SettingChanged -= OnSignFallbackFontsConfigChanged;
 
-            GuiStyle.TopMap.Title.Font.Entry.SettingChanged -= OnTitleFontConfigChanged;
-            GuiStyle.TopMap.Title.FontSize.Entry.SettingChanged -= OnTitleFontSizeConfigChanged;
-            GuiStyle.TopMap.Title.FallbackFonts.Entry.SettingChanged -= OnTitleFallbackFontsConfigChanged;
+            Config.GuiStyle.TopMap.Title.Font.Entry.SettingChanged -= OnTitleFontConfigChanged;
+            Config.GuiStyle.TopMap.Title.FontSize.Entry.SettingChanged -= OnTitleFontSizeConfigChanged;
+            Config.GuiStyle.TopMap.Title.FallbackFonts.Entry.SettingChanged -= OnTitleFallbackFontsConfigChanged;
 
-            GuiStyle.TopMap.Count.Font.Entry.SettingChanged -= OnCountFontConfigChanged;
-            GuiStyle.TopMap.Count.FontSize.Entry.SettingChanged -= OnCountFontSizeConfigChanged;
-            GuiStyle.TopMap.Count.FallbackFonts.Entry.SettingChanged -= OnCountFallbackFontsConfigChanged;
+            Config.GuiStyle.TopMap.Count.Font.Entry.SettingChanged -= OnCountFontConfigChanged;
+            Config.GuiStyle.TopMap.Count.FontSize.Entry.SettingChanged -= OnCountFontSizeConfigChanged;
+            Config.GuiStyle.TopMap.Count.FallbackFonts.Entry.SettingChanged -= OnCountFallbackFontsConfigChanged;
 
         }
 
         private void OnBackgroundConfigChanged(object sender, EventArgs e)
         {
-            _view.UpdateBackgroundImage();
+            PlayerOverlay.ForEachTopMapView(view => view.UpdateBackgroundImage());
         }
 
         private void OnSignFontConfigChanged(object sender, EventArgs e)
         {
-            SignFont = FontManager.CreateMainFont(GuiStyle.TopMap.Sign.Font, SignFont);
-            SignFont.AssignFallbackFonts(GuiStyle.TopMap.Sign.FallbackFonts.AsStringArray);
+            SignFont = FontManager.CreateMainFont(Config.GuiStyle.TopMap.Sign.Font, SignFont);
+            SignFont.AssignFallbackFonts(Config.GuiStyle.TopMap.Sign.FallbackFonts.AsStringArray);
 
-            foreach (var pair in _view.MapMarkers)
+            PlayerOverlay.ForEachTopMapView(view =>
             {
-                pair.Value.UpdateSignFont(SignFont.Font);
-            }
+                foreach (var pair in view.MapMarkers)
+                {
+                    pair.Value.UpdateSignFont(SignFont.Font);
+                }
+            });
         }
 
         private void OnSignFontSizeConfigChanged(object sender, EventArgs e)
         {
-            SignFontSize = GuiStyle.TopMap.Sign.FontSize;
-            foreach (var pair in _view.MapMarkers)
+            SignFontSize = Config.GuiStyle.TopMap.Sign.FontSize;
+
+            PlayerOverlay.ForEachTopMapView(view =>
             {
-                pair.Value.UpdateSignFontSize(SignFontSize);
-            }
+                foreach (var pair in view.MapMarkers)
+                {
+                    pair.Value.UpdateSignFontSize(SignFontSize);
+                }
+            });
         }
 
         private void OnSignFallbackFontsConfigChanged(object sender, EventArgs e)
         {
-            var fallbackFonts = GuiStyle.TopMap.Sign.FallbackFonts.AsStringArray;
+            var fallbackFonts = Config.GuiStyle.TopMap.Sign.FallbackFonts.AsStringArray;
             SignFont.AssignFallbackFonts(fallbackFonts);
 
-            foreach (var pair in _view.MapMarkers)
+            PlayerOverlay.ForEachTopMapView(view =>
             {
-                pair.Value.ForceSignMeshUpdate();
-            }
+                foreach (var pair in view.MapMarkers)
+                {
+                    pair.Value.ForceSignMeshUpdate();
+                }
+            });
         }
 
         private void OnTitleFontConfigChanged(object sender, EventArgs e)
         {
-            TitleFont = FontManager.CreateMainFont(GuiStyle.TopMap.Title.Font, TitleFont);
-            TitleFont.AssignFallbackFonts(GuiStyle.TopMap.Title.FallbackFonts.AsStringArray);
+            TitleFont = FontManager.CreateMainFont(Config.GuiStyle.TopMap.Title.Font, TitleFont);
+            TitleFont.AssignFallbackFonts(Config.GuiStyle.TopMap.Title.FallbackFonts.AsStringArray);
 
-            foreach (var pair in _view.MapMarkers)
+            PlayerOverlay.ForEachTopMapView(view =>
             {
-                pair.Value.UpdateTitleFont(TitleFont.Font);
-            }
+                foreach (var pair in view.MapMarkers)
+                {
+                    pair.Value.UpdateTitleFont(TitleFont.Font);
+                }
+            });
         }
 
         private void OnTitleFontSizeConfigChanged(object sender, EventArgs e)
         {
-            TitleFontSize = GuiStyle.TopMap.Title.FontSize;
-            foreach (var pair in _view.MapMarkers)
+            TitleFontSize = Config.GuiStyle.TopMap.Title.FontSize;
+
+            PlayerOverlay.ForEachTopMapView(view =>
             {
-                pair.Value.UpdateTitleFontSize(TitleFontSize);
-            }
+                foreach (var pair in view.MapMarkers)
+                {
+                    pair.Value.UpdateTitleFontSize(TitleFontSize);
+                }
+            });
         }
 
         private void OnTitleFallbackFontsConfigChanged(object sender, EventArgs e)
         {
-            var fallbackFonts = GuiStyle.TopMap.Title.FallbackFonts.AsStringArray;
+            var fallbackFonts = Config.GuiStyle.TopMap.Title.FallbackFonts.AsStringArray;
             TitleFont.AssignFallbackFonts(fallbackFonts);
 
-            foreach (var pair in _view.MapMarkers)
+            PlayerOverlay.ForEachTopMapView(view =>
             {
-                pair.Value.ForceTitleMeshUpdate();
-            }
+                foreach (var pair in view.MapMarkers)
+                {
+                    pair.Value.ForceTitleMeshUpdate();
+                }
+            });
         }
 
         private void OnCountFontConfigChanged(object sender, EventArgs e)
         {
-            CountFont = FontManager.CreateMainFont(GuiStyle.TopMap.Count.Font, CountFont);
-            CountFont.AssignFallbackFonts(GuiStyle.TopMap.Count.FallbackFonts.AsStringArray);
+            CountFont = FontManager.CreateMainFont(Config.GuiStyle.TopMap.Count.Font, CountFont);
+            CountFont.AssignFallbackFonts(Config.GuiStyle.TopMap.Count.FallbackFonts.AsStringArray);
 
-            foreach (var pair in _view.MapMarkers)
+            PlayerOverlay.ForEachTopMapView(view =>
             {
-                pair.Value.UpdateCountFont(CountFont.Font);
-            }
+                foreach (var pair in view.MapMarkers)
+                {
+                    pair.Value.UpdateCountFont(CountFont.Font);
+                }
+            });
         }
 
         private void OnCountFontSizeConfigChanged(object sender, EventArgs e)
         {
-            CountFontSize = GuiStyle.TopMap.Count.FontSize;
-            foreach (var pair in _view.MapMarkers)
+            CountFontSize = Config.GuiStyle.TopMap.Count.FontSize;
+
+            PlayerOverlay.ForEachTopMapView(view =>
             {
-                pair.Value.UpdateCountFontSize(CountFontSize);
-            }
+                foreach (var pair in view.MapMarkers)
+                {
+                    pair.Value.UpdateCountFontSize(CountFontSize);
+                }
+            });
         }
 
         private void OnCountFallbackFontsConfigChanged(object sender, EventArgs e)
         {
-            var fallbackFonts = GuiStyle.TopMap.Count.FallbackFonts.AsStringArray;
+            var fallbackFonts = Config.GuiStyle.TopMap.Count.FallbackFonts.AsStringArray;
             CountFont.AssignFallbackFonts(fallbackFonts);
 
-            foreach (var pair in _view.MapMarkers)
+            PlayerOverlay.ForEachTopMapView(view =>
             {
-                pair.Value.ForceCountMeshUpdate();
-            }
+                foreach (var pair in view.MapMarkers)
+                {
+                    pair.Value.ForceCountMeshUpdate();
+                }
+            });
         }
     }
 }

@@ -33,7 +33,7 @@ namespace KingdomMod.OverlayMap.Assets
                 return null;
             }
 
-            AddChineseCharactersToFont(newFont);
+            // AddChineseCharactersToFont(newFont);
 
             if (lastFont != null)
                 newFont.TryAddCharacters(new string(lastFont.Chars.ToArray()));
@@ -119,6 +119,7 @@ namespace KingdomMod.OverlayMap.Assets
                 return null;
             }
 
+            UnityEngine.Object.DontDestroyOnLoad(font);
             font.hideFlags |= HideFlags.DontUnloadUnusedAsset;
             return font;
         }
@@ -129,6 +130,7 @@ namespace KingdomMod.OverlayMap.Assets
             if (fontAsset == null)
                 LogError($"Failed to create font.");
 
+            UnityEngine.Object.DontDestroyOnLoad(fontAsset);
             fontAsset.sourceFontFile.hideFlags |= HideFlags.DontUnloadUnusedAsset;
             fontAsset.hideFlags |= HideFlags.DontUnloadUnusedAsset;
             fontAsset.atlasPopulationMode = AtlasPopulationMode.Dynamic;

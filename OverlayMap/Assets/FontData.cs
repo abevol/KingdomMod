@@ -88,6 +88,13 @@ namespace KingdomMod.OverlayMap.Assets
 
             LogTrace($"TryAddCharacters: {FontName}, {Font.faceInfo.familyName}, chars: {characters}");
 
+            if (!Font.sourceFontFile)
+            {
+                LogTrace($"Font.sourceFontFile is null, try to re-create it.");
+                SourceFont = FontManager.CreateSourceFont(FontName);
+                Font.sourceFontFile = SourceFont;
+            }
+
             if (Font.HasCharacters(characters, out var notOwnedChars))
                 return;
 
@@ -96,6 +103,9 @@ namespace KingdomMod.OverlayMap.Assets
             var charsToAdd = new string(notOwnedChars.ToArray());
             var missingChars = TryAddCharacters(Font, charsToAdd);
             MissingChars.UnionWith(missingChars);
+
+            if (!string.IsNullOrEmpty(missingChars))
+                LogWarning($"SourceFont '{SourceFont == null}' '{!SourceFont}'");
 
             if (!string.IsNullOrEmpty(missingChars) && Font.fallbackFontAssetTable != null)
             {
@@ -120,6 +130,7 @@ namespace KingdomMod.OverlayMap.Assets
             {
                 LogWarning($"Font '{fontAsset.faceInfo.familyName}' is missing characters: {missingChars}");
                 LogWarning($"sourceFontFile '{fontAsset.sourceFontFile == null}' '{!fontAsset.sourceFontFile}'");
+
             }
 
             return missingChars;
