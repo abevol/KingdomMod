@@ -41,6 +41,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
         {
             _rectTransform = this.gameObject.AddComponent<RectTransform>();
             _owner = _rectTransform.parent.GetComponent<TopMapView>();
+            var style = Instance.guiStyle.topMapStyle;
 
             // 设置锚点
             _rectTransform.anchorMin = new Vector2(0.5f, 1); // 以顶部中心为锚点
@@ -48,9 +49,9 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
             _rectTransform.pivot = new Vector2(0.5f, 0.5f); // 以顶部中心为支点
 
             // _icon = this.gameObject.AddComponent<Image>();
-            _sign = CreateTextObject("Sign", -10, _owner.Style.SignFont.Font, _owner.Style.SignFontSize);
-            _title = CreateTextObject("Title", -26, _owner.Style.TitleFont.Font, _owner.Style.TitleFontSize);
-            _count = CreateTextObject("Count", -26 - 16, _owner.Style.CountFont.Font, _owner.Style.CountFontSize);
+            _sign = CreateTextObject("Sign", -10, style.SignFont.Font, style.SignFontSize);
+            _title = CreateTextObject("Title", -26, style.TitleFont.Font, style.TitleFontSize);
+            _count = CreateTextObject("Count", -26 - 16, style.CountFont.Font, style.CountFontSize);
 
             LogTrace($"MapMarker.Init, _title.font: {_title.font.faceInfo.familyName}");
         }
@@ -186,7 +187,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
 
         public void UpdateSign(string text)
         {
-            _owner.Style.SignFont.TryAddCharacters(text);
+            Instance.guiStyle.topMapStyle.SignFont.TryAddCharacters(text);
             _sign.text = text;
         }
 
@@ -207,7 +208,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
 
         public void UpdateTitle(string text)
         {
-            _owner.Style.TitleFont.TryAddCharacters(text);
+            Instance.guiStyle.topMapStyle.TitleFont.TryAddCharacters(text);
             _title.text = text;
         }
 
@@ -228,7 +229,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
 
         public void UpdateCount(int count)
         {
-            _owner.Style.CountFont.TryAddCharacters(count.ToString());
+            Instance.guiStyle.topMapStyle.CountFont.TryAddCharacters(count.ToString());
             _count.text = count == 0 ? "" : count.ToString();
         }
 

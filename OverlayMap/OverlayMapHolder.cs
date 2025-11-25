@@ -5,7 +5,7 @@ using BepInEx.Logging;
 using UnityEngine;
 using System.IO;
 using System.Reflection;
-using KingdomMod.OverlayMap.Config;
+using KingdomMod.OverlayMap;
 using KingdomMod.OverlayMap.Gui;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
@@ -44,6 +44,7 @@ public class OverlayMapHolder : MonoBehaviour
     private static PersephoneCage _persephoneCage;
     private static readonly CachePrefabID _cachePrefabID = new CachePrefabID();
     private Canvas _canvas;
+    public GuiStyle guiStyle;
     public (PlayerOverlay P1, PlayerOverlay P2) PlayerOverlays = (null, null);
     public static event GameStateEventHandler OnGameStateChanged;
     public static event ProgramDirectorStateEventHandler OnProgramDirectorStateChanged;
@@ -74,11 +75,12 @@ public class OverlayMapHolder : MonoBehaviour
 
     private void Awake()
     {
-        Global.ConfigBind(_config);
+        Config.Global.ConfigBind(_config);
         Patchers.Patcher.PatchAll();
 
         CreateCanvas();
         CreateFontDebugPanel();
+        guiStyle = CreateGuiStyle();
         PlayerOverlays.P1 = CreatePlayerOverlay(PlayerId.P1);
         PlayerOverlays.P2 = CreatePlayerOverlay(PlayerId.P2);
 
@@ -132,7 +134,7 @@ public class OverlayMapHolder : MonoBehaviour
     /// </summary>
     private void CreateFontDebugPanel()
     {
-        LogDebug("CreateFontDebugPanel");
+        LogTrace("CreateFontDebugPanel");
 
         var debugPanelObj = new GameObject(nameof(SimpleFontDebugPanel));
         debugPanelObj.transform.SetParent(_canvas.transform, false);
@@ -140,9 +142,20 @@ public class OverlayMapHolder : MonoBehaviour
         _fontDebugPanel.Initialize(_canvas);
     }
 
+    private GuiStyle CreateGuiStyle()
+    {
+        LogTrace($"CreateGuiStyle");
+
+        var guiObj = new GameObject(nameof(GuiStyle));
+        guiObj.transform.SetParent(_canvas.transform, false);
+        var guiComp = guiObj.AddComponent<GuiStyle>();
+
+        return guiComp;
+    }
+
     private PlayerOverlay CreatePlayerOverlay(PlayerId playerId)
     {
-        LogDebug($"CreatePlayerOverlay, playerId: {playerId}");
+        LogTrace($"CreatePlayerOverlay, playerId: {playerId}");
 
         var guiObj = new GameObject(nameof(PlayerOverlay));
         guiObj.transform.SetParent(_canvas.transform, false);
@@ -205,7 +218,7 @@ public class OverlayMapHolder : MonoBehaviour
 
         // LogMessage($"resSet test Alfred: {Strings.Alfred}");
         // LogMessage($"resSet test Culture: {Strings.Culture?.Name}");
-        // var resSet = Strings.ResourceManager.GetResourceSet(CultureInfo.CurrentCulture, false, true);
+        // var resSet = Config.Strings.ResourceManager.GetResourceSet(CultureInfo.CurrentCulture, false, true);
         // if (resSet != null)
         // {
         //     var dict = new SortedDictionary<string, string>();
@@ -240,28 +253,28 @@ public class OverlayMapHolder : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.UpArrow))
             {
                 LogTrace("UpArrow");
-                SaveDataExtras.ZoomScale.Value += 0.01f;
+                Config.SaveDataExtras.ZoomScale.Value += 0.01f;
                 changed = true;
             }
 
             if (Input.GetKeyDown(KeyCode.DownArrow))
             {
                 LogTrace("DownArrow");
-                SaveDataExtras.ZoomScale.Value -= 0.01f;
+                Config.SaveDataExtras.ZoomScale.Value -= 0.01f;
                 changed = true;
             }
 
             if (Input.GetKeyDown(KeyCode.LeftArrow))
             {
                 LogTrace("LeftArrow");
-                SaveDataExtras.MapOffset.Value -= 1.0f;
+                Config.SaveDataExtras.MapOffset.Value -= 1.0f;
                 changed = true;
             }
 
             if (Input.GetKeyDown(KeyCode.RightArrow))
             {
                 LogTrace("RightArrow");
-                SaveDataExtras.MapOffset.Value += 1.0f;
+                Config.SaveDataExtras.MapOffset.Value += 1.0f;
                 changed = true;
             }
 
@@ -324,7 +337,7 @@ public class OverlayMapHolder : MonoBehaviour
 
         _timeSinceLastGuiUpdate += Time.deltaTime;
 
-        if (_timeSinceLastGuiUpdate > (1.0 / Global.GuiUpdatesPerSecond))
+        if (_timeSinceLastGuiUpdate > (1.0 / Config.Global.GuiUpdatesPerSecond))
         {
             _timeSinceLastGuiUpdate = 0;
 
@@ -428,7 +441,7 @@ public class OverlayMapHolder : MonoBehaviour
         _persephoneCage = UnityEngine.Object.FindAnyObjectByType<PersephoneCage>();
         _cachePrefabID.CachePrefabIDs();
 
-        SaveDataExtras.Init();
+        Config.SaveDataExtras.Init();
 
         // 在场景切换后重新加载GUI样式
         NeedToReloadGuiBoxStyle = true;
@@ -445,24 +458,24 @@ public class OverlayMapHolder : MonoBehaviour
     {
         LogTrace("OverlayMapHolder.OnGameSaved");
 
-        SaveDataExtras.Save();
+        Config.SaveDataExtras.Save();
     }
 
     public void ReloadGuiStyle()
     {
         _guiBoxStyle = new GUIStyle(GUI.skin.box);
-        var bgImageFile = Path.Combine(AssetsDir, GuiStyle.TopMap.BackgroundImageFile);
+        var bgImageFile = Path.Combine(AssetsDir, Config.GuiStyle.TopMap.BackgroundImageFile);
         LogDebug($"ReloadGuiStyle: \n" +
                  $"bgImageFile={bgImageFile}\n" +
-                 $"BackgroundImageArea={GuiStyle.TopMap.BackgroundImageArea.Value}\n" +
-                 $"BackgroundImageBorder={GuiStyle.TopMap.BackgroundImageBorder.Value}");
+                 $"BackgroundImageArea={Config.GuiStyle.TopMap.BackgroundImageArea.Value}\n" +
+                 $"BackgroundImageBorder={Config.GuiStyle.TopMap.BackgroundImageBorder.Value}");
         if (File.Exists(bgImageFile))
         {
             byte[] imageData = File.ReadAllBytes(bgImageFile);
             Texture2D texture = new Texture2D(2, 2, TextureFormat.RGBA32, false);
             texture.LoadImage(imageData);
 
-            var imageArea = (RectInt)GuiStyle.TopMap.BackgroundImageArea;
+            var imageArea = (RectInt)Config.GuiStyle.TopMap.BackgroundImageArea;
             imageArea.y = texture.height - imageArea.y - imageArea.height;
             Texture2D subTexture = new Texture2D(imageArea.width, imageArea.height, TextureFormat.RGBA32, false);
             Color[] pixels = texture.GetPixels(imageArea.x, imageArea.y, imageArea.width, imageArea.height);
@@ -472,10 +485,10 @@ public class OverlayMapHolder : MonoBehaviour
                 subTexture.Apply();
 
                 //  _guiBoxStyle.normal.background = subTexture;
-                _guiBoxStyle.normal.background = MakeColoredTexture(subTexture, GuiStyle.TopMap.BackgroundColor);
+                _guiBoxStyle.normal.background = MakeColoredTexture(subTexture, Config.GuiStyle.TopMap.BackgroundColor);
                 _guiBoxStyle.stretchWidth = false;
                 _guiBoxStyle.stretchHeight = false;
-                _guiBoxStyle.border = GuiStyle.TopMap.BackgroundImageBorder;
+                _guiBoxStyle.border = Config.GuiStyle.TopMap.BackgroundImageBorder;
             }
             else
             {
@@ -542,16 +555,16 @@ public class OverlayMapHolder : MonoBehaviour
         foreach (var obj in kingdom.AllPortals)
         {
             if (obj.type == Portal.Type.Regular)
-                poiList.Add(new MarkInfo(obj.transform.position.x, MarkerStyle.Portal.Color, MarkerStyle.Portal.Sign, Strings.Portal));
+                poiList.Add(new MarkInfo(obj.transform.position.x, Config.MarkerStyle.Portal.Color, Config.MarkerStyle.Portal.Sign, Config.Strings.Portal));
             else if (obj.type == Portal.Type.Cliff)
-                poiList.Add(new MarkInfo(obj.transform.position.x, obj.state switch{ Portal.State.Destroyed => MarkerStyle.PortalCliff.Destroyed.Color, Portal.State.Rebuilding => MarkerStyle.PortalCliff.Rebuilding.Color, _=> MarkerStyle.PortalCliff.Color }, MarkerStyle.PortalCliff.Sign, Strings.PortalCliff));
+                poiList.Add(new MarkInfo(obj.transform.position.x, obj.state switch{ Portal.State.Destroyed => Config.MarkerStyle.PortalCliff.Destroyed.Color, Portal.State.Rebuilding => Config.MarkerStyle.PortalCliff.Rebuilding.Color, _=> Config.MarkerStyle.PortalCliff.Color }, Config.MarkerStyle.PortalCliff.Sign, Config.Strings.PortalCliff));
             else if (obj.type == Portal.Type.Dock)
-                poiList.Add(new MarkInfo(obj.transform.position.x, MarkerStyle.PortalDock.Color, MarkerStyle.PortalDock.Sign, Strings.PortalDock));
+                poiList.Add(new MarkInfo(obj.transform.position.x, Config.MarkerStyle.PortalDock.Color, Config.MarkerStyle.PortalDock.Sign, Config.Strings.PortalDock));
         }
 
         var beach = _gameLayer.GetComponentInChildren<Beach>();
         if (beach != null)
-            poiList.Add(new MarkInfo(beach.transform.position.x, MarkerStyle.Beach.Color, MarkerStyle.Beach.Sign, Strings.Beach));
+            poiList.Add(new MarkInfo(beach.transform.position.x, Config.MarkerStyle.Beach.Color, Config.MarkerStyle.Beach.Sign, Config.Strings.Beach));
 
         foreach (var beggarCamp in kingdom.BeggarCamps)
         {
@@ -561,7 +574,7 @@ public class OverlayMapHolder : MonoBehaviour
                 if (beggar != null && beggar.isActiveAndEnabled)
                     count++;
             }
-            poiList.Add(new MarkInfo(beggarCamp.transform.position.x, MarkerStyle.BeggarCamp.Color, MarkerStyle.BeggarCamp.Sign, Strings.BeggarCamp, count));
+            poiList.Add(new MarkInfo(beggarCamp.transform.position.x, Config.MarkerStyle.BeggarCamp.Color, Config.MarkerStyle.BeggarCamp.Sign, Config.Strings.BeggarCamp, count));
         }
 
         foreach (var beggar in kingdom.Beggars)
@@ -570,7 +583,7 @@ public class OverlayMapHolder : MonoBehaviour
 
             if (beggar.hasFoundBaker)
             {
-                poiList.Add(new MarkInfo(beggar.transform.position.x, MarkerStyle.Beggar.Color, MarkerStyle.Beggar.Sign, Strings.Beggar, 0, MarkRow.Movable));
+                poiList.Add(new MarkInfo(beggar.transform.position.x, Config.MarkerStyle.Beggar.Color, Config.MarkerStyle.Beggar.Sign, Config.Strings.Beggar, 0, MarkRow.Movable));
             }
         }
 
@@ -581,24 +594,24 @@ public class OverlayMapHolder : MonoBehaviour
             var mover = player.mover;
             if (mover == null) continue;
 
-            poiList.Add(new MarkInfo(mover.transform.position.x, MarkerStyle.Player.Color, MarkerStyle.Player.Sign, player.playerId == 0 ? Strings.P1 : Strings.P2, 0, MarkRow.Movable));
+            poiList.Add(new MarkInfo(mover.transform.position.x, Config.MarkerStyle.Player.Color, Config.MarkerStyle.Player.Sign, player.playerId == 0 ? Config.Strings.P1 : Config.Strings.P2, 0, MarkRow.Movable));
             float l = mover.transform.position.x - 12;
             float r = mover.transform.position.x + 12;
-            SaveDataExtras.ExploredLeft.Value = Math.Min(SaveDataExtras.ExploredLeft, l);
-            SaveDataExtras.ExploredRight.Value = Math.Max(SaveDataExtras.ExploredRight, r);
+            Config.SaveDataExtras.ExploredLeft.Value = Math.Min(Config.SaveDataExtras.ExploredLeft, l);
+            Config.SaveDataExtras.ExploredRight.Value = Math.Max(Config.SaveDataExtras.ExploredRight, r);
         }
 
         if (kingdom.teleExitP1)
-            poiList.Add(new MarkInfo(kingdom.teleExitP1.transform.position.x, MarkerStyle.TeleExitP1.Color, MarkerStyle.TeleExitP1.Sign, Strings.TeleExitP1, 0, MarkRow.Movable));
+            poiList.Add(new MarkInfo(kingdom.teleExitP1.transform.position.x, Config.MarkerStyle.TeleExitP1.Color, Config.MarkerStyle.TeleExitP1.Sign, Config.Strings.TeleExitP1, 0, MarkRow.Movable));
 
         if (kingdom.teleExitP2)
-            poiList.Add(new MarkInfo(kingdom.teleExitP2.transform.position.x, MarkerStyle.TeleExitP2.Color, MarkerStyle.TeleExitP2.Sign, Strings.TeleExitP2, 0, MarkRow.Movable));
+            poiList.Add(new MarkInfo(kingdom.teleExitP2.transform.position.x, Config.MarkerStyle.TeleExitP2.Color, Config.MarkerStyle.TeleExitP2.Sign, Config.Strings.TeleExitP2, 0, MarkRow.Movable));
 
         var deers = GameExtensions.FindObjectsWithTagOfType<Deer>(Tags.Wildlife);
         foreach (var deer in deers)
         {
             if (!deer._damageable.isDead)
-                poiList.Add(new MarkInfo(deer.transform.position.x, deer._fsm.Current == 5 ? MarkerStyle.DeerFollowing.Color : MarkerStyle.Deer.Color, MarkerStyle.Deer.Sign, Strings.Deer, 0, MarkRow.Movable));
+                poiList.Add(new MarkInfo(deer.transform.position.x, deer._fsm.Current == 5 ? Config.MarkerStyle.DeerFollowing.Color : Config.MarkerStyle.Deer.Color, Config.MarkerStyle.Deer.Sign, Config.Strings.Deer, 0, MarkRow.Movable));
         }
 
         var enemies = Managers.Inst.enemies._enemies;
@@ -637,13 +650,13 @@ public class OverlayMapHolder : MonoBehaviour
                 if (leftBosses.Count > 0)
                 {
                     leftBosses.Sort((a, b) => b.CompareTo(a));
-                    poiList.Add(new MarkInfo(leftBosses[0], MarkerStyle.Boss.Color, MarkerStyle.Boss.Sign, Strings.Boss, leftBosses.Count, MarkRow.Movable));
+                    poiList.Add(new MarkInfo(leftBosses[0], Config.MarkerStyle.Boss.Color, Config.MarkerStyle.Boss.Sign, Config.Strings.Boss, leftBosses.Count, MarkRow.Movable));
                     if (leftEnemies[0] - leftBosses[0] < 6)
                         drawEnemies = false;
                 }
 
                 if (drawEnemies)
-                    poiList.Add(new MarkInfo(leftEnemies[0], MarkerStyle.Enemy.Color, MarkerStyle.Enemy.Sign, Strings.Enemy, leftEnemies.Count, MarkRow.Movable));
+                    poiList.Add(new MarkInfo(leftEnemies[0], Config.MarkerStyle.Enemy.Color, Config.MarkerStyle.Enemy.Sign, Config.Strings.Enemy, leftEnemies.Count, MarkRow.Movable));
             }
 
             if (rightEnemies.Count > 0)
@@ -654,13 +667,13 @@ public class OverlayMapHolder : MonoBehaviour
                 if (rightBosses.Count > 0)
                 {
                     rightBosses.Sort((a, b) => a.CompareTo(b));
-                    poiList.Add(new MarkInfo(rightBosses[0], MarkerStyle.Boss.Color, MarkerStyle.Boss.Sign, Strings.Boss, rightBosses.Count, MarkRow.Movable));
+                    poiList.Add(new MarkInfo(rightBosses[0], Config.MarkerStyle.Boss.Color, Config.MarkerStyle.Boss.Sign, Config.Strings.Boss, rightBosses.Count, MarkRow.Movable));
                     if (rightBosses[0] - rightEnemies[0] < 6)
                         drawEnemies = false;
                 }
 
                 if (drawEnemies)
-                    poiList.Add(new MarkInfo(rightEnemies[0], MarkerStyle.Enemy.Color, MarkerStyle.Enemy.Sign, Strings.Enemy, rightEnemies.Count, MarkRow.Movable));
+                    poiList.Add(new MarkInfo(rightEnemies[0], Config.MarkerStyle.Enemy.Color, Config.MarkerStyle.Enemy.Sign, Config.Strings.Enemy, rightEnemies.Count, MarkRow.Movable));
             }
         }
 
@@ -672,17 +685,17 @@ public class OverlayMapHolder : MonoBehaviour
             bool isLocked = reason != LockIndicator.LockReason.NotLocked && reason != LockIndicator.LockReason.NoUpgrade;
             bool isLockedForInvalidTime = reason == LockIndicator.LockReason.InvalidTime;
             var price = isLockedForInvalidTime ? (int)(payable.timeAvailableFrom - Time.time) : canPay ? payable.Price : 0;
-            var color = isLocked ? MarkerStyle.Castle.Locked.Color : MarkerStyle.Castle.Color;
-            poiList.Add(new MarkInfo(castle.transform.position.x, color, MarkerStyle.Castle.Sign, Strings.Castle, price));
+            var color = isLocked ? Config.MarkerStyle.Castle.Locked.Color : Config.MarkerStyle.Castle.Color;
+            poiList.Add(new MarkInfo(castle.transform.position.x, color, Config.MarkerStyle.Castle.Sign, Config.Strings.Castle, price));
 
-            leftWalls.Add(new WallPoint(castle.transform.position, MarkerStyle.WallLine.Color));
-            rightWalls.Add(new WallPoint(castle.transform.position, MarkerStyle.WallLine.Color));
+            leftWalls.Add(new WallPoint(castle.transform.position, Config.MarkerStyle.WallLine.Color));
+            rightWalls.Add(new WallPoint(castle.transform.position, Config.MarkerStyle.WallLine.Color));
         }
 
         var campfire = kingdom.campfire;
         if (campfire !=  null)
         {
-            poiList.Add(new MarkInfo(campfire.transform.position.x, MarkerStyle.Campfire.Color, MarkerStyle.Campfire.Sign, Strings.Campfire));
+            poiList.Add(new MarkInfo(campfire.transform.position.x, Config.MarkerStyle.Campfire.Color, Config.MarkerStyle.Campfire.Sign, Config.Strings.Campfire));
         }
 
         var chestList = _gameLayer.GetComponentsInChildren<Chest>();
@@ -691,24 +704,24 @@ public class OverlayMapHolder : MonoBehaviour
             if (obj.currencyAmount == 0) continue;
 
             if (obj.currencyType == CurrencyType.Gems)
-                poiList.Add(new MarkInfo(obj.transform.position.x, MarkerStyle.GemChest.Color, MarkerStyle.GemChest.Sign, Strings.GemChest, obj.currencyAmount));
+                poiList.Add(new MarkInfo(obj.transform.position.x, Config.MarkerStyle.GemChest.Color, Config.MarkerStyle.GemChest.Sign, Config.Strings.GemChest, obj.currencyAmount));
             else
-                poiList.Add(new MarkInfo(obj.transform.position.x, MarkerStyle.Chest.Color, MarkerStyle.Chest.Sign, Strings.Chest, obj.currencyAmount));
+                poiList.Add(new MarkInfo(obj.transform.position.x, Config.MarkerStyle.Chest.Color, Config.MarkerStyle.Chest.Sign, Config.Strings.Chest, obj.currencyAmount));
         }
 
         foreach (var obj in kingdom._walls)
         {
-            poiList.Add(new MarkInfo(obj.transform.position.x, MarkerStyle.Wall.Color, MarkerStyle.Wall.Sign, ""));
+            poiList.Add(new MarkInfo(obj.transform.position.x, Config.MarkerStyle.Wall.Color, Config.MarkerStyle.Wall.Sign, ""));
             if (kingdom.GetBorderSideForPosition(obj.transform.position.x) == Side.Left)
-                leftWalls.Add(new WallPoint(obj.transform.position, MarkerStyle.WallLine.Color));
+                leftWalls.Add(new WallPoint(obj.transform.position, Config.MarkerStyle.WallLine.Color));
             else
-                rightWalls.Add(new WallPoint(obj.transform.position, MarkerStyle.WallLine.Color));
+                rightWalls.Add(new WallPoint(obj.transform.position, Config.MarkerStyle.WallLine.Color));
         }
 
         var shopForge = GameObject.FindGameObjectWithTag(Tags.ShopForge);
         if (shopForge != null)
         {
-            poiList.Add(new MarkInfo(shopForge.transform.position.x, MarkerStyle.ShopForge.Color, MarkerStyle.ShopForge.Sign, Strings.ShopForge));
+            poiList.Add(new MarkInfo(shopForge.transform.position.x, Config.MarkerStyle.ShopForge.Color, Config.MarkerStyle.ShopForge.Sign, Config.Strings.ShopForge));
         }
 
         var citizenHouses = GameObject.FindGameObjectsWithTag(Tags.CitizenHouse);
@@ -717,7 +730,7 @@ public class OverlayMapHolder : MonoBehaviour
             var citizenHouse = obj.GetComponent<CitizenHousePayable>();
             if (citizenHouse != null)
             {
-                poiList.Add(new MarkInfo(obj.transform.position.x, MarkerStyle.CitizenHouse.Color, MarkerStyle.CitizenHouse.Sign, Strings.CitizenHouse, citizenHouse._numberOfAvailableCitizens));
+                poiList.Add(new MarkInfo(obj.transform.position.x, Config.MarkerStyle.CitizenHouse.Color, Config.MarkerStyle.CitizenHouse.Sign, Config.Strings.CitizenHouse, citizenHouse._numberOfAvailableCitizens));
             }
         }
 
@@ -729,56 +742,56 @@ public class OverlayMapHolder : MonoBehaviour
             bool canPay = payable != null && !payable.IsLocked(GetLocalPlayer(), out reason);
             bool isLocked = payable != null && (reason != LockIndicator.LockReason.NotLocked && reason != LockIndicator.LockReason.NoUpgrade);
             var price = canPay ? payable.Price : 0;
-            var color = isLocked ? MarkerStyle.Lighthouse.Locked.Color : MarkerStyle.Lighthouse.Color;
-            poiList.Add(new MarkInfo(obj.transform.position.x, color, MarkerStyle.Lighthouse.Sign, Strings.Lighthouse, price));
+            var color = isLocked ? Config.MarkerStyle.Lighthouse.Locked.Color : Config.MarkerStyle.Lighthouse.Color;
+            poiList.Add(new MarkInfo(obj.transform.position.x, color, Config.MarkerStyle.Lighthouse.Sign, Config.Strings.Lighthouse, price));
         }
 
         var wallWreckList = GameObject.FindGameObjectsWithTag(Tags.WallWreck);
         foreach (var obj in wallWreckList)
         {
-            poiList.Add(new MarkInfo(obj.transform.position.x, MarkerStyle.Wall.Wrecked.Color, MarkerStyle.Wall.Sign, ""));
+            poiList.Add(new MarkInfo(obj.transform.position.x, Config.MarkerStyle.Wall.Wrecked.Color, Config.MarkerStyle.Wall.Sign, ""));
             if (kingdom.GetBorderSideForPosition(obj.transform.position.x) == Side.Left)
-                leftWalls.Add(new WallPoint(obj.transform.position, MarkerStyle.WallLine.Wrecked.Color));
+                leftWalls.Add(new WallPoint(obj.transform.position, Config.MarkerStyle.WallLine.Wrecked.Color));
             else
-                rightWalls.Add(new WallPoint(obj.transform.position, MarkerStyle.WallLine.Wrecked.Color));
+                rightWalls.Add(new WallPoint(obj.transform.position, Config.MarkerStyle.WallLine.Wrecked.Color));
         }
 
         var wallFoundation = GameObject.FindGameObjectsWithTag(Tags.WallFoundation);
         foreach (var obj in wallFoundation)
         {
-            poiList.Add(new MarkInfo(obj.transform.position.x, MarkerStyle.WallFoundation.Color, MarkerStyle.WallFoundation.Sign, ""));
+            poiList.Add(new MarkInfo(obj.transform.position.x, Config.MarkerStyle.WallFoundation.Color, Config.MarkerStyle.WallFoundation.Sign, ""));
         }
 
         var riverList = _gameLayer.GetComponentsInChildren<River>();
         foreach (var obj in riverList)
         {
-            poiList.Add(new MarkInfo(obj.transform.position.x, MarkerStyle.River.Color, MarkerStyle.River.Sign, ""));
+            poiList.Add(new MarkInfo(obj.transform.position.x, Config.MarkerStyle.River.Color, Config.MarkerStyle.River.Sign, ""));
         }
 
         foreach (var obj in Managers.Inst.world._berryBushes)
         {
             if (obj.paid)
-                poiList.Add(new MarkInfo(obj.transform.position.x, MarkerStyle.BerryBushPaid.Color, MarkerStyle.BerryBushPaid.Sign, ""));
+                poiList.Add(new MarkInfo(obj.transform.position.x, Config.MarkerStyle.BerryBushPaid.Color, Config.MarkerStyle.BerryBushPaid.Sign, ""));
             else
-                poiList.Add(new MarkInfo(obj.transform.position.x, MarkerStyle.BerryBush.Color, MarkerStyle.BerryBush.Sign, ""));
+                poiList.Add(new MarkInfo(obj.transform.position.x, Config.MarkerStyle.BerryBush.Color, Config.MarkerStyle.BerryBush.Sign, ""));
         }
 
         var payableGemChest = GameExtensions.GetPayableOfType<PayableGemChest>();
         if (payableGemChest != null)
         {
             var gemsCount = payableGemChest.infiniteGems ? payableGemChest.guardRef.Price : payableGemChest.gemsStored;
-            poiList.Add(new MarkInfo(payableGemChest.transform.position.x, MarkerStyle.GemMerchant.Color, MarkerStyle.GemMerchant.Sign, Strings.GemMerchant, gemsCount));
+            poiList.Add(new MarkInfo(payableGemChest.transform.position.x, Config.MarkerStyle.GemMerchant.Color, Config.MarkerStyle.GemMerchant.Sign, Config.Strings.GemMerchant, gemsCount));
         }
 
         var dogSpawn = GameExtensions.GetPayableBlockerOfType<DogSpawn>();
         if (dogSpawn != null && !dogSpawn._dogFreed)
-            poiList.Add(new MarkInfo(dogSpawn.transform.position.x, MarkerStyle.DogSpawn.Color, MarkerStyle.DogSpawn.Sign, Strings.DogSpawn));
+            poiList.Add(new MarkInfo(dogSpawn.transform.position.x, Config.MarkerStyle.DogSpawn.Color, Config.MarkerStyle.DogSpawn.Sign, Config.Strings.DogSpawn));
 
         var boarSpawn = world.boarSpawnGroup;
         if (boarSpawn != null)
         {
-            poiList.Add(new MarkInfo(boarSpawn.transform.position.x, MarkerStyle.BoarSpawn.Color, MarkerStyle.BoarSpawn.Sign,
-                Strings.BoarSpawn, boarSpawn._spawnedBoar ? 0 : 1));
+            poiList.Add(new MarkInfo(boarSpawn.transform.position.x, Config.MarkerStyle.BoarSpawn.Color, Config.MarkerStyle.BoarSpawn.Sign,
+                Config.Strings.BoarSpawn, boarSpawn._spawnedBoar ? 0 : 1));
         }
 
         var caveHelper = Managers.Inst.caveHelper;
@@ -787,57 +800,57 @@ public class OverlayMapHolder : MonoBehaviour
             var bomb = caveHelper.Getbomb(caveHelper.CurrentlyBombingPortal.Side);
             if (bomb != null)
             {
-                poiList.Add(new MarkInfo(bomb.transform.position.x, MarkerStyle.Bomb.Color, MarkerStyle.Bomb.Sign, Strings.Bomb, 0, MarkRow.Movable));
+                poiList.Add(new MarkInfo(bomb.transform.position.x, Config.MarkerStyle.Bomb.Color, Config.MarkerStyle.Bomb.Sign, Config.Strings.Bomb, 0, MarkRow.Movable));
             }
         }
 
         foreach (var obj in kingdom.GetFarmHouses())
         {
-            poiList.Add(new MarkInfo(obj.transform.position.x, MarkerStyle.Farmhouse.Color, MarkerStyle.Farmhouse.Sign, Strings.Farmhouse));
+            poiList.Add(new MarkInfo(obj.transform.position.x, Config.MarkerStyle.Farmhouse.Color, Config.MarkerStyle.Farmhouse.Sign, Config.Strings.Farmhouse));
         }
 
         var steedNames = new System.Collections.Generic.Dictionary<SteedType, string>
         {
-            { SteedType.INVALID,               Strings.Invalid },
-            { SteedType.Bear,                  Strings.Bear },
-            { SteedType.P1Griffin,             Strings.Griffin },
-            { SteedType.Lizard,                Strings.Lizard },
-            { SteedType.Reindeer,              Strings.Reindeer },
-            { SteedType.Spookyhorse,           Strings.Spookyhorse },
-            { SteedType.Stag,                  Strings.Stag },
-            { SteedType.Unicorn,               Strings.Unicorn },
-            { SteedType.P1Warhorse,            Strings.Warhorse },
-            { SteedType.P1Default,             Strings.DefaultSteed },
-            { SteedType.P2Default,             Strings.DefaultSteed },
-            { SteedType.HorseStamina,          Strings.HorseStamina },
-            { SteedType.HorseBurst,            Strings.HorseBurst },
-            { SteedType.HorseFast,             Strings.HorseFast },
-            { SteedType.P1Wolf,                Strings.Wolf },
-            { SteedType.Trap,                  Strings.Trap },
-            { SteedType.Barrier,               Strings.Barrier },
-            { SteedType.Bloodstained,          Strings.Bloodstained },
-            { SteedType.P2Wolf,                Strings.Wolf },
-            { SteedType.P2Griffin,             Strings.Griffin },
-            { SteedType.P2Warhorse,            Strings.Warhorse },
-            { SteedType.P2Stag,                Strings.Stag },
-            { SteedType.Gullinbursti,          Strings.Gullinbursti },
-            { SteedType.Sleipnir,              Strings.Sleipnir },
-            { SteedType.Reindeer_Norselands,   Strings.Reindeer },
-            { SteedType.CatCart,               Strings.CatCart },
-            { SteedType.Kelpie,                Strings.Kelpie },
-            { SteedType.DayNight,              Strings.DayNight },
-            { SteedType.P2Kelpie,              Strings.Kelpie },
-            { SteedType.P2Reindeer_Norselands, Strings.Reindeer },
-            { SteedType.Hippocampus,           Strings.Hippocampus },
-            { SteedType.Cerberus,              Strings.Cerberus },
-            { SteedType.Spider,                Strings.Spider },
-            { SteedType.TheChariotDay,         Strings.TheChariotDay },
-            { SteedType.TheChariotNight,       Strings.TheChariotNight },
-            { SteedType.Pegasus,               Strings.Pegasus },
-            { SteedType.Donkey,                Strings.Donkey },
-            { SteedType.MolossianHound,        Strings.MolossianHound },
-            { SteedType.Chimera,               Strings.Chimera },
-            { SteedType.Total,                 Strings.Total }
+            { SteedType.INVALID,               Config.Strings.Invalid },
+            { SteedType.Bear,                  Config.Strings.Bear },
+            { SteedType.P1Griffin,             Config.Strings.Griffin },
+            { SteedType.Lizard,                Config.Strings.Lizard },
+            { SteedType.Reindeer,              Config.Strings.Reindeer },
+            { SteedType.Spookyhorse,           Config.Strings.Spookyhorse },
+            { SteedType.Stag,                  Config.Strings.Stag },
+            { SteedType.Unicorn,               Config.Strings.Unicorn },
+            { SteedType.P1Warhorse,            Config.Strings.Warhorse },
+            { SteedType.P1Default,             Config.Strings.DefaultSteed },
+            { SteedType.P2Default,             Config.Strings.DefaultSteed },
+            { SteedType.HorseStamina,          Config.Strings.HorseStamina },
+            { SteedType.HorseBurst,            Config.Strings.HorseBurst },
+            { SteedType.HorseFast,             Config.Strings.HorseFast },
+            { SteedType.P1Wolf,                Config.Strings.Wolf },
+            { SteedType.Trap,                  Config.Strings.Trap },
+            { SteedType.Barrier,               Config.Strings.Barrier },
+            { SteedType.Bloodstained,          Config.Strings.Bloodstained },
+            { SteedType.P2Wolf,                Config.Strings.Wolf },
+            { SteedType.P2Griffin,             Config.Strings.Griffin },
+            { SteedType.P2Warhorse,            Config.Strings.Warhorse },
+            { SteedType.P2Stag,                Config.Strings.Stag },
+            { SteedType.Gullinbursti,          Config.Strings.Gullinbursti },
+            { SteedType.Sleipnir,              Config.Strings.Sleipnir },
+            { SteedType.Reindeer_Norselands,   Config.Strings.Reindeer },
+            { SteedType.CatCart,               Config.Strings.CatCart },
+            { SteedType.Kelpie,                Config.Strings.Kelpie },
+            { SteedType.DayNight,              Config.Strings.DayNight },
+            { SteedType.P2Kelpie,              Config.Strings.Kelpie },
+            { SteedType.P2Reindeer_Norselands, Config.Strings.Reindeer },
+            { SteedType.Hippocampus,           Config.Strings.Hippocampus },
+            { SteedType.Cerberus,              Config.Strings.Cerberus },
+            { SteedType.Spider,                Config.Strings.Spider },
+            { SteedType.TheChariotDay,         Config.Strings.TheChariotDay },
+            { SteedType.TheChariotNight,       Config.Strings.TheChariotNight },
+            { SteedType.Pegasus,               Config.Strings.Pegasus },
+            { SteedType.Donkey,                Config.Strings.Donkey },
+            { SteedType.MolossianHound,        Config.Strings.MolossianHound },
+            { SteedType.Chimera,               Config.Strings.Chimera },
+            { SteedType.Total,                 Config.Strings.Total }
         };
 
         foreach (var obj in kingdom.spawnedSteeds)
@@ -846,7 +859,7 @@ public class OverlayMapHolder : MonoBehaviour
             {
                 if (!steedNames.TryGetValue(obj.steedType, out var steedName))
                     steedName = obj.steedType.ToString();
-                poiList.Add(new MarkInfo(obj.transform.position.x, MarkerStyle.Steeds.Color, MarkerStyle.Steeds.Sign, steedName, obj.Price));
+                poiList.Add(new MarkInfo(obj.transform.position.x, Config.MarkerStyle.Steeds.Color, Config.MarkerStyle.Steeds.Sign, steedName, obj.Price));
             }
         }
 
@@ -861,7 +874,7 @@ public class OverlayMapHolder : MonoBehaviour
             }
 
             if (!obj._hasSpawned)
-                poiList.Add(new MarkInfo(obj.transform.position.x, MarkerStyle.SteedSpawns.Color, MarkerStyle.SteedSpawns.Sign, info, obj.Price));
+                poiList.Add(new MarkInfo(obj.transform.position.x, Config.MarkerStyle.SteedSpawns.Color, Config.MarkerStyle.SteedSpawns.Sign, info, obj.Price));
         }
 
         string LogUnknownHermitType(Hermit.HermitType hermitType)
@@ -875,25 +888,25 @@ public class OverlayMapHolder : MonoBehaviour
         {
             var info = obj.hermitType switch
             {
-                Hermit.HermitType.Horse => Strings.HermitHorse,
-                Hermit.HermitType.Horn => Strings.HermitHorn,
-                Hermit.HermitType.Ballista => Strings.HermitBallista,
-                Hermit.HermitType.Baker => Strings.HermitBaker,
-                Hermit.HermitType.Knight => Strings.HermitKnight,
-                Hermit.HermitType.Persephone => Strings.HermitPersephone,
-                Hermit.HermitType.Fire => Strings.HermitFire,
+                Hermit.HermitType.Horse => Config.Strings.HermitHorse,
+                Hermit.HermitType.Horn => Config.Strings.HermitHorn,
+                Hermit.HermitType.Ballista => Config.Strings.HermitBallista,
+                Hermit.HermitType.Baker => Config.Strings.HermitBaker,
+                Hermit.HermitType.Knight => Config.Strings.HermitKnight,
+                Hermit.HermitType.Persephone => Config.Strings.HermitPersephone,
+                Hermit.HermitType.Fire => Config.Strings.HermitFire,
                 _ => LogUnknownHermitType(obj.hermitType)
             };
 
-            var color = obj.canPay ? MarkerStyle.HermitCabins.Locked.Color : MarkerStyle.HermitCabins.Unlocked.Color;
+            var color = obj.canPay ? Config.MarkerStyle.HermitCabins.Locked.Color : Config.MarkerStyle.HermitCabins.Unlocked.Color;
             var price = obj.canPay ? obj.Price : 0;
-            poiList.Add(new MarkInfo(obj.transform.position.x, color, MarkerStyle.HermitCabins.Sign, info, price));
+            poiList.Add(new MarkInfo(obj.transform.position.x, color, Config.MarkerStyle.HermitCabins.Sign, info, price));
         }
 
         if (_persephoneCage)
         {
-            var color = PersephoneCage.State.IsPersephoneLocked(_persephoneCage._fsm.Current) ? MarkerStyle.PersephoneCage.Locked.Color : MarkerStyle.PersephoneCage.Unlocked.Color;
-            poiList.Add(new MarkInfo(_persephoneCage.transform.position.x, color, MarkerStyle.PersephoneCage.Sign, Strings.HermitPersephone, 0));
+            var color = PersephoneCage.State.IsPersephoneLocked(_persephoneCage._fsm.Current) ? Config.MarkerStyle.PersephoneCage.Locked.Color : Config.MarkerStyle.PersephoneCage.Unlocked.Color;
+            poiList.Add(new MarkInfo(_persephoneCage.transform.position.x, color, Config.MarkerStyle.PersephoneCage.Sign, Config.Strings.HermitPersephone, 0));
         }
 
         var statueList = GameExtensions.GetPayablesOfType<Statue>();
@@ -901,43 +914,43 @@ public class OverlayMapHolder : MonoBehaviour
         {
             var info = obj.deity switch
             {
-                Statue.Deity.Archer => Strings.StatueArcher,
-                Statue.Deity.Worker => Strings.StatueWorker,
-                Statue.Deity.Knight => Strings.StatueKnight,
-                Statue.Deity.Farmer => Strings.StatueFarmer,
-                Statue.Deity.Time => Strings.StatueTime,
-                Statue.Deity.Pike => Strings.StatuePike,
+                Statue.Deity.Archer => Config.Strings.StatueArcher,
+                Statue.Deity.Worker => Config.Strings.StatueWorker,
+                Statue.Deity.Knight => Config.Strings.StatueKnight,
+                Statue.Deity.Farmer => Config.Strings.StatueFarmer,
+                Statue.Deity.Time => Config.Strings.StatueTime,
+                Statue.Deity.Pike => Config.Strings.StatuePike,
                 _ => ""
             };
 
             bool isLocked = obj.deityStatus != Statue.DeityStatus.Activated;
-            var color = isLocked ? MarkerStyle.Statues.Locked.Color : MarkerStyle.Statues.Unlocked.Color;
+            var color = isLocked ? Config.MarkerStyle.Statues.Locked.Color : Config.MarkerStyle.Statues.Unlocked.Color;
             var price = isLocked ? obj.Price : 0;
-            poiList.Add(new MarkInfo(obj.transform.position.x, color, MarkerStyle.Statues.Sign, info, price));
+            poiList.Add(new MarkInfo(obj.transform.position.x, color, Config.MarkerStyle.Statues.Sign, info, price));
         }
 
         var timeStatue = kingdom.timeStatue;
         if (timeStatue)
-            poiList.Add(new MarkInfo(timeStatue.transform.position.x, MarkerStyle.StatueTime.Color, MarkerStyle.StatueTime.Sign, Strings.StatueTime, timeStatue._daysRemaining));
+            poiList.Add(new MarkInfo(timeStatue.transform.position.x, Config.MarkerStyle.StatueTime.Color, Config.MarkerStyle.StatueTime.Sign, Config.Strings.StatueTime, timeStatue._daysRemaining));
 
         // var wharf = kingdom.wharf;
         var boat = kingdom.boat;
         if (boat)
-            poiList.Add(new MarkInfo(boat.transform.position.x, MarkerStyle.Boat.Color, MarkerStyle.Boat.Sign, Strings.Boat));
+            poiList.Add(new MarkInfo(boat.transform.position.x, Config.MarkerStyle.Boat.Color, Config.MarkerStyle.Boat.Sign, Config.Strings.Boat));
         else
         {
             var wreck = kingdom.wreckPlaceholder;
             if (wreck)
-                poiList.Add(new MarkInfo(wreck.transform.position.x, MarkerStyle.Boat.Wrecked.Color, MarkerStyle.Boat.Sign, Strings.BoatWreck));
+                poiList.Add(new MarkInfo(wreck.transform.position.x, Config.MarkerStyle.Boat.Wrecked.Color, Config.MarkerStyle.Boat.Sign, Config.Strings.BoatWreck));
         }
 
         var summonBell = kingdom.boatSailPosition?.GetComponentInChildren<BoatSummoningBell>();
         if (summonBell)
-            poiList.Add(new MarkInfo(summonBell.transform.position.x, MarkerStyle.SummonBell.Color, MarkerStyle.SummonBell.Sign, Strings.SummonBell));
+            poiList.Add(new MarkInfo(summonBell.transform.position.x, Config.MarkerStyle.SummonBell.Color, Config.MarkerStyle.SummonBell.Sign, Config.Strings.SummonBell));
 
         var hephaestusForge = _gameLayer.GetComponentInChildren<HephaestusForge>();
         if (hephaestusForge)
-            poiList.Add(new MarkInfo(hephaestusForge.transform.position.x, MarkerStyle.HephaestusForge.Color, MarkerStyle.HephaestusForge.Sign, Strings.HephaestusForge));
+            poiList.Add(new MarkInfo(hephaestusForge.transform.position.x, Config.MarkerStyle.HephaestusForge.Color, Config.MarkerStyle.HephaestusForge.Sign, Config.Strings.HephaestusForge));
 
         foreach (var obj in payables.AllPayables)
         {
@@ -949,19 +962,19 @@ public class OverlayMapHolder : MonoBehaviour
 
             if (prefab.prefabID == (int)GamePrefabID.Quarry_undeveloped)
             {
-                poiList.Add(new MarkInfo(go.transform.position.x, MarkerStyle.Quarry.Locked.Color, MarkerStyle.Quarry.Sign, Strings.Quarry, obj.Price));
+                poiList.Add(new MarkInfo(go.transform.position.x, Config.MarkerStyle.Quarry.Locked.Color, Config.MarkerStyle.Quarry.Sign, Config.Strings.Quarry, obj.Price));
             }
             else if (prefab.prefabID == (int)GamePrefabID.Mine_undeveloped)
             {
-                poiList.Add(new MarkInfo(go.transform.position.x, MarkerStyle.Mine.Locked.Color, MarkerStyle.Mine.Sign, Strings.Mine, obj.Price));
+                poiList.Add(new MarkInfo(go.transform.position.x, Config.MarkerStyle.Mine.Locked.Color, Config.MarkerStyle.Mine.Sign, Config.Strings.Mine, obj.Price));
             }
             else if (prefab.prefabID == (int)GamePrefabID.Lighthouse_undeveloped)
             {
-                poiList.Add(new MarkInfo(go.transform.position.x, MarkerStyle.Lighthouse.Unpaid.Color, MarkerStyle.Lighthouse.Sign, Strings.Lighthouse, obj.Price));
+                poiList.Add(new MarkInfo(go.transform.position.x, Config.MarkerStyle.Lighthouse.Unpaid.Color, Config.MarkerStyle.Lighthouse.Sign, Config.Strings.Lighthouse, obj.Price));
             }
             else if (prefab.prefabID == (int)GamePrefabID.Cliff_Portal)
             {
-                poiList.Add(new MarkInfo(go.transform.position.x, MarkerStyle.PortalCliff.Color, MarkerStyle.PortalCliff.Sign, Strings.PortalCliff, obj.Price));
+                poiList.Add(new MarkInfo(go.transform.position.x, Config.MarkerStyle.PortalCliff.Color, Config.MarkerStyle.PortalCliff.Sign, Config.Strings.PortalCliff, obj.Price));
             }
             else
             {
@@ -970,27 +983,27 @@ public class OverlayMapHolder : MonoBehaviour
                 {
                     var color = unlockNewRulerStatue.status switch
                     {
-                        UnlockNewRulerStatue.Status.Locked => MarkerStyle.RulerSpawns.Locked.Color,
-                        UnlockNewRulerStatue.Status.WaitingForArcher => MarkerStyle.RulerSpawns.Building.Color,
-                        _ => MarkerStyle.RulerSpawns.Unlocked.Color
+                        UnlockNewRulerStatue.Status.Locked => Config.MarkerStyle.RulerSpawns.Locked.Color,
+                        UnlockNewRulerStatue.Status.WaitingForArcher => Config.MarkerStyle.RulerSpawns.Building.Color,
+                        _ => Config.MarkerStyle.RulerSpawns.Unlocked.Color
                     };
-                    if (color != MarkerStyle.RulerSpawns.Unlocked.Color)
+                    if (color != Config.MarkerStyle.RulerSpawns.Unlocked.Color)
                     {
                         var markName = unlockNewRulerStatue.rulerToUnlock switch
                         {
-                            MonarchType.King => Strings.King,
-                            MonarchType.Queen => Strings.Queen,
-                            MonarchType.Prince => Strings.Prince,
-                            MonarchType.Princess => Strings.Princess,
-                            MonarchType.Hooded => Strings.Hooded,
-                            MonarchType.Zangetsu => Strings.Zangetsu,
-                            MonarchType.Alfred => Strings.Alfred,
-                            MonarchType.Gebel => Strings.Gebel,
-                            MonarchType.Miriam => Strings.Miriam,
+                            MonarchType.King => Config.Strings.King,
+                            MonarchType.Queen => Config.Strings.Queen,
+                            MonarchType.Prince => Config.Strings.Prince,
+                            MonarchType.Princess => Config.Strings.Princess,
+                            MonarchType.Hooded => Config.Strings.Hooded,
+                            MonarchType.Zangetsu => Config.Strings.Zangetsu,
+                            MonarchType.Alfred => Config.Strings.Alfred,
+                            MonarchType.Gebel => Config.Strings.Gebel,
+                            MonarchType.Miriam => Config.Strings.Miriam,
                             MonarchType.Total => "",
                             _ => ""
                         };
-                        poiList.Add(new MarkInfo(go.transform.position.x, color, MarkerStyle.RulerSpawns.Sign, markName, obj.Price));
+                        poiList.Add(new MarkInfo(go.transform.position.x, color, Config.MarkerStyle.RulerSpawns.Sign, markName, obj.Price));
                     }
                 }
             }
@@ -1006,30 +1019,30 @@ public class OverlayMapHolder : MonoBehaviour
 
             if (prefab.prefabID == (int)GamePrefabID.Quarry)
             {
-                poiList.Add(new MarkInfo(go.transform.position.x, MarkerStyle.Quarry.Unlocked.Color, MarkerStyle.Quarry.Sign, Strings.Quarry));
+                poiList.Add(new MarkInfo(go.transform.position.x, Config.MarkerStyle.Quarry.Unlocked.Color, Config.MarkerStyle.Quarry.Sign, Config.Strings.Quarry));
             }
             else if (prefab.prefabID == (int)GamePrefabID.Mine)
             {
-                poiList.Add(new MarkInfo(go.transform.position.x, MarkerStyle.Mine.Unlocked.Color, MarkerStyle.Mine.Sign, Strings.Mine));
+                poiList.Add(new MarkInfo(go.transform.position.x, Config.MarkerStyle.Mine.Unlocked.Color, Config.MarkerStyle.Mine.Sign, Config.Strings.Mine));
             }
             else if (prefab.prefabID == (int)GamePrefabID.MerchantHouse)
             {
-                poiList.Add(new MarkInfo(go.transform.position.x, MarkerStyle.MerchantHouse.Color, MarkerStyle.MerchantHouse.Sign, Strings.MerchantHouse));
+                poiList.Add(new MarkInfo(go.transform.position.x, Config.MarkerStyle.MerchantHouse.Color, Config.MarkerStyle.MerchantHouse.Sign, Config.Strings.MerchantHouse));
             }
             else
             {
                 var thorPuzzleController = go.GetComponent<ThorPuzzleController>();
                 if (thorPuzzleController != null)
                 {
-                    var color = thorPuzzleController.State == 0 ? MarkerStyle.ThorPuzzleStatue.Locked.Color : MarkerStyle.ThorPuzzleStatue.Unlocked.Color;
-                    poiList.Add(new MarkInfo(thorPuzzleController.transform.position.x, color, MarkerStyle.ThorPuzzleStatue.Sign, Strings.ThorPuzzleStatue));
+                    var color = thorPuzzleController.State == 0 ? Config.MarkerStyle.ThorPuzzleStatue.Locked.Color : Config.MarkerStyle.ThorPuzzleStatue.Unlocked.Color;
+                    poiList.Add(new MarkInfo(thorPuzzleController.transform.position.x, color, Config.MarkerStyle.ThorPuzzleStatue.Sign, Config.Strings.ThorPuzzleStatue));
                 }
 
                 var helPuzzleController = go.GetComponent<HelPuzzleController>();
                 if (helPuzzleController != null)
                 {
-                    var color = helPuzzleController.State == 0 ? MarkerStyle.HelPuzzleStatue.Locked.Color : MarkerStyle.HelPuzzleStatue.Unlocked.Color;
-                    poiList.Add(new MarkInfo(helPuzzleController.transform.position.x, color, MarkerStyle.HelPuzzleStatue.Sign, Strings.HelPuzzleStatue));
+                    var color = helPuzzleController.State == 0 ? Config.MarkerStyle.HelPuzzleStatue.Locked.Color : Config.MarkerStyle.HelPuzzleStatue.Unlocked.Color;
+                    poiList.Add(new MarkInfo(helPuzzleController.transform.position.x, color, Config.MarkerStyle.HelPuzzleStatue.Sign, Config.Strings.HelPuzzleStatue));
                 }
             }
         }
@@ -1045,29 +1058,29 @@ public class OverlayMapHolder : MonoBehaviour
             var wall = go.GetComponent<Wall>();
             if (wall)
             {
-                poiList.Add(new MarkInfo(go.transform.position.x, MarkerStyle.Wall.Building.Color, MarkerStyle.Wall.Sign, ""));
+                poiList.Add(new MarkInfo(go.transform.position.x, Config.MarkerStyle.Wall.Building.Color, Config.MarkerStyle.Wall.Sign, ""));
                 if (kingdom.GetBorderSideForPosition(go.transform.position.x) == Side.Left)
-                    leftWalls.Add(new WallPoint(go.transform.position, MarkerStyle.WallLine.Building.Color));
+                    leftWalls.Add(new WallPoint(go.transform.position, Config.MarkerStyle.WallLine.Building.Color));
                 else
-                    rightWalls.Add(new WallPoint(go.transform.position, MarkerStyle.WallLine.Building.Color));
+                    rightWalls.Add(new WallPoint(go.transform.position, Config.MarkerStyle.WallLine.Building.Color));
             }
 
             var prefab = go.GetComponent<PrefabID>();
             if (prefab == null) continue;
             if (prefab.prefabID == (int)GamePrefabID.Quarry)
             {
-                poiList.Add(new MarkInfo(go.transform.position.x, MarkerStyle.Quarry.Building.Color, MarkerStyle.Quarry.Sign, Strings.Quarry));
+                poiList.Add(new MarkInfo(go.transform.position.x, Config.MarkerStyle.Quarry.Building.Color, Config.MarkerStyle.Quarry.Sign, Config.Strings.Quarry));
             }
             else if (prefab.prefabID == (int)GamePrefabID.Mine)
             {
-                poiList.Add(new MarkInfo(go.transform.position.x, MarkerStyle.Mine.Building.Color, MarkerStyle.Mine.Sign, Strings.Mine));
+                poiList.Add(new MarkInfo(go.transform.position.x, Config.MarkerStyle.Mine.Building.Color, Config.MarkerStyle.Mine.Sign, Config.Strings.Mine));
             }
         }
 
         // var mine = GameObject.Find("Mine_undeveloped(Clone)");
         // if (mine)
         // {
-        //     poiList.Add(new MarkInfo(mine.transform.position, Color.red, Strings.Mine));
+        //     poiList.Add(new MarkInfo(mine.transform.position, Color.red, Config.Strings.Mine));
         //     LogMessage($"mine prefabID: {mine.GetComponent<PrefabID>().prefabID}");
         // }
             
@@ -1080,7 +1093,7 @@ public class OverlayMapHolder : MonoBehaviour
         {
             if (ShowFullMap)
                 poi.Visible = true;
-            else if(poi.WorldPosX >= SaveDataExtras.ExploredLeft && poi.WorldPosX <= SaveDataExtras.ExploredRight)
+            else if(poi.WorldPosX >= Config.SaveDataExtras.ExploredLeft && poi.WorldPosX <= Config.SaveDataExtras.ExploredRight)
                 poi.Visible = true;
             else if (poi.WorldPosX >= wallLeft && poi.WorldPosX <= wallRight)
                 poi.Visible = true;
@@ -1157,14 +1170,14 @@ public class OverlayMapHolder : MonoBehaviour
 
     private static bool IsYourSelf(int playerId, string name)
     {
-        if (name == Strings.P1)
+        if (name == Config.Strings.P1)
         {
             if (playerId == 0 && NetworkBigBoss.HasWorldAuth)
             {
                 return true;
             }
         }
-        else if (name == Strings.P2)
+        else if (name == Config.Strings.P2)
         {
             if (playerId == 1 && (Managers.COOP_ENABLED || ProgramDirector.IsClient))
             {
@@ -1198,8 +1211,8 @@ public class OverlayMapHolder : MonoBehaviour
             {
                 if (IsYourSelf(playerId, markName))
                 {
-                    markName = Strings.You.Value;
-                    color = MarkerStyle.PlayerSelf.Color;
+                    markName = Config.Strings.You.Value;
+                    color = Config.MarkerStyle.PlayerSelf.Color;
 
                     // draw self vec.x
 
@@ -1259,7 +1272,7 @@ public class OverlayMapHolder : MonoBehaviour
 
     private void DrawStatsInfo(int playerId)
     {
-        _guiStyle.normal.textColor = MarkerStyle.StatsInfo.Color;
+        _guiStyle.normal.textColor = Config.MarkerStyle.StatsInfo.Color;
         _guiStyle.alignment = TextAnchor.UpperLeft;
 
         float boxTop = 160;
@@ -1271,15 +1284,15 @@ public class OverlayMapHolder : MonoBehaviour
         GUI.Box(boxRect, "", _guiBoxStyle);
 
         var infoLines = new List<string>();
-        infoLines.Add(Strings.Peasant + ": " + _statsInfo.PeasantCount);
-        infoLines.Add(Strings.Worker + ": " + _statsInfo.WorkerCount);
-        infoLines.Add($"{Strings.Archer.Value}: {_statsInfo.ArcherCount} ({GameExtensions.GetArcherCount(GameExtensions.ArcherType.Free)}|{GameExtensions.GetArcherCount(GameExtensions.ArcherType.GuardSlot)}|{GameExtensions.GetArcherCount(GameExtensions.ArcherType.KnightSoldier)})");
-        infoLines.Add(Strings.Pikeman + ": " + kingdom.Pikemen.Count);
-        infoLines.Add($"{Strings.Knight.Value}: {kingdom.Knights.Count} ({GameExtensions.GetKnightCount(true)})");
-        infoLines.Add(Strings.Farmer + ": " + _statsInfo.FarmerCount);
-        infoLines.Add(Strings.Farmlands + ": " + _statsInfo.MaxFarmlands);
-        infoLines.Add("ZoomScale" + ": " + SaveDataExtras.ZoomScale.Value);
-        infoLines.Add("MapOffset" + ": " + SaveDataExtras.MapOffset.Value);
+        infoLines.Add(Config.Strings.Peasant + ": " + _statsInfo.PeasantCount);
+        infoLines.Add(Config.Strings.Worker + ": " + _statsInfo.WorkerCount);
+        infoLines.Add($"{Config.Strings.Archer.Value}: {_statsInfo.ArcherCount} ({GameExtensions.GetArcherCount(GameExtensions.ArcherType.Free)}|{GameExtensions.GetArcherCount(GameExtensions.ArcherType.GuardSlot)}|{GameExtensions.GetArcherCount(GameExtensions.ArcherType.KnightSoldier)})");
+        infoLines.Add(Config.Strings.Pikeman + ": " + kingdom.Pikemen.Count);
+        infoLines.Add($"{Config.Strings.Knight.Value}: {kingdom.Knights.Count} ({GameExtensions.GetKnightCount(true)})");
+        infoLines.Add(Config.Strings.Farmer + ": " + _statsInfo.FarmerCount);
+        infoLines.Add(Config.Strings.Farmlands + ": " + _statsInfo.MaxFarmlands);
+        infoLines.Add("ZoomScale" + ": " + Config.SaveDataExtras.ZoomScale.Value);
+        infoLines.Add("MapOffset" + ": " + Config.SaveDataExtras.MapOffset.Value);
         infoLines.Add("BorderSide" + ": " + kingdom.GetBorderSide(Side.Left) + ", " + kingdom.GetBorderSide(Side.Right));
         infoLines.Add("BorderSideIntact" + ": " + kingdom.GetBorderSideIntact(Side.Left) + ", " + kingdom.GetBorderSideIntact(Side.Right));
         // infoLines.Add("outerWall" + ": " + kingdom.outerWall?.left?.transform?.position.x + ", " + kingdom.outerWall?.right?.transform?.position.x);
@@ -1293,7 +1306,7 @@ public class OverlayMapHolder : MonoBehaviour
 
     private void DrawExtraInfo(int playerId)
     {
-        _guiStyle.normal.textColor = MarkerStyle.ExtraInfo.Color;
+        _guiStyle.normal.textColor = Config.MarkerStyle.ExtraInfo.Color;
         _guiStyle.alignment = TextAnchor.UpperLeft;
 
         var left = Screen.width / 2 - 20;
@@ -1301,8 +1314,8 @@ public class OverlayMapHolder : MonoBehaviour
         if (Managers.COOP_ENABLED)
             top = 136 - 56;
 
-        GUI.Label(new Rect(14, top, 60, 20),  Strings.Land + ": " + (Managers.Inst.game.currentLand + 1), _guiStyle);
-        GUI.Label(new Rect(14 + 60, top, 60, 20), Strings.Days + ": " + (Managers.Inst.director.CurrentDayForSpawning), _guiStyle);
+        GUI.Label(new Rect(14, top, 60, 20),  Config.Strings.Land + ": " + (Managers.Inst.game.currentLand + 1), _guiStyle);
+        GUI.Label(new Rect(14 + 60, top, 60, 20), Config.Strings.Days + ": " + (Managers.Inst.director.CurrentDayForSpawning), _guiStyle);
 
         float currentTime = Managers.Inst.director.currentTime;
         var currentHour = Math.Truncate(currentTime);
@@ -1312,8 +1325,8 @@ public class OverlayMapHolder : MonoBehaviour
         var player = Managers.Inst.kingdom.GetPlayer(playerId);
         if (player != null)
         {
-            GUI.Label(new Rect(Screen.width - 126, 136 + 22, 60, 20), Strings.Gems + ": " + player.gems, _guiStyle);
-            GUI.Label(new Rect(Screen.width - 66, 136 + 22, 60, 20), Strings.Coins + ": " + player.coins, _guiStyle);
+            GUI.Label(new Rect(Screen.width - 126, 136 + 22, 60, 20), Config.Strings.Gems + ": " + player.gems, _guiStyle);
+            GUI.Label(new Rect(Screen.width - 66, 136 + 22, 60, 20), Config.Strings.Coins + ": " + player.coins, _guiStyle);
         }
     }
 

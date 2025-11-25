@@ -40,7 +40,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
         // {
         //     public static void Postfix(Castle __instance)
         //     {
-        //         TopMapView.ForEachTopMapView(view => view.OnComponentCreated(__instance, [ObjectPatcher.SourceFlag.Create10]));
+        //         PlayerOverlay.ForEachTopMapView(view => view.OnComponentCreated(__instance, [ObjectPatcher.SourceFlag.Create10]));
         //     }
         // }
         //
@@ -49,7 +49,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
         // {
         //     public static void Prefix(Castle __instance)
         //     {
-        //         TopMapView.ForEachTopMapView(view => view.OnComponentDestroyed(__instance, [ObjectPatcher.SourceFlag.Destroy10]));
+        //         PlayerOverlay.ForEachTopMapView(view => view.OnComponentDestroyed(__instance, [ObjectPatcher.SourceFlag.Destroy10]));
         //     }
         // }
     }

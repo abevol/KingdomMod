@@ -35,10 +35,7 @@ public class TopMapView : MonoBehaviour
 
     public static float MappingScale;
     public PlayerId PlayerId;
-#if IL2CPP
-    [HideFromIl2Cpp]
-#endif
-    public TopMapStyle Style { get; set; }
+
 #if IL2CPP
     [HideFromIl2Cpp]
 #endif
@@ -59,14 +56,6 @@ public class TopMapView : MonoBehaviour
     [HideFromIl2Cpp]
 #endif
     public Dictionary<Component, MapMarker> MapMarkers { get; set; }
-
-    public static void ForEachTopMapView(System.Action<TopMapView> action)
-    {
-        var p1View = Instance?.PlayerOverlays.P1?.TopMapView;
-        var p2View = Instance?.PlayerOverlays.P2?.TopMapView;
-        if (p1View != null) action(p1View);
-        if (p2View != null) action(p2View);
-    }
 
 #if IL2CPP
     public TopMapView(IntPtr ptr) : base(ptr) { }
@@ -119,7 +108,6 @@ public class TopMapView : MonoBehaviour
             { typeof(WreckPlaceholder),     new Mappers.WreckPlaceholderMapper(this) },
         };
 
-        Style = new TopMapStyle();
         PlayerMarkers = new List<MapMarker>();
         LeftWalls = new LinkedList<MapMarker>();
         RightWalls = new LinkedList<MapMarker>();
@@ -128,7 +116,6 @@ public class TopMapView : MonoBehaviour
         _rectTransform = this.gameObject.AddComponent<RectTransform>();
         _backgroundImage = this.gameObject.AddComponent<Image>();
 
-        Style.Init(this);
         UpdateLayout();
         UpdateBackgroundImage();
         // CreateText();
@@ -151,7 +138,6 @@ public class TopMapView : MonoBehaviour
         ObjectPatcher.OnComponentDestroyed -= OnComponentDestroyed;
         OverlayMapHolder.OnGameStateChanged -= OnGameStateChanged;
         Game.OnGameStart -= (System.Action)OnGameStart;
-        Style.Destroy();
     }
 
     private void Start()
@@ -447,14 +433,14 @@ public class TopMapView : MonoBehaviour
     public void UpdateBackgroundImage()
     {
         // 读取 PNG 文件
-        var bgImageFile = Path.Combine(AssetsDir, GuiStyle.TopMap.BackgroundImageFile);
+        var bgImageFile = Path.Combine(AssetsDir, Config.GuiStyle.TopMap.BackgroundImageFile);
         byte[] fileData = File.ReadAllBytes(bgImageFile);
 
         // 创建 Texture2D 并加载数据
         Texture2D texture = new Texture2D(2, 2); // 创建一个临时的纹理
         texture.LoadImage(fileData); // 加载数据
 
-        var imageArea = (RectInt)GuiStyle.TopMap.BackgroundImageArea;
+        var imageArea = (RectInt)Config.GuiStyle.TopMap.BackgroundImageArea;
         imageArea.y = texture.height - imageArea.y - imageArea.height;
         Texture2D subTexture = new Texture2D(imageArea.width, imageArea.height);
         Color[] pixels = texture.GetPixels(imageArea.x, imageArea.y, imageArea.width, imageArea.height);
@@ -463,8 +449,8 @@ public class TopMapView : MonoBehaviour
 
         // 创建 Sprite
         Rect rect = new Rect(0, 0, subTexture.width, subTexture.height);
-        Vector4 border = GuiStyle.TopMap.BackgroundImageBorder; // 根据需要设置边框宽度
-        Sprite sprite = Sprite.Create(MakeColoredTexture(subTexture, GuiStyle.TopMap.BackgroundColor), rect, new Vector2(0.5f, 0.5f), 100, 1, SpriteMeshType.FullRect, border);
+        Vector4 border = Config.GuiStyle.TopMap.BackgroundImageBorder; // 根据需要设置边框宽度
+        Sprite sprite = Sprite.Create(MakeColoredTexture(subTexture, Config.GuiStyle.TopMap.BackgroundColor), rect, new Vector2(0.5f, 0.5f), 100, 1, SpriteMeshType.FullRect, border);
 
         // 添加背景图，并设置九宫格
         _backgroundImage.sprite = sprite; // 将png图片放在Resources文件夹下
