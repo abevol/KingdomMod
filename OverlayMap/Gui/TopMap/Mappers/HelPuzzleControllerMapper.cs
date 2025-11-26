@@ -8,7 +8,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
         public void Map(Component component)
         {
             view.TryAddMapMarker(component, null, MarkerStyle.HelPuzzleStatue.Sign, Strings.HelPuzzleStatue, null,
-                comp => ((HelPuzzleController)comp).State == 0 ? MarkerStyle.HelPuzzleStatue.Locked.Color : MarkerStyle.HelPuzzleStatue.Unlocked.Color);
+                comp => comp.Cast<HelPuzzleController>().State == 0 ? MarkerStyle.HelPuzzleStatue.Locked.Color : MarkerStyle.HelPuzzleStatue.Unlocked.Color);
         }
     }
 }

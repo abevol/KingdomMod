@@ -11,7 +11,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                 comp =>
                 {
                     int count = 0;
-                    foreach (var beggar in ((BeggarCamp)comp)._beggars)
+                    foreach (var beggar in comp.Cast<BeggarCamp>()._beggars)
                     {
                         if (beggar != null && beggar.isActiveAndEnabled)
                             count++;

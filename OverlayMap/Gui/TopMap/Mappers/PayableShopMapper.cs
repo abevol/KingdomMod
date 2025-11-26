@@ -10,12 +10,12 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
     {
         public void Map(Component component)
         {
-            var obj = (PayableShop)component;
+            var obj = component.Cast<PayableShop>();
             var shopType = obj.GetComponent<ShopTag>().type;
             switch (shopType)
             {
                 case PayableShop.ShopType.Forge:
-                    view.TryAddMapMarker(component, MarkerStyle.ShopForge.Color, MarkerStyle.ShopForge.Sign, Strings.ShopForge, comp => ((PayableShop)comp).GetItemCount());
+                    view.TryAddMapMarker(component, MarkerStyle.ShopForge.Color, MarkerStyle.ShopForge.Sign, Strings.ShopForge, comp => comp.Cast<PayableShop>().GetItemCount());
                     break;
             }
         }

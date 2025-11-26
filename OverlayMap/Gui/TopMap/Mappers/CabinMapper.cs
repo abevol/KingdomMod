@@ -9,7 +9,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
     {
         public void Map(Component component)
         {
-            var obj = (Cabin)component;
+            var obj = component.Cast<Cabin>();
             var title = obj.hermitType switch
             {
                 Hermit.HermitType.Horse => Strings.HermitHorse,
@@ -23,8 +23,8 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
             };
 
             view.TryAddMapMarker(component, null, MarkerStyle.HermitCabins.Sign, title,
-                comp => ((Cabin)comp).canPay ? ((Cabin)comp).Price : 0,
-                comp => ((Cabin)comp).canPay? MarkerStyle.HermitCabins.Locked.Color : MarkerStyle.HermitCabins.Unlocked.Color);
+                comp => comp.Cast<Cabin>().canPay ? comp.Cast<Cabin>().Price : 0,
+                comp => comp.Cast<Cabin>().canPay? MarkerStyle.HermitCabins.Locked.Color : MarkerStyle.HermitCabins.Unlocked.Color);
         }
 
         private static ConfigEntryWrapper<string> LogUnknownHermitType(Hermit.HermitType hermitType)

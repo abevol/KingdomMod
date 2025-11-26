@@ -21,9 +21,9 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
             view.TryAddMapMarker(component, MarkerStyle.Deer.Color, MarkerStyle.Deer.Sign, Strings.Deer, null,
                 comp =>
             {
-                var state = ((Deer)comp)._fsm.Current;
+                var state = comp.Cast<Deer>()._fsm.Current;
                 return state == 5 ? MarkerStyle.DeerFollowing.Color : MarkerStyle.Deer.Color;
-            }, comp => comp.gameObject.activeSelf && !((Deer)comp)._damageable.isDead, MarkerRow.Movable);
+            }, comp => comp.gameObject.activeSelf && !comp.Cast<Deer>()._damageable.isDead, MarkerRow.Movable);
         }
 
         // [HarmonyPatch(typeof(Deer), nameof(Deer.Awake))]

@@ -8,7 +8,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
         public void Map(Component component)
         {
             view.TryAddMapMarker(component, MarkerStyle.BoarSpawn.Color, MarkerStyle.BoarSpawn.Sign, Strings.BoarSpawn,
-                comp => ((BoarSpawnGroup)comp)._spawnedBoar ? 0 : 1);
+                comp => comp.Cast<BoarSpawnGroup>()._spawnedBoar ? 0 : 1);
         }
     }
 }
