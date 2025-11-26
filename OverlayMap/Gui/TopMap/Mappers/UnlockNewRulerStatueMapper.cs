@@ -9,11 +9,11 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
     {
         public void Map(Component component)
         {
-            var obj = (UnlockNewRulerStatue)component;
+            var obj = component.Cast<UnlockNewRulerStatue>();
             Strings.MonarchNames.TryGetValue(obj.rulerToUnlock, out var monarchName);
             view.TryAddMapMarker(component, null, MarkerStyle.RulerSpawns.Sign, monarchName,
-                comp => ((UnlockNewRulerStatue)comp).Price,
-                comp => ((UnlockNewRulerStatue)comp).status switch
+                comp => comp.Cast<UnlockNewRulerStatue>().Price,
+                comp => comp.Cast<UnlockNewRulerStatue>().status switch
                 {
                     UnlockNewRulerStatue.Status.Locked => MarkerStyle.RulerSpawns.Locked.Color,
                     UnlockNewRulerStatue.Status.WaitingForArcher => MarkerStyle.RulerSpawns.Building.Color,

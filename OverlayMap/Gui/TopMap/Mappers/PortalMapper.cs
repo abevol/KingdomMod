@@ -10,7 +10,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
     {
         public void Map(Component component)
         {
-            var obj = (Portal)component;
+            var obj = component.Cast<Portal>();
             switch (obj.type)
             {
                 case Portal.Type.Regular:
@@ -18,7 +18,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                     break;
                 case Portal.Type.Cliff:
                     view.TryAddMapMarker(component, MarkerStyle.PortalCliff.Color, MarkerStyle.PortalCliff.Sign, Strings.PortalCliff, null,
-                        (comp) => ((Portal)comp).state switch
+                        (comp) => comp.Cast<Portal>().state switch
                     {
                         Portal.State.Destroyed => MarkerStyle.PortalCliff.Destroyed.Color,
                         Portal.State.Rebuilding => MarkerStyle.PortalCliff.Rebuilding.Color,

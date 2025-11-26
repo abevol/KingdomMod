@@ -9,14 +9,14 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
     {
         public void Map(Component component)
         {
-            var obj = (Chest)component;
+            var obj = component.Cast<Chest>();
             var isGem = obj.currencyType == CurrencyType.Gems;
             view.TryAddMapMarker(component,
                 isGem ? MarkerStyle.GemChest.Color : MarkerStyle.Chest.Color,
                 isGem ? MarkerStyle.GemChest.Sign : MarkerStyle.Chest.Sign,
                 isGem ? Strings.GemChest : Strings.Chest,
-                comp => ((Chest)comp).currencyAmount,
-                null, comp => ((Chest)comp).currencyAmount != 0);
+                comp => comp.Cast<Chest>().currencyAmount,
+                null, comp => comp.Cast<Chest>().currencyAmount != 0);
         }
     }
 }

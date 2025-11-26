@@ -9,7 +9,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
     {
         public void Map(Component component)
         {
-            var payableUpgrade = (PayableUpgrade)component;
+            var payableUpgrade = component.Cast<PayableUpgrade>();
             var prefabId = payableUpgrade.gameObject.GetComponent<PrefabID>();
             if (prefabId == null) return;
             switch ((GamePrefabID)prefabId.prefabID)
@@ -38,7 +38,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                     break;
                 case GamePrefabID.Lighthouse_undeveloped:
                     view.TryAddMapMarker(component, MarkerStyle.Lighthouse.Unpaid.Color, MarkerStyle.Lighthouse.Sign, Strings.Lighthouse,
-                        comp => ((PayableUpgrade)comp).Price);
+                        comp => comp.Cast<PayableUpgrade>().Price);
                     break;
                 case GamePrefabID.Lighthouse_Wood:
                 case GamePrefabID.Lighthouse_Stone:
@@ -46,7 +46,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                     view.TryAddMapMarker(component, null, MarkerStyle.Lighthouse.Sign, Strings.Lighthouse,
                         comp =>
                         {
-                            var p = (PayableUpgrade)comp;
+                            var p = comp.Cast<PayableUpgrade>();
                             bool canPay = !p.IsLocked(GetLocalPlayer(), out var reason);
                             var price = canPay ? p.Price : 0;
                             return price;
@@ -55,7 +55,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                         {
                             if (!comp.gameObject.activeSelf)
                                 return MarkerStyle.Lighthouse.Building.Color;
-                            var p = (PayableUpgrade)comp;
+                            var p = comp.Cast<PayableUpgrade>();
                             bool canPay = !p.IsLocked(GetLocalPlayer(), out var reason);
                             bool isLocked = (reason != LockIndicator.LockReason.NotLocked && reason != LockIndicator.LockReason.NoUpgrade);
                             var color = isLocked ? MarkerStyle.Lighthouse.Locked.Color : MarkerStyle.Lighthouse.Color;
@@ -64,7 +64,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                     break;
                 case GamePrefabID.Quarry_undeveloped:
                     view.TryAddMapMarker(component, MarkerStyle.Quarry.Locked.Color, MarkerStyle.Quarry.Sign, Strings.Quarry,
-                        comp => ((PayableUpgrade)comp).Price);
+                        comp => comp.Cast<PayableUpgrade>().Price);
                     break;
                 case GamePrefabID.Quarry:
                     view.TryAddMapMarker(component, null, MarkerStyle.Quarry.Sign, Strings.Quarry, null,
@@ -72,7 +72,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                     break;
                 case GamePrefabID.Mine_undeveloped:
                     view.TryAddMapMarker(component, MarkerStyle.Mine.Locked.Color, MarkerStyle.Mine.Sign, Strings.Mine,
-                        comp => ((PayableUpgrade)comp).Price);
+                        comp => comp.Cast<PayableUpgrade>().Price);
                     break;
                 case GamePrefabID.Mine:
                     view.TryAddMapMarker(component, null, MarkerStyle.Mine.Sign, Strings.Mine, null,
@@ -80,7 +80,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                     break;
                 case GamePrefabID.Cliff_Portal:
                     view.TryAddMapMarker(component, MarkerStyle.PortalCliff.Color, MarkerStyle.PortalCliff.Sign, Strings.PortalCliff,
-                        comp => ((PayableUpgrade)comp).Price);
+                        comp => comp.Cast<PayableUpgrade>().Price);
                     break;
             }
         }

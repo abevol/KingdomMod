@@ -9,11 +9,11 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
     {
         public void Map(Component component)
         {
-            var obj = (Steed)component;
+            var obj = component.Cast<Steed>();
             Strings.SteedNames.TryGetValue(obj.steedType, out var steedName);
             view.TryAddMapMarker(component, MarkerStyle.Steeds.Color, MarkerStyle.Steeds.Sign, steedName,
-                comp => ((Steed)comp).Price, null,
-                comp => ((Steed)comp).CurrentMode != SteedMode.Player);
+                comp => comp.Cast<Steed>().Price, null,
+                comp => comp.Cast<Steed>().CurrentMode != SteedMode.Player);
         }
     }
 }

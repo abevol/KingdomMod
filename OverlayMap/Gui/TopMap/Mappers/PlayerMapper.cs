@@ -24,7 +24,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
             var marker = view.TryAddMapMarker(component, MarkerStyle.Player.Color, MarkerStyle.Player.Sign, Strings.You, null, null,
                 comp =>
                 {
-                    var p = (Player)comp;
+                    var p = comp.Cast<Player>();
                     if (p == null) return false;
                     if (p.isActiveAndEnabled == false) return false;
                     var mover = p.mover;
@@ -43,7 +43,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                     view.PlayerMarkers.Add(marker);
                 }
 
-                LogDebug($"player.playerId: {((Player)component).playerId}, _playerMarkers.Count: {view.PlayerMarkers.Count}");
+                LogDebug($"player.playerId: {component.Cast<Player>().playerId}, _playerMarkers.Count: {view.PlayerMarkers.Count}");
             }
         }
 

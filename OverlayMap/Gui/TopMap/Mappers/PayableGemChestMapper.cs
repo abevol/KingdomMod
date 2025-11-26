@@ -12,7 +12,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
             view.TryAddMapMarker(component, MarkerStyle.GemMerchant.Color, MarkerStyle.GemMerchant.Sign, Strings.GemMerchant,
                 comp =>
                 {
-                    var payableGemChest = (PayableGemChest)comp;
+                    var payableGemChest = comp.Cast<PayableGemChest>();
                     return payableGemChest.infiniteGems ? payableGemChest.guardRef.Price : payableGemChest.gemsStored;
                 });
         }

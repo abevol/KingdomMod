@@ -17,14 +17,14 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
         {
             var marker = view.TryAddMapMarker(component, MarkerStyle.Castle.Color, MarkerStyle.Castle.Sign, Strings.Castle, (comp) =>
             {
-                var payable = ((Castle)comp)._payableUpgrade;
+                var payable = comp.Cast<Castle>()._payableUpgrade;
                 bool canPay = !payable.IsLocked(GetLocalPlayer(), out var reason);
                 bool isLockedForInvalidTime = reason == LockIndicator.LockReason.InvalidTime;
                 var price = isLockedForInvalidTime ? (int)(payable.timeAvailableFrom - Time.time) : canPay ? payable.Price : 0;
                 return price;
             }, (comp) =>
             {
-                var payable = ((Castle)comp)._payableUpgrade;
+                var payable = comp.Cast<Castle>()._payableUpgrade;
                 bool _ = !payable.IsLocked(GetLocalPlayer(), out var reason);
                 bool isLocked = reason != LockIndicator.LockReason.NotLocked && reason != LockIndicator.LockReason.NoUpgrade;
                 var color = isLocked ? MarkerStyle.Castle.Locked.Color : MarkerStyle.Castle.Color;

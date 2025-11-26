@@ -8,7 +8,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
         public void Map(Component component)
         {
             view.TryAddMapMarker(component, null, MarkerStyle.PersephoneCage.Sign, Strings.HermitPersephone, null,
-                comp => PersephoneCage.State.IsPersephoneLocked(((PersephoneCage)comp)._fsm.Current)
+                comp => PersephoneCage.State.IsPersephoneLocked(comp.Cast<PersephoneCage>()._fsm.Current)
                     ? MarkerStyle.PersephoneCage.Locked.Color
                     : MarkerStyle.PersephoneCage.Unlocked.Color);
         }

@@ -230,7 +230,7 @@ public class TopMapView : MonoBehaviour
     {
         foreach (var playerMarker in PlayerMarkers)
         {
-            var player = (Player)playerMarker.Data.Target;
+            var player = playerMarker.Data.Target.Cast<Player>();
             if (IsYourSelf(player))
             {
                 LogDebug($"IsYourSelf, PlayerId: {PlayerId}, player.playerId: {player.playerId}");
@@ -307,7 +307,7 @@ public class TopMapView : MonoBehaviour
                 // 3. 指针碰撞，极速查找
                 if (_fastLookup.TryGetValue(typePtr, out var mapper))
                 {
-                    LogTrace($"OnGameObjectCreated Found {comp.GetIl2CppType().Name} on {go.name}");
+                    // LogTrace($"OnGameObjectCreated Found {comp.GetIl2CppType().Name} on {go.name}");
                     mapper.Map(comp);
                 }
             }
@@ -389,7 +389,7 @@ public class TopMapView : MonoBehaviour
     {
         try
         {
-            LogTrace($"TopMapView.TryAddMapMarker, title: {title?.Value}, target: {target}");
+            // LogTrace($"TopMapView.TryAddMapMarker, title: {title?.Value}, target: {target}");
 
             if (target.gameObject == null)
                 return null;

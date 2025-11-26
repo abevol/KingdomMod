@@ -8,7 +8,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
     {
         public void Map(Component component)
         {
-            var obj = (Statue)component;
+            var obj = component.Cast<Statue>();
             var title = obj.deity switch
             {
                 Statue.Deity.Archer => Strings.StatueArcher,
@@ -22,12 +22,12 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
             view.TryAddMapMarker(component, null, MarkerStyle.Statues.Sign, title,
                 comp =>
                 {
-                    bool isLocked = ((Statue)comp).deityStatus != Statue.DeityStatus.Activated;
-                    return isLocked ? ((Statue)comp).Price : 0;
+                    bool isLocked = comp.Cast<Statue>().deityStatus != Statue.DeityStatus.Activated;
+                    return isLocked ? comp.Cast<Statue>().Price : 0;
                 },
                 comp =>
                 {
-                    bool isLocked = ((Statue)comp).deityStatus != Statue.DeityStatus.Activated;
+                    bool isLocked = comp.Cast<Statue>().deityStatus != Statue.DeityStatus.Activated;
                     return isLocked ? MarkerStyle.Statues.Locked.Color : MarkerStyle.Statues.Unlocked.Color;
                 });
         }

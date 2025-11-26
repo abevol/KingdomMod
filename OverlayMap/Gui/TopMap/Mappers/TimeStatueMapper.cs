@@ -8,7 +8,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
         public void Map(Component component)
         {
             view.TryAddMapMarker(component, MarkerStyle.StatueTime.Color, MarkerStyle.StatueTime.Sign, Strings.StatueTime,
-                comp => ((TimeStatue)comp)._daysRemaining);
+                comp => comp.Cast<TimeStatue>()._daysRemaining);
         }
     }
 }

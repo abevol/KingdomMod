@@ -10,7 +10,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
         public void Map(Component component)
         {
             view.TryAddMapMarker(component, MarkerStyle.DogSpawn.Color, MarkerStyle.DogSpawn.Sign, Strings.DogSpawn, null, null,
-                comp => !((DogSpawn)comp)._dogFreed);
+                comp => !comp.Cast<DogSpawn>()._dogFreed);
         }
     }
 }
