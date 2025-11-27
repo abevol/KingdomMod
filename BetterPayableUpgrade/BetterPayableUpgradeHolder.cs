@@ -287,10 +287,15 @@ public class BetterPayableUpgradeHolder : MonoBehaviour
 
             if (modifyData.NextPrefab != GamePrefabID.Invalid)
             {
+                int nextPrefabId = (int)modifyData.NextPrefab;
                 if (isPrefab)
-                    payable.nextPrefab = prefabs.GetPrefabById((int)modifyData.NextPrefab);
+                    payable.nextPrefab = prefabs.GetPrefabById(nextPrefabId);
                 else
-                    payable.SetNextPrefab((int)modifyData.NextPrefab);
+                {
+                    if (payable.parentHeaderRef == null)
+                        return;
+                    payable.SetNextPrefab(nextPrefabId);
+                }
 
                 log.LogDebug($"Change {prefabId} nextPrefab to {modifyData.NextPrefab}");
             }
