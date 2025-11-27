@@ -155,6 +155,9 @@ public class TopMapView : MonoBehaviour
         ObjectPatcher.OnGameObjectDestroyed -= OnGameObjectDestroyed;
         OverlayMapHolder.OnGameStateChanged -= OnGameStateChanged;
         Game.OnGameStart -= (System.Action)OnGameStart;
+
+        // 停止对象池批处理协程
+        ObjectPatcher.StopProcessing(this);
     }
 
     private void Start()
@@ -171,6 +174,9 @@ public class TopMapView : MonoBehaviour
         //             mapper.Map(component);
         //     }
         // }
+
+        // 启动对象池批处理协程
+        ObjectPatcher.StartProcessing(this);
 
         _isStarted = true;
     }
@@ -307,7 +313,7 @@ public class TopMapView : MonoBehaviour
                 // 3. 指针碰撞，极速查找
                 if (_fastLookup.TryGetValue(typePtr, out var mapper))
                 {
-                    // LogTrace($"OnGameObjectCreated Found {comp.GetIl2CppType().Name} on {go.name}");
+                    LogTrace($"OnGameObjectCreated Found {comp.GetIl2CppType().Name} on {go.name}");
                     mapper.Map(comp);
                 }
             }

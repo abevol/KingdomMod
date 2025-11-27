@@ -1,4 +1,6 @@
-﻿using HarmonyLib;
+﻿using BepInEx.Unity.IL2CPP.Utils.Collections;
+using HarmonyLib;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -39,14 +41,77 @@ public class ObjectPatcher
         Destroy10
     }
 
+    // 对象状态枚举
+    private enum ObjectState
+    {
+        Created,    // 仅创建
+        Destroyed,  // 仅销毁
+        Canceled    // 创建后又销毁，取消处理
+    }
+
+    // 缓存条目
+    private class ObjectCacheEntry
+    {
+        public ObjectState State { get; set; }
+        public HashSet<SourceFlag> CreatedSources { get; set; } = new HashSet<SourceFlag>();
+        public HashSet<SourceFlag> DestroyedSources { get; set; } = new HashSet<SourceFlag>();
+    }
+
+    // 单一缓存池
+    private static Dictionary<GameObject, ObjectCacheEntry> _objectCache = new Dictionary<GameObject, ObjectCacheEntry>();
+    
+    // 批处理间隔（秒）
+    private static float _batchProcessInterval = 0.1f;
+    
+    // 协程引用
+    private static Coroutine _processingCoroutine = null;
+
     private static void HandleGameObjectInstantiate(GameObject go, HashSet<SourceFlag> sources)
     {
-        OnGameObjectCreated?.Invoke(go, sources);
+        if (_objectCache.TryGetValue(go, out var entry))
+        {
+            // 对象已在缓存中
+            if (entry.State == ObjectState.Destroyed)
+            {
+                // 之前被标记为销毁，现在又创建了，取消处理
+                entry.State = ObjectState.Canceled;
+            }
+            entry.CreatedSources.UnionWith(sources);
+        }
+        else
+        {
+            // 新对象，添加到缓存
+            _objectCache[go] = new ObjectCacheEntry
+            {
+                State = ObjectState.Created,
+               CreatedSources = new HashSet<SourceFlag>(sources)
+            };
+
+            LogDebug($"Object created: {go.name}");
+        }
     }
 
     private static void HandleGameObjectDestroy(GameObject go, HashSet<SourceFlag> sources)
     {
-        OnGameObjectDestroyed?.Invoke(go, sources);
+        if (_objectCache.TryGetValue(go, out var entry))
+        {
+            // 对象已在缓存中
+            if (entry.State == ObjectState.Created)
+            {
+                // 在同一批次内创建后又销毁，标记为取消
+                entry.State = ObjectState.Canceled;
+            }
+            entry.DestroyedSources.UnionWith(sources);
+        }
+        else
+        {
+            // 新对象，添加到缓存
+            _objectCache[go] = new ObjectCacheEntry
+            {
+                State = ObjectState.Destroyed,
+                DestroyedSources = new HashSet<SourceFlag>(sources)
+            };
+        }
     }
 
     private static void HandleInstantiate(Object __result, HashSet<SourceFlag> sources)
@@ -78,7 +143,7 @@ public class ObjectPatcher
         }
         else if (obj is Component comp)
         {
-            LogDebug($"Object.Destroy, Component: {comp.GetType()}");
+            LogDebug($"Object.Destroy, Component: {comp.GetType()}, gameObject: {comp.gameObject.name}");
 
             sources.Add(SourceFlag.Destroy4);
             // HandleComponentDestroy(comp, sources);
@@ -130,6 +195,71 @@ public class ObjectPatcher
         }
     }
 
+    // 批处理协程
+    private static IEnumerator ProcessCachedObjects()
+    {
+        LogDebug($"ProcessCachedObjects started");
+        while (true)
+        {
+            yield return new WaitForSeconds(_batchProcessInterval);
+
+            if (_objectCache.Count > 0)
+            {
+                LogDebug($"ProcessCachedObjects: {_objectCache.Count} objects to process");
+                var toProcess = new List<KeyValuePair<GameObject, ObjectCacheEntry>>(_objectCache);
+                _objectCache.Clear();
+                
+                foreach (var kvp in toProcess)
+                {
+                    var go = kvp.Key;
+                    var entry = kvp.Value;
+                    
+                    // 跳过 null 对象和已取消的对象
+                    if (go == null || entry.State == ObjectState.Canceled)
+                        continue;
+                    
+                    if (entry.State == ObjectState.Created)
+                    {
+                        LogDebug($"Object created: {go.name}");
+                        OnGameObjectCreated?.Invoke(go, entry.CreatedSources);
+                    }
+                    else if (entry.State == ObjectState.Destroyed)
+                    {
+                        OnGameObjectDestroyed?.Invoke(go, entry.DestroyedSources);
+                    }
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// 启动对象池批处理协程
+    /// </summary>
+    /// <param name="monoBehaviour">用于启动协程的 MonoBehaviour</param>
+    public static void StartProcessing(MonoBehaviour monoBehaviour)
+    {
+        if (_processingCoroutine == null && monoBehaviour != null)
+        {
+            _processingCoroutine = monoBehaviour.StartCoroutine(ProcessCachedObjects().WrapToIl2Cpp());
+            LogDebug("Object cache processing started");
+        }
+    }
+
+    /// <summary>
+    /// 停止对象池批处理协程
+    /// </summary>
+    /// <param name="monoBehaviour">用于停止协程的 MonoBehaviour</param>
+    public static void StopProcessing(MonoBehaviour monoBehaviour)
+    {
+        if (_processingCoroutine != null && monoBehaviour != null)
+        {
+            monoBehaviour.StopCoroutine(_processingCoroutine);
+            _processingCoroutine = null;
+            _objectCache.Clear();
+            LogDebug("Object cache processing stopped");
+        }
+    }
+
     // [HarmonyPatch(typeof(Object), nameof(Object.Instantiate), new[] { typeof(Object) })]
     // public class InstantiatePatcher
     // {
@@ -175,21 +305,21 @@ public class ObjectPatcher
     //     }
     // }
 
-    // [HarmonyPatch(typeof(Object), nameof(Object.Destroy), new[] { typeof(Object), typeof(float) })]
-    // public class DestroyPatcher
-    // {
-    //     public static void Prefix(Object obj)
-    //     {
-    //         HandleDestroy(obj, [SourceFlag.Destroy1]);
-    //     }
-    // }
+    [HarmonyPatch(typeof(Object), nameof(Object.Destroy), new[] { typeof(Object), typeof(float) })]
+    public class DestroyPatcher
+    {
+        public static void Prefix(Object obj)
+        {
+            HandleDestroy(obj, [SourceFlag.Destroy1]);
+        }
+    }
 
-    // [HarmonyPatch(typeof(Object), nameof(Object.DestroyImmediate), new[] { typeof(Object), typeof(bool) })]
-    // public class DestroyImmediatePatcher
-    // {
-    //     public static void Prefix(Object obj)
-    //     {
-    //         HandleDestroy(obj, [SourceFlag.Destroy2]);
-    //     }
-    // }
+    [HarmonyPatch(typeof(Object), nameof(Object.DestroyImmediate), new[] { typeof(Object), typeof(bool) })]
+    public class DestroyImmediatePatcher
+    {
+        public static void Prefix(Object obj)
+        {
+            HandleDestroy(obj, [SourceFlag.Destroy2]);
+        }
+    }
 }
