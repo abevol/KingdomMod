@@ -23,7 +23,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                 case GamePrefabID.Wall4:
                 case GamePrefabID.Wall5:
                     // LogMessage($"Wall: InstanceID: {component.GetInstanceID()}, {GameObjectDetails.JsonSerialize(new GameObjectDetails(component.gameObject))}");
-                    var marker = view.TryAddMapMarker(component, MarkerStyle.Wall.Building.Color, MarkerStyle.Wall.Sign, null);
+                    var marker = view.TryAddMapMarker(component, MarkerStyle.Wall.Color, MarkerStyle.Wall.Sign, null);
                     if (marker != null)
                         view.AddWallNode(marker);
                     ConstructionEventHandler.Create(marker, MarkerStyle.Wall.Color);
