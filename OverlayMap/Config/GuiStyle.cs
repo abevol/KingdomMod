@@ -57,9 +57,9 @@ public class GuiStyle
         TopMap.BackgroundImageArea = config.Bind("TopMap", "BackgroundImageArea", "17, 17, 94, 94", "");
         TopMap.BackgroundImageBorder = config.Bind("TopMap", "BackgroundImageBorder", "17, 17, 17, 17", "");
 
-        TopMap.Sign.Font = config.Bind("TopMap.Sign", "Font", "msgothic.ttc", "");
+        TopMap.Sign.Font = config.Bind("TopMap.Sign", "Font", "arial.ttf", "");
         TopMap.Sign.FontSize = config.Bind("TopMap.Sign", "FontSize", 12.0f, "");
-        TopMap.Sign.FallbackFonts = config.Bind("TopMap.Sign", "FallbackFonts", "", "");
+        TopMap.Sign.FallbackFonts = config.Bind("TopMap.Sign", "FallbackFonts", "msgothic.ttc", "");
 
         TopMap.Title.Font = config.Bind("TopMap.Title", "Font", "msyh.ttc", "");
         TopMap.Title.FontSize = config.Bind("TopMap.Title", "FontSize", 12.0f, "");
