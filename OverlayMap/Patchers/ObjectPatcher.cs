@@ -5,41 +5,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using KingdomMod.Shared;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
 
 namespace KingdomMod.OverlayMap.Patchers;
 
 public class ObjectPatcher
 {
-    public delegate void GameObjectEventHandler(GameObject gameObject, HashSet<SourceFlag> sources);
-    public static event GameObjectEventHandler OnGameObjectCreated;
-    public static event GameObjectEventHandler OnGameObjectDestroyed;
-
-    public enum SourceFlag
-    {
-        Create1,
-        Create2,
-        Create3,
-        Create4,
-        Create5,
-        Create6,
-        Create7,
-        Create8,
-        Create9,
-        Create10,
-        Destroy1,
-        Destroy2,
-        Destroy3,
-        Destroy4,
-        Destroy5,
-        Destroy6,
-        Destroy7,
-        Destroy8,
-        Destroy9,
-        Destroy10
-    }
+    public delegate void ComponentEventHandler(Component component);
+    public static event ComponentEventHandler OnComponentCreated;
+    public static event ComponentEventHandler OnComponentDestroyed;
 
     // 对象状态枚举
     private enum ObjectState
@@ -53,12 +27,10 @@ public class ObjectPatcher
     private class ObjectCacheEntry
     {
         public ObjectState State { get; set; }
-        public HashSet<SourceFlag> CreatedSources { get; set; } = new HashSet<SourceFlag>();
-        public HashSet<SourceFlag> DestroyedSources { get; set; } = new HashSet<SourceFlag>();
     }
 
     // 单一缓存池
-    private static Dictionary<GameObject, ObjectCacheEntry> _objectCache = new Dictionary<GameObject, ObjectCacheEntry>();
+    private static Dictionary<Object, ObjectCacheEntry> _objectCache = new Dictionary<Object, ObjectCacheEntry>();
     
     // 批处理间隔（秒）
     private static float _batchProcessInterval = 0.1f;
@@ -66,7 +38,7 @@ public class ObjectPatcher
     // 协程引用
     private static Coroutine _processingCoroutine = null;
 
-    private static void HandleGameObjectInstantiate(GameObject go, HashSet<SourceFlag> sources)
+    private static void HandleObjectInstantiate(Object go)
     {
         if (_objectCache.TryGetValue(go, out var entry))
         {
@@ -76,22 +48,20 @@ public class ObjectPatcher
                 // 之前被标记为销毁，现在又创建了，取消处理
                 entry.State = ObjectState.Canceled;
             }
-            entry.CreatedSources.UnionWith(sources);
         }
         else
         {
             // 新对象，添加到缓存
             _objectCache[go] = new ObjectCacheEntry
             {
-                State = ObjectState.Created,
-               CreatedSources = new HashSet<SourceFlag>(sources)
+                State = ObjectState.Created
             };
 
-            LogDebug($"Object created: {go.name}");
+            // LogDebug($"Object created: {go.name}");
         }
     }
 
-    private static void HandleGameObjectDestroy(GameObject go, HashSet<SourceFlag> sources)
+    private static void HandleObjectDestroy(Object go)
     {
         if (_objectCache.TryGetValue(go, out var entry))
         {
@@ -101,72 +71,25 @@ public class ObjectPatcher
                 // 在同一批次内创建后又销毁，标记为取消
                 entry.State = ObjectState.Canceled;
             }
-            entry.DestroyedSources.UnionWith(sources);
         }
         else
         {
             // 新对象，添加到缓存
             _objectCache[go] = new ObjectCacheEntry
             {
-                State = ObjectState.Destroyed,
-                DestroyedSources = new HashSet<SourceFlag>(sources)
+                State = ObjectState.Destroyed
             };
-        }
-    }
-
-    private static void HandleInstantiate(Object __result, HashSet<SourceFlag> sources)
-    {
-        // LogDebug($"Object.Instantiate: {__result.GetType()}");
-        if (__result is GameObject go)
-        {
-            HandleInstantiate(go, sources);
-        }
-    }
-
-    private static void HandleInstantiate(GameObject __result, HashSet<SourceFlag> sources)
-    {
-        // LogDebug($"Object.Instantiate: {__result.GetType()}");
-        sources.Add(SourceFlag.Create6);
-        HandleGameObjectInstantiate(__result, sources);
-    }
-
-    private static void HandleDestroy(Object obj, HashSet<SourceFlag> sources)
-    {
-        // LogDebug($"Object.Destroy: {obj.GetType()}");
-
-        var go = obj.TryCast<GameObject>();
-
-        if (go != null)
-        {
-            sources.Add(SourceFlag.Destroy3);
-            HandleGameObjectDestroy(go, sources);
-        }
-        else if (obj is Component comp)
-        {
-            LogDebug($"Object.Destroy, Component: {comp.GetType()}, gameObject: {comp.gameObject.name}");
-
-            sources.Add(SourceFlag.Destroy4);
-            // HandleComponentDestroy(comp, sources);
         }
     }
 
     public static void GenericInstantiatePostfix(UnityEngine.Object __result)
     {
-        // 1. 安全检查是否为空
+        // 安全检查是否为空
         if (__result == null) return;
 
-        // 2. 尝试转换为 GameObject
-        // 在 BepInEx IL2CPP 中，必须使用 TryCast<T>() 而不是 C# 的 "as" 关键字
-        // 因为这是跨越 Native/Managed 边界的对象
-        var go = __result.TryCast<GameObject>();
+        // LogDebug($"Captured Object: {__result.name}");
 
-        if (go != null)
-        {
-            // 这里才是真正捕获到 GameObject 的地方
-            LogDebug($"Captured GameObject: {go.name}");
-
-            HandleGameObjectInstantiate(go, [SourceFlag.Create1]);
-        }
+        HandleObjectInstantiate(__result);
     }
 
     public static void PatchInstantiateGenerics()
@@ -206,26 +129,62 @@ public class ObjectPatcher
             if (_objectCache.Count > 0)
             {
                 LogDebug($"ProcessCachedObjects: {_objectCache.Count} objects to process");
-                var toProcess = new List<KeyValuePair<GameObject, ObjectCacheEntry>>(_objectCache);
+                var toProcess = new List<KeyValuePair<Object, ObjectCacheEntry>>(_objectCache);
                 _objectCache.Clear();
                 
                 foreach (var kvp in toProcess)
                 {
-                    var go = kvp.Key;
+                    var obj = kvp.Key;
                     var entry = kvp.Value;
                     
                     // 跳过 null 对象和已取消的对象
-                    if (go == null || entry.State == ObjectState.Canceled)
+                    if (obj == null || entry.State == ObjectState.Canceled)
                         continue;
                     
                     if (entry.State == ObjectState.Created)
                     {
-                        LogDebug($"Object created: {go.name}");
-                        OnGameObjectCreated?.Invoke(go, entry.CreatedSources);
+                        // LogDebug($"Process cached object created: {obj.name}");
+
+                        var go = obj.TryCast<GameObject>();
+                        if (go != null)
+                        {
+                            var allComponents = go.GetComponentsInChildren<Component>(true);
+                            foreach (var c in allComponents)
+                            {
+                                OnComponentCreated?.Invoke(c);
+                            }
+
+                            continue;
+                        }
+
+                        var comp = obj.TryCast<Component>();
+                        if (comp != null)
+                        {
+                            LogDebug($"Process cached Component created: {comp.name}, Pointer: {comp.Pointer:X}");
+                            OnComponentCreated?.Invoke(comp);
+                        }
                     }
                     else if (entry.State == ObjectState.Destroyed)
                     {
-                        OnGameObjectDestroyed?.Invoke(go, entry.DestroyedSources);
+                        // LogDebug($"Process cached object destroyed: {obj.name}");
+
+                        var go = obj.TryCast<GameObject>();
+                        if (go != null)
+                        {
+                            var allComponents = go.GetComponentsInChildren<Component>(true);
+                            foreach (var c in allComponents)
+                            {
+                                OnComponentDestroyed?.Invoke(c);
+                            }
+
+                            continue;
+                        }
+                        var comp = obj.TryCast<Component>();
+                        if (comp != null)
+                        {
+                            LogDebug($"Process cached Component destroyed: {comp.name}, Pointer: {comp.Pointer:X}");
+                            OnComponentDestroyed?.Invoke(comp);
+                        }
                     }
                 }
             }
@@ -260,57 +219,12 @@ public class ObjectPatcher
         }
     }
 
-    // [HarmonyPatch(typeof(Object), nameof(Object.Instantiate), new[] { typeof(Object) })]
-    // public class InstantiatePatcher
-    // {
-    //     public static void Postfix(Object __result)
-    //     {
-    //         HandleInstantiate(__result, [SourceFlag.Create1]);
-    //     }
-    // }
-
-    // [HarmonyPatch(typeof(Object), nameof(Object.Instantiate), new[] { typeof(Object), typeof(Scene) })]
-    // public class InstantiatePatcher1
-    // {
-    //     public static void Postfix(Object __result)
-    //     {
-    //         HandleInstantiate(__result, [SourceFlag.Create2]);
-    //     }
-    // }
-
-    // [HarmonyPatch(typeof(Object), nameof(Object.Instantiate), new[] { typeof(Object), typeof(Transform), typeof(bool) })]
-    // public class InstantiatePatcher2
-    // {
-    //     public static void Postfix(Object __result)
-    //     {
-    //         HandleInstantiate(__result, [SourceFlag.Create3]);
-    //     }
-    // }
-
-    // [HarmonyPatch(typeof(Object), nameof(Object.Instantiate), new[] { typeof(Object), typeof(Vector3), typeof(Quaternion) })]
-    // public class InstantiatePatcher3
-    // {
-    //     public static void Postfix(Object __result)
-    //     {
-    //         HandleInstantiate(__result, [SourceFlag.Create4]);
-    //     }
-    // }
-
-    // [HarmonyPatch(typeof(Object), nameof(Object.Instantiate), new[] { typeof(Object), typeof(Vector3), typeof(Quaternion), typeof(Transform) })]
-    // public class InstantiatePatcher4
-    // {
-    //     public static void Postfix(Object __result)
-    //     {
-    //         HandleInstantiate(__result, [SourceFlag.Create5]);
-    //     }
-    // }
-
     [HarmonyPatch(typeof(Object), nameof(Object.Destroy), new[] { typeof(Object), typeof(float) })]
     public class DestroyPatcher
     {
         public static void Prefix(Object obj)
         {
-            HandleDestroy(obj, [SourceFlag.Destroy1]);
+            HandleObjectDestroy(obj);
         }
     }
 
@@ -319,7 +233,7 @@ public class ObjectPatcher
     {
         public static void Prefix(Object obj)
         {
-            HandleDestroy(obj, [SourceFlag.Destroy2]);
+            HandleObjectDestroy(obj);
         }
     }
 }
