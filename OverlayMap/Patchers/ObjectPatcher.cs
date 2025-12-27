@@ -15,22 +15,8 @@ public class ObjectPatcher
     public static event ComponentEventHandler OnComponentCreated;
     public static event ComponentEventHandler OnComponentDestroyed;
 
-    // 对象状态枚举
-    private enum ObjectState
-    {
-        Created,    // 仅创建
-        Destroyed,  // 仅销毁
-        Canceled    // 创建后又销毁，取消处理
-    }
-
-    // 缓存条目
-    private class ObjectCacheEntry
-    {
-        public ObjectState State { get; set; }
-    }
-
-    // 单一缓存池
-    private static Dictionary<Object, ObjectCacheEntry> _objectCache = new Dictionary<Object, ObjectCacheEntry>();
+    // 创建对象缓存池（用于批处理）
+    private static HashSet<Object> _createdCache = new HashSet<Object>();
     
     // 批处理间隔（秒）
     private static float _batchProcessInterval = 0.1f;
@@ -40,45 +26,41 @@ public class ObjectPatcher
 
     private static void HandleObjectInstantiate(Object go)
     {
-        if (_objectCache.TryGetValue(go, out var entry))
-        {
-            // 对象已在缓存中
-            if (entry.State == ObjectState.Destroyed)
-            {
-                // 之前被标记为销毁，现在又创建了，取消处理
-                entry.State = ObjectState.Canceled;
-            }
-        }
-        else
-        {
-            // 新对象，添加到缓存
-            _objectCache[go] = new ObjectCacheEntry
-            {
-                State = ObjectState.Created
-            };
-
-            // LogDebug($"Object created: {go.name}");
-        }
+        if (go == null) return;
+        _createdCache.Add(go);
     }
 
-    private static void HandleObjectDestroy(Object go)
+    private static void HandleObjectDestroy(Object obj)
     {
-        if (_objectCache.TryGetValue(go, out var entry))
+        if (obj == null) return;
+
+        // 如果该对象还在创建缓存中（尚未处理 OnComponentCreated），则将其移除，取消后续的创建处理
+        if (_createdCache.Remove(obj))
         {
-            // 对象已在缓存中
-            if (entry.State == ObjectState.Created)
+            return;
+        }
+
+        // 立即处理销毁事件
+        var go = obj.TryCast<GameObject>();
+        if (go != null)
+        {
+            // 获取该 GameObject 下的所有组件（包括子对象）
+            var allComponents = go.GetComponentsInChildren<Component>(true);
+            foreach (var c in allComponents)
             {
-                // 在同一批次内创建后又销毁，标记为取消
-                entry.State = ObjectState.Canceled;
+                if (c != null)
+                {
+                    OnComponentDestroyed?.Invoke(c);
+                }
             }
         }
         else
         {
-            // 新对象，添加到缓存
-            _objectCache[go] = new ObjectCacheEntry
+            var comp = obj.TryCast<Component>();
+            if (comp != null)
             {
-                State = ObjectState.Destroyed
-            };
+                OnComponentDestroyed?.Invoke(comp);
+            }
         }
     }
 
@@ -126,65 +108,47 @@ public class ObjectPatcher
         {
             yield return new WaitForSeconds(_batchProcessInterval);
 
-            if (_objectCache.Count > 0)
+            if (_createdCache.Count > 0)
             {
-                LogDebug($"ProcessCachedObjects: {_objectCache.Count} objects to process");
-                var toProcess = new List<KeyValuePair<Object, ObjectCacheEntry>>(_objectCache);
-                _objectCache.Clear();
+                LogDebug($"ProcessCachedObjects: {_createdCache.Count} objects to process");
+                var toProcess = _createdCache.ToList();
+                _createdCache.Clear();
                 
-                foreach (var kvp in toProcess)
+                // 使用 Dictionary 按 Pointer 去重组件
+                var createdComponents = new Dictionary<System.IntPtr, Component>();
+                
+                foreach (var obj in toProcess)
                 {
-                    var obj = kvp.Key;
-                    var entry = kvp.Value;
-                    
-                    // 跳过 null 对象和已取消的对象
-                    if (obj == null || entry.State == ObjectState.Canceled)
+                    // 跳过 null 对象
+                    if (obj == null)
                         continue;
                     
-                    if (entry.State == ObjectState.Created)
+                    var go = obj.TryCast<GameObject>();
+                    if (go != null)
                     {
-                        // LogDebug($"Process cached object created: {obj.name}");
-
-                        var go = obj.TryCast<GameObject>();
-                        if (go != null)
+                        var allComponents = go.GetComponentsInChildren<Component>(true);
+                        foreach (var c in allComponents)
                         {
-                            var allComponents = go.GetComponentsInChildren<Component>(true);
-                            foreach (var c in allComponents)
-                            {
-                                OnComponentCreated?.Invoke(c);
-                            }
-
-                            continue;
-                        }
-
-                        var comp = obj.TryCast<Component>();
-                        if (comp != null)
-                        {
-                            LogDebug($"Process cached Component created: {comp.name}, Pointer: {comp.Pointer:X}");
-                            OnComponentCreated?.Invoke(comp);
+                            if (c != null)
+                                createdComponents.TryAdd(c.Pointer, c);
                         }
                     }
-                    else if (entry.State == ObjectState.Destroyed)
+                    else
                     {
-                        // LogDebug($"Process cached object destroyed: {obj.name}");
-
-                        var go = obj.TryCast<GameObject>();
-                        if (go != null)
-                        {
-                            var allComponents = go.GetComponentsInChildren<Component>(true);
-                            foreach (var c in allComponents)
-                            {
-                                OnComponentDestroyed?.Invoke(c);
-                            }
-
-                            continue;
-                        }
                         var comp = obj.TryCast<Component>();
                         if (comp != null)
-                        {
-                            LogDebug($"Process cached Component destroyed: {comp.name}, Pointer: {comp.Pointer:X}");
-                            OnComponentDestroyed?.Invoke(comp);
-                        }
+                            createdComponents.TryAdd(comp.Pointer, comp);
+                    }
+                }
+                
+                // 批量调用事件处理器
+                if (createdComponents.Count > 0)
+                {
+                    LogDebug($"Invoking OnComponentCreated for {createdComponents.Count} components");
+                    foreach (var comp in createdComponents.Values)
+                    {
+                        LogDebug($"Component created: {comp.name}, Pointer: {comp.Pointer:X}");
+                        OnComponentCreated?.Invoke(comp);
                     }
                 }
             }
@@ -214,7 +178,7 @@ public class ObjectPatcher
         {
             monoBehaviour.StopCoroutine(_processingCoroutine);
             _processingCoroutine = null;
-            _objectCache.Clear();
+            _createdCache.Clear();
             LogDebug("Object cache processing stopped");
         }
     }
