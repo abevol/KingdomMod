@@ -366,3 +366,6 @@ FodyWeavers.xsd
 
 # AI files
 .cursor/
+
+# Decompiled files
+Decompiled/

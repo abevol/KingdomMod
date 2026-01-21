@@ -13,6 +13,8 @@ using Coatsink.Common;
 using KingdomMod.OverlayMap.Gui.Debugging;
 using KingdomMod.SharedLib;
 using KingdomMod.Shared.Attributes;
+using KingdomMod.OverlayMap.Patchers;
+
 
 
 #if IL2CPP
@@ -372,6 +374,9 @@ public class OverlayMapHolder : MonoBehaviour
             DrawGuiForPlayer(0);
             DrawGuiForPlayer(1);
         }
+
+        if (ObjectPatcher.ProcessCachedObjectsRunning)
+            GUI.Label(new Rect(14, 16, 300, 20), "ProcessCachedObjects is running.", _guiStyle);
     }
 
     private void DrawGuiForPlayer(int playerId)
