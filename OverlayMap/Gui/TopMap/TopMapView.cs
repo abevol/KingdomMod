@@ -348,9 +348,14 @@ public class TopMapView : MonoBehaviour
             foreach (var pair in MapMarkers)
             {
                 var markerData = pair.Value.Data;
+                if (markerData == null)
+                {
+                    LogError($"markerData is null, target: {pair.Key}");
+                    continue;
+                }
                 if (!markerData.Target)
                 {
-                    LogError($"markerData.Target is null, Title: {markerData.Title.Value}, Target.Pointer: {markerData.Target.Pointer:X}");
+                    LogError($"markerData.Target is null, Title: {markerData.Title?.Value}");
                     continue;
                 }
                 var worldPosX = markerData.Target.transform.position.x;

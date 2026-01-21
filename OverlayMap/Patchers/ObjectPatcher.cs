@@ -15,6 +15,8 @@ public class ObjectPatcher
     public static event ComponentEventHandler OnComponentCreated;
     public static event ComponentEventHandler OnComponentDestroyed;
 
+    public static bool ProcessCachedObjectsRunning = false;
+
     // 创建对象缓存池（用于批处理）
     private static HashSet<Object> _createdCache = new HashSet<Object>();
     
@@ -28,6 +30,7 @@ public class ObjectPatcher
     {
         if (go == null) return;
         _createdCache.Add(go);
+        LogDebug($"HandleObjectInstantiate: {go.name}, Pointer: {go.Pointer:X}");
     }
 
     private static void HandleObjectDestroy(Object obj)
@@ -50,6 +53,7 @@ public class ObjectPatcher
             {
                 if (c != null)
                 {
+                    LogDebug($"Process cached Component destroyed: {c.name}, Pointer: {c.Pointer:X}");
                     OnComponentDestroyed?.Invoke(c);
                 }
             }
@@ -59,6 +63,7 @@ public class ObjectPatcher
             var comp = obj.TryCast<Component>();
             if (comp != null)
             {
+                LogDebug($"Process cached Component destroyed 2: {comp.name}, Pointer: {comp.Pointer:X}");
                 OnComponentDestroyed?.Invoke(comp);
             }
         }
@@ -76,27 +81,34 @@ public class ObjectPatcher
 
     public static void PatchInstantiateGenerics()
     {
-        // 1. 获取 UnityEngine.Object 类中名为 Instantiate 的所有方法
-        var methods = typeof(UnityEngine.Object).GetMethods(BindingFlags.Public | BindingFlags.Static)
+        var harmony = Patcher.HarmonyInst;
+
+        // 1. Hook generic Instantiate methods
+        var genericMethods = typeof(UnityEngine.Object).GetMethods(BindingFlags.Public | BindingFlags.Static)
             .Where(m => m.Name == "Instantiate" && m.IsGenericMethodDefinition);
 
-        // 2. 针对你想要拦截的 T 类型（通常是 UnityEngine.Object），手动生成具体方法并 Hook
-        foreach (var method in methods)
+        foreach (var method in genericMethods)
         {
-            // 这里将泛型 T 实例化为 UnityEngine.Object
             var genericMethod = method.MakeGenericMethod(typeof(UnityEngine.Object));
-
-            // 获取参数类型，以便匹配特定的重载
-            var parameters = genericMethod.GetParameters();
-
-            // 可以在这里通过 parameters.Length 或类型来过滤具体的重载
-            // 比如为了保险起见，把所有泛型重载全 Hook 了：
             Patcher.HarmonyInst.Patch(
                 original: genericMethod,
                 postfix: new HarmonyMethod(typeof(ObjectPatcher), nameof(ObjectPatcher.GenericInstantiatePostfix))
             );
+            LogDebug($"Hooked generic Instantiate<UnityEngine.Object> with {method.GetParameters().Length} params");
+        }
 
-            LogDebug($"Hooked Instantiate<UnityEngine.Object> with {parameters.Length} params");
+        // 2. Hook non-generic Instantiate methods
+        var nonGenericMethods = typeof(UnityEngine.Object).GetMethods(BindingFlags.Public | BindingFlags.Static)
+            .Where(m => m.Name == "Instantiate" && !m.IsGenericMethodDefinition);
+
+        foreach (var method in nonGenericMethods)
+        {
+            // Filter out methods that might be obscure or obsolete if needed, but usually hooking all public static Instantiate is safe
+            Patcher.HarmonyInst.Patch(
+                original: method,
+                postfix: new HarmonyMethod(typeof(ObjectPatcher), nameof(ObjectPatcher.GenericInstantiatePostfix))
+            );
+            LogDebug($"Hooked non-generic Instantiate with {method.GetParameters().Length} params");
         }
     }
 
@@ -106,6 +118,7 @@ public class ObjectPatcher
         LogDebug($"ProcessCachedObjects started");
         while (true)
         {
+            ProcessCachedObjectsRunning = true;
             yield return new WaitForSeconds(_batchProcessInterval);
 
             if (_createdCache.Count > 0)
@@ -121,23 +134,39 @@ public class ObjectPatcher
                 {
                     // 跳过 null 对象
                     if (obj == null)
+                    {
+                        LogDebug("ProcessCachedObjects: obj is null");
                         continue;
+                    }
                     
                     var go = obj.TryCast<GameObject>();
                     if (go != null)
                     {
                         var allComponents = go.GetComponentsInChildren<Component>(true);
-                        foreach (var c in allComponents)
+                        if (allComponents == null || allComponents.Count == 0)
                         {
-                            if (c != null)
-                                createdComponents.TryAdd(c.Pointer, c);
+                            LogDebug($"ProcessCachedObjects: GameObject {go.name} has no components");
+                        }
+                        else
+                        {
+                            foreach (var c in allComponents)
+                            {
+                                if (c != null)
+                                    createdComponents.TryAdd(c.Pointer, c);
+                            }
                         }
                     }
                     else
                     {
                         var comp = obj.TryCast<Component>();
                         if (comp != null)
+                        {
                             createdComponents.TryAdd(comp.Pointer, comp);
+                        }
+                        else
+                        {
+                             LogDebug($"ProcessCachedObjects: Object {obj.name} ({obj.GetIl2CppType().Name}) is neither GameObject nor Component");
+                        }
                     }
                 }
                 
@@ -151,7 +180,13 @@ public class ObjectPatcher
                         OnComponentCreated?.Invoke(comp);
                     }
                 }
+                else
+                {
+                     LogDebug("ProcessCachedObjects: createdComponents is empty after processing");
+                }
             }
+
+            ProcessCachedObjectsRunning = false;
         }
     }
 
