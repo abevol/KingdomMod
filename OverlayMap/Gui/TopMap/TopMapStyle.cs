@@ -77,7 +77,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
 
         private void OnBackgroundConfigChanged(object sender, EventArgs e)
         {
-            PlayerOverlay.ForEachTopMapView(view => view.UpdateBackgroundImage());
+            ForEachTopMapView(view => view.UpdateBackgroundImage());
         }
 
         private void OnSignFontConfigChanged(object sender, EventArgs e)
@@ -85,7 +85,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
             SignFont = FontManager.CreateMainFont(Config.GuiStyle.TopMap.Sign.Font, SignFont);
             SignFont.AssignFallbackFonts(Config.GuiStyle.TopMap.Sign.FallbackFonts.AsStringArray);
 
-            PlayerOverlay.ForEachTopMapView(view =>
+            ForEachTopMapView(view =>
             {
                 foreach (var pair in view.MapMarkers)
                 {
@@ -98,7 +98,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
         {
             SignFontSize = Config.GuiStyle.TopMap.Sign.FontSize;
 
-            PlayerOverlay.ForEachTopMapView(view =>
+            ForEachTopMapView(view =>
             {
                 foreach (var pair in view.MapMarkers)
                 {
@@ -112,7 +112,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
             var fallbackFonts = Config.GuiStyle.TopMap.Sign.FallbackFonts.AsStringArray;
             SignFont.AssignFallbackFonts(fallbackFonts);
 
-            PlayerOverlay.ForEachTopMapView(view =>
+            ForEachTopMapView(view =>
             {
                 foreach (var pair in view.MapMarkers)
                 {
@@ -126,7 +126,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
             TitleFont = FontManager.CreateMainFont(Config.GuiStyle.TopMap.Title.Font, TitleFont);
             TitleFont.AssignFallbackFonts(Config.GuiStyle.TopMap.Title.FallbackFonts.AsStringArray);
 
-            PlayerOverlay.ForEachTopMapView(view =>
+            ForEachTopMapView(view =>
             {
                 foreach (var pair in view.MapMarkers)
                 {
@@ -139,7 +139,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
         {
             TitleFontSize = Config.GuiStyle.TopMap.Title.FontSize;
 
-            PlayerOverlay.ForEachTopMapView(view =>
+            ForEachTopMapView(view =>
             {
                 foreach (var pair in view.MapMarkers)
                 {
@@ -153,7 +153,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
             var fallbackFonts = Config.GuiStyle.TopMap.Title.FallbackFonts.AsStringArray;
             TitleFont.AssignFallbackFonts(fallbackFonts);
 
-            PlayerOverlay.ForEachTopMapView(view =>
+            ForEachTopMapView(view =>
             {
                 foreach (var pair in view.MapMarkers)
                 {
@@ -167,7 +167,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
             CountFont = FontManager.CreateMainFont(Config.GuiStyle.TopMap.Count.Font, CountFont);
             CountFont.AssignFallbackFonts(Config.GuiStyle.TopMap.Count.FallbackFonts.AsStringArray);
 
-            PlayerOverlay.ForEachTopMapView(view =>
+            ForEachTopMapView(view =>
             {
                 foreach (var pair in view.MapMarkers)
                 {
@@ -180,7 +180,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
         {
             CountFontSize = Config.GuiStyle.TopMap.Count.FontSize;
 
-            PlayerOverlay.ForEachTopMapView(view =>
+            ForEachTopMapView(view =>
             {
                 foreach (var pair in view.MapMarkers)
                 {
@@ -194,7 +194,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
             var fallbackFonts = Config.GuiStyle.TopMap.Count.FallbackFonts.AsStringArray;
             CountFont.AssignFallbackFonts(fallbackFonts);
 
-            PlayerOverlay.ForEachTopMapView(view =>
+            ForEachTopMapView(view =>
             {
                 foreach (var pair in view.MapMarkers)
                 {

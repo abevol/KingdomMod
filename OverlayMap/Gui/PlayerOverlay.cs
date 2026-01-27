@@ -20,14 +20,6 @@ namespace KingdomMod.OverlayMap.Gui
         public PlayerOverlay(IntPtr ptr) : base(ptr) { }
 #endif
 
-        public static void ForEachTopMapView(System.Action<TopMapView> action)
-        {
-            var p1 = Instance?.PlayerOverlays.P1;
-            var p2 = Instance?.PlayerOverlays.P2;
-            if (p1 != null && p1.enabled) action(p1.TopMapView);
-            if (p2 != null && p2.enabled) action(p2.TopMapView);
-        }
-
         private void Awake()
         {
             LogDebug("PlayerOverlay.Awake");
@@ -81,6 +73,8 @@ namespace KingdomMod.OverlayMap.Gui
         public void Show()
         {
             if (!this.enabled)
+                return;
+            if (Instance.OverlayMapSwitch.CurrentState != OverlayMapHolder.MapSwitchState.NewMap)
                 return;
 
             this.gameObject.SetActive(true);
