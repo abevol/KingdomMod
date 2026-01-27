@@ -14,7 +14,6 @@ public class Patcher
         {
             HarmonyInst = new Harmony("KingdomMod.OverlayMap.Patcher");
             HarmonyInst.PatchAll();
-            ObjectPatcher.PatchInstantiateGenerics();
 
             foreach (var patchedMethod in HarmonyInst.GetPatchedMethods())
             {
