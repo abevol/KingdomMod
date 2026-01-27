@@ -11,6 +11,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Coatsink.Common;
 using KingdomMod.OverlayMap.Gui.Debugging;
+using KingdomMod.OverlayMap.Gui.TopMap;
 using KingdomMod.SharedLib;
 using KingdomMod.Shared.Attributes;
 using KingdomMod.OverlayMap.Patchers;
@@ -37,7 +38,7 @@ public class OverlayMapHolder : MonoBehaviour
     private GUIStyle _guiBoxStyle = new();
     private float _timeSinceLastGuiUpdate = 0;
     public bool NeedToReloadGuiBoxStyle = true;
-    public static bool EnabledOverlayMap = true;
+    public MapSwitch OverlayMapSwitch = new();
     private System.Collections.Generic.List<MarkInfo> _minimapMarkList = new();
     private System.Collections.Generic.List<LineInfo> _drawLineList = new();
     private readonly StatsInfo _statsInfo = new();
@@ -304,7 +305,16 @@ public class OverlayMapHolder : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.M))
         {
             LogDebug("M key pressed.");
-            EnabledOverlayMap = !EnabledOverlayMap;
+            OverlayMapSwitch.Toggle();
+
+            if (OverlayMapSwitch.CurrentState == MapSwitchState.NewMap)
+            {
+                ForEachPlayerOverlay(playerOverlay => playerOverlay.Show());
+            }
+            else
+            {
+                ForEachPlayerOverlay(playerOverlay => playerOverlay.Hide());
+            }
         }
 
         if (Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.F))
@@ -345,7 +355,7 @@ public class OverlayMapHolder : MonoBehaviour
 
             if (!IsPlaying()) return;
 
-            if (EnabledOverlayMap)
+            if (OverlayMapSwitch.CurrentState == MapSwitchState.OldMap)
             {
                 UpdateMinimapMarkList();
                 UpdateStatsInfo();
@@ -364,7 +374,7 @@ public class OverlayMapHolder : MonoBehaviour
     {
         if (!IsPlaying()) return;
 
-        if (EnabledOverlayMap)
+        if (OverlayMapSwitch.CurrentState == MapSwitchState.OldMap)
         {
             if (NeedToReloadGuiBoxStyle)
             {
@@ -374,9 +384,6 @@ public class OverlayMapHolder : MonoBehaviour
             DrawGuiForPlayer(0);
             DrawGuiForPlayer(1);
         }
-
-        if (ObjectPatcher.ProcessCachedObjectsRunning)
-            GUI.Label(new Rect(14, 16, 300, 20), "ProcessCachedObjects is running.", _guiStyle);
     }
 
     private void DrawGuiForPlayer(int playerId)
@@ -1397,6 +1404,30 @@ public class OverlayMapHolder : MonoBehaviour
         P2
     }
 
+    public enum MapSwitchState
+    {
+        Off,
+        OldMap,
+        NewMap
+    }
+
+    public class MapSwitch
+    {
+        private MapSwitchState _currentState = MapSwitchState.OldMap;
+
+        public MapSwitchState CurrentState => _currentState;
+
+        public void Toggle()
+        {
+            _currentState = _currentState switch
+            {
+                MapSwitchState.NewMap => MapSwitchState.OldMap,
+                MapSwitchState.OldMap => MapSwitchState.NewMap,
+                _ => MapSwitchState.Off
+            };
+        }
+    }
+
     private static string GetBepInExDir()
     {
         var baseDir = Assembly.GetExecutingAssembly().Location;
@@ -1460,6 +1491,22 @@ public class OverlayMapHolder : MonoBehaviour
         int sourceLineNumber = 0)
     {
         _log.LogError($"[{Path.GetFileName(sourceFilePath)}][{sourceLineNumber.ToString("0000")}][{memberName}] {message}");
+    }
+
+    public static void ForEachPlayerOverlay(System.Action<PlayerOverlay> action)
+    {
+        var p1 = Instance?.PlayerOverlays.P1;
+        var p2 = Instance?.PlayerOverlays.P2;
+        if (p1 != null && p1.enabled) action(p1);
+        if (p2 != null && p2.enabled) action(p2);
+    }
+
+    public static void ForEachTopMapView(System.Action<TopMapView> action)
+    {
+        var p1 = Instance?.PlayerOverlays.P1;
+        var p2 = Instance?.PlayerOverlays.P2;
+        if (p1 != null && p1.enabled) action(p1.TopMapView);
+        if (p2 != null && p2.enabled) action(p2.TopMapView);
     }
 }
 
