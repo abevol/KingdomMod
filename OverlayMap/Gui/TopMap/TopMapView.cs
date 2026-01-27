@@ -127,6 +127,7 @@ public class TopMapView : MonoBehaviour
         ObjectPatcher.OnComponentDestroyed += OnComponentDestroyed;
         OverlayMapHolder.OnGameStateChanged += OnGameStateChanged;
         Game.OnGameStart += (System.Action)OnGameStart;
+        Level.OnLoaded += (System.Action<bool>)OnLevelLoaded;
     }
 
     private void BuildFastLookup()
@@ -151,9 +152,7 @@ public class TopMapView : MonoBehaviour
         ObjectPatcher.OnComponentDestroyed -= OnComponentDestroyed;
         OverlayMapHolder.OnGameStateChanged -= OnGameStateChanged;
         Game.OnGameStart -= (System.Action)OnGameStart;
-
-        // 停止对象池批处理协程
-        ObjectPatcher.StopProcessing(this);
+        Level.OnLoaded -= (System.Action<bool>)OnLevelLoaded;
     }
 
     private void Start()
@@ -170,9 +169,6 @@ public class TopMapView : MonoBehaviour
         //             mapper.Map(component);
         //     }
         // }
-
-        // 启动对象池批处理协程
-        ObjectPatcher.StartProcessing(this);
 
         _isStarted = true;
     }
@@ -284,6 +280,12 @@ public class TopMapView : MonoBehaviour
         LogTrace($"MappingScale: {MappingScale}, minLevelWidth: {minLevelWidth}");
 
         UpdatePlayerMarker();
+    }
+
+    private void OnLevelLoaded(bool fromSave)
+    {
+        LogWarning($"OnLevelLoaded fromSave: {fromSave}");
+
     }
 
 #if IL2CPP
@@ -440,7 +442,7 @@ public class TopMapView : MonoBehaviour
         {
             LogDebug($"TopMapView.TryRemoveMapMarker, target: {target}, Pointer: {target.Pointer:X}");
 
-            RemoveWallNode(marker);
+            // RemoveWallNode(marker);
             MapMarkers.Remove(target);
             Destroy(marker.gameObject);
         }
