@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
     <Import Project="..\ProjectSettings.shared.props" />
     <Import Project="..\ProjectSettings.custom.props" />
 
@@ -22,6 +22,7 @@
         <Compile Include="..\Shared\GamePrefabID.cs" Link="Shared\GamePrefabID.cs" />
         <Compile Include="..\Shared\GameExtensions.cs" Link="Shared\GameExtensions.cs" />
         <Compile Include="..\Shared\GuiHelper.cs" Link="Shared\GuiHelper.cs" />
+        <Compile Include="..\Shared\NullableAttributes.cs" Link="Shared\NullableAttributes.cs" />
     </ItemGroup>
 
     <ItemGroup>
