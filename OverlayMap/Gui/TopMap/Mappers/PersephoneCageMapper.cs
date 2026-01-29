@@ -1,5 +1,7 @@
-﻿using KingdomMod.OverlayMap.Config;
+﻿using HarmonyLib;
+using KingdomMod.OverlayMap.Config;
 using UnityEngine;
+using static KingdomMod.OverlayMap.OverlayMapHolder;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
@@ -11,6 +13,24 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                 comp => PersephoneCage.State.IsPersephoneLocked(comp.Cast<PersephoneCage>()._fsm.Current)
                     ? MarkerStyle.PersephoneCage.Locked.Color
                     : MarkerStyle.PersephoneCage.Unlocked.Color);
+        }
+
+        [HarmonyPatch(typeof(PersephoneCage), nameof(PersephoneCage.Awake))]
+        private class AwakePatch
+        {
+            public static void Postfix(PersephoneCage __instance)
+            {
+                ForEachTopMapView(view => view.OnComponentCreated(__instance));
+            }
+        }
+
+        [HarmonyPatch(typeof(PersephoneCage), nameof(PersephoneCage.OnDestroy))]
+        private class OnDestroyPatch
+        {
+            public static void Prefix(PersephoneCage __instance)
+            {
+                ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
+            }
         }
     }
 }

@@ -47,22 +47,22 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
             }
         }
 
-        // [HarmonyPatch(typeof(Player), nameof(Player.Awake))]
-        // private class Player_Awake_Patch
-        // {
-        //     public static void Postfix(Player __instance)
-        //     {
-        //         PlayerOverlay.ForEachTopMapView(view => view.OnComponentCreated(__instance, [ObjectPatcher.SourceFlag.Create10]));
-        //     }
-        // }
-        //
-        // [HarmonyPatch(typeof(Player), nameof(Player.OnDestroy))]
-        // private class Player_OnDestroy_Patch
-        // {
-        //     public static void Prefix(Player __instance)
-        //     {
-        //         PlayerOverlay.ForEachTopMapView(view => view.OnComponentDestroyed(__instance, [ObjectPatcher.SourceFlag.Destroy10]));
-        //     }
-        // }
+        [HarmonyPatch(typeof(Player), nameof(Player.OnEnable))]
+        private class OnEnablePatch
+        {
+            public static void Postfix(Player __instance)
+            {
+                ForEachTopMapView(view => view.OnComponentCreated(__instance));
+            }
+        }
+
+        [HarmonyPatch(typeof(Player), nameof(Player.OnDisable))]
+        private class OnDisablePatch
+        {
+            public static void Prefix(Player __instance)
+            {
+                ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
+            }
+        }
     }
 }

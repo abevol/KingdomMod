@@ -1,4 +1,5 @@
-﻿using KingdomMod.OverlayMap.Config;
+﻿using HarmonyLib;
+using KingdomMod.OverlayMap.Config;
 using KingdomMod.SharedLib;
 using UnityEngine;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
@@ -15,7 +16,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
             switch ((GamePrefabID)prefabId.prefabID)
             {
                 case GamePrefabID.Wall0:
-                    // view.TryAddMapMarker(component, MarkerStyle.WallFoundation.Color, MarkerStyle.WallFoundation.Sign, null);
+                    view.TryAddMapMarker(component, MarkerStyle.WallFoundation.Color, MarkerStyle.WallFoundation.Sign, null);
                     break;
                 case GamePrefabID.Wall1:
                 case GamePrefabID.Wall2:
@@ -24,8 +25,8 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                 case GamePrefabID.Wall5:
                     // LogMessage($"Wall: InstanceID: {component.GetInstanceID()}, {GameObjectDetails.JsonSerialize(new GameObjectDetails(component.gameObject))}");
                     var marker = view.TryAddMapMarker(component, MarkerStyle.Wall.Color, MarkerStyle.Wall.Sign, null);
-                    if (marker != null)
-                        view.AddWallNode(marker);
+                    // if (marker != null)
+                    //     view.AddWallNode(marker);
                     ConstructionEventHandler.Create(marker, MarkerStyle.Wall.Color);
                     break;
                 case GamePrefabID.Wall1_Wreck:
@@ -82,7 +83,13 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                     view.TryAddMapMarker(component, MarkerStyle.PortalCliff.Color, MarkerStyle.PortalCliff.Sign, Strings.PortalCliff,
                         comp => comp.Cast<PayableUpgrade>().Price);
                     break;
+                case GamePrefabID.Wreck:
+                    view.TryAddMapMarker(component, MarkerStyle.Boat.Wrecked.Color, MarkerStyle.Boat.Sign, Strings.BoatWreck, null, null,
+                        comp => comp.gameObject.activeSelf);
+                    break;
             }
         }
+
+        // 已由 PayableMapper 中的父类方法补丁通知组件的启用和禁用事件
     }
 }

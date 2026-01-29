@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using HarmonyLib;
 using KingdomMod.OverlayMap.Config;
 using KingdomMod.OverlayMap.Patchers;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
@@ -17,6 +18,24 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                 isGem ? Strings.GemChest : Strings.Chest,
                 comp => comp.Cast<Chest>().currencyAmount,
                 null, comp => comp.Cast<Chest>().currencyAmount != 0);
+        }
+
+        [HarmonyPatch(typeof(Chest), nameof(Chest.Awake))]
+        private class OnEnablePatch
+        {
+            public static void Postfix(Chest __instance)
+            {
+                OverlayMapHolder.ForEachTopMapView(view => view.OnComponentCreated(__instance));
+            }
+        }
+
+        [HarmonyPatch(typeof(Chest), nameof(Chest.OnDestroy))]
+        private class OnDisablePatch
+        {
+            public static void Prefix(Chest __instance)
+            {
+                OverlayMapHolder.ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
+            }
         }
     }
 }

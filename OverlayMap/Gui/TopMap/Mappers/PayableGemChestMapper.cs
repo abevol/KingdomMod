@@ -16,5 +16,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                     return payableGemChest.infiniteGems ? payableGemChest.guardRef.Price : payableGemChest.gemsStored;
                 });
         }
+
+        // 已由 PayableMapper 中的父类方法补丁通知组件的启用和禁用事件
     }
 }

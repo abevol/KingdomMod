@@ -1,30 +1,30 @@
 ﻿using HarmonyLib;
 using KingdomMod.OverlayMap.Config;
+using KingdomMod.SharedLib;
 using UnityEngine;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
-    public class HephaestusForgeMapper(TopMapView view) : IComponentMapper
+    public class PayableMapper(TopMapView view) : IComponentMapper
     {
         public void Map(Component component)
         {
-            view.TryAddMapMarker(component, MarkerStyle.HephaestusForge.Color, MarkerStyle.HephaestusForge.Sign, Strings.HephaestusForge);
         }
 
-        [HarmonyPatch(typeof(HephaestusForge), nameof(Deer.OnEnable))]
+        [HarmonyPatch(typeof(Payable), nameof(Payable.OnEnable))]
         private class OnEnablePatch
         {
-            public static void Postfix(Deer __instance)
+            public static void Postfix(Payable __instance)
             {
                 ForEachTopMapView(view => view.OnComponentCreated(__instance));
             }
         }
 
-        [HarmonyPatch(typeof(Deer), nameof(Deer.OnDisable))]
+        [HarmonyPatch(typeof(Payable), nameof(Payable.OnDisable))]
         private class OnDisablePatch
         {
-            public static void Prefix(Deer __instance)
+            public static void Prefix(Payable __instance)
             {
                 ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
             }
