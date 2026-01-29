@@ -26,22 +26,22 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
             }, comp => comp.gameObject.activeSelf && !comp.Cast<Deer>()._damageable.isDead, MarkerRow.Movable);
         }
 
-        // [HarmonyPatch(typeof(Deer), nameof(Deer.Awake))]
-        // private class Deer_Awake_Patch
-        // {
-        //     public static void Postfix(Deer __instance)
-        //     {
-        //         PlayerOverlay.ForEachTopMapView(view => view.OnComponentCreated(__instance, [ObjectPatcher.SourceFlag.Create10]));
-        //     }
-        // }
-        //
-        // [HarmonyPatch(typeof(Deer), nameof(Deer.OnDestroy))]
-        // private class Deer_OnDestroy_Patch
-        // {
-        //     public static void Prefix(Deer __instance)
-        //     {
-        //         PlayerOverlay.ForEachTopMapView(view => view.OnComponentDestroyed(__instance, [ObjectPatcher.SourceFlag.Destroy10]));
-        //     }
-        // }
+        [HarmonyPatch(typeof(Deer), nameof(Deer.OnEnable))]
+        private class OnEnablePatch
+        {
+            public static void Postfix(Deer __instance)
+            {
+                ForEachTopMapView(view => view.OnComponentCreated(__instance));
+            }
+        }
+
+        [HarmonyPatch(typeof(Deer), nameof(Deer.OnDisable))]
+        private class OnDisablePatch
+        {
+            public static void Prefix(Deer __instance)
+            {
+                ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
+            }
+        }
     }
 }

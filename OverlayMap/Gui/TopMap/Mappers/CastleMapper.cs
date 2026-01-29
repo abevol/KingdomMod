@@ -35,22 +35,22 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                 view.CastleMarker = marker;
         }
 
-        // [HarmonyPatch(typeof(Castle), nameof(Castle.Awake))]
-        // private class Deer_Awake_Patch
-        // {
-        //     public static void Postfix(Castle __instance)
-        //     {
-        //         PlayerOverlay.ForEachTopMapView(view => view.OnComponentCreated(__instance, [ObjectPatcher.SourceFlag.Create10]));
-        //     }
-        // }
-        //
-        // [HarmonyPatch(typeof(Castle), nameof(Castle.OnDestroy))]
-        // private class Deer_OnDestroy_Patch
-        // {
-        //     public static void Prefix(Castle __instance)
-        //     {
-        //         PlayerOverlay.ForEachTopMapView(view => view.OnComponentDestroyed(__instance, [ObjectPatcher.SourceFlag.Destroy10]));
-        //     }
-        // }
+        [HarmonyPatch(typeof(Castle), nameof(Castle.OnEnable))]
+        private class OnEnablePatch
+        {
+            public static void Postfix(Castle __instance)
+            {
+                ForEachTopMapView(view => view.OnComponentCreated(__instance));
+            }
+        }
+        
+        [HarmonyPatch(typeof(Castle), nameof(Castle.OnDisable))]
+        private class OnDisablePatch
+        {
+            public static void Prefix(Castle __instance)
+            {
+                ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
+            }
+        }
     }
 }

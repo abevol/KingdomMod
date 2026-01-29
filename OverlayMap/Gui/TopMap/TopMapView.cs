@@ -90,6 +90,7 @@ public class TopMapView : MonoBehaviour
             { typeof(HelPuzzleController),  new Mappers.HelPuzzleControllerMapper(this) },
             { typeof(HephaestusForge),      new Mappers.HephaestusForgeMapper(this) },
             { typeof(MerchantSpawner),      new Mappers.MerchantSpawnerMapper(this) },
+            { typeof(PayableBlocker),       new Mappers.PayableBlockerMapper(this) },
             { typeof(PayableBush),          new Mappers.PayableBushMapper(this) },
             { typeof(PayableGemChest),      new Mappers.PayableGemChestMapper(this) },
             { typeof(PayableShop),          new Mappers.PayableShopMapper(this) },
@@ -105,7 +106,6 @@ public class TopMapView : MonoBehaviour
             { typeof(ThorPuzzleController), new Mappers.ThorPuzzleControllerMapper(this) },
             { typeof(TimeStatue),           new Mappers.TimeStatueMapper(this) },
             { typeof(UnlockNewRulerStatue), new Mappers.UnlockNewRulerStatueMapper(this) },
-            { typeof(WreckPlaceholder),     new Mappers.WreckPlaceholderMapper(this) },
         };
 
         BuildFastLookup();

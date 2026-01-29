@@ -19,5 +19,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                     break;
             }
         }
+
+        // 已由 PayableMapper 中的父类方法补丁通知组件的启用和禁用事件
     }
 }

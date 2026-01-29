@@ -1,4 +1,5 @@
-﻿using KingdomMod.OverlayMap.Config;
+﻿using HarmonyLib;
+using KingdomMod.OverlayMap.Config;
 using KingdomMod.OverlayMap.Config.Extensions;
 using UnityEngine;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
@@ -31,6 +32,24 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
         {
             LogWarning($"Unknown hermit type: {hermitType}");
             return null;
+        }
+
+        [HarmonyPatch(typeof(Cabin), nameof(Cabin.OnEnable))]
+        private class OnEnablePatch
+        {
+            public static void Postfix(Cabin __instance)
+            {
+                ForEachTopMapView(view => view.OnComponentCreated(__instance));
+            }
+        }
+
+        [HarmonyPatch(typeof(Cabin), nameof(Cabin.OnDisable))]
+        private class OnDisablePatch
+        {
+            public static void Prefix(Cabin __instance)
+            {
+                ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
+            }
         }
     }
 }

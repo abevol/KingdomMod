@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using HarmonyLib;
 using KingdomMod.OverlayMap.Config;
 using KingdomMod.OverlayMap.Patchers;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
@@ -20,5 +21,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                 comp => comp.Cast<SteedSpawn>().Price, null,
                 comp => !comp.Cast<SteedSpawn>().HasSpawned);
         }
+
+        // 已由 PayableMapper 中的父类方法补丁通知组件的启用和禁用事件
     }
 }

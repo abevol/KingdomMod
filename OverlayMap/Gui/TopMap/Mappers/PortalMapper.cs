@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using HarmonyLib;
 using KingdomMod.OverlayMap.Config;
 using KingdomMod.OverlayMap.Patchers;
+using System.Collections.Generic;
 using UnityEngine;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
 
@@ -28,6 +29,24 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                 case Portal.Type.Dock:
                     view.TryAddMapMarker(component, MarkerStyle.PortalDock.Color, MarkerStyle.PortalDock.Sign, Strings.PortalDock);
                     break;
+            }
+        }
+
+        [HarmonyPatch(typeof(Portal), nameof(Portal.OnEnable))]
+        private class OnEnablePatch
+        {
+            public static void Postfix(Portal __instance)
+            {
+                ForEachTopMapView(view => view.OnComponentCreated(__instance));
+            }
+        }
+
+        [HarmonyPatch(typeof(Portal), nameof(Portal.OnDisable))]
+        private class OnDisablePatch
+        {
+            public static void Prefix(Portal __instance)
+            {
+                ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
             }
         }
     }

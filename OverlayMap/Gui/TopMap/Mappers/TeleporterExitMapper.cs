@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using HarmonyLib;
 using KingdomMod.OverlayMap.Config;
 using KingdomMod.OverlayMap.Patchers;
+using System.Collections.Generic;
 using UnityEngine;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
 
@@ -21,6 +22,24 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                 var id = (PlayerId)t._player.playerId;
                 return id == PlayerId.P1 ? MarkerStyle.TeleExitP1.Color : MarkerStyle.TeleExitP2.Color;
             }, null, MarkerRow.Movable);
+        }
+
+        [HarmonyPatch(typeof(TeleporterExit), nameof(TeleporterExit.Awake))]
+        private class AwakePatch
+        {
+            public static void Postfix(TeleporterExit __instance)
+            {
+                ForEachTopMapView(view => view.OnComponentCreated(__instance));
+            }
+        }
+
+        [HarmonyPatch(typeof(TeleporterExit), nameof(TeleporterExit.OnDestroy))]
+        private class OnDestroyPatch
+        {
+            public static void Prefix(TeleporterExit __instance)
+            {
+                ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
+            }
         }
     }
 }
