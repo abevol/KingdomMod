@@ -15,6 +15,7 @@ namespace KingdomMod.SharedLib
         public bool enabled = false;
         public int layer = -1;
         public int prefabID = -1;
+        public int instanceID = 0;
         public string position = "";
         public string localPosition = "";
         public System.Collections.Generic.List<string> components = new();
@@ -40,6 +41,7 @@ namespace KingdomMod.SharedLib
 
             this.enabled = rootObject.activeSelf;
             this.layer = rootObject.layer;
+            this.instanceID = rootObject.GetInstanceID();
             this.position = rootObject.transform.position.ToString();
             this.localPosition = rootObject.transform.localPosition.ToString();
 
@@ -142,6 +144,7 @@ namespace KingdomMod.SharedLib
             xml += "<enabled value=\"" + obj.enabled.ToString() + "\" />\r\n";
             xml += "<layer value=\"" + obj.layer.ToString() + "\" />\r\n";
             xml += "<prefabID value=\"" + obj.prefabID.ToString() + "\" />\r\n";
+            xml += "<instanceID value=\"" + obj.instanceID.ToString() + "\" />\r\n";
             xml += "<position value=\"" + obj.position + "\" />\r\n";
             xml += "<localPosition value=\"" + obj.localPosition + "\" />\r\n";
 
@@ -204,6 +207,7 @@ namespace KingdomMod.SharedLib
             json += "\"layer\":" + obj.layer.ToString() + ",";
             if (obj.prefabID != -1)
                 json += "\"prefabID\":" + obj.prefabID.ToString() + ",";
+            json += "\"instanceID\":" + obj.instanceID.ToString() + ",";
 
             json += "\"position\":\"" + obj.position + "\",";
             json += "\"localPosition\":\"" + obj.localPosition + "\",";
