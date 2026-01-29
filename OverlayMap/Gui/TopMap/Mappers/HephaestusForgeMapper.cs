@@ -11,23 +11,5 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
         {
             view.TryAddMapMarker(component, MarkerStyle.HephaestusForge.Color, MarkerStyle.HephaestusForge.Sign, Strings.HephaestusForge);
         }
-
-        [HarmonyPatch(typeof(HephaestusForge), nameof(Deer.OnEnable))]
-        private class OnEnablePatch
-        {
-            public static void Postfix(Deer __instance)
-            {
-                ForEachTopMapView(view => view.OnComponentCreated(__instance));
-            }
-        }
-
-        [HarmonyPatch(typeof(Deer), nameof(Deer.OnDisable))]
-        private class OnDisablePatch
-        {
-            public static void Prefix(Deer __instance)
-            {
-                ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
-            }
-        }
     }
 }

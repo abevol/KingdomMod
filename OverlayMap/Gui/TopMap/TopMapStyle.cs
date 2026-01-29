@@ -1,9 +1,12 @@
-﻿using KingdomMod.OverlayMap.Assets;
+using KingdomMod.OverlayMap.Assets;
 using KingdomMod.OverlayMap.Patchers;
 using KingdomMod.Shared.Attributes;
 using System;
 using UnityEngine;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
+#if IL2CPP
+using Il2CppInterop.Runtime.Attributes;
+#endif
 
 namespace KingdomMod.OverlayMap.Gui.TopMap
 {
@@ -72,14 +75,19 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
             Config.GuiStyle.TopMap.Count.Font.Entry.SettingChanged -= OnCountFontConfigChanged;
             Config.GuiStyle.TopMap.Count.FontSize.Entry.SettingChanged -= OnCountFontSizeConfigChanged;
             Config.GuiStyle.TopMap.Count.FallbackFonts.Entry.SettingChanged -= OnCountFallbackFontsConfigChanged;
-
         }
 
+#if IL2CPP
+        [HideFromIl2Cpp]
+#endif
         private void OnBackgroundConfigChanged(object sender, EventArgs e)
         {
             ForEachTopMapView(view => view.UpdateBackgroundImage());
         }
 
+#if IL2CPP
+        [HideFromIl2Cpp]
+#endif
         private void OnSignFontConfigChanged(object sender, EventArgs e)
         {
             SignFont = FontManager.CreateMainFont(Config.GuiStyle.TopMap.Sign.Font, SignFont);
@@ -94,6 +102,9 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
             });
         }
 
+#if IL2CPP
+        [HideFromIl2Cpp]
+#endif
         private void OnSignFontSizeConfigChanged(object sender, EventArgs e)
         {
             SignFontSize = Config.GuiStyle.TopMap.Sign.FontSize;
@@ -107,6 +118,9 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
             });
         }
 
+#if IL2CPP
+        [HideFromIl2Cpp]
+#endif
         private void OnSignFallbackFontsConfigChanged(object sender, EventArgs e)
         {
             var fallbackFonts = Config.GuiStyle.TopMap.Sign.FallbackFonts.AsStringArray;
@@ -121,6 +135,9 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
             });
         }
 
+#if IL2CPP
+        [HideFromIl2Cpp]
+#endif
         private void OnTitleFontConfigChanged(object sender, EventArgs e)
         {
             TitleFont = FontManager.CreateMainFont(Config.GuiStyle.TopMap.Title.Font, TitleFont);
@@ -135,6 +152,9 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
             });
         }
 
+#if IL2CPP
+        [HideFromIl2Cpp]
+#endif
         private void OnTitleFontSizeConfigChanged(object sender, EventArgs e)
         {
             TitleFontSize = Config.GuiStyle.TopMap.Title.FontSize;
@@ -148,6 +168,9 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
             });
         }
 
+#if IL2CPP
+        [HideFromIl2Cpp]
+#endif
         private void OnTitleFallbackFontsConfigChanged(object sender, EventArgs e)
         {
             var fallbackFonts = Config.GuiStyle.TopMap.Title.FallbackFonts.AsStringArray;
@@ -162,6 +185,9 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
             });
         }
 
+#if IL2CPP
+        [HideFromIl2Cpp]
+#endif
         private void OnCountFontConfigChanged(object sender, EventArgs e)
         {
             CountFont = FontManager.CreateMainFont(Config.GuiStyle.TopMap.Count.Font, CountFont);
@@ -176,6 +202,9 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
             });
         }
 
+#if IL2CPP
+        [HideFromIl2Cpp]
+#endif
         private void OnCountFontSizeConfigChanged(object sender, EventArgs e)
         {
             CountFontSize = Config.GuiStyle.TopMap.Count.FontSize;
@@ -189,6 +218,9 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
             });
         }
 
+#if IL2CPP
+        [HideFromIl2Cpp]
+#endif
         private void OnCountFallbackFontsConfigChanged(object sender, EventArgs e)
         {
             var fallbackFonts = Config.GuiStyle.TopMap.Count.FallbackFonts.AsStringArray;
