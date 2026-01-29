@@ -1,6 +1,6 @@
 <Project>
     <PropertyGroup>
-        <Version>2.4.2</Version>
+        <Version>2.4.3</Version>
         <WarningsAsErrors>$(WarningsAsErrors);NU1605</WarningsAsErrors>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -12,7 +12,7 @@
         <DefineConstants>IL2CPP,BIE,BIE6</DefineConstants>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='BIE6_Mono|AnyCPU'">
-        <TargetFramework>net472</TargetFramework>
+        <TargetFramework>netstandard2.1</TargetFramework>
         <DefineConstants>MONO,BIE,BIE6</DefineConstants>
     </PropertyGroup>
 </Project>

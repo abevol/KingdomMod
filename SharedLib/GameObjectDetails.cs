@@ -111,7 +111,7 @@ namespace KingdomMod.SharedLib
             For example: GetAllScenesObjects() doesn't find this Trainer and the games StageLoadManager object.
             */
             //log.LogMessage("AllScenesObject's Count: " + allObjectsList.Count.ToString());
-            //log.LogMessage("FindAll<GameObject>() Count: " + GameObject.FindObjectsOfType<GameObject>().Count.ToString());
+            //log.LogMessage("FindAll<GameObject>() Count: " + GameObject.FindObjectsByType<GameObject>(FindObjectsSortMode.None).Count.ToString());
 
             #endregion
 

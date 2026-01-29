@@ -223,7 +223,7 @@ public class DevToolsHolder : MonoBehaviour
         {
             log.LogMessage("Insert key pressed.");
 
-            var cursorSystem = GameObject.FindObjectOfType<CursorSystem>();
+            var cursorSystem = GameObject.FindFirstObjectByType<CursorSystem>();
             if (cursorSystem)
                 cursorSystem.SetForceVisibleCursor(true);
 
@@ -264,7 +264,7 @@ public class DevToolsHolder : MonoBehaviour
         {
             log.LogMessage($"Dump Prefabs:");
 
-            var prefabList = GameObject.FindObjectsOfType<PrefabID>();
+            var prefabList = GameObject.FindObjectsByType<PrefabID>(FindObjectsSortMode.None);
             foreach (var prefab in prefabList)
             {
                 log.LogMessage($"PrefabID:{prefab.prefabID}, name: {prefab.name}");
@@ -411,7 +411,7 @@ public class DevToolsHolder : MonoBehaviour
 #else
                     var iDebugTools = (IDebugTools)(array[i].GetComponent("DebugTools"));
 #endif
-                    var cursorSystem = GameObject.FindObjectOfType<CursorSystem>();
+                    var cursorSystem = GameObject.FindFirstObjectByType<CursorSystem>();
                     if (cursorSystem)
                         cursorSystem.SetForceVisibleCursor(!iDebugTools.IsOpen());
 
@@ -507,7 +507,7 @@ public class DevToolsHolder : MonoBehaviour
         if (!worldCam) return;
 
         objectsInfoList.Clear();
-        var objects = GameObject.FindObjectsOfType<GameObject>();
+        var objects = GameObject.FindObjectsByType<GameObject>(FindObjectsSortMode.None);
         foreach (var obj in objects)
         {
             var renderer = obj.GetComponent<Renderer>();
@@ -560,7 +560,7 @@ public class DevToolsHolder : MonoBehaviour
             // GUI.Label(vecPos, obj.vec.x.ToString(), SpotMarkGUIStyle);
         }
 
-        // var dog = GameObject.FindObjectOfType<Dog>();
+        // var dog = GameObject.FindFirstObjectByType<Dog>();
         // if (!dog)
         //     return;
         //

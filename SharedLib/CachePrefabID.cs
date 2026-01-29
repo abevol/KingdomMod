@@ -12,7 +12,7 @@ public class CachePrefabID
     {
         _prefabIdCache.Clear();
 
-        PrefabID[] allPrefabIDs = Object.FindObjectsOfType<PrefabID>();
+        PrefabID[] allPrefabIDs = Object.FindObjectsByType<PrefabID>(FindObjectsSortMode.None);
         foreach (PrefabID prefab in allPrefabIDs)
         {
             int id = prefab.prefabID;
