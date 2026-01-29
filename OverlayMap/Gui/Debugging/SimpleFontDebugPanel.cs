@@ -8,6 +8,9 @@ using UnityEngine.UI;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
 using FontData = KingdomMod.OverlayMap.Assets.FontData;
 using FontManager = KingdomMod.OverlayMap.Assets.FontManager;
+#if IL2CPP
+using Il2CppInterop.Runtime.Attributes;
+#endif
 
 namespace KingdomMod.OverlayMap.Gui.Debugging
 {
@@ -417,6 +420,9 @@ namespace KingdomMod.OverlayMap.Gui.Debugging
         /// <summary>
         /// 向字体添加中文字符
         /// </summary>
+#if IL2CPP
+        [HideFromIl2Cpp]
+#endif
         private void AddChineseCharactersToFont(FontData fontData)
         {
             if (fontData == null) return;
@@ -481,7 +487,7 @@ namespace KingdomMod.OverlayMap.Gui.Debugging
                 }
             }
 
-            LogTrace($"UpdateFontDisplay, StackTrace: {System.Environment.StackTrace}");
+            // LogTrace($"UpdateFontDisplay, StackTrace: {System.Environment.StackTrace}");
             _testTextComponent.text = _testText;
             _testTextComponent.fontSize = _fontSize;
             _testTextComponent.color = _fontColor;
