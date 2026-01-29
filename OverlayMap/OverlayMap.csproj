@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
     <Import Project="..\ProjectSettings.shared.props" />
     <Import Project="..\ProjectSettings.custom.props" />
 
@@ -209,6 +209,11 @@
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\SharedLib\SharedLib.csproj" />
+    </ItemGroup>
+
+    <!-- Nullable Attributes Polyfill - 编译器所需的 internal 属性，每个程序集需单独编译 -->
+    <ItemGroup>
+      <Compile Include="..\SharedLib\Attributes\NullableAttributes.cs" Link="Attributes\NullableAttributes.cs" />
     </ItemGroup>
 
     <Target Name="CopyOutput" AfterTargets="Build">
