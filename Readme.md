@@ -26,9 +26,9 @@ Both `IL2CPP` and `Mono` versions of the game are now supported!
     * `IL2CPP` version, the game directory contains the folder `KingdomTwoCrowns_Data\il2cpp_data`
     * `Mono` version, the game directory contains the folder `KingdomTwoCrowns_Data\Managed`
 2. According to your game version, download the mod loader of a specific version. Unzip all files to the root directory of the game, and ensure that the `BepInEx` folder and `winhttp.dll` file are in the same directory with the game main program `KingdomTwoCrowns.exe`.
-    * `IL2CPP` version, download [BepInEx-Unity.IL2CPP-win-x64-6.0.0-be.735](https://builds.bepinex.dev/projects/bepinex_be/735/BepInEx-Unity.IL2CPP-win-x64-6.0.0-be.735%2B5fef357.zip)
-    * Due to incompatibility caused by game updates, for `IL2CPP` version you also need to download [Cpp2IL.Patch](https://github.com/abevol/KingdomMod/releases/download/2.4.0/Cpp2IL.Patch.zip), extract it to the game root directory, and overwrite the files with the same name in the BepInEx mod loader.
-    * `Mono` version, download [BepInEx-Unity.Mono-win-x64-6.0.0-be.735](https://builds.bepinex.dev/projects/bepinex_be/735/BepInEx-Unity.Mono-win-x64-6.0.0-be.735%2B5fef357.zip)
+    * `IL2CPP` version, download [BepInEx-Unity.IL2CPP-win-x64-6.0.0-be.753](https://builds.bepinex.dev/projects/bepinex_be/753/BepInEx-Unity.IL2CPP-win-x64-6.0.0-be.753%2B0d275a4.zip)
+    * Due to incompatibility caused by game updates, for `IL2CPP` version you also need to download [Cpp2IL.Patch](https://github.com/abevol/KingdomMod/releases/download/2.4.0/Cpp2IL.Patch.zip) and [Il2CppInterop.Patch](https://github.com/abevol/KingdomMod/releases/download/2.4.3/Il2CppInterop.Patch.zip), extract it to the game root directory, and overwrite the files with the same name in the BepInEx mod loader.
+    * `Mono` version, download [BepInEx-Unity.Mono-win-x64-6.0.0-be.753](https://builds.bepinex.dev/projects/bepinex_be/753/BepInEx-Unity.Mono-win-x64-6.0.0-be.753%2B0d275a4.zip)
 3. Download the mod of a specific version according to your game version. Download the mod file from [Releases](https://github.com/abevol/KingdomMod/releases), unzip all files to the directory `Kingdom Two Crowns\BepInEx\plugins`.
     * `IL2CPP` version, download mods with `BIE6_IL2CPP` in the file name.
     * `Mono` version, download mods with `BIE6_Mono` in the file name.
