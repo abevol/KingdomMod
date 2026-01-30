@@ -32,8 +32,10 @@ set "modZip=%pkgDir%\KingdomMod.All-%BIE%-v%version%.zip"
 set "outZip=%pkgDir%\KingdomMod.All-%BIE%-v%version%-with-BepInEx.zip"
 
 if not exist "%bepinexZip%" (echo [ERROR] Missing file: %bepinexZip% & goto END)
-if not exist "%cpp2ilZip%" (echo [ERROR] Missing file: %cpp2ilZip% & goto END)
-if not exist "%il2cppInteropZip%" (echo [ERROR] Missing file: %il2cppInteropZip% & goto END)
+if /I "%BIE%"=="BIE6_IL2CPP" (
+    if not exist "%cpp2ilZip%" (echo [ERROR] Missing file: %cpp2ilZip% & goto END)
+    if not exist "%il2cppInteropZip%" (echo [ERROR] Missing file: %il2cppInteropZip% & goto END)
+)
 if not exist "%modZip%" (echo [ERROR] Missing file: %modZip% & goto END)
 
 set "tmpDir=%pkgDir%\_merge_tmp"
@@ -42,10 +44,12 @@ mkdir "%tmpDir%"
 
 if exist "%outZip%" del /f /q "%outZip%"
 
-REM 解压四个压缩包到同一临时目录以实现合并
+REM 解压压缩包到同一临时目录以实现合并
 7za x -y -o"%tmpDir%" "%bepinexZip%"
-7za x -y -o"%tmpDir%" "%cpp2ilZip%"
-7za x -y -o"%tmpDir%" "%il2cppInteropZip%"
+if /I "%BIE%"=="BIE6_IL2CPP" (
+    7za x -y -o"%tmpDir%" "%cpp2ilZip%"
+    7za x -y -o"%tmpDir%" "%il2cppInteropZip%"
+)
 7za x -y -o"%tmpDir%\BepInEx\plugins" "%modZip%"
 
 REM 重新打包为最终输出
