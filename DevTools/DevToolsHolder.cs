@@ -407,7 +407,15 @@ public class DevToolsHolder : MonoBehaviour
                         componentsInChildren[j].text = componentsInChildren[j].text.ToLower();
                     }
 #if IL2CPP
-                        var iDebugTools = new IDebugTools(array[i].GetComponent("DebugTools").Pointer);
+                    IDebugTools iDebugTools = null;
+                    var tmpComps = array[i].GetComponents<Component>();
+                    foreach (var comp in tmpComps)
+                    {
+                        if (comp.name == "DebugTools")
+                        {
+                            iDebugTools = new IDebugTools(comp.Pointer);
+                        }
+                    }
 #else
                     var iDebugTools = (IDebugTools)(array[i].GetComponent("DebugTools"));
 #endif
