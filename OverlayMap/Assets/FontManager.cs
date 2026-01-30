@@ -80,34 +80,39 @@ namespace KingdomMod.OverlayMap.Assets
 
         public static Font CreateSourceFont(string fontName)
         {
-            var fontFilePath = Path.Combine(AssetsDir, "Fonts", fontName);
-            if (!File.Exists(fontFilePath))
-            {
-                fontFilePath = GetSystemFontFile(fontName);
-            }
-
             Font font;
-            if (File.Exists(fontFilePath))
+
+            font = Resources.Load<Font>(fontName);
+            if (font == null)
+                font = Resources.GetBuiltinResource<Font>(fontName);
+
+            if (font == null)
             {
-                LogTrace($"fontFilePath: {fontFilePath}");
+                LogError($"Failed to find font in Resources: {fontName}.");
+
+                var fontFilePath = Path.Combine(AssetsDir, "Fonts", fontName);
+                if (!File.Exists(fontFilePath))
+                {
+                    fontFilePath = GetSystemFontFile(fontName);
+                }
+                if (File.Exists(fontFilePath))
+                {
+                    LogTrace($"fontFilePath: {fontFilePath}");
 
 #if IL2CPP
-                font = new Font();
-                if (string.IsNullOrEmpty(Path.GetDirectoryName(fontFilePath)))
-                    Font.Internal_CreateFont(font, fontFilePath);
-                else
-                    Font.Internal_CreateFontFromPath(font, fontFilePath);
+                    font = new Font();
+                    if (string.IsNullOrEmpty(Path.GetDirectoryName(fontFilePath)))
+                        Font.Internal_CreateFont(font, fontFilePath);
+                    else
+                        Font.Internal_CreateFontFromPath(font, fontFilePath);
 #else
                 font = new Font(fontFilePath);
 #endif
-            }
-            else
-            {
-                LogError($"Failed to find font file: {fontFilePath}, try to load font '{fontName}' from game resources.");
-
-                font = Resources.Load<Font>(fontName);
-                if (font == null)
-                    font = Resources.GetBuiltinResource<Font>(fontName);
+                }
+                else
+                {
+                    LogError($"Failed to find font file: {fontFilePath}.");
+                }
             }
 
             // Font font = Resources.GetBuiltinResource<Font>("Arial.ttf");
@@ -128,7 +133,10 @@ namespace KingdomMod.OverlayMap.Assets
         {
             var fontAsset = TMP_FontAsset.CreateFontAsset(font, 48, 3, GlyphRenderMode.SDFAA, 1024, 1024);
             if (fontAsset == null)
+            {
                 LogError($"Failed to create font.");
+                return null;
+            }
 
             UnityEngine.Object.DontDestroyOnLoad(fontAsset);
             fontAsset.sourceFontFile.hideFlags |= HideFlags.DontUnloadUnusedAsset;

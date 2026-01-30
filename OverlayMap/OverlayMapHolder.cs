@@ -1460,7 +1460,7 @@ public class OverlayMapHolder : MonoBehaviour
         _log.LogInfo($"[{Path.GetFileName(sourceFilePath)}][{sourceLineNumber.ToString("0000")}][{memberName}] {message}");
     }
 
-    public static void LogMessage(string message,
+    public static void LogInfo(string message,
         [System.Runtime.CompilerServices.CallerMemberName]
         string memberName = "",
         [System.Runtime.CompilerServices.CallerFilePath]
