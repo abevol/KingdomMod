@@ -7,6 +7,11 @@ using UnityEngine;
 using UnityEngine.TextCore.LowLevel;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
 
+#if IL2CPP
+using UnityEngine.Bindings;
+using Il2CppInterop.Runtime;
+#endif
+
 namespace KingdomMod.OverlayMap.Assets
 {
     public class FontManager
@@ -102,11 +107,11 @@ namespace KingdomMod.OverlayMap.Assets
 #if IL2CPP
                     font = new Font();
                     if (string.IsNullOrEmpty(Path.GetDirectoryName(fontFilePath)))
-                        Font.Internal_CreateFont(font, fontFilePath);
+                        Internal_CreateFont(font, fontFilePath);
                     else
-                        Font.Internal_CreateFontFromPath(font, fontFilePath);
+                        Internal_CreateFontFromPath(font, fontFilePath);
 #else
-                font = new Font(fontFilePath);
+                    font = new Font(fontFilePath);
 #endif
                 }
                 else
@@ -146,5 +151,57 @@ namespace KingdomMod.OverlayMap.Assets
             LogTrace($"Font Created: {fontAsset.faceInfo.familyName}, '{fontAsset.sourceFontFile == null}' '{!fontAsset.sourceFontFile}', sourceFontFile: {fontAsset.sourceFontFile.name}");
             return fontAsset;
         }
+
+#if IL2CPP
+        private unsafe static void Internal_CreateFont(Font self, string name)
+        {
+            try
+            {
+                ManagedSpanWrapper managedSpanWrapper;
+                if (string.IsNullOrEmpty(name))
+                {
+                    managedSpanWrapper = default;
+                    Font.Internal_CreateFont_Injected(self, ref managedSpanWrapper);
+                }
+                else
+                {
+                    fixed (char* ptr = name)
+                    {
+                        managedSpanWrapper = new ManagedSpanWrapper((void*)ptr, name.Length);
+                        Font.Internal_CreateFont_Injected(self, ref managedSpanWrapper);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogError($"Internal_CreateFont failed: {ex}");
+            }
+        }
+
+        private unsafe static void Internal_CreateFontFromPath(Font self, string fontPath)
+        {
+            try
+            {
+                ManagedSpanWrapper managedSpanWrapper;
+                if (string.IsNullOrEmpty(fontPath))
+                {
+                    managedSpanWrapper = default;
+                    Font.Internal_CreateFontFromPath_Injected(self, ref managedSpanWrapper);
+                }
+                else
+                {
+                    fixed (char* ptr = fontPath)
+                    {
+                        managedSpanWrapper = new ManagedSpanWrapper((void*)ptr, fontPath.Length);
+                        Font.Internal_CreateFontFromPath_Injected(self, ref managedSpanWrapper);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogError($"Internal_CreateFontFromPath failed: {ex}");
+            }
+        }
+#endif
     }
 }

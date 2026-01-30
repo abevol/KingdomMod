@@ -70,10 +70,6 @@
             <HintPath>..\_libs\BIE6_IL2CPP\interop\Il2CppSystem.Core.dll</HintPath>
             <Private>False</Private>
         </Reference>
-        <Reference Include="UnityEngine">
-            <HintPath>..\_libs\BIE6_IL2CPP\interop\UnityEngine.dll</HintPath>
-            <Private>False</Private>
-        </Reference>
         <Reference Include="UnityEngine.AnimationModule">
             <HintPath>..\_libs\BIE6_IL2CPP\interop\UnityEngine.AnimationModule.dll</HintPath>
             <Private>False</Private>
