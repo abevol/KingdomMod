@@ -93,7 +93,7 @@ namespace KingdomMod.OverlayMap.Assets
 
             if (font == null)
             {
-                LogError($"Failed to find font in Resources: {fontName}.");
+                LogTrace($"Failed to find font in Resources: {fontName}.");
 
                 var fontFilePath = Path.Combine(AssetsDir, "Fonts", fontName);
                 if (!File.Exists(fontFilePath))
@@ -153,7 +153,7 @@ namespace KingdomMod.OverlayMap.Assets
         }
 
 #if IL2CPP
-        private unsafe static void Internal_CreateFont(Font self, string name)
+        private static unsafe void Internal_CreateFont(Font self, string name)
         {
             try
             {
@@ -178,7 +178,7 @@ namespace KingdomMod.OverlayMap.Assets
             }
         }
 
-        private unsafe static void Internal_CreateFontFromPath(Font self, string fontPath)
+        private static unsafe void Internal_CreateFontFromPath(Font self, string fontPath)
         {
             try
             {
