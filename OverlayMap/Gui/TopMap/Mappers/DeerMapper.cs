@@ -26,8 +26,8 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
             }, comp => comp.gameObject.activeSelf && !comp.Cast<Deer>()._damageable.isDead, MarkerRow.Movable);
         }
 
-        [HarmonyPatch(typeof(Deer), nameof(Deer.OnEnable))]
-        private class OnEnablePatch
+        [HarmonyPatch(typeof(Deer), nameof(Deer.Start))]
+        private class StartPatch
         {
             public static void Postfix(Deer __instance)
             {
@@ -35,8 +35,8 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
             }
         }
 
-        [HarmonyPatch(typeof(Deer), nameof(Deer.OnDisable))]
-        private class OnDisablePatch
+        [HarmonyPatch(typeof(Deer), nameof(Deer.OnDestroy))]
+        private class OnDestroyPatch
         {
             public static void Prefix(Deer __instance)
             {
