@@ -42,10 +42,11 @@ public class DevToolsHolder : MonoBehaviour
         Instance = obj.AddComponent<DevToolsHolder>();
     }
 
-    public DevToolsHolder()
+    private void Awake()
     {
         Patcher.PatchAll();
         log.LogMessage($"isDebugBuild: {Debug.isDebugBuild}");
+
     }
 
     private void Start()

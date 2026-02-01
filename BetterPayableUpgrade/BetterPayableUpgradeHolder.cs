@@ -74,11 +74,6 @@ public class BetterPayableUpgradeHolder : MonoBehaviour
         Instance = obj.AddComponent<BetterPayableUpgradeHolder>();
     }
 
-    public BetterPayableUpgradeHolder()
-    {
-        log.LogDebug($"{this.GetType().Name} constructor");
-    }
-
     private void Start()
     {
         log.LogMessage($"{this.GetType().Name} Start.");
