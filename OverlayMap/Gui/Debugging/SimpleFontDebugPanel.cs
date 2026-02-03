@@ -26,14 +26,6 @@ namespace KingdomMod.OverlayMap.Gui.Debugging
         private FontData _currentFontData;
         private List<FontData> _availableFonts = new List<FontData>();
         private int _currentFontIndex = 0;
-        private string _testText = """
-                                   字体测试文本 Font Test Text 1234567890 !@#$%^&*()
-                                   城堡：♜
-                                   城墙：۩
-                                   浆果：♣
-                                   河流：≈
-                                   土堆：∧
-                                   """;
         private float _fontSize = 24f;
         private Color _fontColor = Color.white;
         private TextAlignmentOptions _textAlignment = TextAlignmentOptions.Center;
@@ -49,6 +41,37 @@ namespace KingdomMod.OverlayMap.Gui.Debugging
         private int _currentColorIndex = 0;
         private int _currentAlignmentIndex = 0;
         private int _currentStyleIndex = 0;
+
+        /// <summary>
+        /// 字体列表配置
+        /// </summary>
+        private readonly string[] _fontList = new string[]
+        {
+            "PerfectDOSVGA437",
+            "fonts/zpix",
+            "fonts/kingdom",
+            "fonts/kingdommenu",
+            "fonts/notoserifhebrew-medium",
+            "fonts/notosanssc-medium",
+            "MSYH.TTC",
+            "ARIAL.TTF",
+            "ARIALUNI.TTF",
+            "CALIBRI.TTF",
+            "MSGOTHIC.TTC",
+            "SEGOEUI.TTF",
+            "SEGUISYM.TTF",
+            "TIMES.TTF",
+            "WINGDING.TTF"
+        };
+
+        private readonly string _testText = """
+                                            字体测试文本 Font Test Text 1234567890 !@#$%^&*()
+                                            城堡：♜
+                                            城墙：۩
+                                            浆果：♣
+                                            河流：≈
+                                            土堆：∧
+                                            """;
 
         private readonly Color[] _colors = { Color.white, Color.red, Color.green, Color.blue, Color.yellow, Color.cyan, Color.magenta };
         private readonly TextAlignmentOptions[] _alignments = { 
@@ -217,7 +240,7 @@ namespace KingdomMod.OverlayMap.Gui.Debugging
                 }));
 
             var info = $"字体调试面板 - Font Debug Panel\n" +
-                       $"热键: Ctrl+T 切换显示 | 数字键1-9切换字体 | 方向键调整参数\n" +
+                       $"热键: Ctrl+T 切换显示 | 数字键1/2切换字体 | 方向键调整参数\n" +
                        $"当前字体: {fontName} | 大小: {_fontSize:F1} | 颜色: {colorName}\n" +
                        $"对齐: {alignmentName} | 样式: {styleName} | 富文本: {(_enableRichText ? "开" : "关")}\n" +
                        $"换行: {(_enableWordWrapping ? "开" : "关")} | 行间距: {_lineSpacing:F1} | 字符间距: {_characterSpacing:F1}\n" +
@@ -270,28 +293,40 @@ namespace KingdomMod.OverlayMap.Gui.Debugging
         {
             if (!_isVisible || !_panel || !_panel.activeInHierarchy) return;
 
-            // 数字键1-9切换字体
-            for (int i = 1; i <= 9; i++)
+            // 数字键1切换上一个字体，数字键2切换下一个字体
+            if (Input.GetKeyDown(KeyCode.Alpha1))
             {
-                if (Input.GetKeyDown(KeyCode.Alpha0 + i))
+                if (_availableFonts.Count > 0)
                 {
-                    var fontIndex = i - 1;
-                    if (fontIndex < _availableFonts.Count)
-                    {
-                        _currentFontIndex = fontIndex;
-                        LogTrace($"_currentFontIndex: {_currentFontIndex}, _availableFonts.Count: {_availableFonts.Count}");
-                        _currentFontData = _availableFonts[fontIndex];
-                        LogTrace($"_availableFonts[fontIndex]: {_availableFonts[fontIndex]?.ToString() ?? "null"}, _availableFonts[fontIndex].Font: {_availableFonts[fontIndex].Font.faceInfo.familyName}");
-                        LogTrace($"_currentFontData: {_currentFontData}, _currentFontData.Font: {_currentFontData.Font.faceInfo.familyName}");
+                    _currentFontIndex = (_currentFontIndex - 1 + _availableFonts.Count) % _availableFonts.Count;
+                    _currentFontData = _availableFonts[_currentFontIndex];
+                    LogTrace($"_currentFontIndex: {_currentFontIndex}, _availableFonts.Count: {_availableFonts.Count}");
+                    LogTrace($"_availableFonts[{_currentFontIndex}]: {_availableFonts[_currentFontIndex]?.ToString() ?? "null"}, Font: {_availableFonts[_currentFontIndex].Font.faceInfo.familyName}");
 
-                        // 确保当前字体包含中文字符
-                        AddChineseCharactersToFont(_currentFontData);
-                        
-                        UpdateFontDisplay();
-                        UpdateInfoDisplay();
-                    }
+                    // 确保当前字体包含中文字符
+                    AddChineseCharactersToFont(_currentFontData);
+                    
+                    UpdateFontDisplay();
+                    UpdateInfoDisplay();
                 }
             }
+            else if (Input.GetKeyDown(KeyCode.Alpha2))
+            {
+                if (_availableFonts.Count > 0)
+                {
+                    _currentFontIndex = (_currentFontIndex + 1) % _availableFonts.Count;
+                    _currentFontData = _availableFonts[_currentFontIndex];
+                    LogTrace($"_currentFontIndex: {_currentFontIndex}, _availableFonts.Count: {_availableFonts.Count}");
+                    LogTrace($"_availableFonts[{_currentFontIndex}]: {_availableFonts[_currentFontIndex]?.ToString() ?? "null"}, Font: {_availableFonts[_currentFontIndex].Font.faceInfo.familyName}");
+
+                    // 确保当前字体包含中文字符
+                    AddChineseCharactersToFont(_currentFontData);
+                    
+                    UpdateFontDisplay();
+                    UpdateInfoDisplay();
+                }
+            }
+
 
             // 方向键调整参数
             if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
@@ -388,10 +423,8 @@ namespace KingdomMod.OverlayMap.Gui.Debugging
         {
             _availableFonts.Clear();
 
-            // 尝试加载一些常见字体
-            var commonFonts = new string[] { "MSYH.TTC", "ARIAL.TTF", "ARIALUNI.TTF", "CALIBRI.TTF", "MSGOTHIC.TTC", "SEGOEUI.TTF", "SEGUISYM.TTF", "TIMES.TTF", "WINGDING.TTF" };
-            
-            foreach (var fontName in commonFonts)
+            // 使用字体列表配置
+            foreach (var fontName in _fontList)
             {
                 try
                 {
