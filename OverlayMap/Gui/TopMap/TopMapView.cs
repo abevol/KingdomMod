@@ -284,7 +284,8 @@ public class TopMapView : MonoBehaviour
 
     private void OnLevelLoaded(bool fromSave)
     {
-        LogWarning($"OnLevelLoaded fromSave: {fromSave}");
+        LogWarning($"OnLevelLoaded: fromSave: {fromSave}, MapMarkers: {MapMarkers.Count}");
+
 
     }
 

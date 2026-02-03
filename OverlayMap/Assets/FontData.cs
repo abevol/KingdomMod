@@ -45,7 +45,7 @@ namespace KingdomMod.OverlayMap.Assets
                 return;
             }
 
-            var fallbackFont = FontManager.CreateFont(sourceFont);
+            var fallbackFont = FontManager.CreateFontAsset(sourceFont);
             if (fallbackFont == null)
             {
                 LogError($"Failed to get fallback font: {fontName}");
@@ -104,9 +104,6 @@ namespace KingdomMod.OverlayMap.Assets
             var missingChars = TryAddCharacters(Font, charsToAdd);
             MissingChars.UnionWith(missingChars);
 
-            if (!string.IsNullOrEmpty(missingChars))
-                LogWarning($"SourceFont '{SourceFont == null}' '{!SourceFont}'");
-
             if (!string.IsNullOrEmpty(missingChars) && Font.fallbackFontAssetTable != null)
             {
                 foreach (var fallbackFont in Font.fallbackFontAssetTable)
@@ -129,8 +126,6 @@ namespace KingdomMod.OverlayMap.Assets
             if (!string.IsNullOrEmpty(missingChars))
             {
                 LogWarning($"Font '{fontAsset.faceInfo.familyName}' is missing characters: {missingChars}");
-                LogWarning($"sourceFontFile '{fontAsset.sourceFontFile == null}' '{!fontAsset.sourceFontFile}'");
-
             }
 
             return missingChars;

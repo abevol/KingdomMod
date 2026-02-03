@@ -55,7 +55,7 @@ namespace KingdomMod.OverlayMap.Assets
                 return null;
             }
 
-            var font = CreateFont(sourceFont);
+            var font = CreateFontAsset(sourceFont);
             if (font == null)
             {
                 LogError($"Failed to create font: {fontName}");
@@ -120,9 +120,6 @@ namespace KingdomMod.OverlayMap.Assets
                 }
             }
 
-            // Font font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-            // Font font = Resources.Load<Font>("Fonts/Zpix");
-
             if (font == null)
             {
                 LogError($"Failed to load font: {fontName}");
@@ -134,7 +131,7 @@ namespace KingdomMod.OverlayMap.Assets
             return font;
         }
 
-        public static TMP_FontAsset CreateFont(Font font)
+        public static TMP_FontAsset CreateFontAsset(Font font)
         {
             var fontAsset = TMP_FontAsset.CreateFontAsset(font, 48, 3, GlyphRenderMode.SDFAA, 1024, 1024);
             if (fontAsset == null)
