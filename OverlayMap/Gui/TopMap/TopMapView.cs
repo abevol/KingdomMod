@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
@@ -32,6 +32,8 @@ public class TopMapView : MonoBehaviour
     private Dictionary<Type, IComponentMapper> _componentMappers { get; set; }
 
     private Dictionary<IntPtr, IComponentMapper> _fastLookup;
+    
+    private Mappers.EnemyMapper _enemyMapper;
 
     public static float MappingScale;
     public PlayerId PlayerId;
@@ -109,6 +111,9 @@ public class TopMapView : MonoBehaviour
         };
 
         BuildFastLookup();
+        
+        // 创建 EnemyMapper（不注册到 _componentMappers，因为它不通过 ObjectPatcher 触发）
+        _enemyMapper = new Mappers.EnemyMapper(this);
 
         PlayerMarkers = new List<MapMarker>();
         LeftWalls = new LinkedList<MapMarker>();
@@ -338,6 +343,12 @@ public class TopMapView : MonoBehaviour
 
     private void Update()
     {
+        // 每帧更新敌人组位置(轻量级操作,实现平滑移动)
+        if (_enemyMapper != null)
+        {
+            _enemyMapper.UpdateGroupPositions();
+        }
+
         _timeSinceLastGuiUpdate += Time.deltaTime;
 
         if (_timeSinceLastGuiUpdate > (1.0 / Global.GuiUpdatesPerSecond))
@@ -347,6 +358,12 @@ public class TopMapView : MonoBehaviour
             if (!IsPlaying()) return;
 
             UpdateExploredRegion();
+            
+            // 更新敌人分组(重量级操作,有 0.5 秒限流)
+            if (_enemyMapper != null)
+            {
+                _enemyMapper.UpdateEnemyGroups();
+            }
 
             foreach (var pair in MapMarkers)
             {
