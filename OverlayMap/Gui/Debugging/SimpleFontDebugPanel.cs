@@ -47,8 +47,6 @@ namespace KingdomMod.OverlayMap.Gui.Debugging
         /// </summary>
         private readonly string[] _fontList = new string[]
         {
-            "PerfectDOSVGA437",
-            "fonts/zpix",
             "fonts/kingdom",
             "fonts/kingdommenu",
             "fonts/notoserifhebrew-medium",
