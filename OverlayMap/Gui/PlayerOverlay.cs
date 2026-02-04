@@ -3,6 +3,8 @@ using Il2CppInterop.Runtime.Injection;
 #endif
 using System;
 using KingdomMod.OverlayMap.Gui.TopMap;
+using KingdomMod.OverlayMap.Gui.StatsInfo;
+using KingdomMod.OverlayMap.Gui.ExtraInfo;
 using UnityEngine;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
 using KingdomMod.Shared.Attributes;
@@ -15,6 +17,8 @@ namespace KingdomMod.OverlayMap.Gui
         private RectTransform _rectTransform;
         private PlayerId _playerId;
         public TopMapView TopMapView;
+        public StatsInfoView StatsInfoView;
+        public ExtraInfoView ExtraInfoView;
 
 #if IL2CPP
         public PlayerOverlay(IntPtr ptr) : base(ptr) { }
@@ -26,6 +30,8 @@ namespace KingdomMod.OverlayMap.Gui
 
             _rectTransform = this.gameObject.AddComponent<RectTransform>();
             TopMapView = CreateTopMapView();
+            StatsInfoView = CreateStatsInfoView();
+            ExtraInfoView = CreateExtraInfoView();
 
             OverlayMapHolder.OnGameStateChanged += OnGameStateChanged;
 
@@ -36,6 +42,7 @@ namespace KingdomMod.OverlayMap.Gui
         {
             _playerId = playerId;
             TopMapView.Init(playerId);
+            ExtraInfoView.Init(playerId);
         }
 
         private void OnDestroy()
@@ -68,6 +75,10 @@ namespace KingdomMod.OverlayMap.Gui
 
             _rectTransform.offsetMin = Vector2.zero;
             _rectTransform.offsetMax = Vector2.zero;
+
+            // 更新子组件布局
+            StatsInfoView?.UpdateLayout();
+            ExtraInfoView?.UpdateLayout();
         }
 
         public void Show()
@@ -140,6 +151,26 @@ namespace KingdomMod.OverlayMap.Gui
 
             GameObject.Destroy(TopMapView.gameObject);
             TopMapView = null;
+        }
+
+        private StatsInfoView CreateStatsInfoView()
+        {
+            LogDebug($"CreateStatsInfoView");
+
+            var viewObj = new GameObject(nameof(StatsInfo.StatsInfoView));
+            viewObj.transform.SetParent(this.transform, false);
+            var view = viewObj.AddComponent<StatsInfoView>();
+            return view;
+        }
+
+        private ExtraInfoView CreateExtraInfoView()
+        {
+            LogDebug($"CreateExtraInfoView");
+
+            var viewObj = new GameObject(nameof(ExtraInfo.ExtraInfoView));
+            viewObj.transform.SetParent(this.transform, false);
+            var view = viewObj.AddComponent<ExtraInfoView>();
+            return view;
         }
     }
 }
