@@ -82,7 +82,6 @@ public class OverlayMapHolder : MonoBehaviour
         Patchers.Patcher.PatchAll();
 
         CreateCanvas();
-        CreateFontDebugPanel();
         guiStyle = CreateGuiStyle();
         PlayerOverlays.P1 = CreatePlayerOverlay(PlayerId.P1);
         PlayerOverlays.P2 = CreatePlayerOverlay(PlayerId.P2);
@@ -326,11 +325,12 @@ public class OverlayMapHolder : MonoBehaviour
         if (Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.T))
         {
             LogDebug("T key pressed.");
-            _showFontDebugPanel = !_showFontDebugPanel;
-            if (_fontDebugPanel != null)
+            if (_fontDebugPanel == null)
             {
-                _fontDebugPanel.SetVisible(_showFontDebugPanel);
+                CreateFontDebugPanel();
             }
+            _showFontDebugPanel = !_showFontDebugPanel;
+            _fontDebugPanel.SetVisible(_showFontDebugPanel);
         }
 
         if (Input.GetKeyDown(KeyCode.F5))

@@ -29,6 +29,9 @@ Supports both IL2CPP and Mono game versions.
 
 **Projects**: OverlayMap, StaminaBar, DevTools, BetterPayableUpgrade, SharedLib
 
+**Game Reference Source Code**: `~\Documents\ILSpy\KingdomTwoCrowns\2.3.2\Assembly-CSharp`  
+This directory contains decompiled game source code for reference when implementing mod features.
+
 ---
 
 ## Build Commands

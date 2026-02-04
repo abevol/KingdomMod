@@ -34,7 +34,7 @@ namespace KingdomMod.OverlayMap.Assets
             var newFont = CreateMainFont(fontName);
             if (newFont == null)
             {
-                LogError($"Failed to create font: {fontName}");
+                LogWarning($"Failed to create font: {fontName}");
                 return null;
             }
 
@@ -51,14 +51,14 @@ namespace KingdomMod.OverlayMap.Assets
             var sourceFont = CreateSourceFont(fontName);
             if (sourceFont == null)
             {
-                LogError($"Failed to create source font: {fontName}");
+                LogWarning($"Failed to create source font: {fontName}");
                 return null;
             }
 
             var font = CreateFontAsset(sourceFont);
             if (font == null)
             {
-                LogError($"Failed to create font: {fontName}");
+                LogWarning($"Failed to create font asset: {fontName}");
                 return null;
             }
 
@@ -136,7 +136,7 @@ namespace KingdomMod.OverlayMap.Assets
             var fontAsset = TMP_FontAsset.CreateFontAsset(font, 48, 3, GlyphRenderMode.SDFAA, 1024, 1024);
             if (fontAsset == null)
             {
-                LogError($"Failed to create font.");
+                LogWarning($"Failed to create font asset: {font.name}.");
                 return null;
             }
 
