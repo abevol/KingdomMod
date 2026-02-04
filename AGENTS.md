@@ -1,5 +1,27 @@
 # AGENTS.md - KingdomMod Repository Guidelines
 
+---
+
+## ⚡ Current Branch Work Context
+
+**Branch:** `dev`  
+**Task:** OverlayMap UI Framework Migration (IMGUI → UGUI + TextMeshPro)
+
+**Current Status:**
+- 正在进行 `KingdomMod.OverlayMap` 模组的 UI 框架迁移工作
+- **OLD (废弃中)**: IMGUI 实现位于 `OverlayMap\OverlayMapHolder.cs`
+- **NEW (开发中)**: UGUI + TextMeshPro 实现位于 `OverlayMap\Gui\` 目录
+
+**Key Points:**
+- 不要修改或依赖旧的 IMGUI 代码 (`OverlayMapHolder.cs`)
+- 所有新的 UI 功能应该基于 UGUI 实现,放在 `Gui\` 目录
+- 使用 TextMeshPro 进行文本渲染,而非旧的 UnityEngine.UI.Text
+
+**完成条件:** 
+此段说明应在 UI 迁移任务完成、分支合并后删除。
+
+---
+
 ## Project Overview
 
 A C# .NET modding project for the game **Kingdom Two Crowns** using BepInEx plugin framework.
