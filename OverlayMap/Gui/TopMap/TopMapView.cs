@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
@@ -125,8 +125,6 @@ public class TopMapView : MonoBehaviour
 
         UpdateLayout();
         UpdateBackgroundImage();
-        // CreateText();
-        // DrawLine(new Vector2(0, 0), new Vector2(300, 0), Color.red, 2);
 
         ObjectPatcher.OnComponentCreated += OnComponentCreated;
         ObjectPatcher.OnComponentDestroyed += OnComponentDestroyed;
@@ -502,51 +500,6 @@ public class TopMapView : MonoBehaviour
         // 添加背景图，并设置九宫格
         _backgroundImage.sprite = sprite; // 将png图片放在Resources文件夹下
         _backgroundImage.type = Image.Type.Sliced;
-    }
-    private void CreateText()
-    {
-        GameObject textObj = new GameObject("GroupText");
-        textObj.transform.SetParent(_rectTransform, false);
-        _groupText = textObj.AddComponent<Text>();
-
-        _groupText.text = "这是一个文本控件\u2663\u265c\u06e9";
-        _groupText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-        _groupText.fontSize = 12;
-        _groupText.color = Color.white;
-        _groupText.alignment = TextAnchor.MiddleCenter;
-
-        // // 添加描边效果
-        // Outline outline = textObj.AddComponent<Outline>();
-        // outline.effectColor = new Color(0, 0, 0, 0.5f); // 描边颜色 (黑色)
-        // outline.effectDistance = new Vector2(1, -1); // 描边偏移
-        //
-        // // 添加阴影效果
-        // Shadow shadow = textObj.AddComponent<Shadow>();
-        // shadow.effectColor = new Color(0, 0, 0, 0.5f); // 阴影颜色 (黑色，半透明)
-        // shadow.effectDistance = new Vector2(2, -2); // 阴影偏移
-
-        // 设置文本控件的尺寸和位置
-        var textRect = textObj.GetComponent<RectTransform>();
-        textRect.anchorMin = new Vector2(0, 0);
-        textRect.anchorMax = new Vector2(1, 1);
-        textRect.sizeDelta = new Vector2(0, 0); // 填充整个 Group
-    }
-
-    private void DrawLine(Vector2 lineStart, Vector2 lineEnd, Color color, uint thickness)
-    {
-        GameObject lineObj = new GameObject("Line");
-        Image lineImage = lineObj.AddComponent<Image>();
-        lineImage.color = color; // 直线颜色
-
-        RectTransform lineRect = lineObj.GetComponent<RectTransform>();
-        lineRect.SetParent(_rectTransform, false);
-
-        Vector2 lineDelta = lineEnd - lineStart;
-        float distance = lineDelta.magnitude;
-        lineRect.pivot = new Vector2(0, 0.5f); // 中心点在左侧中间
-        lineRect.sizeDelta = new Vector2(distance, thickness);
-        lineRect.anchoredPosition = lineStart;
-        lineRect.localRotation = Quaternion.Euler(0, 0, Mathf.Atan2(lineDelta.y, lineDelta.x) * Mathf.Rad2Deg);
     }
 
     //
