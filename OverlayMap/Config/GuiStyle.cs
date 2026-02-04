@@ -44,6 +44,31 @@ public class GuiStyle
         }
     }
 
+    public static class StatsInfo
+    {
+        public static ConfigEntryWrapper<string> BackgroundColor;
+        public static ConfigEntryWrapper<string> BackgroundImageFile;
+        public static ConfigEntryWrapper<string> BackgroundImageArea;
+        public static ConfigEntryWrapper<string> BackgroundImageBorder;
+
+        public static class Text
+        {
+            public static ConfigEntryWrapper<string> Font;
+            public static ConfigEntryWrapper<float> FontSize;
+            public static ConfigEntryWrapper<string> FallbackFonts;
+        }
+    }
+
+    public static class ExtraInfo
+    {
+        public static class Text
+        {
+            public static ConfigEntryWrapper<string> Font;
+            public static ConfigEntryWrapper<float> FontSize;
+            public static ConfigEntryWrapper<string> FallbackFonts;
+        }
+    }
+
     public static void ConfigBind(ConfigFile config)
     {
         LogDebug($"ConfigBind: {Path.GetFileName(config.ConfigFilePath)}");
@@ -69,6 +94,18 @@ public class GuiStyle
         TopMap.Count.FontSize = config.Bind("TopMap.Count", "FontSize", 12.0f, "");
         TopMap.Count.FallbackFonts = config.Bind("TopMap.Count", "FallbackFonts", "", "");
 
+        StatsInfo.BackgroundColor = config.Bind("StatsInfo", "BackgroundColor", "0,0,0,0", "");
+        StatsInfo.BackgroundImageFile = config.Bind("StatsInfo", "BackgroundImageFile", "Background.png", "");
+        StatsInfo.BackgroundImageArea = config.Bind("StatsInfo", "BackgroundImageArea", "17, 17, 94, 94", "");
+        StatsInfo.BackgroundImageBorder = config.Bind("StatsInfo", "BackgroundImageBorder", "17, 17, 17, 17", "");
+
+        StatsInfo.Text.Font = config.Bind("StatsInfo.Text", "Font", "fonts/notosanssc-medium", "");
+        StatsInfo.Text.FontSize = config.Bind("StatsInfo.Text", "FontSize", 13.0f, "");
+        StatsInfo.Text.FallbackFonts = config.Bind("StatsInfo.Text", "FallbackFonts", "", "");
+
+        ExtraInfo.Text.Font = config.Bind("ExtraInfo.Text", "Font", "fonts/notosanssc-medium", "");
+        ExtraInfo.Text.FontSize = config.Bind("ExtraInfo.Text", "FontSize", 13.0f, "");
+        ExtraInfo.Text.FallbackFonts = config.Bind("ExtraInfo.Text", "FallbackFonts", "", "");
         LogDebug($"Loaded config: {Path.GetFileName(ConfigFile.ConfigFilePath)}");
 
         _configFileWatcher.Set(Path.GetFileName(config.ConfigFilePath), OnConfigFileChanged);

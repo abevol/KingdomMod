@@ -46,6 +46,39 @@ public class ExtraInfoView : MonoBehaviour
     private void Start()
     {
         LogTrace("ExtraInfoView.Start");
+        ApplyStyleConfig();
+    }
+
+    /// <summary>
+    /// 应用风格配置（字体、字体大小）
+    /// 在 Start() 中调用，此时 GuiStyle 已初始化完成
+    /// </summary>
+    private void ApplyStyleConfig()
+    {
+        try
+        {
+            if (Instance == null || Instance.guiStyle == null)
+            {
+                LogWarning("Instance or guiStyle is null, using default font");
+                return;
+            }
+
+            var styleComp = Instance.guiStyle.extraInfoStyle;
+            if (styleComp != null && styleComp.TextFont != null && styleComp.TextFont.Font != null)
+            {
+                UpdateTextFont(styleComp.TextFont.Font);
+                UpdateTextFontSize(styleComp.TextFontSize);
+                LogDebug($"Applied ExtraInfo font: {styleComp.TextFont.Font.name}, size: {styleComp.TextFontSize}");
+            }
+            else
+            {
+                LogWarning("ExtraInfoStyle or TextFont is null, using default font");
+            }
+        }
+        catch (Exception ex)
+        {
+            LogError($"Failed to apply style config: {ex.Message}");
+        }
     }
 
     /// <summary>
@@ -97,11 +130,13 @@ public class ExtraInfoView : MonoBehaviour
         textRect.sizeDelta = new Vector2(120, 20);
 
         // 配置文本样式
-        _landAndDaysText.fontSize = 14;
         _landAndDaysText.color = Config.MarkerStyle.ExtraInfo.Color;
         _landAndDaysText.alignment = TextAlignmentOptions.TopLeft;
         _landAndDaysText.enableWordWrapping = false;
         _landAndDaysText.overflowMode = TextOverflowModes.Overflow;
+
+        // 使用配置文件中的默认字体大小（字体在 Start() 中加载）
+        _landAndDaysText.fontSize = Config.GuiStyle.ExtraInfo.Text.FontSize;
     }
 
     /// <summary>
@@ -122,11 +157,13 @@ public class ExtraInfoView : MonoBehaviour
         textRect.sizeDelta = new Vector2(40, 20);
 
         // 配置文本样式
-        _timeText.fontSize = 14;
         _timeText.color = Config.MarkerStyle.ExtraInfo.Color;
         _timeText.alignment = TextAlignmentOptions.TopLeft;
         _timeText.enableWordWrapping = false;
         _timeText.overflowMode = TextOverflowModes.Overflow;
+
+        // 使用配置文件中的默认字体大小（字体在 Start() 中加载）
+        _timeText.fontSize = Config.GuiStyle.ExtraInfo.Text.FontSize;
     }
 
     /// <summary>
@@ -146,11 +183,13 @@ public class ExtraInfoView : MonoBehaviour
         gemsRect.anchoredPosition = new Vector2(-66, -(136 + 22));
         gemsRect.sizeDelta = new Vector2(60, 20);
 
-        _gemsText.fontSize = 14;
         _gemsText.color = Config.MarkerStyle.ExtraInfo.Color;
         _gemsText.alignment = TextAlignmentOptions.TopRight;
         _gemsText.enableWordWrapping = false;
         _gemsText.overflowMode = TextOverflowModes.Overflow;
+
+        // 使用配置文件中的默认字体大小（字体在 Start() 中加载）
+        _gemsText.fontSize = Config.GuiStyle.ExtraInfo.Text.FontSize;
 
         // 金币文本
         var coinsObj = new GameObject("CoinsText");
@@ -164,11 +203,13 @@ public class ExtraInfoView : MonoBehaviour
         coinsRect.anchoredPosition = new Vector2(-6, -(136 + 22));
         coinsRect.sizeDelta = new Vector2(60, 20);
 
-        _coinsText.fontSize = 14;
         _coinsText.color = Config.MarkerStyle.ExtraInfo.Color;
         _coinsText.alignment = TextAlignmentOptions.TopRight;
         _coinsText.enableWordWrapping = false;
         _coinsText.overflowMode = TextOverflowModes.Overflow;
+
+        // 使用配置文件中的默认字体大小（字体在 Start() 中加载）
+        _coinsText.fontSize = Config.GuiStyle.ExtraInfo.Text.FontSize;
     }
 
     private void Update()
@@ -232,4 +273,61 @@ public class ExtraInfoView : MonoBehaviour
             LogError($"Failed to update extra info: {ex.Message}");
         }
     }
+
+    /// <summary>
+    /// 更新文本字体
+    /// </summary>
+    public void UpdateTextFont(TMP_FontAsset font)
+    {
+        if (font == null) return;
+
+        if (_landAndDaysText != null)
+            _landAndDaysText.font = font;
+
+        if (_timeText != null)
+            _timeText.font = font;
+
+        if (_gemsText != null)
+            _gemsText.font = font;
+
+        if (_coinsText != null)
+            _coinsText.font = font;
+    }
+
+    /// <summary>
+    /// 更新文本字体大小
+    /// </summary>
+    public void UpdateTextFontSize(float fontSize)
+    {
+        if (_landAndDaysText != null)
+            _landAndDaysText.fontSize = fontSize;
+
+        if (_timeText != null)
+            _timeText.fontSize = fontSize;
+
+        if (_gemsText != null)
+            _gemsText.fontSize = fontSize;
+
+        if (_coinsText != null)
+            _coinsText.fontSize = fontSize;
+    }
+
+    /// <summary>
+    /// 强制更新文本网格（用于备用字体更改后）
+    /// </summary>
+    public void ForceTextMeshUpdate()
+    {
+        if (_landAndDaysText != null)
+            _landAndDaysText.ForceMeshUpdate();
+
+        if (_timeText != null)
+            _timeText.ForceMeshUpdate();
+
+        if (_gemsText != null)
+            _gemsText.ForceMeshUpdate();
+
+        if (_coinsText != null)
+            _coinsText.ForceMeshUpdate();
+    }
 }
+
