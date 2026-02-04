@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using KingdomMod.Shared.Attributes;
@@ -49,6 +49,40 @@ public class StatsInfoView : MonoBehaviour
     private void Start()
     {
         LogTrace("StatsInfoView.Start");
+
+        // 从风格配置加载字体（延迟到 Start，确保 Instance.guiStyle 已初始化）
+        ApplyStyleConfig();
+    }
+
+    /// <summary>
+    /// 应用风格配置
+    /// </summary>
+    private void ApplyStyleConfig()
+    {
+        try
+        {
+            if (Instance == null || Instance.guiStyle == null)
+            {
+                LogWarning("Instance or guiStyle is null, using default font");
+                return;
+            }
+
+            var styleComp = Instance.guiStyle.statsInfoStyle;
+            if (styleComp != null && styleComp.TextFont != null && styleComp.TextFont.Font != null)
+            {
+                _statsText.font = styleComp.TextFont.Font;
+                _statsText.fontSize = styleComp.TextFontSize;
+                LogDebug($"Applied StatsInfo font: {styleComp.TextFont.Font.name}, size: {styleComp.TextFontSize}");
+            }
+            else
+            {
+                LogWarning("StatsInfoStyle or TextFont is null, using default font");
+            }
+        }
+        catch (Exception ex)
+        {
+            LogError($"Failed to apply style config: {ex.Message}");
+        }
     }
 
     /// <summary>
@@ -89,8 +123,8 @@ public class StatsInfoView : MonoBehaviour
         textRect.offsetMin = new Vector2(9, 5);
         textRect.offsetMax = new Vector2(-5, -5);
 
-        // 配置文本样式
-        _statsText.fontSize = 14;
+        // 配置文本样式 - 使用默认值
+        _statsText.fontSize = Config.GuiStyle.StatsInfo.Text.FontSize;
         _statsText.color = Config.MarkerStyle.StatsInfo.Color;
         _statsText.alignment = TextAlignmentOptions.TopLeft;
         _statsText.enableWordWrapping = false;
@@ -100,12 +134,12 @@ public class StatsInfoView : MonoBehaviour
     /// <summary>
     /// 更新背景图像（参考 TopMapView.UpdateBackgroundImage）
     /// </summary>
-    private void UpdateBackgroundImage()
+    public void UpdateBackgroundImage()
     {
         try
         {
-            // 读取 PNG 文件
-            var bgImageFile = Path.Combine(AssetsDir, Config.GuiStyle.TopMap.BackgroundImageFile);
+            // 读取 PNG 文件 - 从 StatsInfo 配置获取
+            var bgImageFile = Path.Combine(AssetsDir, Config.GuiStyle.StatsInfo.BackgroundImageFile);
             if (!File.Exists(bgImageFile))
             {
                 LogError($"Background image file not found: {bgImageFile}");
@@ -119,7 +153,7 @@ public class StatsInfoView : MonoBehaviour
             texture.LoadImage(fileData);
 
             // 提取九宫格区域
-            var imageArea = (RectInt)Config.GuiStyle.TopMap.BackgroundImageArea;
+            var imageArea = (RectInt)Config.GuiStyle.StatsInfo.BackgroundImageArea;
             imageArea.y = texture.height - imageArea.y - imageArea.height;
             Texture2D subTexture = new Texture2D(imageArea.width, imageArea.height);
             Color[] pixels = texture.GetPixels(imageArea.x, imageArea.y, imageArea.width, imageArea.height);
@@ -128,9 +162,9 @@ public class StatsInfoView : MonoBehaviour
 
             // 创建 Sprite
             Rect rect = new Rect(0, 0, subTexture.width, subTexture.height);
-            Vector4 border = Config.GuiStyle.TopMap.BackgroundImageBorder;
+            Vector4 border = Config.GuiStyle.StatsInfo.BackgroundImageBorder;
             Sprite sprite = Sprite.Create(
-                MakeColoredTexture(subTexture, Config.GuiStyle.TopMap.BackgroundColor),
+                MakeColoredTexture(subTexture, Config.GuiStyle.StatsInfo.BackgroundColor),
                 rect,
                 new Vector2(0.5f, 0.5f),
                 100,
@@ -279,4 +313,38 @@ public class StatsInfoView : MonoBehaviour
         public float BorderLeftIntact;
         public float BorderRightIntact;
     }
+
+    /// <summary>
+    /// 更新文本字体
+    /// </summary>
+    public void UpdateTextFont(TMP_FontAsset font)
+    {
+        if (_statsText != null && font != null)
+        {
+            _statsText.font = font;
+        }
+    }
+
+    /// <summary>
+    /// 更新文本字体大小
+    /// </summary>
+    public void UpdateTextFontSize(float fontSize)
+    {
+        if (_statsText != null)
+        {
+            _statsText.fontSize = fontSize;
+        }
+    }
+
+    /// <summary>
+    /// 强制更新文本网格（用于备用字体更改后）
+    /// </summary>
+    public void ForceTextMeshUpdate()
+    {
+        if (_statsText != null)
+        {
+            _statsText.ForceMeshUpdate();
+        }
+    }
 }
+
