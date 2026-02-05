@@ -54,9 +54,9 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
             _count = CreateTextObject("Count", -26 - 16, style.CountFont.Font, style.CountFontSize);
         }
 
-        private void Awake()
+        private void Start()
         {
-
+            UpdatePosition();
         }
 
         private void OnDestroy()
@@ -64,9 +64,9 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
             _data?.Dispose();
         }
 
-        private void Start()
+        public void OnTargetVisibleChanged(bool visible)
         {
-            // UpdatePosition();
+            UpdateVisible(visible);
         }
 
         private void Update()
@@ -243,7 +243,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
 
             if (_data.Target == null)
             {
-                LogError("_data.Target is null");
+                LogError($"_data.Target is null: {_data.Title.Value}, {_worldPosX}");
                 return;
             }
 

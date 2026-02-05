@@ -16,8 +16,6 @@ using KingdomMod.SharedLib;
 using KingdomMod.Shared.Attributes;
 using KingdomMod.OverlayMap.Patchers;
 
-
-
 #if IL2CPP
 using Il2CppInterop.Runtime.Injection;
 #endif
@@ -66,6 +64,7 @@ public class OverlayMapHolder : MonoBehaviour
     {
         _log = plugin.LogSource;
         _config = plugin.Config;
+        LogDebug("OverlayMapHolder.Initialize");
 
         BepInExDir = GetBepInExDir();
         AssetsDir = Path.Combine(BepInExDir, "config", "KingdomMod.OverlayMap.Assets");
@@ -78,6 +77,8 @@ public class OverlayMapHolder : MonoBehaviour
 
     private void Awake()
     {
+        LogDebug("OverlayMapHolder.Awake");
+
         Config.Global.ConfigBind(_config);
         Patchers.Patcher.PatchAll();
 
@@ -86,6 +87,7 @@ public class OverlayMapHolder : MonoBehaviour
         PlayerOverlays.P1 = CreatePlayerOverlay(PlayerId.P1);
         PlayerOverlays.P2 = CreatePlayerOverlay(PlayerId.P2);
 
+        Level.OnLoaded += (System.Action<bool>)OnLevelLoaded;
         Game.OnGameStart += (Action)OnGameStart;
         Game.OnGameEnd += (Action)OnGameEnd;
 
@@ -98,6 +100,8 @@ public class OverlayMapHolder : MonoBehaviour
 
     private void OnDestroy()
     {
+        LogDebug("OverlayMapHolder.OnDestroy");
+        Level.OnLoaded -= (System.Action<bool>)OnLevelLoaded;
         Game.OnGameStart -= (Action)OnGameStart;
         Game.OnGameEnd -= (Action)OnGameEnd;
 
@@ -445,6 +449,13 @@ public class OverlayMapHolder : MonoBehaviour
 #endif
     }
 
+    private void OnLevelLoaded(bool fromSave)
+    {
+        LogWarning($"OverlayMapHolder.OnLevelLoaded: fromSave: {fromSave}");
+
+        Config.SaveDataExtras.Init();
+    }
+
     public void OnGameStart()
     {
         LogDebug("OverlayMapHolder.OnGameStart");
@@ -452,8 +463,6 @@ public class OverlayMapHolder : MonoBehaviour
         _gameLayer = GameObject.FindGameObjectWithTag(Tags.GameLayer);
         _persephoneCage = UnityEngine.Object.FindAnyObjectByType<PersephoneCage>();
         _cachePrefabID.CachePrefabIDs();
-
-        Config.SaveDataExtras.Init();
 
         // 在场景切换后重新加载GUI样式
         NeedToReloadGuiBoxStyle = true;
@@ -1516,4 +1525,4 @@ public static class EnumUtil
     {
         return Enum.GetValues(typeof(T)).Cast<T>();
     }
-}
+}
