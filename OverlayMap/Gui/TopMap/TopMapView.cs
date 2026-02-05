@@ -9,6 +9,8 @@ using KingdomMod.OverlayMap.Patchers;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
 using KingdomMod.Shared.Attributes;
 using Il2CppInterop.Runtime;
+using static UnityEngine.GraphicsBuffer;
+
 
 #if IL2CPP
 using Il2CppInterop.Runtime.Attributes;
@@ -57,6 +59,10 @@ public class TopMapView : MonoBehaviour
 #if IL2CPP
     [HideFromIl2Cpp]
 #endif
+    public List<WallLine> WallLines { get; set; }
+#if IL2CPP
+    [HideFromIl2Cpp]
+#endif
     public Dictionary<Component, MapMarker> MapMarkers { get; set; }
 
 #if IL2CPP
@@ -101,6 +107,7 @@ public class TopMapView : MonoBehaviour
             { typeof(Player),               new Mappers.PlayerMapper(this) },
             { typeof(Portal),               new Mappers.PortalMapper(this) },
             { typeof(River),                new Mappers.RiverMapper(this) },
+            { typeof(Scaffolding),          new Mappers.ScaffoldingMapper(this) },
             { typeof(Statue),               new Mappers.StatueMapper(this) },
             { typeof(Steed),                new Mappers.SteedMapper(this) },
             { typeof(SteedSpawn),           new Mappers.SteedSpawnMapper(this) },
@@ -118,6 +125,7 @@ public class TopMapView : MonoBehaviour
         PlayerMarkers = new List<MapMarker>();
         LeftWalls = new LinkedList<MapMarker>();
         RightWalls = new LinkedList<MapMarker>();
+        WallLines = new List<WallLine>();
         MapMarkers = new Dictionary<Component, MapMarker>();
 
         _rectTransform = this.gameObject.AddComponent<RectTransform>();
@@ -281,16 +289,78 @@ public class TopMapView : MonoBehaviour
         var minLevelWidth = Managers.Inst.game.currentLevelConfig.minLevelWidth;
         MappingScale = clientWidth / minLevelWidth;
         LogTrace($"MappingScale: {MappingScale}, minLevelWidth: {minLevelWidth}");
-
+        
         UpdatePlayerMarker();
-    }
 
+        // 游戏开始时自动调整地图偏移以居中显示
+        // 在这里调用是因为此时 SaveDataExtras 已经初始化，且所有 MapMarkers 已创建
+        AutoCenterMap();
+    }
+    
     private void OnLevelLoaded(bool fromSave)
     {
         LogWarning($"OnLevelLoaded: fromSave: {fromSave}, MapMarkers: {MapMarkers.Count}");
-
-
     }
+    
+    /// <summary>
+    /// 自动调整地图偏移，使 MapMarkers 在屏幕上居中显示
+    /// </summary>
+    public void AutoCenterMap()
+    {
+        // 检查 SaveDataExtras 是否已初始化
+        if (SaveDataExtras.MapOffset == null)
+        {
+            LogWarning("AutoCenterMap: SaveDataExtras not initialized yet");
+            return;
+        }
+        
+        if (MapMarkers.Count == 0)
+        {
+            LogTrace("AutoCenterMap: No markers to center");
+            return;
+        }
+        
+        // 查找所有 MapMarker 的世界坐标 X 的最小值和最大值
+        float minWorldX = float.MaxValue;
+        float maxWorldX = float.MinValue;
+        
+        foreach (var pair in MapMarkers)
+        {
+            if (pair.Key == null || !pair.Key) continue;
+            if (pair.Value == null || !pair.Value) continue;
+            if (pair.Value.Data == null) continue;
+            if (pair.Value.Data.Target == null || !pair.Value.Data.Target) continue;
+            
+            float worldX = pair.Value.Data.Target.transform.position.x;
+            if (worldX < minWorldX) minWorldX = worldX;
+            if (worldX > maxWorldX) maxWorldX = worldX;
+        }
+        
+        if (minWorldX == float.MaxValue || maxWorldX == float.MinValue)
+        {
+            LogWarning("AutoCenterMap: No valid markers found");
+            return;
+        }
+        
+        // 计算偏移量，使最小值和最大值到屏幕中心的距离相等
+        // UI坐标 = (世界坐标 + MapOffset) * MappingScale * ZoomScale
+        // 要让地图居中：offset = -(minWorldX + maxWorldX) / 2
+        float offset = -(minWorldX + maxWorldX) / 2f;
+        
+        SaveDataExtras.MapOffset.Value = offset;
+        
+        LogInfo($"AutoCenterMap: minWorldX={minWorldX}, maxWorldX={maxWorldX}, offset={offset}");
+        
+        // 强制更新所有 MapMarker 的位置
+        foreach (var pair in MapMarkers)
+        {
+            if (pair.Value != null && pair.Value)
+            {
+                pair.Value.UpdatePosition(true);
+            }
+        }
+    }
+
 
 #if IL2CPP
     [HideFromIl2Cpp]
@@ -314,6 +384,17 @@ public class TopMapView : MonoBehaviour
     public void OnComponentDestroyed(Component comp)
     {
         TryRemoveMapMarker(comp);
+    }
+
+#if IL2CPP
+    [HideFromIl2Cpp]
+#endif
+    public void OnComponentVisibleChanged(Component comp, bool visible)
+    {
+        if (MapMarkers.TryGetValue(comp, out var marker))
+        {
+            marker.OnTargetVisibleChanged(visible);
+        }
     }
 
     private void UpdateExploredRegion()
@@ -363,19 +444,31 @@ public class TopMapView : MonoBehaviour
                 _enemyMapper.UpdateEnemyGroups();
             }
 
+            // 清理已销毁的 MapMarkers（Key 或 Target 已销毁）
+            var destroyedKeys = new List<Component>();
             foreach (var pair in MapMarkers)
             {
+                // 检查字典的 Key（Component）是否已销毁
+                if (!pair.Key)
+                {
+                    destroyedKeys.Add(pair.Key);
+                    continue;
+                }
+                
                 var markerData = pair.Value.Data;
                 if (markerData == null)
                 {
-                    LogError($"markerData is null, target: {pair.Key}");
+                    destroyedKeys.Add(pair.Key);
                     continue;
                 }
+                
+                // 检查 Target 是否已销毁
                 if (!markerData.Target)
                 {
-                    LogError($"markerData.Target is null, Title: {markerData.Title?.Value}");
+                    destroyedKeys.Add(pair.Key);
                     continue;
                 }
+                
                 var worldPosX = markerData.Target.transform.position.x;
                 markerData.IsInFogOfWar = !(ShowFullMap || (worldPosX >= SaveDataExtras.ExploredLeft && worldPosX <= SaveDataExtras.ExploredRight));
 
@@ -384,6 +477,16 @@ public class TopMapView : MonoBehaviour
 
                 if (markerData.VisibleUpdater != null)
                     markerData.Visible = markerData.VisibleUpdater(markerData.Target);
+            }
+            
+            // 清理已销毁的 MapMarkers
+            if (destroyedKeys.Count > 0)
+            {
+                LogDebug($"Cleaning up {destroyedKeys.Count} destroyed MapMarkers in Update");
+                foreach (var key in destroyedKeys)
+                {
+                    TryRemoveMapMarker(key);
+                }
             }
         }
     }
@@ -405,7 +508,10 @@ public class TopMapView : MonoBehaviour
         {
             // LogTrace($"TopMapView.TryAddMapMarker, title: {title?.Value}, target: {target}");
 
-            if (target.gameObject == null)
+            if (!target)
+                return null;
+
+            if (!target.gameObject)
                 return null;
 
             if (MapMarkers.TryGetValue(target, out var marker))
@@ -458,7 +564,26 @@ public class TopMapView : MonoBehaviour
         {
             LogDebug($"TopMapView.TryRemoveMapMarker, target: {target}, Pointer: {target.Pointer:X}");
 
-            // RemoveWallNode(marker);
+            // 检查是否是墙体（通过判断是否在 LeftWalls 或 RightWalls 中）
+            bool isWall = LeftWalls.Contains(marker) || RightWalls.Contains(marker);
+            if (isWall)
+            {
+                RemoveWallFromList(marker);
+            }
+            
+            // 从 WallLines 列表中查找并删除该 marker 自己的 WallLine
+            // 不删除 TargetMarker == marker 的 WallLine，因为那是下一个墙的线条
+            for (int i = WallLines.Count - 1; i >= 0; i--)
+            {
+                var wallLine = WallLines[i];
+                if (wallLine != null && wallLine.OwnerMarker == marker)
+                {
+                    WallLines.RemoveAt(i);
+                    Destroy(wallLine.gameObject);
+                    break;  // 每个 marker 只有一条自己的 WallLine
+                }
+            }
+            
             MapMarkers.Remove(target);
             Destroy(marker.gameObject);
         }
@@ -506,121 +631,216 @@ public class TopMapView : MonoBehaviour
     // Wall lines controller
     //
 
-    // public void AddWallLine(MapMarker wallMarker, bool isCastle = false)
-    // {
-    //     LinkedListNode<WallLine> node;
-    //     var wallLine = WallLine.Create(wallMarker);
-    //     var kingdom = Managers.Inst.kingdom;
-    //     var worldPosX = wallMarker.Data.Target.transform.position.x;
-    //     var wallLines = kingdom.GetBorderSideForPosition(worldPosX) == Side.Left ? SidedWalls.left : SidedWalls.right;
-    //     if (wallLines.Count == 0 || worldPosX <= wallLines.First.Value.Owner.Data.Target.transform.position.x)
-    //     {
-    //         node = wallLines.AddFirst(wallLine);
-    //     }
-    //     else if (worldPosX >= wallLines.Last.Value.Owner.Data.Target.transform.position.x)
-    //     {
-    //         node = wallLines.AddLast(wallLine);
-    //     }
-    //     else
-    //     {
-    //         var current = wallLines.First;
-    //         while (current != null && current.Value.Owner.Data.Target.transform.position.x < worldPosX)
-    //         {
-    //             current = current.Next;
-    //         }
-    //
-    //         if (current != null)
-    //             node = wallLines.AddBefore(current, wallLine);
-    //         else
-    //             node = wallLines.AddLast(wallLine);
-    //     }
-    //
-    //     wallLine.Init(node);
-    // }
-
+    /// <summary>
+    /// 将墙体 marker 添加到 LeftWalls 或 RightWalls 列表，并创建连接线
+    /// </summary>
 #if IL2CPP
     [HideFromIl2Cpp]
 #endif
-    private LinkedList<MapMarker> GetLinkedWalls(MapMarker wallMarker)
+    public void AddWallToList(MapMarker wallMarker)
     {
+        if (wallMarker == null || wallMarker.Data == null || wallMarker.Data.Target == null)
+        {
+            LogError("AddWallToList: wallMarker or its data is null");
+            return;
+        }
+
+        // 判断墙在城堡的左侧还是右侧
         var kingdom = Managers.Inst.kingdom;
         var worldPosX = wallMarker.Data.Target.transform.position.x;
-        var linkedWalls = kingdom.GetBorderSideForPosition(worldPosX) == Side.Left ? LeftWalls : RightWalls;
-        return linkedWalls;
-    }
+        var isLeftSide = kingdom.GetBorderSideForPosition(worldPosX) == Side.Left;
+        var wallList = isLeftSide ? LeftWalls : RightWalls;
 
-#if IL2CPP
-    [HideFromIl2Cpp]
-#endif
-    public void AddWallNode(MapMarker wallMarker)
-    {
-        LinkedListNode<MapMarker> wallNode;
-        var linkedWalls = GetLinkedWalls(wallMarker);
-        var worldPosX = Math.Abs(wallMarker.Data.Target.transform.position.x);
-        var current = linkedWalls.First;
-        while (current != null && Math.Abs(current.Value.Data.Target.transform.position.x) < worldPosX)
+        // 根据 worldPosX 的绝对值插入到有序列表中
+        var absX = Math.Abs(worldPosX);
+        LinkedListNode<MapMarker> insertNode = null;
+        var current = wallList.First;
+        
+        while (current != null)
         {
+            var currentAbsX = Math.Abs(current.Value.Data.Target.transform.position.x);
+            if (absX < currentAbsX)
+            {
+                insertNode = current;
+                break;
+            }
             current = current.Next;
         }
 
-        if (current != null)
-            wallNode = linkedWalls.AddBefore(current, wallMarker);
+        // 插入到列表
+        LinkedListNode<MapMarker> wallNode;
+        if (insertNode != null)
+            wallNode = wallList.AddBefore(insertNode, wallMarker);
         else
-            wallNode = linkedWalls.AddLast(wallMarker);
+            wallNode = wallList.AddLast(wallMarker);
 
-        AddWallLine(wallNode);
+        // 创建从前一个墙（或城堡）到当前墙的连接线
+        CreateWallLineForNode(wallNode);
+        
+        // 如果当前墙后面还有墙，需要更新下一个墙的连接线（指向当前墙而不是前一个）
+        if (wallNode.Next != null)
+        {
+            UpdateWallLineForNode(wallNode.Next);
+        }
     }
 
+    /// <summary>
+    /// 从列表中移除墙体 marker，并清理相关连接线
+    /// </summary>
 #if IL2CPP
     [HideFromIl2Cpp]
 #endif
-    public void AddWallLine(LinkedListNode<MapMarker> wallNode)
+    public void RemoveWallFromList(MapMarker wallMarker)
     {
+        if (wallMarker == null)
+            return;
+
+        // 先确定墙体在哪个列表中
+        bool isInLeftWalls = LeftWalls.Contains(wallMarker);
+        bool isInRightWalls = RightWalls.Contains(wallMarker);
+        
+        if (!isInLeftWalls && !isInRightWalls)
+        {
+            LogWarning($"RemoveWallFromList: wallMarker not found in LeftWalls or RightWalls");
+            return;
+        }
+
+        var wallList = isInLeftWalls ? LeftWalls : RightWalls;
+        
+        // 重要：在移除之前找到下一个节点
+        LinkedListNode<MapMarker> nextNode = null;
+        var currentNode = wallList.First;
+        while (currentNode != null)
+        {
+            if (currentNode.Value == wallMarker)
+            {
+                nextNode = currentNode.Next;
+                break;
+            }
+            currentNode = currentNode.Next;
+        }
+        
+        // 从列表中移除
+        wallList.Remove(wallMarker);
+        
+        // 更新下一个墙的连接线（如果存在）
+        if (nextNode != null)
+        {
+            UpdateWallLineForNode(nextNode);
+        }
+    }
+
+    /// <summary>
+    /// 为指定节点创建连接线
+    /// </summary>
+#if IL2CPP
+    [HideFromIl2Cpp]
+#endif
+    private void CreateWallLineForNode(LinkedListNode<MapMarker> wallNode)
+    {
+        if (wallNode == null || wallNode.Value == null)
+            return;
+
         var currentWall = wallNode.Value;
-
-        // 获取上一个城墙或城堡
-        MapMarker previousWall;
+        
+        // 获取连接目标（前一个墙或城堡）
+        MapMarker targetMarker;
         if (wallNode.Previous != null && wallNode.Previous.Value != null)
-            previousWall = wallNode.Previous.Value;
+            targetMarker = wallNode.Previous.Value;
         else
-            previousWall = CastleMarker; // 如果是第一个城墙，则从城堡开始
+            targetMarker = CastleMarker; // 第一个墙连接到城堡
 
-        // 创建新的 WallLine 组件
-        var wallLine = WallLine.Create(currentWall);
-        wallLine.Init(wallNode);
+        if (targetMarker == null)
+        {
+            LogError("CreateWallLineForNode: target marker (castle or previous wall) is null");
+            return;
+        }
+
+        // 获取线条颜色（与当前墙的颜色一致）
+        // ConfigEntryWrapper<string> 有隐式转换到 Color
+        Color lineColor = currentWall.Data.Color != null 
+            ? (Color)currentWall.Data.Color 
+            : Color.green;
+
+        // 创建 WallLine 组件
+        // 注意：WallLine 是 TopMapView 的子对象，而不是 MapMarker 的子对象
+        var wallLine = WallLine.Create(this, currentWall, targetMarker, lineColor);
+        
+        // 添加到 WallLines 列表
+        WallLines.Add(wallLine);
+        
+        LogDebug($"Created WallLine for wall at {currentWall.Data.Target.transform.position.x}, connecting to {targetMarker.Data.Target.transform.position.x}, color: {lineColor}");
     }
 
+    /// <summary>
+    /// 更新指定节点的连接线（删除旧线条并创建新线条）
+    /// </summary>
 #if IL2CPP
     [HideFromIl2Cpp]
 #endif
-    public void UpdateWallLinePosition(MapMarker wallMarker)
+    private void UpdateWallLineForNode(LinkedListNode<MapMarker> wallNode)
     {
-        var wallLineRect = wallMarker.transform.Find("WallLine");
-        var wallLineObject = wallLineRect.gameObject;
+        if (wallNode == null || wallNode.Value == null)
+            return;
 
+        var wallMarker = wallNode.Value;
+        
+        // 从 WallLines 列表中查找并销毁旧的 WallLine
+        for (int i = WallLines.Count - 1; i >= 0; i--)
+        {
+            var wallLine = WallLines[i];
+            if (wallLine != null && wallLine.OwnerMarker == wallMarker)
+            {
+                WallLines.RemoveAt(i);
+                Destroy(wallLine.gameObject);
+                break;  // 每个墙体只有一条自己的 WallLine
+            }
+        }
 
+        // 创建新的 WallLine
+        CreateWallLineForNode(wallNode);
     }
 
+    /// <summary>
+    /// 在列表中查找指定墙体的下一个节点
+    /// </summary>
 #if IL2CPP
     [HideFromIl2Cpp]
 #endif
-    public void RemoveWallNode(MapMarker wallMarker)
+    private LinkedListNode<MapMarker> FindNextWallNode(LinkedList<MapMarker> wallList, MapMarker wallMarker)
     {
-        var linkedWalls = GetLinkedWalls(wallMarker);
-        linkedWalls.Remove(wallMarker);
+        var current = wallList.First;
+        LinkedListNode<MapMarker> previousNode = null;
+        
+        while (current != null)
+        {
+            if (previousNode != null && previousNode.Value == wallMarker)
+            {
+                return current;
+            }
+            previousNode = current;
+            current = current.Next;
+        }
+        
+        return null;
     }
 
+    /// <summary>
+    /// 清空墙体列表和所有 WallLine（游戏退出时调用）
+    /// </summary>
     public void ClearWallNodes()
     {
+        // 销毁所有 WallLine
+        foreach (var wallLine in WallLines)
+        {
+            if (wallLine != null)
+            {
+                Destroy(wallLine.gameObject);
+            }
+        }
+        WallLines.Clear();
+        
         LeftWalls.Clear();
         RightWalls.Clear();
-    }
-
-    private WallLine CreateWallLine()
-    {
-        var wallLineObject = new GameObject(nameof(WallLine));
-        wallLineObject.transform.SetParent(this.gameObject.transform, false);
-        var wallLine = wallLineObject.AddComponent<WallLine>();
-        return wallLine;
     }
 }

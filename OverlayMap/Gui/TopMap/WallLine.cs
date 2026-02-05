@@ -1,163 +1,203 @@
 ﻿#if IL2CPP
 using Il2CppInterop.Runtime.Injection;
 #endif
-using KingdomMod.OverlayMap.Config;
+using KingdomMod.Shared.Attributes;
+using Il2CppInterop.Runtime.Attributes;
 using System;
-using System.Collections.Generic;
-using KingdomMod.SharedLib;
 using UnityEngine;
 using UnityEngine.UI;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
-using KingdomMod.Shared.Attributes;
-using Il2CppInterop.Runtime.Attributes;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap
 {
+    /// <summary>
+    /// UGUI 墙体连接线组件
+    /// 使用 Image + RectTransform 绘制连接相邻墙体（或城堡）的线条
+    /// </summary>
     [RegisterTypeInIl2Cpp]
     public class WallLine : MonoBehaviour
     {
-        public MapMarker Owner;
-        private TopMapView _view;
-        private Image _line;
+        private MapMarker _ownerMarker;      // 当前墙的 marker
+        private MapMarker _targetMarker;     // 连接的目标 marker（前一个墙或城堡）
+        private Image _lineImage;            // 线条的 Image 组件
         private RectTransform _rectTransform;
-        private float _distance;
-        private float _timeSinceLastGuiUpdate = 0;
-        private LinkedListNode<MapMarker> _node;
+        private Color _lineColor;
+        private float _lastDistance;         // 上次计算的距离，用于优化更新
+        private const float LINE_THICKNESS = 2.0f;  // 线条粗细（像素）
+
+        // 暴露属性供外部访问
+        public MapMarker OwnerMarker => _ownerMarker;
+        public MapMarker TargetMarker => _targetMarker;
 
 #if IL2CPP
         public WallLine(IntPtr ptr) : base(ptr) { }
 #endif
 
-        public static WallLine Create(MapMarker wallMarker)
+        /// <summary>
+        /// 创建墙体连接线
+        /// </summary>
+        /// <param name="topMapView">TopMapView（作为父对象）</param>
+        /// <param name="ownerMarker">当前墙的 MapMarker</param>
+        /// <param name="targetMarker">连接目标（前一个墙或城堡）</param>
+        /// <param name="initialColor">初始颜色</param>
+        public static WallLine Create(TopMapView topMapView, MapMarker ownerMarker, MapMarker targetMarker, Color initialColor)
         {
-            var obj = new GameObject(nameof(WallLine));
-            obj.transform.SetParent(wallMarker.transform, false);
+            var obj = new GameObject("WallLine");
+            // 重要：WallLine 是 TopMapView 的子对象，而不是 MapMarker 的子对象
+            // 这样 anchoredPosition 才能正确使用绝对坐标
+            obj.transform.SetParent(topMapView.transform, false);
             var comp = obj.AddComponent<WallLine>();
-
+            comp.Init(ownerMarker, targetMarker, initialColor);
             return comp;
         }
 
 #if IL2CPP
         [HideFromIl2Cpp]
 #endif
-        public void Init(LinkedListNode<MapMarker> node)
+        private void Init(MapMarker ownerMarker, MapMarker targetMarker, Color initialColor)
         {
+            _ownerMarker = ownerMarker;
+            _targetMarker = targetMarker;
+            _lineColor = initialColor;
+
+            // 创建 RectTransform
             _rectTransform = this.gameObject.AddComponent<RectTransform>();
-            Owner = _rectTransform.parent.GetComponent<MapMarker>();
-            _view = _rectTransform.parent.transform.parent.GetComponent<TopMapView>();
-            _node = node;
+            
+            // 设置锚点和支点
+            // 锚点设置为父元素中心（与 MapMarker 一致）
+            _rectTransform.anchorMin = new Vector2(0.5f, 1);
+            _rectTransform.anchorMax = new Vector2(0.5f, 1);
+            // 支点在线条左侧中间，使其从起点向右延伸
+            _rectTransform.pivot = new Vector2(0.0f, 0.5f);
+            
+            // 创建 Image 组件并设置为纯色填充
+            _lineImage = this.gameObject.AddComponent<Image>();
+            _lineImage.color = _lineColor;
+            
+            // 创建一个简单的白色纹理作为 sprite（用于纯色填充）
+            // Unity UGUI Image 需要 sprite 才能显示
+            var texture = new Texture2D(1, 1);
+            texture.SetPixel(0, 0, Color.white);
+            texture.Apply();
+            var sprite = Sprite.Create(texture, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f));
+            _lineImage.sprite = sprite;
+            _lineImage.type = Image.Type.Sliced;  // 使用切片模式以支持拉伸
 
-            // 设置锚点
-            // _rectTransform.anchorMin = new Vector2(0.0f, 0.5f); // 以父元素中心为锚点
-            // _rectTransform.anchorMax = new Vector2(1.0f, 0.5f); // 以父元素中心为锚点
-            _rectTransform.pivot = new Vector2(0.0f, 0.5f); // 以自身中心为支点
-            _rectTransform.sizeDelta = Vector2.zero;
+            // 监听 owner 和 target 的位置变化
+            _ownerMarker.OnPositionChanged += OnMarkerPositionChanged;
+            _targetMarker.OnPositionChanged += OnMarkerPositionChanged;
 
-            _line = CreateLineObject(Color.green.WithAlpha(0.5f));
-        }
-
-        private void Awake()
-        {
-
+            // 初始化位置
+            UpdateLinePosition();
         }
 
         private void OnDestroy()
         {
+            // 取消事件监听
+            if (_ownerMarker != null)
+                _ownerMarker.OnPositionChanged -= OnMarkerPositionChanged;
+            if (_targetMarker != null)
+                _targetMarker.OnPositionChanged -= OnMarkerPositionChanged;
         }
 
-        private void Start()
+#if IL2CPP
+        [HideFromIl2Cpp]
+#endif
+        private void OnMarkerPositionChanged(MapMarker marker, Vector2 position)
         {
-        }
-
-        private void Update()
-        {
-            _timeSinceLastGuiUpdate += Time.deltaTime;
-
-            if (_timeSinceLastGuiUpdate > (1.0 / Global.GuiUpdatesPerSecond))
+            // 检查 WallLine 自己是否已被销毁（Unity 延迟销毁机制）
+            if (this == null || !this || this.gameObject == null)
             {
-                _timeSinceLastGuiUpdate = 0;
-
-                if (!IsPlaying()) return;
-
-                UpdatePosition();
-
+                return;
             }
+            
+            UpdateLinePosition();
         }
 
-        private void DrawLine(Vector2 lineStart, Vector2 lineEnd, Color color, uint thickness)
+        /// <summary>
+        /// 更新线条的位置、长度和旋转
+        /// </summary>
+        public void UpdateLinePosition()
         {
-            GameObject lineObj = new GameObject("Line");
-            Image lineImage = lineObj.AddComponent<Image>();
-            lineImage.color = color; // 直线颜色
+            // 检查 WallLine 自己是否已被销毁
+            if (this == null || !this)
+            {
+                return;
+            }
+            
+            // 检查 GameObject 是否仍然有效
+            if (this.gameObject == null || !this.gameObject)
+            {
+                return;
+            }
+            
+            if (_ownerMarker == null || _targetMarker == null)
+            {
+                LogError("WallLine: ownerMarker or targetMarker is null");
+                return;
+            }
 
-            RectTransform lineRect = lineObj.GetComponent<RectTransform>();
-            lineRect.SetParent(_rectTransform, false);
+            if (_ownerMarker.Data == null || _targetMarker.Data == null)
+            {
+                LogError("WallLine: marker data is null");
+                return;
+            }
 
-            Vector2 lineDelta = lineEnd - lineStart;
-            float distance = lineDelta.magnitude;
-            lineRect.pivot = new Vector2(0, 0.5f); // 支点在左侧中间
-            lineRect.sizeDelta = new Vector2(distance, thickness);
-            lineRect.anchoredPosition = lineStart;
-            lineRect.localRotation = Quaternion.Euler(0, 0, Mathf.Atan2(lineDelta.y, lineDelta.x) * Mathf.Rad2Deg);
+            // 重要：WallLine 现在是 TopMapView 的子对象，与 MapMarker 同级
+            // 直接获取 Marker 的 anchoredPosition（相对于 TopMapView）
+            var ownerRect = _ownerMarker.GetComponent<RectTransform>();
+            var targetRect = _targetMarker.GetComponent<RectTransform>();
+            
+            Vector2 startPos = targetRect.anchoredPosition;  // 起点：前一个墙/城堡
+            Vector2 endPos = ownerRect.anchoredPosition;     // 终点：当前墙
+            Vector2 delta = endPos - startPos;
+            float distance = delta.magnitude;
+
+            // 优化：仅在距离变化时更新
+            if (Mathf.Abs(distance - _lastDistance) < 0.01f)
+                return;
+
+            _lastDistance = distance;
+
+            if (distance < 0.1f)
+            {
+                // 距离太近，隐藏线条
+                LogWarning($"WallLine distance too small: {distance}, hiding line");
+                this.gameObject.SetActive(false);
+                return;
+            }
+
+            this.gameObject.SetActive(true);
+
+            // 设置线条位置：由于 Pivot 是 (0, 0.5)，直接设为起点
+            _rectTransform.anchoredPosition = startPos;
+
+            // 设置线条的长度和宽度
+            _rectTransform.sizeDelta = new Vector2(distance, LINE_THICKNESS);
+
+            // 计算旋转角度：从起点指向终点
+            float angle = Mathf.Atan2(delta.y, delta.x) * Mathf.Rad2Deg;
+            _rectTransform.localRotation = Quaternion.Euler(0, 0, angle);
+            
+            LogDebug($"WallLine updated: startPos={startPos}, endPos={endPos}, distance={distance}, angle={angle}, color={_lineColor}");
         }
 
-        private Image CreateLineObject(Color color)
+        /// <summary>
+        /// 更新线条颜色
+        /// </summary>
+        public void UpdateColor(Color color)
         {
-            var obj = new GameObject("Line");
-            var comp = obj.AddComponent<Image>();
-
-            comp.color = color;
-            return comp;
+            _lineColor = color;
+            if (_lineImage != null)
+                _lineImage.color = color;
         }
 
+        /// <summary>
+        /// 更新线条可见性
+        /// </summary>
         public void UpdateVisible(bool visible)
         {
             this.gameObject.SetActive(visible);
-        }
-
-        public void UpdateColor(Color color)
-        {
-            _line.color = color;
-        }
-
-        public void UpdatePosition(bool force = false)
-        {
-            // 从中心到两边分布
-
-            if (TopMapView.MappingScale == 0)
-            {
-                // LogError("TopMapView.MappingScale is 0");
-                return;
-            }
-
-            // 获取上一个城墙或城堡
-            MapMarker previousWall;
-            if (_node.Previous != null && _node.Previous.Value != null)
-                previousWall = _node.Previous.Value;
-            else
-                previousWall = _view.CastleMarker; // 如果是第一个城墙，则从城堡开始
-
-            // 计算起点和终点
-            var startPosition = previousWall.transform.localPosition;
-            var endPosition = Owner.transform.localPosition;
-
-            // 设置 WallLine 的位置和旋转（线条应该始终对齐于 x 轴）
-            _rectTransform.localPosition = startPosition;
-
-            // 计算宽度，根据起点和终点的 X 坐标差来设置
-            var distance = Mathf.Abs(endPosition.x - startPosition.x);
-            if (distance == 0)
-                return;
-
-            if (force || Math.Abs(_distance - distance) > 0f)
-            {
-                _distance = distance;
-                _rectTransform.sizeDelta = new Vector2(distance, 2.0f);
-                // _rectTransform.anchoredPosition = new Vector2(
-                //     (_distance + SaveDataExtras.MapOffset) * TopMapView.MappingScale * SaveDataExtras.ZoomScale,
-                //     _rectTransform.anchoredPosition.y
-                // );
-            }
         }
     }
 }
