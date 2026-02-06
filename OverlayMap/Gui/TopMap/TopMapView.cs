@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
@@ -85,8 +85,8 @@ public class TopMapView : MonoBehaviour
     {
         LogTrace("TopMapView.Awake");
 
-        // 初始化新架构（Resolver + Mapper 系统）
-        InitializeNewArchitecture();
+        // 初始化 Mapper 系统
+        MapperInitializer.Initialize(this);
         
         // 创建 EnemyMapper（不通过 ObjectPatcher 触发，直接管理）
         _enemyMapper = new Mappers.EnemyMapper(this);
@@ -108,187 +108,30 @@ public class TopMapView : MonoBehaviour
         Level.OnLoaded += (System.Action<bool>)OnLevelLoaded;
     }
 
-
     /// <summary>
-    /// 初始化新架构：注册 Resolver 和 Mapper。
-    /// 新架构通过 MapMarkerType 枚举解耦游戏代码类型依赖。
+    /// 设置 Resolver 字典（由 MapperInitializer 调用）
     /// </summary>
 #if IL2CPP
     [HideFromIl2Cpp]
 #endif
-    private void InitializeNewArchitecture()
+    internal void SetResolvers(
+        Dictionary<Type, List<IMarkerResolver>> resolvers,
+        Dictionary<IntPtr, List<IMarkerResolver>> resolverLookup)
     {
-        // 1. 初始化 Resolver 字典
-        _resolvers = new Dictionary<Type, List<IMarkerResolver>>();
-
-        // 2. 注册所有 Resolver（按类别组织）
-        
-        // 复杂 Resolver（一对多映射）
-        RegisterResolver(new Resolvers.PayableUpgradeResolver());  // Wall, Lighthouse, Mine, Quarry
-        RegisterResolver(new Resolvers.PayableShopResolver());     // Shop
-        
-        // 简单 Resolver（一对一映射）- 地形类
-        RegisterResolver(new Resolvers.BeachResolver());
-        RegisterResolver(new Resolvers.RiverResolver());
-        
-        // 简单 Resolver - 建筑类
-        RegisterResolver(new Resolvers.CastleResolver());
-        RegisterResolver(new Resolvers.ScaffoldingResolver());
-        RegisterResolver(new Resolvers.CabinResolver());
-        RegisterResolver(new Resolvers.FarmhouseResolver());
-        RegisterResolver(new Resolvers.CitizenHousePayableResolver());
-        
-        // 简单 Resolver - 交互建筑
-        RegisterResolver(new Resolvers.ChestResolver());
-        RegisterResolver(new Resolvers.PayableGemChestResolver());
-        RegisterResolver(new Resolvers.BoatSummoningBellResolver());
-        
-        // 简单 Resolver - 传送点
-        RegisterResolver(new Resolvers.PortalResolver());
-        RegisterResolver(new Resolvers.TeleporterExitResolver());
-        
-        // 简单 Resolver - 雕像类
-        RegisterResolver(new Resolvers.TimeStatueResolver());
-        RegisterResolver(new Resolvers.UnlockNewRulerStatueResolver());
-        RegisterResolver(new Resolvers.StatueResolver());
-        
-        // 简单 Resolver - 营地类
-        RegisterResolver(new Resolvers.BeggarCampResolver());
-        RegisterResolver(new Resolvers.CampfireResolver());
-        
-        // 简单 Resolver - 单位类
-        RegisterResolver(new Resolvers.PlayerResolver());
-        RegisterResolver(new Resolvers.BeggarResolver());
-        RegisterResolver(new Resolvers.DeerResolver());
-        
-        // 简单 Resolver - 坐骑类
-        RegisterResolver(new Resolvers.SteedResolver());
-        RegisterResolver(new Resolvers.SteedSpawnResolver());
-        RegisterResolver(new Resolvers.DogSpawnResolver());
-        RegisterResolver(new Resolvers.BoarSpawnGroupResolver());
-        
-        // 简单 Resolver - 载具类
-        RegisterResolver(new Resolvers.BoatResolver());
-        
-        // 简单 Resolver - 障碍物
-        RegisterResolver(new Resolvers.PayableBlockerResolver());
-        RegisterResolver(new Resolvers.PayableBushResolver());
-        
-        // 简单 Resolver - 武器
-        RegisterResolver(new Resolvers.BombResolver());
-        
-        // 简单 Resolver - DLC 内容
-        RegisterResolver(new Resolvers.HelPuzzleControllerResolver());
-        RegisterResolver(new Resolvers.ThorPuzzleControllerResolver());
-        RegisterResolver(new Resolvers.HephaestusForgeResolver());
-        RegisterResolver(new Resolvers.PersephoneCageResolver());
-        RegisterResolver(new Resolvers.MerchantSpawnerResolver());
-
-        // 3. 构建 IL2CPP 指针查找表
-        BuildResolverLookup();
-
-        // 4. 初始化新 Mapper 字典（基于 MapMarkerType）
-        _mappers = new Dictionary<MapMarkerType, IComponentMapper>()
-        {
-            // 地形类
-            { MapMarkerType.Beach, new Mappers.BeachMapper(this) },
-            { MapMarkerType.River, new Mappers.RiverMapper(this) },
-            
-            // 建筑类
-            { MapMarkerType.Castle, new Mappers.CastleMapper(this) },
-            { MapMarkerType.Wall, new Mappers.WallMapper(this) },
-            { MapMarkerType.Scaffolding, new Mappers.ScaffoldingMapper(this) },
-            { MapMarkerType.Cabin, new Mappers.CabinMapper(this) },
-            { MapMarkerType.Farmhouse, new Mappers.FarmhouseMapper(this) },
-            { MapMarkerType.CitizenHouse, new Mappers.CitizenHousePayableMapper(this) },
-            
-            // 交互建筑
-            { MapMarkerType.Lighthouse, new Mappers.LighthouseMapper(this) },
-            { MapMarkerType.Mine, new Mappers.MineMapper(this) },
-            { MapMarkerType.Quarry, new Mappers.QuarryMapper(this) },
-            { MapMarkerType.Shop, new Mappers.PayableShopMapper(this) },
-            { MapMarkerType.Chest, new Mappers.ChestMapper(this) },
-            { MapMarkerType.GemChest, new Mappers.PayableGemChestMapper(this) },
-            { MapMarkerType.BoatSummoningBell, new Mappers.BoatSummoningBellMapper(this) },
-            
-            // 传送点
-            { MapMarkerType.Portal, new Mappers.PortalMapper(this) },
-            { MapMarkerType.TeleporterExit, new Mappers.TeleporterExitMapper(this) },
-            
-            // 雕像类
-            { MapMarkerType.TimeStatue, new Mappers.TimeStatueMapper(this) },
-            { MapMarkerType.UnlockNewRulerStatue, new Mappers.UnlockNewRulerStatueMapper(this) },
-            { MapMarkerType.Statue, new Mappers.StatueMapper(this) },
-            
-            // 营地类
-            { MapMarkerType.BeggarCamp, new Mappers.BeggarCampMapper(this) },
-            { MapMarkerType.Campfire, new Mappers.CampfireMapper(this) },
-            
-            // 单位类
-            { MapMarkerType.Player, new Mappers.PlayerMapper(this) },
-            { MapMarkerType.Beggar, new Mappers.BeggarMapper(this) },
-            { MapMarkerType.Deer, new Mappers.DeerMapper(this) },
-            
-            // 坐骑类
-            { MapMarkerType.Steed, new Mappers.SteedMapper(this) },
-            { MapMarkerType.SteedSpawn, new Mappers.SteedSpawnMapper(this) },
-            { MapMarkerType.DogSpawn, new Mappers.DogSpawnMapper(this) },
-            { MapMarkerType.BoarSpawnGroup, new Mappers.BoarSpawnGroupMapper(this) },
-            
-            // 载具类
-            { MapMarkerType.Boat, new Mappers.BoatMapper(this) },
-            
-            // 障碍物
-            { MapMarkerType.PayableBlocker, new Mappers.PayableBlockerMapper(this) },
-            { MapMarkerType.PayableBush, new Mappers.PayableBushMapper(this) },
-            
-            // 武器
-            { MapMarkerType.Bomb, new Mappers.BombMapper(this) },
-            
-            // DLC 内容
-            { MapMarkerType.HelPuzzleController, new Mappers.HelPuzzleControllerMapper(this) },
-            { MapMarkerType.ThorPuzzleController, new Mappers.ThorPuzzleControllerMapper(this) },
-            { MapMarkerType.HephaestusForge, new Mappers.HephaestusForgeMapper(this) },
-            { MapMarkerType.PersephoneCage, new Mappers.PersephoneCageMapper(this) },
-            { MapMarkerType.MerchantSpawner, new Mappers.MerchantSpawnerMapper(this) },
-        };
-
-        LogDebug($"新架构初始化完成：注册了 {_resolvers.Count} 种组件类型的 Resolver，{_mappers.Count} 个 Mapper");
+        _resolvers = resolvers;
+        _resolverLookup = resolverLookup;
     }
 
-
     /// <summary>
-    /// 构建 Resolver 的 IL2CPP 指针查找表。
-    /// 类似 BuildFastLookup()，将 System.Type 转换为 IntPtr 以提高查找性能。
+    /// 设置 Mapper 字典（由 MapperInitializer 调用）
     /// </summary>
 #if IL2CPP
     [HideFromIl2Cpp]
 #endif
-    private void BuildResolverLookup()
+    internal void SetMappers(Dictionary<MapMarkerType, IComponentMapper> mappers)
     {
-        _resolverLookup = new Dictionary<IntPtr, List<IMarkerResolver>>();
-        foreach (var kvp in _resolvers)
-        {
-            var il2cppType = Il2CppType.From(kvp.Key);
-            _resolverLookup[il2cppType.Pointer] = kvp.Value;
-        }
+        _mappers = mappers;
     }
-
-    /// <summary>
-    /// 注册 Resolver 到字典。
-    /// 同一个游戏组件类型可以有多个 Resolver（按优先级执行）。
-    /// </summary>
-#if IL2CPP
-    [HideFromIl2Cpp]
-#endif
-    private void RegisterResolver(IMarkerResolver resolver)
-    {
-        if (!_resolvers.ContainsKey(resolver.TargetComponentType))
-            _resolvers[resolver.TargetComponentType] = new List<IMarkerResolver>();
-
-        _resolvers[resolver.TargetComponentType].Add(resolver);
-    }
-
 
 
     public void Init(PlayerId playerId)
