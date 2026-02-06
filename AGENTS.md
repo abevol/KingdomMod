@@ -306,6 +306,23 @@ public void OnComponentCreated(Component comp)
 - ✅ 旧 FastLookup 系统已完全移除
 - ✅ 所有 Mapper 已迁移到新架构
 - ✅ 所有组件类型通过 Resolver 识别
+- ✅ 初始化逻辑分离至 `MapperInitializer` 类
+
+### 🏗️ 架构组件
+
+#### MapperInitializer 类
+
+位置: `OverlayMap/Gui/TopMap/MapperInitializer.cs`
+
+**职责**: 
+- 注册所有 Resolver 和 Mapper
+- 构建 IL2CPP 指针查找缓存
+- 将初始化结果设置到 TopMapView
+
+**关键方法**:
+- `Initialize(TopMapView view)`: 执行完整初始化流程
+- `BuildResolverCache()`: 构建 IL2CPP 指针查找缓存
+- `RegisterResolver()`: 注册单个 Resolver
 
 ### 📊 数据结构
 
@@ -373,7 +390,7 @@ public enum MarkerLayer
 1. 在 `MapMarkerType` 枚举中添加新类型
 2. 创建对应的 Resolver（简单类型用 `SimpleResolver`，复杂类型自定义）
 3. 创建对应的 Mapper（如果需要特殊渲染逻辑）
-4. 在 `TopMapView.InitializeNewArchitecture()` 中注册 Resolver 和 Mapper
+4. 在 `MapperInitializer.Initialize()` 中注册 Resolver 和 Mapper
 
 ### 📌 注意事项
 
