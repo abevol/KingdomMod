@@ -290,36 +290,27 @@ public interface IMarkerResolver
 
 每个 Mapper 实现 `IComponentMapper` 接口，并声明 `MapMarkerType? MarkerType` 属性。
 
-### 🔄 双轨制架构 (新旧系统共存)
+### 🔄 新架构（旧系统已完全移除）
 
 **TopMapView 核心流程**:
 
 ```csharp
 public void OnComponentCreated(Component comp)
 {
-    // 1. 优先尝试新架构（Resolver 系统）
-    if (TryResolveAndMap(comp))
-        return;  // 新系统成功识别
-
-    // 2. 回退到旧架构（FastLookup 系统）
-    if (_fastLookup.TryGetValue(typePtr, out var mapper))
-        mapper.Map(comp);
+    // 仅使用新架构（Resolver 系统）
+    TryResolveAndMap(comp);
 }
 ```
 
-**优势**:
-- 向后兼容：旧 Mapper 继续工作
-- 渐进式迁移：可逐步将类型迁移到新架构
-- 风险可控：新架构失败时有旧系统兜底
+**架构迁移完成** (2026-02-06):
+- ✅ 旧 FastLookup 系统已完全移除
+- ✅ 所有 Mapper 已迁移到新架构
+- ✅ 所有组件类型通过 Resolver 识别
 
 ### 📊 数据结构
 
 ```csharp
-// 旧架构 (保留以兼容)
-private Dictionary<Type, IComponentMapper> _componentMappers;
-private Dictionary<IntPtr, IComponentMapper> _fastLookup;
-
-// 新架构
+// 新架构（当前唯一系统）
 private Dictionary<Type, List<IMarkerResolver>> _resolvers;
 private Dictionary<IntPtr, List<IMarkerResolver>> _resolverLookup;  // IL2CPP 优化
 private Dictionary<MapMarkerType, IComponentMapper> _mappers;
@@ -372,7 +363,7 @@ public enum MarkerLayer
 - [ ] 采石场 (Quarry) 标记正常显示，颜色状态正确
 - [ ] 海滩 (Beach)、河流 (River) 等地形标记正常
 - [ ] 玩家 (Player)、敌人 (Enemy) 等单位标记正常
-- [ ] 旧架构处理的类型（尚未迁移的）仍然正常工作
+- [ ] 所有 50+ 种标记类型均正常工作
 - [ ] 检查 BepInEx 日志，确认新架构日志输出正常：`[NewArch] Resolved XXX -> YYY`
 
 ### 🔧 维护指南
@@ -382,20 +373,12 @@ public enum MarkerLayer
 1. 在 `MapMarkerType` 枚举中添加新类型
 2. 创建对应的 Resolver（简单类型用 `SimpleResolver`，复杂类型自定义）
 3. 创建对应的 Mapper（如果需要特殊渲染逻辑）
-4. 在 `TopMapView.InitializeNewArchitecture()` 中注册
-
-#### 迁移现有类型到新架构
-
-1. 创建对应的 Resolver
-2. 创建对应的 Mapper（可选，如果旧 Mapper 逻辑够用则复用）
-3. 在 `InitializeNewArchitecture()` 中注册
-4. 测试验证
-5. （可选）删除旧 Mapper 中对应的逻辑
+4. 在 `TopMapView.InitializeNewArchitecture()` 中注册 Resolver 和 Mapper
 
 ### 📌 注意事项
 
 - **IL2CPP 指针查找**: 使用 `_resolverLookup` 而非直接的 `Type` 查找，避免类型转换问题
 - **性能**: 新架构的查找开销略高于旧架构，但由于触发频率低（仅 OnEnable），可接受
 - **日志**: 新架构使用 `[NewArch]` 前缀标记日志，便于调试
-- **向后兼容**: 保留旧系统直到所有类型完全迁移
+
 
