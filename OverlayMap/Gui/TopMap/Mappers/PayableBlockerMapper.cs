@@ -22,6 +22,10 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                     view.TryAddMapMarker(component, null, MarkerStyle.Quarry.Sign, Strings.Quarry, null,
                         comp => comp.gameObject.activeSelf ? MarkerStyle.Quarry.Unlocked.Color : MarkerStyle.Quarry.Building.Color);
                     return;
+                case GamePrefabID.Mine:
+                    view.TryAddMapMarker(component, null, MarkerStyle.Mine.Sign, Strings.Mine, null,
+                        comp => comp.gameObject.activeSelf ? MarkerStyle.Mine.Unlocked.Color : MarkerStyle.Mine.Building.Color);
+                    return;
             }
         }
 

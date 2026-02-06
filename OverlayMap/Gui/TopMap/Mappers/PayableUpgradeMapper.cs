@@ -23,12 +23,10 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                 case GamePrefabID.Wall3:
                 case GamePrefabID.Wall4:
                 case GamePrefabID.Wall5:
-                    // LogMessage($"Wall: InstanceID: {component.GetInstanceID()}, {GameObjectDetails.JsonSerialize(new GameObjectDetails(component.gameObject))}");
                     var marker = view.TryAddMapMarker(component, MarkerStyle.Wall.Color, MarkerStyle.Wall.Sign, null);
                     if (marker != null)
                     {
                         view.AddWallToList(marker);  // 添加到 LeftWalls 或 RightWalls 并创建连接线
-                        // ConstructionEventHandler.Create(marker, MarkerStyle.Wall.Color, MarkerStyle.Wall.Building.Color);
                     }
                     break;
                 case GamePrefabID.Wall1_Wreck:
@@ -36,8 +34,11 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                 case GamePrefabID.Wall3_Wreck:
                 case GamePrefabID.Wall4_Wreck:
                 case GamePrefabID.Wall5_Wreck:
-                    // LogMessage($"Wall_Wreck: InstanceID: {component.GetInstanceID()}, {GameObjectDetails.JsonSerialize(new GameObjectDetails(component.gameObject))}");
-                    view.TryAddMapMarker(component, MarkerStyle.Wall.Wrecked.Color, MarkerStyle.Wall.Sign, null);
+                    var wallWreckMarker = view.TryAddMapMarker(component, MarkerStyle.Wall.Wrecked.Color, MarkerStyle.Wall.Sign, null);
+                    if (wallWreckMarker != null)
+                    {
+                        view.AddWallToList(wallWreckMarker);  // 添加到 LeftWalls 或 RightWalls 并创建连接线
+                    }
                     break;
                 case GamePrefabID.Lighthouse_undeveloped:
                     view.TryAddMapMarker(component, MarkerStyle.Lighthouse.Unpaid.Color, MarkerStyle.Lighthouse.Sign, Strings.Lighthouse,

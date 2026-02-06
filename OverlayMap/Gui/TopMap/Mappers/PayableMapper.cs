@@ -6,7 +6,7 @@ using static KingdomMod.OverlayMap.OverlayMapHolder;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
-    public class PayableMapper(TopMapView view) : IComponentMapper
+    public class PayableMapper : IComponentMapper
     {
         public void Map(Component component)
         {

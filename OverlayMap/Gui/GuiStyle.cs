@@ -1,4 +1,4 @@
-using KingdomMod.OverlayMap.Gui.TopMap;
+﻿using KingdomMod.OverlayMap.Gui.TopMap;
 using KingdomMod.OverlayMap.Gui.StatsInfo;
 using KingdomMod.OverlayMap.Gui.ExtraInfo;
 using KingdomMod.Shared.Attributes;
@@ -11,9 +11,9 @@ namespace KingdomMod.OverlayMap.Gui
     [RegisterTypeInIl2Cpp]
     public class GuiStyle : MonoBehaviour
     {
-        public TopMapStyle topMapStyle;
-        public StatsInfoStyle statsInfoStyle;
-        public ExtraInfoStyle extraInfoStyle;
+        public TopMapStyle TopMapStyle;
+        public StatsInfoStyle StatsInfoStyle;
+        public ExtraInfoStyle ExtraInfoStyle;
 
 #if IL2CPP
         public GuiStyle(IntPtr ptr) : base(ptr) { }
@@ -22,16 +22,16 @@ namespace KingdomMod.OverlayMap.Gui
         private void Awake()
         {
             LogTrace($"GuiStyle.Awake");
-            topMapStyle = CreateTopMapStyle();
-            statsInfoStyle = CreateStatsInfoStyle();
-            extraInfoStyle = CreateExtraInfoStyle();
+            TopMapStyle = CreateTopMapStyle();
+            StatsInfoStyle = CreateStatsInfoStyle();
+            ExtraInfoStyle = CreateExtraInfoStyle();
         }
 
         private TopMapStyle CreateTopMapStyle()
         {
             LogDebug($"CreateTopMapStyle");
 
-            var guiObj = new GameObject(nameof(TopMapStyle));
+            var guiObj = new GameObject(nameof(TopMap.TopMapStyle));
             guiObj.transform.SetParent(this.transform, false);
             var guiComp = guiObj.AddComponent<TopMapStyle>();
 
@@ -42,7 +42,7 @@ namespace KingdomMod.OverlayMap.Gui
         {
             LogDebug($"CreateStatsInfoStyle");
 
-            var guiObj = new GameObject(nameof(StatsInfoStyle));
+            var guiObj = new GameObject(nameof(StatsInfo.StatsInfoStyle));
             guiObj.transform.SetParent(this.transform, false);
             var guiComp = guiObj.AddComponent<StatsInfoStyle>();
 
@@ -53,7 +53,7 @@ namespace KingdomMod.OverlayMap.Gui
         {
             LogDebug($"CreateExtraInfoStyle");
 
-            var guiObj = new GameObject(nameof(ExtraInfoStyle));
+            var guiObj = new GameObject(nameof(ExtraInfo.ExtraInfoStyle));
             guiObj.transform.SetParent(this.transform, false);
             var guiComp = guiObj.AddComponent<ExtraInfoStyle>();
 

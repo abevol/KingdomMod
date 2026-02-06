@@ -50,7 +50,7 @@ public class StatsInfoView : MonoBehaviour
     {
         LogTrace("StatsInfoView.Start");
 
-        // 从风格配置加载字体（延迟到 Start，确保 Instance.guiStyle 已初始化）
+        // 从风格配置加载字体（延迟到 Start，确保 Instance.GlobalGuiStyle 已初始化）
         ApplyStyleConfig();
     }
 
@@ -61,13 +61,13 @@ public class StatsInfoView : MonoBehaviour
     {
         try
         {
-            if (Instance == null || Instance.guiStyle == null)
+            if (Instance == null || Instance.GlobalGuiStyle == null)
             {
-                LogWarning("Instance or guiStyle is null, using default font");
+                LogWarning("Instance or GlobalGuiStyle is null, using default font");
                 return;
             }
 
-            var styleComp = Instance.guiStyle.statsInfoStyle;
+            var styleComp = Instance.GlobalGuiStyle.StatsInfoStyle;
             if (styleComp != null && styleComp.TextFont != null && styleComp.TextFont.Font != null)
             {
                 _statsText.font = styleComp.TextFont.Font;
