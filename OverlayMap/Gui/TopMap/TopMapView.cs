@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
@@ -26,14 +26,7 @@ public class TopMapView : MonoBehaviour
     private Image _backgroundImage;
     private float _timeSinceLastGuiUpdate;
 
-#if IL2CPP
-    [HideFromIl2Cpp]
-#endif
-    private Dictionary<Type, IComponentMapper> _componentMappers { get; set; }
-
-    private Dictionary<IntPtr, IComponentMapper> _fastLookup;
-    
-    // ===== 新架构：Resolver + Mapper 系统 =====
+    // ===== Resolver + Mapper 系统（新架构）=====
 #if IL2CPP
     [HideFromIl2Cpp]
 #endif
@@ -92,51 +85,10 @@ public class TopMapView : MonoBehaviour
     {
         LogTrace("TopMapView.Awake");
 
-        _componentMappers = new Dictionary<Type, IComponentMapper>()
-        {
-            { typeof(Beach),                new Mappers.BeachMapper(this) },
-            { typeof(BeggarCamp),           new Mappers.BeggarCampMapper(this) },
-            { typeof(Beggar),               new Mappers.BeggarMapper(this) },
-            { typeof(BoarSpawnGroup),       new Mappers.BoarSpawnGroupMapper(this) },
-            { typeof(Boat),                 new Mappers.BoatMapper(this) },
-            { typeof(BoatSummoningBell),    new Mappers.BoatSummoningBellMapper(this) },
-            { typeof(Bomb),                 new Mappers.BombMapper(this) },
-            { typeof(Cabin),                new Mappers.CabinMapper(this) },
-            { typeof(Campfire),             new Mappers.CampfireMapper(this) },
-            { typeof(Castle),               new Mappers.CastleMapper(this) },
-            { typeof(Chest),                new Mappers.ChestMapper(this) },
-            { typeof(CitizenHousePayable),  new Mappers.CitizenHousePayableMapper(this) },
-            { typeof(Deer),                 new Mappers.DeerMapper(this) },
-            { typeof(DogSpawn),             new Mappers.DogSpawnMapper(this) },
-            { typeof(Farmhouse),            new Mappers.FarmhouseMapper(this) },
-            { typeof(HelPuzzleController),  new Mappers.HelPuzzleControllerMapper(this) },
-            { typeof(HephaestusForge),      new Mappers.HephaestusForgeMapper(this) },
-            { typeof(MerchantSpawner),      new Mappers.MerchantSpawnerMapper(this) },
-            { typeof(PayableBlocker),       new Mappers.PayableBlockerMapper(this) },
-            { typeof(PayableBush),          new Mappers.PayableBushMapper(this) },
-            { typeof(PayableGemChest),      new Mappers.PayableGemChestMapper(this) },
-            { typeof(PayableShop),          new Mappers.PayableShopMapper(this) },
-            { typeof(PayableUpgrade),       new Mappers.PayableUpgradeMapper(this) },
-            { typeof(PersephoneCage),       new Mappers.PersephoneCageMapper(this) },
-            { typeof(Player),               new Mappers.PlayerMapper(this) },
-            { typeof(Portal),               new Mappers.PortalMapper(this) },
-            { typeof(River),                new Mappers.RiverMapper(this) },
-            { typeof(Scaffolding),          new Mappers.ScaffoldingMapper(this) },
-            { typeof(Statue),               new Mappers.StatueMapper(this) },
-            { typeof(Steed),                new Mappers.SteedMapper(this) },
-            { typeof(SteedSpawn),           new Mappers.SteedSpawnMapper(this) },
-            { typeof(TeleporterExit),       new Mappers.TeleporterExitMapper(this) },
-            { typeof(ThorPuzzleController), new Mappers.ThorPuzzleControllerMapper(this) },
-            { typeof(TimeStatue),           new Mappers.TimeStatueMapper(this) },
-            { typeof(UnlockNewRulerStatue), new Mappers.UnlockNewRulerStatueMapper(this) },
-        };
-
-        BuildFastLookup();
-        
-        // ===== 新架构初始化：注册 Resolver 和新 Mapper =====
+        // 初始化新架构（Resolver + Mapper 系统）
         InitializeNewArchitecture();
         
-        // 创建 EnemyMapper（不注册到 _componentMappers，因为它不通过 ObjectPatcher 触发）
+        // 创建 EnemyMapper（不通过 ObjectPatcher 触发，直接管理）
         _enemyMapper = new Mappers.EnemyMapper(this);
 
         PlayerMarkers = new List<MapMarker>();
@@ -156,16 +108,6 @@ public class TopMapView : MonoBehaviour
         Level.OnLoaded += (System.Action<bool>)OnLevelLoaded;
     }
 
-    private void BuildFastLookup()
-    {
-        _fastLookup = new Dictionary<IntPtr, IComponentMapper>();
-        foreach (var kvp in _componentMappers)
-        {
-            // 获取 System.Type 对应的 IL2CPP 类型指针
-            var il2cppType = Il2CppType.From(kvp.Key);
-            _fastLookup[il2cppType.Pointer] = kvp.Value;
-        }
-    }
 
     /// <summary>
     /// 初始化新架构：注册 Resolver 和 Mapper。
@@ -248,12 +190,67 @@ public class TopMapView : MonoBehaviour
         // 4. 初始化新 Mapper 字典（基于 MapMarkerType）
         _mappers = new Dictionary<MapMarkerType, IComponentMapper>()
         {
-            // 新架构 Mapper：通过 MapMarkerType 独立定义
+            // 地形类
+            { MapMarkerType.Beach, new Mappers.BeachMapper(this) },
+            { MapMarkerType.River, new Mappers.RiverMapper(this) },
+            
+            // 建筑类
+            { MapMarkerType.Castle, new Mappers.CastleMapper(this) },
+            { MapMarkerType.Wall, new Mappers.WallMapper(this) },
+            { MapMarkerType.Scaffolding, new Mappers.ScaffoldingMapper(this) },
+            { MapMarkerType.Cabin, new Mappers.CabinMapper(this) },
+            { MapMarkerType.Farmhouse, new Mappers.FarmhouseMapper(this) },
+            { MapMarkerType.CitizenHouse, new Mappers.CitizenHousePayableMapper(this) },
+            
+            // 交互建筑
             { MapMarkerType.Lighthouse, new Mappers.LighthouseMapper(this) },
             { MapMarkerType.Mine, new Mappers.MineMapper(this) },
             { MapMarkerType.Quarry, new Mappers.QuarryMapper(this) },
-            { MapMarkerType.Wall, new Mappers.WallMapper(this) },
-            // 更多新 Mapper 将逐步添加...
+            { MapMarkerType.Shop, new Mappers.PayableShopMapper(this) },
+            { MapMarkerType.Chest, new Mappers.ChestMapper(this) },
+            { MapMarkerType.GemChest, new Mappers.PayableGemChestMapper(this) },
+            { MapMarkerType.BoatSummoningBell, new Mappers.BoatSummoningBellMapper(this) },
+            
+            // 传送点
+            { MapMarkerType.Portal, new Mappers.PortalMapper(this) },
+            { MapMarkerType.TeleporterExit, new Mappers.TeleporterExitMapper(this) },
+            
+            // 雕像类
+            { MapMarkerType.TimeStatue, new Mappers.TimeStatueMapper(this) },
+            { MapMarkerType.UnlockNewRulerStatue, new Mappers.UnlockNewRulerStatueMapper(this) },
+            { MapMarkerType.Statue, new Mappers.StatueMapper(this) },
+            
+            // 营地类
+            { MapMarkerType.BeggarCamp, new Mappers.BeggarCampMapper(this) },
+            { MapMarkerType.Campfire, new Mappers.CampfireMapper(this) },
+            
+            // 单位类
+            { MapMarkerType.Player, new Mappers.PlayerMapper(this) },
+            { MapMarkerType.Beggar, new Mappers.BeggarMapper(this) },
+            { MapMarkerType.Deer, new Mappers.DeerMapper(this) },
+            
+            // 坐骑类
+            { MapMarkerType.Steed, new Mappers.SteedMapper(this) },
+            { MapMarkerType.SteedSpawn, new Mappers.SteedSpawnMapper(this) },
+            { MapMarkerType.DogSpawn, new Mappers.DogSpawnMapper(this) },
+            { MapMarkerType.BoarSpawnGroup, new Mappers.BoarSpawnGroupMapper(this) },
+            
+            // 载具类
+            { MapMarkerType.Boat, new Mappers.BoatMapper(this) },
+            
+            // 障碍物
+            { MapMarkerType.PayableBlocker, new Mappers.PayableBlockerMapper(this) },
+            { MapMarkerType.PayableBush, new Mappers.PayableBushMapper(this) },
+            
+            // 武器
+            { MapMarkerType.Bomb, new Mappers.BombMapper(this) },
+            
+            // DLC 内容
+            { MapMarkerType.HelPuzzleController, new Mappers.HelPuzzleControllerMapper(this) },
+            { MapMarkerType.ThorPuzzleController, new Mappers.ThorPuzzleControllerMapper(this) },
+            { MapMarkerType.HephaestusForge, new Mappers.HephaestusForgeMapper(this) },
+            { MapMarkerType.PersephoneCage, new Mappers.PersephoneCageMapper(this) },
+            { MapMarkerType.MerchantSpawner, new Mappers.MerchantSpawnerMapper(this) },
         };
 
         LogDebug($"新架构初始化完成：注册了 {_resolvers.Count} 种组件类型的 Resolver，{_mappers.Count} 个 Mapper");
@@ -495,23 +492,8 @@ public class TopMapView : MonoBehaviour
 #endif
     public void OnComponentCreated(Component comp)
     {
-        // ===== 新架构：优先尝试 Resolver 系统 =====
-        if (TryResolveAndMap(comp))
-        {
-            // 新系统成功识别并映射，直接返回
-            return;
-        }
-
-        // ===== 旧架构：回退到 FastLookup 系统 =====
-        // 获取组件底层的真实类型指针
-        var typePtr = comp.GetIl2CppType().Pointer;
-
-        // 指针碰撞，极速查找
-        if (_fastLookup.TryGetValue(typePtr, out var mapper))
-        {
-            LogTrace($"OnComponentCreated Found {comp.GetIl2CppType().Name} on {comp.name}, Pointer: {comp.Pointer:X}");
-            mapper.Map(comp);
-        }
+        // 新架构:仅使用 Resolver 系统
+        TryResolveAndMap(comp);
     }
 
     /// <summary>
