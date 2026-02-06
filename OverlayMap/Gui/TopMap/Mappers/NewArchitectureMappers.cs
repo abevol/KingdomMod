@@ -155,7 +155,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                     var marker = view.TryAddMapMarker(component, MarkerStyle.Wall.Color, MarkerStyle.Wall.Sign, null);
                     if (marker != null)
                     {
-                        view.AddWallToList(marker);  // 添加到 LeftWalls 或 RightWalls 并创建连接线
+                        view.WallController.AddWallToList(marker);  // 添加到 LeftWalls 或 RightWalls 并创建连接线
                     }
                     break;
 
@@ -168,7 +168,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                     var wallWreckMarker = view.TryAddMapMarker(component, MarkerStyle.Wall.Wrecked.Color, MarkerStyle.Wall.Sign, null);
                     if (wallWreckMarker != null)
                     {
-                        view.AddWallToList(wallWreckMarker);  // 添加到 LeftWalls 或 RightWalls 并创建连接线
+                        view.WallController.AddWallToList(wallWreckMarker);  // 添加到 LeftWalls 或 RightWalls 并创建连接线
                     }
                     break;
             }
