@@ -5,20 +5,13 @@
 ## ⚡ Current Branch Work Context
 
 **Branch:** `dev`  
-**Task:** OverlayMap UI Framework Migration (IMGUI → UGUI + TextMeshPro)
+**Task:**
 
 **Current Status:**
-- 正在进行 `KingdomMod.OverlayMap` 模组的 UI 框架迁移工作
-- **OLD (废弃中)**: IMGUI 实现位于 `OverlayMap\OverlayMapHolder.cs`
-- **NEW (开发中)**: UGUI + TextMeshPro 实现位于 `OverlayMap\Gui\` 目录
 
 **Key Points:**
-- 不要修改或依赖旧的 IMGUI 代码 (`OverlayMapHolder.cs`)
-- 所有新的 UI 功能应该基于 UGUI 实现,放在 `Gui\` 目录
-- 使用 TextMeshPro 进行文本渲染,而非旧的 UnityEngine.UI.Text
 
-**完成条件:** 
-此段说明应在 UI 迁移任务完成、分支合并后删除。
+**完成条件:**
 
 ---
 
@@ -231,3 +224,178 @@ No unit test projects currently configured. Test by:
 1. Build the project
 2. Copy DLLs to game's BepInEx/plugins folder
 3. Run the game and check BepInEx logs
+
+---
+
+## OverlayMap 新架构设计 (MapMarkerType 枚举重构)
+
+### 📋 架构概述
+
+**重构日期**: 2026-02-06  
+**目标**: 通过引入 `MapMarkerType` 枚举，解耦模组代码与游戏代码的类型依赖
+
+### 🎯 核心价值
+
+1. **解决多态歧义**: 游戏中 `PayableShop` 同时表示灯塔/矿井/采石场，旧架构无法区分
+2. **打破 IL2CPP 硬链接**: 不再依赖脆弱的 IL2CPP 指针转换
+3. **独立 Mapper**: Wall、Lighthouse、Mine、Quarry 等现在有独立的 Mapper 文件
+4. **防腐层 (Anti-Corruption Layer)**: `MapMarkerType` 充当游戏代码与模组代码之间的隔离层
+
+### 🏗️ 新架构组件
+
+#### 1. MapMarkerType 枚举
+
+位置: `OverlayMap/Gui/TopMap/MapMarkerType.cs`
+
+定义了 50+ 种地图标记类型，包括：
+- 地形类: Beach, River
+- 建筑类: Castle, Wall, Cabin, Farmhouse
+- 交互建筑: Lighthouse, Mine, Quarry, Shop
+- 单位类: Player, Beggar, Deer, Enemy
+- 等等...
+
+#### 2. IMarkerResolver 接口
+
+位置: `OverlayMap/Gui/TopMap/IMarkerResolver.cs`
+
+```csharp
+public interface IMarkerResolver
+{
+    Type TargetComponentType { get; }
+    MapMarkerType? Resolve(Component component);
+}
+```
+
+**职责**: 将游戏组件（Component）识别为具体的地图标记类型（MapMarkerType）
+
+#### 3. Resolver 实现
+
+**简单 Resolver** (1:1 映射):
+- 位置: `OverlayMap/Gui/TopMap/Resolvers/SimpleResolvers.cs`
+- 示例: `CastleResolver`, `BeachResolver`, `PortalResolver` 等 30+ 个
+
+**复杂 Resolver** (1:N 映射):
+- 位置: `OverlayMap/Gui/TopMap/Resolvers/ComplexResolvers.cs`
+- `PayableUpgradeResolver`: 通过 `PrefabID` 区分 Wall/Lighthouse/Mine/Quarry
+- `PayableShopResolver`: 通过 `ShopTag.type` 区分不同商店
+
+#### 4. 新 Mapper 实现
+
+位置: `OverlayMap/Gui/TopMap/Mappers/NewArchitectureMappers.cs`
+
+- `LighthouseMapper`: 独立的灯塔标记映射器
+- `MineMapper`: 独立的矿井标记映射器
+- `QuarryMapper`: 独立的采石场标记映射器
+- `WallMapper`: **首次实现**独立的墙体标记映射器
+
+每个 Mapper 实现 `IComponentMapper` 接口，并声明 `MapMarkerType? MarkerType` 属性。
+
+### 🔄 双轨制架构 (新旧系统共存)
+
+**TopMapView 核心流程**:
+
+```csharp
+public void OnComponentCreated(Component comp)
+{
+    // 1. 优先尝试新架构（Resolver 系统）
+    if (TryResolveAndMap(comp))
+        return;  // 新系统成功识别
+
+    // 2. 回退到旧架构（FastLookup 系统）
+    if (_fastLookup.TryGetValue(typePtr, out var mapper))
+        mapper.Map(comp);
+}
+```
+
+**优势**:
+- 向后兼容：旧 Mapper 继续工作
+- 渐进式迁移：可逐步将类型迁移到新架构
+- 风险可控：新架构失败时有旧系统兜底
+
+### 📊 数据结构
+
+```csharp
+// 旧架构 (保留以兼容)
+private Dictionary<Type, IComponentMapper> _componentMappers;
+private Dictionary<IntPtr, IComponentMapper> _fastLookup;
+
+// 新架构
+private Dictionary<Type, List<IMarkerResolver>> _resolvers;
+private Dictionary<IntPtr, List<IMarkerResolver>> _resolverLookup;  // IL2CPP 优化
+private Dictionary<MapMarkerType, IComponentMapper> _mappers;
+```
+
+### 🚀 扩展性设计
+
+#### 未来可配置化
+
+```json
+// 示例: config/markers.json
+{
+  "Lighthouse": {
+    "icon": "assets/lighthouse.png",
+    "color": "#FFD700",
+    "sign": "🗼"
+  }
+}
+```
+
+#### 标记过滤系统
+
+```csharp
+public class MarkerFilter
+{
+    public HashSet<MapMarkerType> EnabledTypes { get; set; }
+}
+```
+
+#### 标记分层
+
+```csharp
+public enum MarkerLayer
+{
+    Terrain,      // Beach, River
+    Buildings,    // Castle, Wall
+    Interactive,  // Shop, Portal
+    Units         // Player, Enemy
+}
+```
+
+### ✅ 测试检查清单
+
+运行游戏后验证以下功能：
+
+- [ ] 城堡 (Castle) 标记正常显示
+- [ ] 墙体 (Wall) 标记正常显示，且有连接线
+- [ ] 灯塔 (Lighthouse) 标记正常显示，颜色状态正确
+- [ ] 矿井 (Mine) 标记正常显示，颜色状态正确
+- [ ] 采石场 (Quarry) 标记正常显示，颜色状态正确
+- [ ] 海滩 (Beach)、河流 (River) 等地形标记正常
+- [ ] 玩家 (Player)、敌人 (Enemy) 等单位标记正常
+- [ ] 旧架构处理的类型（尚未迁移的）仍然正常工作
+- [ ] 检查 BepInEx 日志，确认新架构日志输出正常：`[NewArch] Resolved XXX -> YYY`
+
+### 🔧 维护指南
+
+#### 添加新的标记类型
+
+1. 在 `MapMarkerType` 枚举中添加新类型
+2. 创建对应的 Resolver（简单类型用 `SimpleResolver`，复杂类型自定义）
+3. 创建对应的 Mapper（如果需要特殊渲染逻辑）
+4. 在 `TopMapView.InitializeNewArchitecture()` 中注册
+
+#### 迁移现有类型到新架构
+
+1. 创建对应的 Resolver
+2. 创建对应的 Mapper（可选，如果旧 Mapper 逻辑够用则复用）
+3. 在 `InitializeNewArchitecture()` 中注册
+4. 测试验证
+5. （可选）删除旧 Mapper 中对应的逻辑
+
+### 📌 注意事项
+
+- **IL2CPP 指针查找**: 使用 `_resolverLookup` 而非直接的 `Type` 查找，避免类型转换问题
+- **性能**: 新架构的查找开销略高于旧架构，但由于触发频率低（仅 OnEnable），可接受
+- **日志**: 新架构使用 `[NewArch]` 前缀标记日志，便于调试
+- **向后兼容**: 保留旧系统直到所有类型完全迁移
+

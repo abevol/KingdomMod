@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
@@ -32,6 +32,22 @@ public class TopMapView : MonoBehaviour
     private Dictionary<Type, IComponentMapper> _componentMappers { get; set; }
 
     private Dictionary<IntPtr, IComponentMapper> _fastLookup;
+    
+    // ===== 新架构：Resolver + Mapper 系统 =====
+#if IL2CPP
+    [HideFromIl2Cpp]
+#endif
+    private Dictionary<Type, List<IMarkerResolver>> _resolvers { get; set; }
+
+#if IL2CPP
+    [HideFromIl2Cpp]
+#endif
+    private Dictionary<IntPtr, List<IMarkerResolver>> _resolverLookup { get; set; }  // IL2CPP 指针查找
+
+#if IL2CPP
+    [HideFromIl2Cpp]
+#endif
+    private Dictionary<MapMarkerType, IComponentMapper> _mappers { get; set; }
     
     private Mappers.EnemyMapper _enemyMapper;
 
@@ -117,6 +133,9 @@ public class TopMapView : MonoBehaviour
 
         BuildFastLookup();
         
+        // ===== 新架构初始化：注册 Resolver 和新 Mapper =====
+        InitializeNewArchitecture();
+        
         // 创建 EnemyMapper（不注册到 _componentMappers，因为它不通过 ObjectPatcher 触发）
         _enemyMapper = new Mappers.EnemyMapper(this);
 
@@ -147,6 +166,133 @@ public class TopMapView : MonoBehaviour
             _fastLookup[il2cppType.Pointer] = kvp.Value;
         }
     }
+
+    /// <summary>
+    /// 初始化新架构：注册 Resolver 和 Mapper。
+    /// 新架构通过 MapMarkerType 枚举解耦游戏代码类型依赖。
+    /// </summary>
+#if IL2CPP
+    [HideFromIl2Cpp]
+#endif
+    private void InitializeNewArchitecture()
+    {
+        // 1. 初始化 Resolver 字典
+        _resolvers = new Dictionary<Type, List<IMarkerResolver>>();
+
+        // 2. 注册所有 Resolver（按类别组织）
+        
+        // 复杂 Resolver（一对多映射）
+        RegisterResolver(new Resolvers.PayableUpgradeResolver());  // Wall, Lighthouse, Mine, Quarry
+        RegisterResolver(new Resolvers.PayableShopResolver());     // Shop
+        
+        // 简单 Resolver（一对一映射）- 地形类
+        RegisterResolver(new Resolvers.BeachResolver());
+        RegisterResolver(new Resolvers.RiverResolver());
+        
+        // 简单 Resolver - 建筑类
+        RegisterResolver(new Resolvers.CastleResolver());
+        RegisterResolver(new Resolvers.ScaffoldingResolver());
+        RegisterResolver(new Resolvers.CabinResolver());
+        RegisterResolver(new Resolvers.FarmhouseResolver());
+        RegisterResolver(new Resolvers.CitizenHousePayableResolver());
+        
+        // 简单 Resolver - 交互建筑
+        RegisterResolver(new Resolvers.ChestResolver());
+        RegisterResolver(new Resolvers.PayableGemChestResolver());
+        RegisterResolver(new Resolvers.BoatSummoningBellResolver());
+        
+        // 简单 Resolver - 传送点
+        RegisterResolver(new Resolvers.PortalResolver());
+        RegisterResolver(new Resolvers.TeleporterExitResolver());
+        
+        // 简单 Resolver - 雕像类
+        RegisterResolver(new Resolvers.TimeStatueResolver());
+        RegisterResolver(new Resolvers.UnlockNewRulerStatueResolver());
+        RegisterResolver(new Resolvers.StatueResolver());
+        
+        // 简单 Resolver - 营地类
+        RegisterResolver(new Resolvers.BeggarCampResolver());
+        RegisterResolver(new Resolvers.CampfireResolver());
+        
+        // 简单 Resolver - 单位类
+        RegisterResolver(new Resolvers.PlayerResolver());
+        RegisterResolver(new Resolvers.BeggarResolver());
+        RegisterResolver(new Resolvers.DeerResolver());
+        
+        // 简单 Resolver - 坐骑类
+        RegisterResolver(new Resolvers.SteedResolver());
+        RegisterResolver(new Resolvers.SteedSpawnResolver());
+        RegisterResolver(new Resolvers.DogSpawnResolver());
+        RegisterResolver(new Resolvers.BoarSpawnGroupResolver());
+        
+        // 简单 Resolver - 载具类
+        RegisterResolver(new Resolvers.BoatResolver());
+        
+        // 简单 Resolver - 障碍物
+        RegisterResolver(new Resolvers.PayableBlockerResolver());
+        RegisterResolver(new Resolvers.PayableBushResolver());
+        
+        // 简单 Resolver - 武器
+        RegisterResolver(new Resolvers.BombResolver());
+        
+        // 简单 Resolver - DLC 内容
+        RegisterResolver(new Resolvers.HelPuzzleControllerResolver());
+        RegisterResolver(new Resolvers.ThorPuzzleControllerResolver());
+        RegisterResolver(new Resolvers.HephaestusForgeResolver());
+        RegisterResolver(new Resolvers.PersephoneCageResolver());
+        RegisterResolver(new Resolvers.MerchantSpawnerResolver());
+
+        // 3. 构建 IL2CPP 指针查找表
+        BuildResolverLookup();
+
+        // 4. 初始化新 Mapper 字典（基于 MapMarkerType）
+        _mappers = new Dictionary<MapMarkerType, IComponentMapper>()
+        {
+            // 新架构 Mapper：通过 MapMarkerType 独立定义
+            { MapMarkerType.Lighthouse, new Mappers.LighthouseMapper(this) },
+            { MapMarkerType.Mine, new Mappers.MineMapper(this) },
+            { MapMarkerType.Quarry, new Mappers.QuarryMapper(this) },
+            { MapMarkerType.Wall, new Mappers.WallMapper(this) },
+            // 更多新 Mapper 将逐步添加...
+        };
+
+        LogDebug($"新架构初始化完成：注册了 {_resolvers.Count} 种组件类型的 Resolver，{_mappers.Count} 个 Mapper");
+    }
+
+
+    /// <summary>
+    /// 构建 Resolver 的 IL2CPP 指针查找表。
+    /// 类似 BuildFastLookup()，将 System.Type 转换为 IntPtr 以提高查找性能。
+    /// </summary>
+#if IL2CPP
+    [HideFromIl2Cpp]
+#endif
+    private void BuildResolverLookup()
+    {
+        _resolverLookup = new Dictionary<IntPtr, List<IMarkerResolver>>();
+        foreach (var kvp in _resolvers)
+        {
+            var il2cppType = Il2CppType.From(kvp.Key);
+            _resolverLookup[il2cppType.Pointer] = kvp.Value;
+        }
+    }
+
+    /// <summary>
+    /// 注册 Resolver 到字典。
+    /// 同一个游戏组件类型可以有多个 Resolver（按优先级执行）。
+    /// </summary>
+#if IL2CPP
+    [HideFromIl2Cpp]
+#endif
+    private void RegisterResolver(IMarkerResolver resolver)
+    {
+        if (!_resolvers.ContainsKey(resolver.TargetComponentType))
+            _resolvers[resolver.TargetComponentType] = new List<IMarkerResolver>();
+
+        _resolvers[resolver.TargetComponentType].Add(resolver);
+    }
+
+
 
     public void Init(PlayerId playerId)
     {
@@ -349,6 +495,14 @@ public class TopMapView : MonoBehaviour
 #endif
     public void OnComponentCreated(Component comp)
     {
+        // ===== 新架构：优先尝试 Resolver 系统 =====
+        if (TryResolveAndMap(comp))
+        {
+            // 新系统成功识别并映射，直接返回
+            return;
+        }
+
+        // ===== 旧架构：回退到 FastLookup 系统 =====
         // 获取组件底层的真实类型指针
         var typePtr = comp.GetIl2CppType().Pointer;
 
@@ -359,6 +513,42 @@ public class TopMapView : MonoBehaviour
             mapper.Map(comp);
         }
     }
+
+    /// <summary>
+    /// 新架构：尝试使用 Resolver 识别组件类型并映射。
+    /// </summary>
+    /// <returns>如果成功识别并映射，返回 true；否则返回 false</returns>
+#if IL2CPP
+    [HideFromIl2Cpp]
+#endif
+    private bool TryResolveAndMap(Component comp)
+    {
+        // 1. 获取组件的类型指针
+        var il2cppType = comp.GetIl2CppType();
+        var typePtr = il2cppType.Pointer;
+
+        // 2. 通过指针查找对应的 Resolver 列表
+        if (!_resolverLookup.TryGetValue(typePtr, out var resolvers))
+            return false;
+
+        // 3. 遍历 Resolver，尝试识别
+        foreach (var resolver in resolvers)
+        {
+            var markerType = resolver.Resolve(comp);
+
+            // 4. 如果识别成功，查找对应的 Mapper
+            if (markerType.HasValue && _mappers.TryGetValue(markerType.Value, out var mapper))
+            {
+                LogTrace($"[NewArch] Resolved {il2cppType.Name} -> {markerType.Value}, mapping...");
+                mapper.Map(comp);
+                return true;  // 成功识别并映射
+            }
+        }
+
+        return false;  // 未能识别
+    }
+
+
 
 #if IL2CPP
     [HideFromIl2Cpp]
