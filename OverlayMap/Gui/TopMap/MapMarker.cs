@@ -41,7 +41,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
         {
             _rectTransform = this.gameObject.AddComponent<RectTransform>();
             _owner = _rectTransform.parent.GetComponent<TopMapView>();
-            var style = Instance.guiStyle.topMapStyle;
+            var style = Instance.GlobalGuiStyle.TopMapStyle;
 
             // 设置锚点
             _rectTransform.anchorMin = new Vector2(0.5f, 1); // 以顶部中心为锚点
@@ -158,7 +158,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
 
         public void UpdateSign(string text)
         {
-            Instance.guiStyle.topMapStyle.SignFont.TryAddCharacters(text);
+            Instance.GlobalGuiStyle.TopMapStyle.SignFont.TryAddCharacters(text);
             _sign.text = text;
         }
 
@@ -179,7 +179,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
 
         public void UpdateTitle(string text)
         {
-            Instance.guiStyle.topMapStyle.TitleFont.TryAddCharacters(text);
+            Instance.GlobalGuiStyle.TopMapStyle.TitleFont.TryAddCharacters(text);
             _title.text = text;
         }
 
@@ -200,7 +200,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
 
         public void UpdateCount(int count)
         {
-            Instance.guiStyle.topMapStyle.CountFont.TryAddCharacters(count.ToString());
+            Instance.GlobalGuiStyle.TopMapStyle.CountFont.TryAddCharacters(count.ToString());
             _count.text = count == 0 ? "" : count.ToString();
         }
 

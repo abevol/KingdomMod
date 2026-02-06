@@ -24,9 +24,7 @@ public class TopMapView : MonoBehaviour
 {
     private RectTransform _rectTransform;
     private Image _backgroundImage;
-    private Text _groupText;
     private float _timeSinceLastGuiUpdate;
-    private bool _isStarted;
 
 #if IL2CPP
     [HideFromIl2Cpp]
@@ -134,8 +132,6 @@ public class TopMapView : MonoBehaviour
         UpdateLayout();
         UpdateBackgroundImage();
 
-        ObjectPatcher.OnComponentCreated += OnComponentCreated;
-        ObjectPatcher.OnComponentDestroyed += OnComponentDestroyed;
         OverlayMapHolder.OnGameStateChanged += OnGameStateChanged;
         Game.OnGameStart += (System.Action)OnGameStart;
         Level.OnLoaded += (System.Action<bool>)OnLevelLoaded;
@@ -159,8 +155,6 @@ public class TopMapView : MonoBehaviour
 
     private void OnDestroy()
     {
-        ObjectPatcher.OnComponentCreated -= OnComponentCreated;
-        ObjectPatcher.OnComponentDestroyed -= OnComponentDestroyed;
         OverlayMapHolder.OnGameStateChanged -= OnGameStateChanged;
         Game.OnGameStart -= (System.Action)OnGameStart;
         Level.OnLoaded -= (System.Action<bool>)OnLevelLoaded;
@@ -170,18 +164,6 @@ public class TopMapView : MonoBehaviour
     {
         LogTrace("TopMapView.Start");
 
-        // foreach (var kv in _componentMappers)
-        // {
-        //     var mapper = kv.Value;
-        //     var components = mapper.GetComponents();
-        //     foreach (var component in components)
-        //     {
-        //         if (component != null)
-        //             mapper.Map(component);
-        //     }
-        // }
-
-        _isStarted = true;
     }
 
     public void UpdateLayout()

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using KingdomMod.Shared.Attributes;
 using UnityEngine;
 using UnityEngine.UI;
@@ -57,13 +57,13 @@ public class ExtraInfoView : MonoBehaviour
     {
         try
         {
-            if (Instance == null || Instance.guiStyle == null)
+            if (Instance == null || Instance.GlobalGuiStyle == null)
             {
-                LogWarning("Instance or guiStyle is null, using default font");
+                LogWarning("Instance or GlobalGuiStyle is null, using default font");
                 return;
             }
 
-            var styleComp = Instance.guiStyle.extraInfoStyle;
+            var styleComp = Instance.GlobalGuiStyle.ExtraInfoStyle;
             if (styleComp != null && styleComp.TextFont != null && styleComp.TextFont.Font != null)
             {
                 UpdateTextFont(styleComp.TextFont.Font);

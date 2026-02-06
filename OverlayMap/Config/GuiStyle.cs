@@ -117,7 +117,6 @@ public class GuiStyle
         {
             LogDebug($"OnConfigFileChanged: {e.Name}, {e.ChangeType}");
             ConfigFile.Reload();
-            OverlayMapHolder.Instance.NeedToReloadGuiBoxStyle = true;
         }
         catch (Exception exception)
         {
