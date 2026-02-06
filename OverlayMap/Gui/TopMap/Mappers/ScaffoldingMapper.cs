@@ -1,4 +1,4 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using KingdomMod.OverlayMap.Config;
 using KingdomMod.SharedLib;
 using UnityEngine;
@@ -22,7 +22,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                 if (marker != null)
                 {
                     // 添加到 LeftWalls 或 RightWalls 并创建连接线
-                    view.AddWallToList(marker);
+                    view.WallController.AddWallToList(marker);
                 }
             }
             else
