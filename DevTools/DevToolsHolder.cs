@@ -23,6 +23,7 @@ public class DevToolsHolder : MonoBehaviour
     private bool enabledDebugInfo = false;
     private bool enabledObjectsInfo = false;
     private bool enableDevTools = false;
+    private bool _objectsInfoLogged = false;
     private readonly GUIStyle guiStyle = new();
     private int tick = 0;
     private readonly List<ObjectsInfo> objectsInfoList = new();
@@ -218,6 +219,7 @@ public class DevToolsHolder : MonoBehaviour
         {
             log.LogMessage("End key pressed.");
             enabledObjectsInfo = !enabledObjectsInfo;
+            _objectsInfoLogged = false;
         }
 
         if (Input.GetKeyDown(KeyCode.Insert))
@@ -553,7 +555,11 @@ public class DevToolsHolder : MonoBehaviour
             {
                 objectsInfoList.Add(new ObjectsInfo(new Rect(uiPos.x, uiPos.y, 100, 100), obj.transform.position, obj.name));
                 //  + " (" + obj.transform.position.ToString() + ")(" + uiPos.ToString() + ")"
-                log.LogInfo(obj.name);
+                if (!_objectsInfoLogged)
+                {
+                    log.LogInfo(obj.name);
+                    _objectsInfoLogged = true;
+                }
             }
         }
     }
