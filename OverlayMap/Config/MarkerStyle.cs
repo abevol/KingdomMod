@@ -1,4 +1,4 @@
-﻿using BepInEx.Configuration;
+using BepInEx.Configuration;
 using System.IO;
 using System;
 using KingdomMod.OverlayMap.Config.Extensions;
@@ -23,12 +23,14 @@ public class MarkerStyle
     public static MarkerConfig DeerFollowing;
     public static MarkerConfig Boss;
     public static MarkerConfig Enemy;
+    public static MarkerConfig Knight;
     public static MarkerConfigStated Castle;
     public static MarkerConfig Campfire;
     public static MarkerConfig Chest;
     public static MarkerConfig GemChest;
     public static MarkerConfigStated Wall;
     public static MarkerConfig ShopForge;
+    public static MarkerConfig ShopScythe;
     public static MarkerConfigStated CitizenHouse;
     public static MarkerConfig WallFoundation;
     public static MarkerConfig River;
@@ -103,6 +105,9 @@ public class MarkerStyle
         Enemy.Color = config.Bind("Enemy", "Color", "1,0,0,1", "");
         Enemy.Sign = config.Bind("Enemy", "Sign", "", "");
 
+        Knight.Color = config.Bind("Knight", "Color", "0,0,1,1", "");
+        Knight.Sign = config.Bind("Knight", "Sign", "", "");
+
         Castle.Sign = config.Bind("Castle", "Sign", "♜", "");
         Castle.Color = config.Bind("Castle", "Color", "0,1,0,1", "");
         Castle.Locked.Color = config.Bind("Castle.Locked", "Color", "0.5,0.5,0.5,1", "");
@@ -123,6 +128,9 @@ public class MarkerStyle
 
         ShopForge.Color = config.Bind("ShopForge", "Color", "1,1,1,1", "");
         ShopForge.Sign = config.Bind("ShopForge", "Sign", "", "");
+
+        ShopScythe.Color = config.Bind("ShopScythe", "Color", "1,1,1,1", "");
+        ShopScythe.Sign = config.Bind("ShopScythe", "Sign", "", "");
 
         CitizenHouse.Sign = config.Bind("CitizenHouse", "Sign", "", "");
         CitizenHouse.Color = config.Bind("CitizenHouse", "Color", "1,1,1,1", "");

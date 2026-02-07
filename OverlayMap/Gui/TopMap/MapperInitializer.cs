@@ -56,6 +56,7 @@ internal static class MapperInitializer
         
         // 简单 Resolver - 单位类
         RegisterResolver(resolvers, new Resolvers.PlayerResolver());
+        RegisterResolver(resolvers, new Resolvers.KnightResolver());
         RegisterResolver(resolvers, new Resolvers.BeggarResolver());
         RegisterResolver(resolvers, new Resolvers.DeerResolver());
         
@@ -124,7 +125,9 @@ internal static class MapperInitializer
             
             // 单位类
             { MapMarkerType.Player, new Mappers.PlayerMapper(view) },
+            { MapMarkerType.Knight, new Mappers.KnightMapper(view) },
             { MapMarkerType.Beggar, new Mappers.BeggarMapper(view) },
+
             { MapMarkerType.Deer, new Mappers.DeerMapper(view) },
             
             // 坐骑类

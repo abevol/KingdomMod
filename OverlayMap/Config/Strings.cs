@@ -1,4 +1,4 @@
-﻿using BepInEx.Configuration;
+using BepInEx.Configuration;
 using System.IO;
 using System;
 using KingdomMod.OverlayMap.Config.Extensions;
@@ -107,8 +107,9 @@ public class Strings
     public static ConfigEntryWrapper<string> MolossianHound;
     public static ConfigEntryWrapper<string> Chimera;
     public static ConfigEntryWrapper<string> Total;
-    public static ConfigEntryWrapper<string> ShopForge;
-    public static ConfigEntryWrapper<string> Sleipnir;
+        public static ConfigEntryWrapper<string> ShopForge;
+        public static ConfigEntryWrapper<string> ShopScythe;
+        public static ConfigEntryWrapper<string> Sleipnir;
     public static ConfigEntryWrapper<string> Spookyhorse;
     public static ConfigEntryWrapper<string> Stag;
     public static ConfigEntryWrapper<string> StatueArcher;
@@ -223,6 +224,7 @@ public class Strings
         Queen = config.Bind("Strings", "Queen", "Queen", "");
         Reindeer = config.Bind("Strings", "Reindeer", "Reindeer", "");
         ShopForge = config.Bind("Strings", "ShopForge", "Smithy", "");
+        ShopScythe = config.Bind("Strings", "ShopScythe", "Scythe", "");
         Sleipnir = config.Bind("Strings", "Sleipnir", "Sleipnir", "");
         Spookyhorse = config.Bind("Strings", "Spookyhorse", "Spookyhorse", "");
         Stag = config.Bind("Strings", "Stag", "Stag", "");

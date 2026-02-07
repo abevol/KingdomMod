@@ -92,6 +92,9 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
         /// &lt;summary&gt;敌人（怪物）&lt;/summary&gt;
         Enemy,
 
+        /// <summary>骑士</summary>
+        Knight,
+
         // ===== 坐骑类 (Mounts) =====
         /// &lt;summary&gt;坐骑&lt;/summary&gt;
         Steed,
