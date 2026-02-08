@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using KingdomMod.SharedLib;
 using UnityEngine;
 
@@ -56,7 +56,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Resolvers
                 GamePrefabID.Cliff_Portal => MapMarkerType.Portal,
 
                 // 船只残骸
-                GamePrefabID.Wreck => MapMarkerType.Boat,
+                GamePrefabID.Wreck => MapMarkerType.BoatWreck,
 
                 // 未识别的类型
                 _ => null

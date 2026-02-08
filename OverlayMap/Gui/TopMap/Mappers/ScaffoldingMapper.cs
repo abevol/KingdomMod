@@ -27,7 +27,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
             }
             else
             {
-                var prefab = component.GetComponent<PrefabID>();
+                var prefab = building.GetComponent<PrefabID>();
                 if (prefab == null) return;
                 if (prefab.prefabID == (int)GamePrefabID.Quarry)
                 {

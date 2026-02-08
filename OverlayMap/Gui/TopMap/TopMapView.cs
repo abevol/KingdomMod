@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
@@ -313,18 +313,16 @@ public class TopMapView : MonoBehaviour
         }
     }
 
-
 #if IL2CPP
     [HideFromIl2Cpp]
 #endif
     public void OnComponentCreated(Component comp)
     {
-        // 新架构:仅使用 Resolver 系统
         TryResolveAndMap(comp);
     }
 
     /// <summary>
-    /// 新架构：尝试使用 Resolver 识别组件类型并映射。
+    /// 尝试使用 Resolver 识别组件类型并映射。
     /// </summary>
     /// <returns>如果成功识别并映射，返回 true；否则返回 false</returns>
 #if IL2CPP
@@ -348,7 +346,7 @@ public class TopMapView : MonoBehaviour
             // 4. 如果识别成功，查找对应的 Mapper
             if (markerType.HasValue && _mappers.TryGetValue(markerType.Value, out var mapper))
             {
-                LogTrace($"[NewArch] Resolved {il2cppType.Name} -> {markerType.Value}, mapping...");
+                LogTrace($"Resolved {il2cppType.Name} -> {markerType.Value}, mapping...");
                 mapper.Map(comp);
                 return true;  // 成功识别并映射
             }
@@ -356,8 +354,6 @@ public class TopMapView : MonoBehaviour
 
         return false;  // 未能识别
     }
-
-
 
 #if IL2CPP
     [HideFromIl2Cpp]
