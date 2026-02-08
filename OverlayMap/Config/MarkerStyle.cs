@@ -1,4 +1,4 @@
-using BepInEx.Configuration;
+﻿using BepInEx.Configuration;
 using System.IO;
 using System;
 using KingdomMod.OverlayMap.Config.Extensions;
@@ -45,7 +45,8 @@ public class MarkerStyle
     public static MarkerConfig SteedSpawns;
     public static MarkerConfigStated Statues;
     public static MarkerConfig StatueTime;
-    public static MarkerConfigStated Boat;
+    public static MarkerConfig Boat;
+    public static MarkerConfig BoatWreck;
     public static MarkerConfigStated Quarry;
     public static MarkerConfigStated Mine;
     public static MarkerConfigStated RulerSpawns;
@@ -178,7 +179,9 @@ public class MarkerStyle
 
         Boat.Sign = config.Bind("Boat", "Sign", "", "");
         Boat.Color = config.Bind("Boat", "Color", "0,1,0,1", "");
-        Boat.Wrecked.Color = config.Bind("Boat.Wrecked", "Color", "1,0,0,1", "");
+
+        BoatWreck.Sign = config.Bind("BoatWreck", "Sign", "", "");
+        BoatWreck.Color = config.Bind("BoatWreck", "Color", "1,0,0,1", "");
 
         Quarry.Sign = config.Bind("Quarry", "Sign", "", "");
         Quarry.Locked.Color = config.Bind("Quarry.Locked", "Color", "1,0,0,1", "");

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Il2CppInterop.Runtime;
 
@@ -138,6 +138,7 @@ internal static class MapperInitializer
             
             // 载具类
             { MapMarkerType.Boat, new Mappers.BoatMapper(view) },
+            { MapMarkerType.BoatWreck, new Mappers.BoatWreckMapper(view) },
             
             // 障碍物
             { MapMarkerType.PayableBlocker, new Mappers.PayableBlockerMapper(view) },
