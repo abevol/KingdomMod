@@ -20,15 +20,21 @@
     <ItemGroup>
         <None Remove="Assets\Background.png" />
         <None Remove="ConfigPrefabs\KingdomMod.OverlayMap.GuiStyle.cfg" />
-        <None Remove="ConfigPrefabs\KingdomMod.OverlayMap.Language_en-US.cfg" />
-        <None Remove="ConfigPrefabs\KingdomMod.OverlayMap.Language_zh-CN.cfg" />
+        <None Remove="ConfigPrefabs\KingdomMod.OverlayMap.Language.ru-RU.cfg" />
         <None Remove="ConfigPrefabs\KingdomMod.OverlayMap.MarkerStyle.cfg" />
     </ItemGroup>
     <ItemGroup>
         <EmbeddedResource Include="Assets\Background.png" />
         <EmbeddedResource Include="ConfigPrefabs\KingdomMod.OverlayMap.GuiStyle.cfg" />
-        <EmbeddedResource Include="ConfigPrefabs\KingdomMod.OverlayMap.Language_en-US.cfg" />
-        <EmbeddedResource Include="ConfigPrefabs\KingdomMod.OverlayMap.Language_zh-CN.cfg" />
+        <EmbeddedResource Include="ConfigPrefabs\KingdomMod.OverlayMap.Language.ru-RU.cfg">
+            <WithCulture>false</WithCulture>
+        </EmbeddedResource>
+        <EmbeddedResource Include="ConfigPrefabs\KingdomMod.OverlayMap.Language.en-US.cfg">
+            <WithCulture>false</WithCulture>
+        </EmbeddedResource>
+        <EmbeddedResource Include="ConfigPrefabs\KingdomMod.OverlayMap.Language.zh-CN.cfg">
+            <WithCulture>false</WithCulture>
+        </EmbeddedResource>
         <EmbeddedResource Include="ConfigPrefabs\KingdomMod.OverlayMap.MarkerStyle.cfg" />
     </ItemGroup>
 
@@ -216,5 +222,14 @@
         <Copy SourceFiles="$(OutputPath)\$(AssemblyName).dll" DestinationFolder="$(BepInExPluginsPath)\$(AssemblyName)\" OverwriteReadOnlyFiles="true" />
         <Copy SourceFiles="$(OutputPath)\$(AssemblyName).pdb" DestinationFolder="$(BepInExPluginsPath)\$(AssemblyName)\" OverwriteReadOnlyFiles="true" />
         <Message Text="Copied output to: $(BepInExPluginsPath)\$(AssemblyName)\" Importance="high" />
+    </Target>
+
+    <Target Name="CopyConfigPrefabs" AfterTargets="Build">
+        <Copy SourceFiles="$(ProjectDir)ConfigPrefabs\KingdomMod.OverlayMap.GuiStyle.cfg" DestinationFolder="$(BepInExConfigPath)" OverwriteReadOnlyFiles="true" />
+        <Copy SourceFiles="$(ProjectDir)ConfigPrefabs\KingdomMod.OverlayMap.Language.en-US.cfg" DestinationFolder="$(BepInExConfigPath)" OverwriteReadOnlyFiles="true" />
+        <Copy SourceFiles="$(ProjectDir)ConfigPrefabs\KingdomMod.OverlayMap.Language.ru-RU.cfg" DestinationFolder="$(BepInExConfigPath)" OverwriteReadOnlyFiles="true" />
+        <Copy SourceFiles="$(ProjectDir)ConfigPrefabs\KingdomMod.OverlayMap.Language.zh-CN.cfg" DestinationFolder="$(BepInExConfigPath)" OverwriteReadOnlyFiles="true" />
+        <Copy SourceFiles="$(ProjectDir)ConfigPrefabs\KingdomMod.OverlayMap.MarkerStyle.cfg" DestinationFolder="$(BepInExConfigPath)" OverwriteReadOnlyFiles="true" />
+        <Message Text="Copied config prefabs to: $(BepInExConfigPath)" Importance="high" />
     </Target>
 </Project>
