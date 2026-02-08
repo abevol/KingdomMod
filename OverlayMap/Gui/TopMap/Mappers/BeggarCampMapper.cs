@@ -11,8 +11,11 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
             view.TryAddMapMarker(component, MarkerStyle.BeggarCamp.Color, MarkerStyle.BeggarCamp.Sign, Strings.BeggarCamp,
                 comp =>
                 {
+                    var camp = comp.Cast<BeggarCamp>();
+                    if (camp == null || camp._beggars == null) return 0;
+
                     int count = 0;
-                    foreach (var beggar in comp.Cast<BeggarCamp>()._beggars)
+                    foreach (var beggar in camp._beggars)
                     {
                         if (beggar != null && beggar.isActiveAndEnabled)
                             count++;

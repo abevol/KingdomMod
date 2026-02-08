@@ -132,6 +132,7 @@ public class Strings
     public static ConfigEntryWrapper<string> StatuePike;
     public static ConfigEntryWrapper<string> HephaestusForge;
     public static ConfigEntryWrapper<string> Lighthouse;
+    public static ConfigEntryWrapper<string> Wharf;
 
     public static void ConfigBind(ConfigFile config)
     {
@@ -259,6 +260,7 @@ public class Strings
         StatuePike = config.Bind("Strings", "StatuePike", "StatuePike", "");
         HephaestusForge = config.Bind("Strings", "HephaestusForge", "HephaestusForge", "");
         Lighthouse = config.Bind("Strings", "Lighthouse", "Lighthouse", "");
+        Wharf = config.Bind("Strings", "Wharf", "Wharf", "");
 
         LogDebug($"Loaded config: {Path.GetFileName(ConfigFile.ConfigFilePath)}");
 

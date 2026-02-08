@@ -1,4 +1,4 @@
-﻿namespace KingdomMod.OverlayMap.Gui.TopMap
+namespace KingdomMod.OverlayMap.Gui.TopMap
 {
     /// <summary>
     /// 地图标记类型枚举。
@@ -114,6 +114,9 @@
 
         /// <summary>船只残骸</summary>
         BoatWreck,
+
+        /// <summary>船坞</summary>
+        Wharf,
 
         // ===== 障碍物/可付费对象 (Obstacles &amp; Payables) =====
         /// <summary>可付费阻挡物</summary>
