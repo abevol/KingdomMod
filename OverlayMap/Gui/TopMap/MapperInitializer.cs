@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Il2CppInterop.Runtime;
 
@@ -24,7 +24,8 @@ internal static class MapperInitializer
         // 复杂 Resolver（一对多映射）
         RegisterResolver(resolvers, new Resolvers.PayableUpgradeResolver());  // Wall, Lighthouse, Mine, Quarry
         RegisterResolver(resolvers, new Resolvers.PayableShopResolver());     // Shop
-        
+        RegisterResolver(resolvers, new Resolvers.WharfResolver());           // Wharf
+
         // 简单 Resolver（一对一映射）- 地形类
         RegisterResolver(resolvers, new Resolvers.BeachResolver());
         RegisterResolver(resolvers, new Resolvers.RiverResolver());
@@ -109,7 +110,8 @@ internal static class MapperInitializer
             { MapMarkerType.Chest, new Mappers.ChestMapper(view) },
             { MapMarkerType.GemChest, new Mappers.PayableGemChestMapper(view) },
             { MapMarkerType.BoatSummoningBell, new Mappers.BoatSummoningBellMapper(view) },
-            
+            { MapMarkerType.Wharf, new Mappers.WharfMapper(view) },
+
             // 传送点
             { MapMarkerType.Portal, new Mappers.PortalMapper(view) },
             { MapMarkerType.TeleporterExit, new Mappers.TeleporterExitMapper(view) },

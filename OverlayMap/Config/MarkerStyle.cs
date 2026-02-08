@@ -63,6 +63,7 @@ public class MarkerStyle
     public static MarkerConfig TeleExitP2;
     public static MarkerConfig HephaestusForge;
     public static MarkerConfigStated Lighthouse;
+    public static MarkerConfigStated Wharf;
 
     public static void ConfigBind(ConfigFile config)
     {
@@ -242,6 +243,10 @@ public class MarkerStyle
         Lighthouse.Locked.Color = config.Bind("Lighthouse.Locked", "Color", "0.5,0.5,0.5,1", "");
         Lighthouse.Unpaid.Color = config.Bind("Lighthouse.Locked", "Color", "1,0,0,1", "");
         Lighthouse.Building.Color = config.Bind("Lighthouse.Building", "Color", "0,0,1,1", "");
+
+        Wharf.Sign = config.Bind("Wharf", "Sign", "", "");
+        Wharf.Color = config.Bind("Wharf", "Color", "0,1,0,1", "");
+        Wharf.Building.Color = config.Bind("Wharf.Building", "Color", "0,0,1,1", "");
 
         LogDebug($"Loaded config: {Path.GetFileName(ConfigFile.ConfigFilePath)}");
 
