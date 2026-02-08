@@ -1,148 +1,148 @@
 ﻿namespace KingdomMod.OverlayMap.Gui.TopMap
 {
-    /// &lt;summary&gt;
+    /// <summary>
     /// 地图标记类型枚举。
     /// 这是模组定义的逻辑类型，与游戏代码的具体实现解耦。
     /// 通过引入此枚举，可以为没有专属游戏对象类型的标记创建独立 Mapper。
-    /// &lt;/summary&gt;
+    /// </summary>
     public enum MapMarkerType
     {
         // ===== 地形类 (Terrain) =====
-        /// &lt;summary&gt;海滩/码头&lt;/summary&gt;
+        /// <summary>海滩/码头</summary>
         Beach,
         
-        /// &lt;summary&gt;河流&lt;/summary&gt;
+        /// <summary>河流</summary>
         River,
 
         // ===== 建筑类 (Buildings) =====
-        /// &lt;summary&gt;城堡&lt;/summary&gt;
+        /// <summary>城堡</summary>
         Castle,
         
-        /// &lt;summary&gt;墙体&lt;/summary&gt;
+        /// <summary>墙体</summary>
         Wall,
         
-        /// &lt;summary&gt;脚手架（建造中）&lt;/summary&gt;
+        /// <summary>脚手架（建造中）</summary>
         Scaffolding,
         
-        /// &lt;summary&gt;小屋&lt;/summary&gt;
+        /// <summary>小屋</summary>
         Cabin,
         
-        /// &lt;summary&gt;农舍&lt;/summary&gt;
+        /// <summary>农舍</summary>
         Farmhouse,
         
-        /// &lt;summary&gt;市民住宅（可付费招募）&lt;/summary&gt;
+        /// <summary>市民住宅（可付费招募）</summary>
         CitizenHouse,
 
         // ===== 可交互建筑 (Interactive Buildings) =====
-        /// &lt;summary&gt;灯塔&lt;/summary&gt;
+        /// <summary>灯塔</summary>
         Lighthouse,
         
-        /// &lt;summary&gt;矿井&lt;/summary&gt;
+        /// <summary>矿井</summary>
         Mine,
         
-        /// &lt;summary&gt;采石场&lt;/summary&gt;
+        /// <summary>采石场</summary>
         Quarry,
         
-        /// &lt;summary&gt;商店&lt;/summary&gt;
+        /// <summary>商店</summary>
         Shop,
         
-        /// &lt;summary&gt;宝箱&lt;/summary&gt;
+        /// <summary>宝箱</summary>
         Chest,
         
-        /// &lt;summary&gt;宝石宝箱（可付费）&lt;/summary&gt;
+        /// <summary>宝石宝箱（可付费）</summary>
         GemChest,
 
         // ===== 传送点/特殊建筑 (Portal &amp; Special) =====
-        /// &lt;summary&gt;传送门&lt;/summary&gt;
+        /// <summary>传送门</summary>
         Portal,
         
-        /// &lt;summary&gt;传送门出口&lt;/summary&gt;
+        /// <summary>传送门出口</summary>
         TeleporterExit,
         
-        /// &lt;summary&gt;船只召唤铃&lt;/summary&gt;
+        /// <summary>船只召唤铃</summary>
         BoatSummoningBell,
 
         // ===== 雕像类 (Statues) =====
-        /// &lt;summary&gt;普通雕像&lt;/summary&gt;
+        /// <summary>普通雕像</summary>
         Statue,
         
-        /// &lt;summary&gt;时间雕像&lt;/summary&gt;
+        /// <summary>时间雕像</summary>
         TimeStatue,
         
-        /// &lt;summary&gt;解锁新统治者雕像&lt;/summary&gt;
+        /// <summary>解锁新统治者雕像</summary>
         UnlockNewRulerStatue,
 
         // ===== 营地类 (Camps) =====
-        /// &lt;summary&gt;乞丐营地&lt;/summary&gt;
+        /// <summary>乞丐营地</summary>
         BeggarCamp,
         
-        /// &lt;summary&gt;篝火&lt;/summary&gt;
+        /// <summary>篝火</summary>
         Campfire,
 
         // ===== 单位类 (Units) =====
-        /// &lt;summary&gt;玩家&lt;/summary&gt;
+        /// <summary>玩家</summary>
         Player,
         
-        /// &lt;summary&gt;乞丐&lt;/summary&gt;
+        /// <summary>乞丐</summary>
         Beggar,
         
-        /// &lt;summary&gt;鹿&lt;/summary&gt;
+        /// <summary>鹿</summary>
         Deer,
         
-        /// &lt;summary&gt;敌人（怪物）&lt;/summary&gt;
+        /// <summary>敌人（怪物）</summary>
         Enemy,
 
         /// <summary>骑士</summary>
         Knight,
 
         // ===== 坐骑类 (Mounts) =====
-        /// &lt;summary&gt;坐骑&lt;/summary&gt;
+        /// <summary>坐骑</summary>
         Steed,
         
-        /// &lt;summary&gt;坐骑刷新点&lt;/summary&gt;
+        /// <summary>坐骑刷新点</summary>
         SteedSpawn,
         
-        /// &lt;summary&gt;狗刷新点&lt;/summary&gt;
+        /// <summary>狗刷新点</summary>
         DogSpawn,
         
-        /// &lt;summary&gt;野猪刷新群&lt;/summary&gt;
+        /// <summary>野猪刷新群</summary>
         BoarSpawnGroup,
 
         // ===== 载具类 (Vehicles) =====
-        /// &lt;summary&gt;船只&lt;/summary&gt;
+        /// <summary>船只</summary>
         Boat,
 
-        /// &lt;summary&gt;船只残骸&lt;/summary&gt;
+        /// <summary>船只残骸</summary>
         BoatWreck,
 
         // ===== 障碍物/可付费对象 (Obstacles &amp; Payables) =====
-        /// &lt;summary&gt;可付费阻挡物&lt;/summary&gt;
+        /// <summary>可付费阻挡物</summary>
         PayableBlocker,
         
-        /// &lt;summary&gt;可付费灌木&lt;/summary&gt;
+        /// <summary>可付费灌木</summary>
         PayableBush,
         
-        /// &lt;summary&gt;可付费升级物（通用）&lt;/summary&gt;
+        /// <summary>可付费升级物（通用）</summary>
         PayableUpgrade,
 
         // ===== 武器/道具 (Weapons &amp; Items) =====
-        /// &lt;summary&gt;炸弹&lt;/summary&gt;
+        /// <summary>炸弹</summary>
         Bomb,
 
         // ===== DLC 相关 (DLC Content) =====
-        /// &lt;summary&gt;赫尔谜题控制器（Norse Lands DLC）&lt;/summary&gt;
+        /// <summary>赫尔谜题控制器（Norse Lands DLC）</summary>
         HelPuzzleController,
         
-        /// &lt;summary&gt;托尔谜题控制器（Norse Lands DLC）&lt;/summary&gt;
+        /// <summary>托尔谜题控制器（Norse Lands DLC）</summary>
         ThorPuzzleController,
         
-        /// &lt;summary&gt;赫菲斯托斯熔炉（Olympus DLC）&lt;/summary&gt;
+        /// <summary>赫菲斯托斯熔炉（Olympus DLC）</summary>
         HephaestusForge,
         
-        /// &lt;summary&gt;珀尔塞福涅牢笼（Olympus DLC）&lt;/summary&gt;
+        /// <summary>珀尔塞福涅牢笼（Olympus DLC）</summary>
         PersephoneCage,
         
-        /// &lt;summary&gt;商人刷新点&lt;/summary&gt;
+        /// <summary>商人刷新点</summary>
         MerchantSpawner,
     }
 }
