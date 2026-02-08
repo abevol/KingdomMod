@@ -1,11 +1,7 @@
 <Project>
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-        <BepInExPluginsPath>D:\SteamLibrary\steamapps\common\Kingdom Two Crowns\BepInEx\plugins</BepInExPluginsPath>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='BIE6_IL2CPP|AnyCPU'">
-        <BepInExPluginsPath>D:\SteamLibrary\steamapps\common\Kingdom Two Crowns\BepInEx\plugins</BepInExPluginsPath>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='BIE6_Mono|AnyCPU'">
-        <BepInExPluginsPath>D:\SteamLibrary\steamapps\common\Kingdom Two Crowns\BepInEx\plugins</BepInExPluginsPath>
+    <PropertyGroup>
+        <BepInExPath>D:\SteamLibrary\steamapps\common\Kingdom Two Crowns\BepInEx\</BepInExPath>
+        <BepInExConfigPath>$(BepInExPath)config\</BepInExConfigPath>
+        <BepInExPluginsPath>$(BepInExPath)plugins\</BepInExPluginsPath>
     </PropertyGroup>
 </Project>

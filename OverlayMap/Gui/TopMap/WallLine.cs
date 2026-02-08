@@ -170,7 +170,8 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
             this.gameObject.SetActive(true);
 
             // 设置线条位置：由于 Pivot 是 (0, 0.5)，直接设为起点
-            _rectTransform.anchoredPosition = startPos;
+            // 向下偏移 2 像素，使线条与墙体标记对齐更好
+            _rectTransform.anchoredPosition = new Vector2(startPos.x, startPos.y - 2);
 
             // 设置线条的长度和宽度
             _rectTransform.sizeDelta = new Vector2(distance, LINE_THICKNESS);

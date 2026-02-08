@@ -27,12 +27,17 @@ public class ConfigPrefabs
                 },
                 new ConfigPrefab
                 {
-                    ResName = "KingdomMod.OverlayMap.ConfigPrefabs.KingdomMod.OverlayMap.Language_en-US.cfg",
+                    ResName = "KingdomMod.OverlayMap.ConfigPrefabs.KingdomMod.OverlayMap.Language.en-US.cfg",
                     FileName = "KingdomMod.OverlayMap.Language.en-US.cfg"
                 },
                 new ConfigPrefab
                 {
-                    ResName = "KingdomMod.OverlayMap.ConfigPrefabs.KingdomMod.OverlayMap.Language_zh-CN.cfg",
+                    ResName = "KingdomMod.OverlayMap.ConfigPrefabs.KingdomMod.OverlayMap.Language.ru-RU.cfg",
+                    FileName = "KingdomMod.OverlayMap.Language.ru-RU.cfg"
+                },
+                new ConfigPrefab
+                {
+                    ResName = "KingdomMod.OverlayMap.ConfigPrefabs.KingdomMod.OverlayMap.Language.zh-CN.cfg",
                     FileName = "KingdomMod.OverlayMap.Language.zh-CN.cfg"
                 },
                 new ConfigPrefab
