@@ -261,6 +261,49 @@ public bool TryAddMapMarker(Component component, ConfigEntryWrapper<string> colo
 🔥 火焰
 ```
 
+## 特殊注意事项
+
+### OnEnable/OnDisable Patch
+
+如果标记对应的游戏组件继承自其他类型（如 `Wharf : Payable`），并且**重写了** `OnEnable` 或 `OnDisable` 方法，则必须在 Mapper 中添加专门的 Harmony Patch：
+
+```csharp
+using HarmonyLib;
+using static KingdomMod.OverlayMap.OverlayMapHolder;
+
+public class WharfMapper(TopMapView view) : IComponentMapper
+{
+    public void Map(Component component)
+    {
+        // ... 标记逻辑 ...
+    }
+
+    // 必须单独 Patch，因为 Wharf 重写了 OnEnable/OnDisable
+    [HarmonyPatch(typeof(Wharf), nameof(Wharf.OnEnable))]
+    private class OnEnablePatch
+    {
+        public static void Postfix(Wharf __instance)
+        {
+            ForEachTopMapView(view => view.OnComponentCreated(__instance));
+        }
+    }
+
+    [HarmonyPatch(typeof(Wharf), nameof(Wharf.OnDisable))]
+    private class OnDisablePatch
+    {
+        public static void Prefix(Wharf __instance)
+        {
+            ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
+        }
+    }
+}
+```
+
+**为什么需要这样做？**
+- `PayableMapper` 已经 Patch 了 `Payable.OnEnable`/`OnDisable`
+- 但 `Wharf` 重写了这些方法，基类的 Patch 对重写方法无效
+- 因此需要为 Wharf 单独 Patch
+
 ## 检查清单
 
 - [ ] MarkerStyle.cs 中添加了静态字段
@@ -268,6 +311,7 @@ public bool TryAddMapMarker(Component component, ConfigEntryWrapper<string> colo
 - [ ] Strings.cs 中添加了字符串字段（如需要）
 - [ ] Strings.cs 中添加了配置绑定（如需要）
 - [ ] Mapper 中实现了标记逻辑
+- [ ] **Mapper 中添加了 OnEnable/OnDisable Patch（如需要）**
 - [ ] MarkerStyle.cfg 中添加了配置节
 - [ ] Language_en-US.cfg 中添加了英文字符串
 - [ ] Language_zh-CN.cfg 中添加了中文字符串

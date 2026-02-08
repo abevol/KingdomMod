@@ -125,6 +125,32 @@ A: 如果现有类型无法区分（如 Forge 和 Scythe 都需要独立配置�
 
 如果现有类型足够（如多个商店共用一个类型但不同样式），则不需要。
 
+### Q: 继承类型的 OnEnable/OnDisable Patch 注意事项？
+
+A: **重要**：如果目标类型继承自某个基类（如 `Wharf : Payable`），并且**重写了** `OnEnable` 或 `OnDisable` 方法，则不能复用基类的 Patch。
+
+**示例**：`Wharf` 继承自 `Payable`，但重写了 `OnEnable`/`OnDisable`，因此 `Payable.OnEnable` 的 Patch 对 `Wharf` 无效。必须在 `WharfMapper` 中单独 Patch：
+
+```csharp
+[HarmonyPatch(typeof(Wharf), nameof(Wharf.OnEnable))]
+private class OnEnablePatch
+{
+    public static void Postfix(Wharf __instance)
+    {
+        ForEachTopMapView(view => view.OnComponentCreated(__instance));
+    }
+}
+
+[HarmonyPatch(typeof(Wharf), nameof(Wharf.OnDisable))]
+private class OnDisablePatch
+{
+    public static void Prefix(Wharf __instance)
+    {
+        ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
+    }
+}
+```
+
 ## 示例场景
 
 ### 场景 1: 添加新商店（已有 Shop 类型）
@@ -175,6 +201,7 @@ KeyName = DisplayName
 1. 检查 Resolver 是否正确识别组件
 2. 检查 Mapper 是否正确处理该类型
 3. 检查配置文件是否包含该标记的配置
+4. **检查是否需要在 Mapper 中添加 OnEnable/OnDisable Patch**：如果目标类型继承自其他类型并重写了这些方法（如 `Wharf : Payable`），必须在 Mapper 中单独 Patch，不能复用基类的 Patch
 
 ### 颜色/符号不正确
 1. 检查 `MarkerStyle.cs` 中的配置绑定是否正确

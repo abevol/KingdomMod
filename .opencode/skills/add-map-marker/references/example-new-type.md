@@ -127,6 +127,8 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 }
 ```
 
+**⚠️ 重要提示**：如果 Windmill 继承自其他类型（如 `Payable` 或 `PayableUpgrade`）并且**重写了** `OnEnable`/`OnDisable` 方法，必须在 Mapper 中添加专门的 Harmony Patch。参见 [OnEnable/OnDisable Patch 注意事项](#onenableondisable-patch-注意事项) 章节。
+
 ### 步骤 4: 注册 Resolver 和 Mapper
 
 **文件**: `OverlayMap/Gui/TopMap/MapperInitializer.cs`
@@ -246,7 +248,7 @@ Windmill = Мельница
 
 1. `OverlayMap/Gui/TopMap/MapMarkerType.cs` - 添加枚举值
 2. `OverlayMap/Gui/TopMap/Resolvers/WindmillResolver.cs` - 新建
-3. `OverlayMap/Gui/TopMap/Mappers/WindmillMapper.cs` - 新建
+3. `OverlayMap/Gui/TopMap/Mappers/WindmillMapper.cs` - 新建（**如需要，包含 OnEnable/OnDisable Patch**）
 4. `OverlayMap/Gui/TopMap/MapperInitializer.cs` - 注册 Resolver 和 Mapper
 5. `OverlayMap/Config/MarkerStyle.cs` - 添加配置
 6. `OverlayMap/Config/Strings.cs` - 添加字符串
@@ -262,6 +264,79 @@ Windmill = Мельница
 - [ ] 符号正确显示（⚙）
 - [ ] 标签显示 "风车"（中文）或 "Windmill"（英文）
 - [ ] 配置文件可以被正确加载和修改
+- [ ] **如果组件继承其他类型并重写了 OnEnable/OnDisable，已添加专门的 Patch**
+
+## OnEnable/OnDisable Patch 注意事项
+
+当标记对应的游戏组件继承自其他类型并重写了 `OnEnable`/`OnDisable` 时，必须单独 Patch。
+
+### 示例：Wharf 继承自 Payable
+
+**WharfMapper.cs**:
+
+```csharp
+using HarmonyLib;
+using KingdomMod.OverlayMap.Config;
+using KingdomMod.SharedLib;
+using UnityEngine;
+using static KingdomMod.OverlayMap.OverlayMapHolder;
+
+namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
+{
+    public class WharfMapper(TopMapView view) : IComponentMapper
+    {
+        public MapMarkerType? MarkerType => MapMarkerType.Wharf;
+
+        public void Map(Component component)
+        {
+            var payable = component.Cast<Payable>();
+            if (payable == null) return;
+
+            // 船坞使用蓝色，标识为空
+            view.TryAddMapMarker(component, MarkerStyle.Wharf.Color, MarkerStyle.Wharf.Sign, Strings.Wharf,
+                comp =>
+                {
+                    var p = comp.Cast<Payable>();
+                    return p.Price;
+                });
+        }
+
+        // Wharf 重写了 OnEnable/OnDisable，必须单独 Patch
+        [HarmonyPatch(typeof(Wharf), nameof(Wharf.OnEnable))]
+        private class OnEnablePatch
+        {
+            public static void Postfix(Wharf __instance)
+            {
+                ForEachTopMapView(view => view.OnComponentCreated(__instance));
+            }
+        }
+
+        [HarmonyPatch(typeof(Wharf), nameof(Wharf.OnDisable))]
+        private class OnDisablePatch
+        {
+            public static void Prefix(Wharf __instance)
+            {
+                ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
+            }
+        }
+    }
+}
+```
+
+### 为什么需要这样做？
+
+1. `PayableMapper` 已经 Patch 了 `Payable.OnEnable`/`OnDisable`
+2. 但 `Wharf` 重写了这些方法：`public override void OnEnable()`
+3. 基类的 Patch 对重写方法无效（Harmony 的 Patch 是基于方法签名的）
+4. 因此需要为重写方法单独 Patch
+
+### 什么时候需要添加 Patch？
+
+| 情况 | 是否需要单独 Patch |
+|------|-------------------|
+| 组件直接继承 MonoBehaviour | ✅ 需要（无基类 Patch） |
+| 组件继承其他类型，**未重写** OnEnable/OnDisable | ❌ 不需要（复用基类 Patch） |
+| 组件继承其他类型，**重写了** OnEnable/OnDisable | ✅ **必须单独 Patch** |
 
 ## 故障排除
 
@@ -271,6 +346,7 @@ Windmill = Мельница
 2. 检查 Mapper 是否已注册
 3. 检查 Resolver 是否已注册
 4. 查看日志确认组件是否被创建
+5. **检查是否需要 OnEnable/OnDisable Patch**：如果组件继承其他类型并重写了这些方法，必须在 Mapper 中添加专门的 Patch（参见上方 OnEnable/OnDisable Patch 注意事项）
 
 ### 状态颜色不正确
 
