@@ -17,7 +17,7 @@ public class Patcher
 
             foreach (var patchedMethod in HarmonyInst.GetPatchedMethods())
             {
-                LogTrace($"Patched method: {patchedMethod.DeclaringType?.FullName}.{patchedMethod.Name}");
+                LogDebug($"Patched method: {patchedMethod.DeclaringType?.FullName}.{patchedMethod.Name}");
             }
         }
         catch (Exception ex)

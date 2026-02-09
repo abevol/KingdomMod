@@ -298,8 +298,8 @@ namespace KingdomMod.OverlayMap.Gui.Debugging
                 {
                     _currentFontIndex = (_currentFontIndex - 1 + _availableFonts.Count) % _availableFonts.Count;
                     _currentFontData = _availableFonts[_currentFontIndex];
-                    LogTrace($"_currentFontIndex: {_currentFontIndex}, _availableFonts.Count: {_availableFonts.Count}");
-                    LogTrace($"_availableFonts[{_currentFontIndex}]: {_availableFonts[_currentFontIndex]?.ToString() ?? "null"}, Font: {_availableFonts[_currentFontIndex].Font.faceInfo.familyName}");
+                    LogDebug($"_currentFontIndex: {_currentFontIndex}, _availableFonts.Count: {_availableFonts.Count}");
+                    LogDebug($"_availableFonts[{_currentFontIndex}]: {_availableFonts[_currentFontIndex]?.ToString() ?? "null"}, Font: {_availableFonts[_currentFontIndex].Font.faceInfo.familyName}");
 
                     // 确保当前字体包含中文字符
                     AddChineseCharactersToFont(_currentFontData);
@@ -314,8 +314,8 @@ namespace KingdomMod.OverlayMap.Gui.Debugging
                 {
                     _currentFontIndex = (_currentFontIndex + 1) % _availableFonts.Count;
                     _currentFontData = _availableFonts[_currentFontIndex];
-                    LogTrace($"_currentFontIndex: {_currentFontIndex}, _availableFonts.Count: {_availableFonts.Count}");
-                    LogTrace($"_availableFonts[{_currentFontIndex}]: {_availableFonts[_currentFontIndex]?.ToString() ?? "null"}, Font: {_availableFonts[_currentFontIndex].Font.faceInfo.familyName}");
+                    LogDebug($"_currentFontIndex: {_currentFontIndex}, _availableFonts.Count: {_availableFonts.Count}");
+                    LogDebug($"_availableFonts[{_currentFontIndex}]: {_availableFonts[_currentFontIndex]?.ToString() ?? "null"}, Font: {_availableFonts[_currentFontIndex].Font.faceInfo.familyName}");
 
                     // 确保当前字体包含中文字符
                     AddChineseCharactersToFont(_currentFontData);
@@ -432,7 +432,7 @@ namespace KingdomMod.OverlayMap.Gui.Debugging
                         // 添加中文字符到字体
                         AddChineseCharactersToFont(fontData);
                         _availableFonts.Add(fontData);
-                        LogTrace($"Loaded font: {fontName}, {fontData.Font?.faceInfo?.familyName ?? "null"}");
+                        LogDebug($"Loaded font: {fontName}, {fontData.Font?.faceInfo?.familyName ?? "null"}");
                     }
                 }
                 catch (Exception ex)
@@ -469,7 +469,7 @@ namespace KingdomMod.OverlayMap.Gui.Debugging
             var commonChineseChars = "的一是了我不人在他有这个上们来到时大地为子中你说生国年着就那和要她出也得里后自以会家可下而过天去能对小多然于心学么之都好看起发当没成只如事把还用第样道想作种开美总从无情面最女但现前些所同日手又行意动方期它头经长儿回位分爱老因很给名法间斯知世什两次使身者被高已亲其进此话常与活正感";
             fontData.TryAddCharacters(commonChineseChars);
             
-            LogTrace($"Added Chinese characters to font: {fontData.FontName}");
+            LogDebug($"Added Chinese characters to font: {fontData.FontName}");
         }
 
         /// <summary>
@@ -479,13 +479,13 @@ namespace KingdomMod.OverlayMap.Gui.Debugging
         {
             if (!_testTextComponent)
             {
-                LogTrace("UpdateFontDisplay, _testTextComponent is null or destroyed.");
+                LogDebug("UpdateFontDisplay, _testTextComponent is null or destroyed.");
                 return;
             }
 
             if (_currentFontData == null)
             {
-                LogTrace("UpdateFontDisplay, _currentFontData is null.");
+                LogDebug("UpdateFontDisplay, _currentFontData is null.");
                 // Even if font data is null, we should update the text properties
             }
             else
@@ -495,21 +495,21 @@ namespace KingdomMod.OverlayMap.Gui.Debugging
                 bool isCSharpNull = font == null;
                 // isUnityNull 使用 UnityEngine.Object 重载的布尔运算符来检查对象是否已在引擎端被销毁
                 bool isUnityNull = !font; 
-                LogTrace($"UpdateFontDisplay Font Check. Font Name: '{_currentFontData.FontName}', C# null: {isCSharpNull}, Unity destroyed: {isUnityNull}");
+                LogDebug($"UpdateFontDisplay Font Check. Font Name: '{_currentFontData.FontName}', C# null: {isCSharpNull}, Unity destroyed: {isUnityNull}");
                 // --- 诊断结束 ---
 
                 if (!isUnityNull)
                 {
-                    LogTrace($"UpdateFontDisplay, Before setting font, _testTextComponent.font: {_testTextComponent.font?.faceInfo.familyName ?? "null"}");
+                    LogDebug($"UpdateFontDisplay, Before setting font, _testTextComponent.font: {_testTextComponent.font?.faceInfo.familyName ?? "null"}");
                     _testTextComponent.font = font;
-                    LogTrace($"UpdateFontDisplay, After setting font, _testTextComponent.font: {_testTextComponent.font.faceInfo.familyName}");
+                    LogDebug($"UpdateFontDisplay, After setting font, _testTextComponent.font: {_testTextComponent.font.faceInfo.familyName}");
 
                     // 同时更新信息文本组件的字体
                     if (_infoTextComponent)
                     {
-                        LogTrace($"UpdateFontDisplay, Before setting font, _infoTextComponent.font: {_infoTextComponent.font?.faceInfo.familyName ?? "null"}");
+                        LogDebug($"UpdateFontDisplay, Before setting font, _infoTextComponent.font: {_infoTextComponent.font?.faceInfo.familyName ?? "null"}");
                         _infoTextComponent.font = font;
-                        LogTrace($"UpdateFontDisplay, After setting font, _infoTextComponent.font: {_infoTextComponent.font.faceInfo.familyName}");
+                        LogDebug($"UpdateFontDisplay, After setting font, _infoTextComponent.font: {_infoTextComponent.font.faceInfo.familyName}");
                     }
                 }
                 else

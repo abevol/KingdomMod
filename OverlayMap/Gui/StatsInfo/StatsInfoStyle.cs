@@ -1,4 +1,4 @@
-using KingdomMod.OverlayMap.Assets;
+﻿using KingdomMod.OverlayMap.Assets;
 using KingdomMod.Shared.Attributes;
 using System;
 using UnityEngine;
@@ -25,8 +25,7 @@ namespace KingdomMod.OverlayMap.Gui.StatsInfo
 
         private void Awake()
         {
-            LogTrace("StatsInfoStyle.Awake");
-            LogTrace($"StatsInfoStyle.Awake, Config.GuiStyle.StatsInfo.Text.Font: {Config.GuiStyle.StatsInfo.Text.Font.Value}");
+            LogDebug("StatsInfoStyle.Awake");
 
             // 初始化文本字体
             TextFont = FontManager.CreateMainFont(Config.GuiStyle.StatsInfo.Text.Font, null);

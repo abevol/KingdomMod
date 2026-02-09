@@ -73,7 +73,7 @@ namespace KingdomMod.OverlayMap.Assets
             if (!mainFont.fallbackFontAssetTable.Contains(fontAsset))
             {
                 mainFont.fallbackFontAssetTable.Add(fontAsset);
-                LogTrace($"Added fallback font: {fontAsset.faceInfo.familyName}, {fontAsset.faceInfo.styleName}");
+                LogDebug($"Added fallback font: {fontAsset.faceInfo.familyName}, {fontAsset.faceInfo.styleName}");
             }
             else
             {
@@ -86,11 +86,11 @@ namespace KingdomMod.OverlayMap.Assets
             if (string.IsNullOrEmpty(characters))
                 return;
 
-            LogTrace($"TryAddCharacters: {FontName}, {Font.faceInfo.familyName}, chars: {characters}");
+            LogDebug($"TryAddCharacters: {FontName}, {Font.faceInfo.familyName}, chars: {characters}");
 
             if (!Font.sourceFontFile)
             {
-                LogTrace($"Font.sourceFontFile is null, try to re-create it.");
+                LogDebug($"Font.sourceFontFile is null, try to re-create it.");
                 SourceFont = FontManager.CreateSourceFont(FontName);
                 Font.sourceFontFile = SourceFont;
             }
@@ -108,7 +108,7 @@ namespace KingdomMod.OverlayMap.Assets
             {
                 foreach (var fallbackFont in Font.fallbackFontAssetTable)
                 {
-                    LogTrace($"Try add missing chars to fallbackFont: {fallbackFont.faceInfo.familyName}, chars: {missingChars}");
+                    LogDebug($"Try add missing chars to fallbackFont: {fallbackFont.faceInfo.familyName}, chars: {missingChars}");
                     missingChars = TryAddCharacters(fallbackFont, missingChars);
                     if (string.IsNullOrEmpty(missingChars))
                         break;
@@ -125,7 +125,7 @@ namespace KingdomMod.OverlayMap.Assets
 
             if (!string.IsNullOrEmpty(missingChars))
             {
-                LogWarning($"Font '{fontAsset.faceInfo.familyName}' is missing characters: {missingChars}");
+                LogDebug($"Font '{fontAsset.faceInfo.familyName}' is missing characters: {missingChars}");
             }
 
             return missingChars;

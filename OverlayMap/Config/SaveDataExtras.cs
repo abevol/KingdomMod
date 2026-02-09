@@ -72,7 +72,7 @@ public class SaveDataExtras
         Days.Value = Managers.Inst.director.CurrentDayForSpawning;
         ConfigFile.Save();
 
-        LogTrace("ConfigFile Saved.");
+        LogDebug("ConfigFile Saved.");
     }
 
     private static bool HasAvailableConfig()

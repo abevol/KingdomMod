@@ -30,7 +30,7 @@ public class ExtraInfoView : MonoBehaviour
 
     private void Awake()
     {
-        LogTrace("ExtraInfoView.Awake");
+        LogDebug("ExtraInfoView.Awake");
 
         _rectTransform = this.gameObject.AddComponent<RectTransform>();
 
@@ -45,7 +45,7 @@ public class ExtraInfoView : MonoBehaviour
 
     private void Start()
     {
-        LogTrace("ExtraInfoView.Start");
+        LogDebug("ExtraInfoView.Start");
         ApplyStyleConfig();
     }
 

@@ -159,7 +159,7 @@ public class MarkerStyle
         BoarSpawn.Color = config.Bind("BoarSpawn", "Color", "1,0,0,1", "");
         BoarSpawn.Sign = config.Bind("BoarSpawn", "Sign", "", "");
 
-        Bomb.Color = config.Bind("Bomb", "Color", "0,1,0,1", "");
+        Bomb.Color = config.Bind("Bomb", "Color", "1,0,0,1", "");
         Bomb.Sign = config.Bind("Bomb", "Sign", "", "");
 
         Farmhouse.Color = config.Bind("Farmhouse", "Color", "1,1,1,1", "");

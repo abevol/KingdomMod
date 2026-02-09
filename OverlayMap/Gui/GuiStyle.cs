@@ -21,7 +21,7 @@ namespace KingdomMod.OverlayMap.Gui
 
         private void Awake()
         {
-            LogTrace($"GuiStyle.Awake");
+            LogDebug($"GuiStyle.Awake");
             TopMapStyle = CreateTopMapStyle();
             StatsInfoStyle = CreateStatsInfoStyle();
             ExtraInfoStyle = CreateExtraInfoStyle();

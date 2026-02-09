@@ -121,7 +121,7 @@ public class OverlayMapHolder : MonoBehaviour
     /// </summary>
     private void CreateFontDebugPanel()
     {
-        LogTrace("CreateFontDebugPanel");
+        LogDebug("CreateFontDebugPanel");
 
         var debugPanelObj = new GameObject(nameof(SimpleFontDebugPanel));
         debugPanelObj.transform.SetParent(_canvas.transform, false);
@@ -131,7 +131,7 @@ public class OverlayMapHolder : MonoBehaviour
 
     private GuiStyle CreateGlobalGuiStyle()
     {
-        LogTrace($"CreateGlobalGuiStyle");
+        LogDebug($"CreateGlobalGuiStyle");
 
         var guiObj = new GameObject(nameof(GuiStyle));
         guiObj.transform.SetParent(_canvas.transform, false);
@@ -142,7 +142,7 @@ public class OverlayMapHolder : MonoBehaviour
 
     private PlayerOverlay CreatePlayerOverlay(PlayerId playerId)
     {
-        LogTrace($"CreatePlayerOverlay, playerId: {playerId}");
+        LogDebug($"CreatePlayerOverlay, playerId: {playerId}");
 
         var guiObj = new GameObject(nameof(PlayerOverlay));
         guiObj.transform.SetParent(_canvas.transform, false);
@@ -154,7 +154,7 @@ public class OverlayMapHolder : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        LogTrace($"Scene: {scene.name}, {scene.buildIndex}");
+        LogDebug($"Scene: {scene.name}, {scene.buildIndex}");
 
     }
 
@@ -168,7 +168,7 @@ public class OverlayMapHolder : MonoBehaviour
 
     private void OnGameGoto(int pre, int next)
     {
-        LogTrace($"OnGameGoto: pre:{pre}({(Game.State)pre}), {next}({(Game.State)next})");
+        LogDebug($"OnGameGoto: pre:{pre}({(Game.State)pre}), {next}({(Game.State)next})");
 
         var state = (Game.State)next;
         switch (state)
@@ -186,14 +186,14 @@ public class OverlayMapHolder : MonoBehaviour
 
     private void OnProgramDirectorGoto(int pre, int next)
     {
-        LogTrace($"OnProgramDirectorGoto: pre:{pre}({(ProgramDirector.State)pre}), {next}({(ProgramDirector.State)next})");
+        LogDebug($"OnProgramDirectorGoto: pre:{pre}({(ProgramDirector.State)pre}), {next}({(ProgramDirector.State)next})");
 
         OnProgramDirectorStateChanged?.Invoke((ProgramDirector.State)next);
     }
 
     private void Start()
     {
-        LogTrace($"{this.GetType().Name}.Start");
+        LogDebug($"{this.GetType().Name}.Start");
 
         NetworkBigBoss.Instance.OnClientCaughtUp += (Action)this.OnClientCaughtUp;
 
@@ -206,28 +206,28 @@ public class OverlayMapHolder : MonoBehaviour
             bool changed = false;
             if (Input.GetKeyDown(KeyCode.UpArrow))
             {
-                LogTrace("UpArrow");
+                LogDebug("UpArrow");
                 Config.SaveDataExtras.ZoomScale.Value += 0.01f;
                 changed = true;
             }
 
             if (Input.GetKeyDown(KeyCode.DownArrow))
             {
-                LogTrace("DownArrow");
+                LogDebug("DownArrow");
                 Config.SaveDataExtras.ZoomScale.Value -= 0.01f;
                 changed = true;
             }
 
             if (Input.GetKeyDown(KeyCode.LeftArrow))
             {
-                LogTrace("LeftArrow");
+                LogDebug("LeftArrow");
                 Config.SaveDataExtras.MapOffset.Value -= 1.0f;
                 changed = true;
             }
 
             if (Input.GetKeyDown(KeyCode.RightArrow))
             {
-                LogTrace("RightArrow");
+                LogDebug("RightArrow");
                 Config.SaveDataExtras.MapOffset.Value += 1.0f;
                 changed = true;
             }
@@ -328,7 +328,7 @@ public class OverlayMapHolder : MonoBehaviour
 
     public void OnGameInit(Game game)
     {
-        LogTrace("OverlayMapHolder.OnGameInit");
+        LogDebug("OverlayMapHolder.OnGameInit");
 
 #if IL2CPP
         game.run.GetOverrideMethodDelegate<IHagletCallable, System.Action<Il2CppSystem.Action<int, int>>>("add_onGoto").Invoke(new System.Action<int, int>(OnGameGoto));
@@ -339,7 +339,7 @@ public class OverlayMapHolder : MonoBehaviour
 
     public void OnProgramDirectorRun()
     {
-        LogTrace("OverlayMapHolder.OnProgramDirectorRun");
+        LogDebug("OverlayMapHolder.OnProgramDirectorRun");
 
 #if IL2CPP
         ProgramDirector.run.GetOverrideMethodDelegate<IHagletCallable, System.Action<Il2CppSystem.Action<int, int>>>("add_onGoto").Invoke(new System.Action<int, int>(OnProgramDirectorGoto));
@@ -350,7 +350,7 @@ public class OverlayMapHolder : MonoBehaviour
 
     private void OnLevelLoaded(bool fromSave)
     {
-        LogWarning($"OverlayMapHolder.OnLevelLoaded: fromSave: {fromSave}");
+        LogDebug($"OverlayMapHolder.OnLevelLoaded: fromSave: {fromSave}");
 
         Config.SaveDataExtras.Init();
     }
@@ -370,7 +370,7 @@ public class OverlayMapHolder : MonoBehaviour
 
     public void OnGameSaved()
     {
-        LogTrace("OverlayMapHolder.OnGameSaved");
+        LogDebug("OverlayMapHolder.OnGameSaved");
 
         Config.SaveDataExtras.Save();
     }
@@ -459,7 +459,7 @@ public class OverlayMapHolder : MonoBehaviour
         _log.LogDebug($"[{Path.GetFileName(sourceFilePath)}][{sourceLineNumber.ToString("0000")}][{memberName}] {message}");
     }
 
-    public static void LogTrace(string message,
+    public static void LogInfo(string message,
         [System.Runtime.CompilerServices.CallerMemberName]
         string memberName = "",
         [System.Runtime.CompilerServices.CallerFilePath]
@@ -470,7 +470,7 @@ public class OverlayMapHolder : MonoBehaviour
         _log.LogInfo($"[{Path.GetFileName(sourceFilePath)}][{sourceLineNumber.ToString("0000")}][{memberName}] {message}");
     }
 
-    public static void LogInfo(string message,
+    public static void LogMessage(string message,
         [System.Runtime.CompilerServices.CallerMemberName]
         string memberName = "",
         [System.Runtime.CompilerServices.CallerFilePath]
