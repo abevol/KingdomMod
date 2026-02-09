@@ -31,7 +31,7 @@ public class StatsInfoView : MonoBehaviour
 
     private void Awake()
     {
-        LogTrace("StatsInfoView.Awake");
+        LogDebug("StatsInfoView.Awake");
 
         // 创建 RectTransform
         _rectTransform = this.gameObject.AddComponent<RectTransform>();
@@ -48,7 +48,7 @@ public class StatsInfoView : MonoBehaviour
 
     private void Start()
     {
-        LogTrace("StatsInfoView.Start");
+        LogDebug("StatsInfoView.Start");
 
         // 从风格配置加载字体（延迟到 Start，确保 Instance.GlobalGuiStyle 已初始化）
         ApplyStyleConfig();

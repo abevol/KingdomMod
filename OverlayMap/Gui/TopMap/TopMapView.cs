@@ -64,12 +64,12 @@ public class TopMapView : MonoBehaviour
 
     public TopMapView()
     {
-        LogTrace("TopMapView.Constructor");
+        LogDebug("TopMapView.Constructor");
     }
 
     private void Awake()
     {
-        LogTrace("TopMapView.Awake");
+        LogDebug("TopMapView.Awake");
 
         // 初始化 Mapper 系统
         MapperInitializer.Initialize(this);
@@ -132,7 +132,7 @@ public class TopMapView : MonoBehaviour
 
     private void Start()
     {
-        LogTrace("TopMapView.Start");
+        LogDebug("TopMapView.Start");
 
     }
 
@@ -156,7 +156,7 @@ public class TopMapView : MonoBehaviour
 
     private void OnGameStateChanged(Game.State state)
     {
-        LogTrace($"OnGameStateChanged.state changed to {state}");
+        LogDebug($"OnGameStateChanged.state changed to {state}");
 
         switch (state)
         {
@@ -235,12 +235,12 @@ public class TopMapView : MonoBehaviour
 
     public void OnGameStart()
     {
-        LogTrace("TopMapView.OnGameStart");
+        LogDebug("TopMapView.OnGameStart");
 
         var clientWidth = Screen.width - 40f;
         var minLevelWidth = Managers.Inst.game.currentLevelConfig.minLevelWidth;
         MappingScale = clientWidth / minLevelWidth;
-        LogTrace($"MappingScale: {MappingScale}, minLevelWidth: {minLevelWidth}");
+        LogDebug($"MappingScale: {MappingScale}, minLevelWidth: {minLevelWidth}");
         
         UpdatePlayerMarker();
 
@@ -251,7 +251,7 @@ public class TopMapView : MonoBehaviour
     
     private void OnLevelLoaded(bool fromSave)
     {
-        LogWarning($"OnLevelLoaded: fromSave: {fromSave}, MapMarkers: {MapMarkers.Count}");
+        LogDebug($"OnLevelLoaded: fromSave: {fromSave}, MapMarkers: {MapMarkers.Count}");
     }
     
     /// <summary>
@@ -268,7 +268,7 @@ public class TopMapView : MonoBehaviour
         
         if (MapMarkers.Count == 0)
         {
-            LogTrace("AutoCenterMap: No markers to center");
+            LogDebug("AutoCenterMap: No markers to center");
             return;
         }
         
@@ -301,7 +301,7 @@ public class TopMapView : MonoBehaviour
         
         SaveDataExtras.MapOffset.Value = offset;
         
-        LogInfo($"AutoCenterMap: minWorldX={minWorldX}, maxWorldX={maxWorldX}, offset={offset}");
+        LogDebug($"AutoCenterMap: minWorldX={minWorldX}, maxWorldX={maxWorldX}, offset={offset}");
         
         // 强制更新所有 MapMarker 的位置
         foreach (var pair in MapMarkers)
@@ -346,7 +346,7 @@ public class TopMapView : MonoBehaviour
             // 4. 如果识别成功，查找对应的 Mapper
             if (markerType.HasValue && _mappers.TryGetValue(markerType.Value, out var mapper))
             {
-                LogTrace($"Resolved {il2cppType.Name} -> {markerType.Value}, mapping...");
+                LogDebug($"Resolved {il2cppType.Name} -> {markerType.Value}, mapping...");
                 mapper.Map(comp);
                 return true;  // 成功识别并映射
             }

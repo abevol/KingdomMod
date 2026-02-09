@@ -11,11 +11,9 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
     {
         public void Map(Component component)
         {
-            LogInfo($"Mapping TeleporterExit component with InstanceID: {component.GetInstanceID()}");
             var teleExit = component.Cast<TeleporterExit>();
             if (teleExit._player == null) return;
 
-            LogInfo($"TeleporterExit player ID: {teleExit._player.playerId}");
             var playerId = (PlayerId)teleExit._player.playerId;
             var sign = playerId == PlayerId.P1 ? MarkerStyle.TeleExitP1.Sign : MarkerStyle.TeleExitP2.Sign;
             var title = playerId == PlayerId.P1 ? Strings.TeleExitP1 : Strings.TeleExitP2;

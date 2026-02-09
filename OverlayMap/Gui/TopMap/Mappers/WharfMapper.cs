@@ -23,7 +23,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                 comp =>
                 {
                     var p = comp.Cast<Wharf>();
-                    return p._availableParts.Count;
+                    return p._availableParts.Count * p.Price;
                 },
                 comp =>
                 {

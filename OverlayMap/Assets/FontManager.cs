@@ -80,7 +80,7 @@ namespace KingdomMod.OverlayMap.Assets
             var commonChineseChars = "的一是了我不人在他有这个上们来到时大地为子中你说生国年着就那和要她出也得里后自以会家可下而过天去能对小多然于心学么之都好看起发当没成只如事把还用第样道想作种开美总从无情面最女但现前些所同日手又行意动方期它头经长儿回位分爱老因很给名法间斯知世什两次使身者被高已亲其进此话常与活正感";
             fontData.TryAddCharacters(commonChineseChars);
 
-            LogTrace($"Added Chinese characters to font: {fontData.FontName}");
+            LogDebug($"Added Chinese characters to font: {fontData.FontName}");
         }
 
         public static Font CreateSourceFont(string fontName)
@@ -93,7 +93,7 @@ namespace KingdomMod.OverlayMap.Assets
 
             if (font == null)
             {
-                LogTrace($"Failed to find font in Resources: {fontName}.");
+                LogDebug($"Failed to find font in Resources: {fontName}.");
 
                 var fontFilePath = Path.Combine(AssetsDir, "Fonts", fontName);
                 if (!File.Exists(fontFilePath))
@@ -102,7 +102,7 @@ namespace KingdomMod.OverlayMap.Assets
                 }
                 if (File.Exists(fontFilePath))
                 {
-                    LogTrace($"fontFilePath: {fontFilePath}");
+                    LogDebug($"fontFilePath: {fontFilePath}");
 
 #if IL2CPP
                     font = new Font();
@@ -145,7 +145,7 @@ namespace KingdomMod.OverlayMap.Assets
             fontAsset.hideFlags |= HideFlags.DontUnloadUnusedAsset;
             fontAsset.atlasPopulationMode = AtlasPopulationMode.Dynamic;
 
-            LogTrace($"Font Created: {fontAsset.faceInfo.familyName}, '{fontAsset.sourceFontFile == null}' '{!fontAsset.sourceFontFile}', sourceFontFile: {fontAsset.sourceFontFile.name}");
+            LogDebug($"Font Created: {fontAsset.faceInfo.familyName}, '{fontAsset.sourceFontFile == null}' '{!fontAsset.sourceFontFile}', sourceFontFile: {fontAsset.sourceFontFile.name}");
             return fontAsset;
         }
 

@@ -1,4 +1,4 @@
-using KingdomMod.OverlayMap.Assets;
+﻿using KingdomMod.OverlayMap.Assets;
 using KingdomMod.OverlayMap.Patchers;
 using KingdomMod.Shared.Attributes;
 using System;
@@ -22,10 +22,10 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
 
         private void Awake()
         {
-            LogTrace("TopMapStyle.Init");
-            LogTrace($"TopMapStyle.Init, Config.GuiStyle.TopMap.Sign.Font: {Config.GuiStyle.TopMap.Sign.Font.Value}");
-            LogTrace($"TopMapStyle.Init, Config.GuiStyle.TopMap.Title.Font: {Config.GuiStyle.TopMap.Title.Font.Value}");
-            LogTrace($"TopMapStyle.Init, Config.GuiStyle.TopMap.Count.Font: {Config.GuiStyle.TopMap.Count.Font.Value}");
+            LogDebug("TopMapStyle.Init");
+            LogDebug($"TopMapStyle.Init, Config.GuiStyle.TopMap.Sign.Font: {Config.GuiStyle.TopMap.Sign.Font.Value}");
+            LogDebug($"TopMapStyle.Init, Config.GuiStyle.TopMap.Title.Font: {Config.GuiStyle.TopMap.Title.Font.Value}");
+            LogDebug($"TopMapStyle.Init, Config.GuiStyle.TopMap.Count.Font: {Config.GuiStyle.TopMap.Count.Font.Value}");
 
             SignFont = FontManager.CreateMainFont(Config.GuiStyle.TopMap.Sign.Font, null);
             SignFontSize = Config.GuiStyle.TopMap.Sign.FontSize;

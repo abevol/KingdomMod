@@ -11,7 +11,7 @@ namespace KingdomMod.OverlayMap.Patchers
         {
             public static void Postfix()
             {
-                LogTrace($"ProgramDirectorPatcher.Run, Application.isPlaying: {Application.isPlaying}");
+                LogDebug($"ProgramDirectorPatcher.Run, Application.isPlaying: {Application.isPlaying}");
                 OverlayMapHolder.Instance.OnProgramDirectorRun();
             }
         }

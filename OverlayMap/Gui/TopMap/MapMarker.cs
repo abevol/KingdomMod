@@ -56,7 +56,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
 
         private void Start()
         {
-            UpdatePosition();
+            UpdatePosition(true);
         }
 
         private void OnDestroy()
