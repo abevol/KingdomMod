@@ -126,7 +126,7 @@ public class ExtraInfoView : MonoBehaviour
         textRect.anchorMin = new Vector2(0, 1);
         textRect.anchorMax = new Vector2(0, 1);
         textRect.pivot = new Vector2(0, 1);
-        textRect.anchoredPosition = new Vector2(14, -topOffset);
+        textRect.anchoredPosition = new Vector2(24, -topOffset + 4);
         textRect.sizeDelta = new Vector2(120, 20);
 
         // 配置文本样式
