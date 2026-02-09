@@ -23,6 +23,8 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                 comp =>
                 {
                     var p = comp.Cast<Wharf>();
+                    if (p._availableParts.Count <= 0 && p.WorkAvailable()) return 0;
+                    if (p._availableParts.Count <= 0 && !p._boatLaunched) return p.Price;
                     return p._availableParts.Count * p.Price;
                 },
                 comp =>

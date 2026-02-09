@@ -101,7 +101,7 @@ public class StatsInfoView : MonoBehaviour
             topOffset = 160 - 56;
 
         // 设置尺寸和位置
-        float width = 120;
+        float width = 130;
         float height = 146;
         _rectTransform.anchoredPosition = new Vector2(5, -topOffset);
         _rectTransform.sizeDelta = new Vector2(width, height);
@@ -120,7 +120,7 @@ public class StatsInfoView : MonoBehaviour
         var textRect = _statsText.GetComponent<RectTransform>();
         textRect.anchorMin = Vector2.zero;
         textRect.anchorMax = Vector2.one;
-        textRect.offsetMin = new Vector2(9, 5);
+        textRect.offsetMin = new Vector2(18, 5);
         textRect.offsetMax = new Vector2(-5, -5);
 
         // 配置文本样式 - 使用默认值
@@ -276,10 +276,12 @@ public class StatsInfoView : MonoBehaviour
                 $"{Config.Strings.Knight.Value}: {_statsData.KnightCount} ({_statsData.KnightMountedCount})",
                 $"{Config.Strings.Farmer.Value}: {_statsData.FarmerCount}",
                 $"{Config.Strings.Farmlands.Value}: {_statsData.MaxFarmlands}",
+#if DEBUG
                 $"ZoomScale: {_statsData.ZoomScale:F2}",
                 $"MapOffset: {_statsData.MapOffset:F0}",
                 $"BorderSide: {_statsData.BorderLeft:F0}, {_statsData.BorderRight:F0}",
                 $"BorderSideIntact: {_statsData.BorderLeftIntact:F0}, {_statsData.BorderRightIntact:F0}"
+#endif
             };
 
             _statsText.text = string.Join("\n", lines);
