@@ -58,7 +58,10 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
         
         /// <summary>传送门出口</summary>
         TeleporterExit,
-        
+
+        /// <summary>传送阵</summary>
+        Teleporter,
+
         /// <summary>船只召唤铃</summary>
         BoatSummoningBell,
 
