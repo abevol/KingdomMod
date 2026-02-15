@@ -1,6 +1,8 @@
+﻿using HarmonyLib;
 using KingdomMod.OverlayMap.Config;
 using KingdomMod.SharedLib;
 using UnityEngine;
+using static KingdomMod.OverlayMap.OverlayMapHolder;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
@@ -14,12 +16,9 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 
         public void Map(Component component)
         {
-            var payableUpgrade = component.Cast<PayableUpgrade>();
-            var prefabId = payableUpgrade.gameObject.GetComponent<PrefabID>();
+            var prefabId = component.gameObject.GetComponent<PrefabID>();
             if (prefabId == null) return;
-
             var gamePrefabId = (GamePrefabID)prefabId.prefabID;
-
             switch (gamePrefabId)
             {
                 case GamePrefabID.Lighthouse_undeveloped:
@@ -32,10 +31,12 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                 case GamePrefabID.Lighthouse_Stone:
                 case GamePrefabID.Lighthouse_Iron:
                     // 已开发状态：根据锁定状态显示不同颜色
+                    if (component.TryCast<PayableUpgrade>() != null) return;
                     view.TryAddMapMarker(component, null, MarkerStyle.Lighthouse.Sign, Strings.Lighthouse,
                         comp =>
                         {
-                            var p = comp.Cast<PayableUpgrade>();
+                            var p = comp.GetComponent<PayableUpgrade>();
+                            if (p == null) return 0;
                             bool canPay = !p.IsLocked(OverlayMapHolder.GetLocalPlayer(), out var reason);
                             var price = canPay ? p.Price : 0;
                             return price;
@@ -44,7 +45,8 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                         {
                             if (!comp.gameObject.activeSelf)
                                 return MarkerStyle.Lighthouse.Building.Color;
-                            var p = comp.Cast<PayableUpgrade>();
+                            var p = comp.GetComponent<PayableUpgrade>();
+                            if (p == null) return MarkerStyle.Lighthouse.Color;
                             bool canPay = !p.IsLocked(OverlayMapHolder.GetLocalPlayer(), out var reason);
                             bool isLocked = (reason != LockIndicator.LockReason.NotLocked && reason != LockIndicator.LockReason.NoUpgrade);
                             var color = isLocked ? MarkerStyle.Lighthouse.Locked.Color : MarkerStyle.Lighthouse.Color;
@@ -55,5 +57,23 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
         }
 
         // 已由 PayableMapper 中的父类方法补丁通知组件的启用和禁用事件
+
+        [HarmonyPatch(typeof(Lighthouse), nameof(Lighthouse.OnEnable))]
+        private class OnEnablePatch
+        {
+            public static void Postfix(Lighthouse __instance)
+            {
+                ForEachTopMapView(view => view.OnComponentCreated(__instance));
+            }
+        }
+
+        [HarmonyPatch(typeof(Lighthouse), nameof(Lighthouse.OnDisable))]
+        private class OnDisablePatch
+        {
+            public static void Prefix(Lighthouse __instance)
+            {
+                ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
+            }
+        }
     }
 }

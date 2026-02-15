@@ -15,7 +15,8 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
             switch (obj.type)
             {
                 case Portal.Type.Regular:
-                    view.TryAddMapMarker(component, MarkerStyle.Portal.Color, MarkerStyle.Portal.Sign, Strings.Portal);
+                    view.TryAddMapMarker(component, MarkerStyle.Portal.Color, MarkerStyle.Portal.Sign, Strings.Portal, null, null,
+                        comp => comp.gameObject.activeSelf && !comp.Cast<Portal>()._damageable.isDead);
                     break;
                 case Portal.Type.Cliff:
                     view.TryAddMapMarker(component, MarkerStyle.PortalCliff.Color, MarkerStyle.PortalCliff.Sign, Strings.PortalCliff, null,

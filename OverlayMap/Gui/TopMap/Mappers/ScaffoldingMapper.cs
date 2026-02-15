@@ -37,6 +37,12 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                 {
                     view.TryAddMapMarker(component, MarkerStyle.Mine.Building.Color, MarkerStyle.Mine.Sign, Strings.Mine);
                 }
+                else if (prefab.prefabID == (int)GamePrefabID.Lighthouse_Wood ||
+                         prefab.prefabID == (int)GamePrefabID.Lighthouse_Stone ||
+                         prefab.prefabID == (int)GamePrefabID.Lighthouse_Iron)
+                {
+                    view.TryAddMapMarker(component, MarkerStyle.Lighthouse.Building.Color, MarkerStyle.Lighthouse.Sign, Strings.Lighthouse);
+                }
             }
         }
     
