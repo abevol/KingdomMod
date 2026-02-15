@@ -1,4 +1,4 @@
-﻿
+
 using System;
 using System.Collections.Generic;
 
@@ -84,6 +84,7 @@ internal static class MapperInitializer
         RegisterResolver(resolvers, new Resolvers.HephaestusForgeResolver());
         RegisterResolver(resolvers, new Resolvers.PersephoneCageResolver());
         RegisterResolver(resolvers, new Resolvers.MerchantSpawnerResolver());
+        RegisterResolver(resolvers, new Resolvers.PayableTeleporterResolver());
 
         // 3. 构建 IL2CPP 指针查找缓存
         var resolverLookup = BuildResolverCache(resolvers);
@@ -156,6 +157,7 @@ internal static class MapperInitializer
             { MapMarkerType.HephaestusForge, new Mappers.HephaestusForgeMapper(view) },
             { MapMarkerType.PersephoneCage, new Mappers.PersephoneCageMapper(view) },
             { MapMarkerType.MerchantSpawner, new Mappers.MerchantSpawnerMapper(view) },
+            { MapMarkerType.Teleporter, new Mappers.PayableTeleporterMapper(view) },
         };
 
         // 5. 将初始化结果设置到 TopMapView
