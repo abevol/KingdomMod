@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using UnityEngine;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap.Resolvers
@@ -225,10 +225,16 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Resolvers
     {
         public PersephoneCageResolver() : base(typeof(PersephoneCage), MapMarkerType.PersephoneCage) { }
     }
-
+    
     /// <summary>商人刷新点解析器</summary>
     public class MerchantSpawnerResolver : SimpleResolver
     {
         public MerchantSpawnerResolver() : base(typeof(MerchantSpawner), MapMarkerType.MerchantSpawner) { }
+    }
+
+    /// <summary>灯塔解析器</summary>
+    public class LighthouseResolver : SimpleResolver
+    {
+        public LighthouseResolver() : base(typeof(Lighthouse), MapMarkerType.Lighthouse) { }
     }
 }

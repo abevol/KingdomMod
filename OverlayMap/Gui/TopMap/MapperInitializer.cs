@@ -1,6 +1,6 @@
+﻿
 using System;
 using System.Collections.Generic;
-using Il2CppInterop.Runtime;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap;
 
@@ -36,6 +36,7 @@ internal static class MapperInitializer
         RegisterResolver(resolvers, new Resolvers.CabinResolver());
         RegisterResolver(resolvers, new Resolvers.FarmhouseResolver());
         RegisterResolver(resolvers, new Resolvers.CitizenHousePayableResolver());
+        RegisterResolver(resolvers, new Resolvers.LighthouseResolver());
         
         // 简单 Resolver - 交互建筑
         RegisterResolver(resolvers, new Resolvers.ChestResolver());
@@ -161,7 +162,7 @@ internal static class MapperInitializer
         view.SetResolvers(resolvers, resolverLookup);
         view.SetMappers(mappers);
 
-        OverlayMapHolder.LogDebug($"Mapper 系统初始化完成：注册了 {resolvers.Count} 种组件类型的 Resolver，{mappers.Count} 个 Mapper");
+        OverlayMapHolder.LogDebug($"Mapper system initialization completed: registered {resolvers.Count} types of component Resolvers and {mappers.Count} Mappers");
     }
 
     /// <summary>
@@ -174,7 +175,7 @@ internal static class MapperInitializer
         var resolverLookup = new Dictionary<IntPtr, List<IMarkerResolver>>();
         foreach (var kvp in resolvers)
         {
-            var il2cppType = Il2CppType.From(kvp.Key);
+            var il2cppType = Il2CppInterop.Runtime.Il2CppType.From(kvp.Key);
             resolverLookup[il2cppType.Pointer] = kvp.Value;
         }
         return resolverLookup;
