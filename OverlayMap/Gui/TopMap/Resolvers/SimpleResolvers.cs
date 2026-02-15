@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap.Resolvers
@@ -236,5 +236,11 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Resolvers
     public class LighthouseResolver : SimpleResolver
     {
         public LighthouseResolver() : base(typeof(Lighthouse), MapMarkerType.Lighthouse) { }
+    }
+
+    /// <summary>传送阵解析器</summary>
+    public class PayableTeleporterResolver : SimpleResolver
+    {
+        public PayableTeleporterResolver() : base(typeof(PayableTeleporter), MapMarkerType.Teleporter) { }
     }
 }
