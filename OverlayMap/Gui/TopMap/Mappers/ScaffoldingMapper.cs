@@ -43,6 +43,10 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                 {
                     view.TryAddMapMarker(component, MarkerStyle.Lighthouse.Building.Color, MarkerStyle.Lighthouse.Sign, Strings.Lighthouse);
                 }
+                else if (prefab.prefabID == (int)GamePrefabID.Teleporter)
+                {
+                    view.TryAddMapMarker(component, MarkerStyle.Teleporter.Building.Color, MarkerStyle.Teleporter.Sign, Strings.Teleporter);
+                }
             }
         }
     

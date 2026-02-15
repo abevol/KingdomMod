@@ -1,4 +1,4 @@
-using HarmonyLib;
+﻿using HarmonyLib;
 using KingdomMod.OverlayMap.Config;
 using UnityEngine;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
@@ -17,22 +17,6 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
             );
         }
 
-        [HarmonyPatch(typeof(PayableTeleporter), nameof(PayableTeleporter.OnEnable))]
-        private class OnEnablePatch
-        {
-            public static void Postfix(PayableTeleporter __instance)
-            {
-                ForEachTopMapView(view => view.OnComponentCreated(__instance));
-            }
-        }
-
-        [HarmonyPatch(typeof(PayableTeleporter), nameof(PayableTeleporter.OnDisable))]
-        private class OnDisablePatch
-        {
-            public static void Prefix(PayableTeleporter __instance)
-            {
-                ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
-            }
-        }
+        // 已由 PayableMapper 中的父类方法补丁通知组件的启用和禁用事件
     }
 }

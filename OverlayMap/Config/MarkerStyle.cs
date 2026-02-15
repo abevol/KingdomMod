@@ -1,4 +1,4 @@
-using BepInEx.Configuration;
+﻿using BepInEx.Configuration;
 using System.IO;
 using System;
 using KingdomMod.OverlayMap.Config.Extensions;
@@ -64,7 +64,7 @@ public class MarkerStyle
     public static MarkerConfig HephaestusForge;
     public static MarkerConfigStated Lighthouse;
     public static MarkerConfigStated Wharf;
-    public static MarkerConfig Teleporter;
+    public static MarkerConfigStated Teleporter;
 
     public static void ConfigBind(ConfigFile config)
     {
@@ -250,7 +250,8 @@ public class MarkerStyle
         Wharf.Building.Color = config.Bind("Wharf.Building", "Color", "0,0,1,1", "");
 
         Teleporter.Color = config.Bind("Teleporter", "Color", "0.62,0,1,1", "");
-        Teleporter.Sign = config.Bind("Teleporter", "Sign", "⧉", "");
+        Teleporter.Sign = config.Bind("Teleporter", "Sign", "۞", "");
+        Teleporter.Building.Color = config.Bind("Teleporter.Building", "Color", "0,0,1,1", "");
 
         LogDebug($"Loaded config: {Path.GetFileName(ConfigFile.ConfigFilePath)}");
 
