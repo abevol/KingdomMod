@@ -253,7 +253,7 @@ Windmill = Мельница
 5. `OverlayMap/Config/MarkerStyle.cs` - 添加配置
 6. `OverlayMap/Config/Strings.cs` - 添加字符串
 7. `OverlayMap/ConfigPrefabs/KingdomMod.OverlayMap.MarkerStyle.cfg` - 添加配置节
-8. `OverlayMap/ConfigPrefabs/KingdomMod.OverlayMap.Language_*.cfg` - 添加多语言
+8. `OverlayMap/ConfigPrefabs/KingdomMod.OverlayMap.Language.*.cfg` - 添加多语言
 
 ## 测试检查清单
 

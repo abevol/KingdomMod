@@ -14,7 +14,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
             if (workableBuilding == null) return;
             if (workableBuilding.gameObject.tag == Tags.Tholos)
             {
-                // view.TryAddMapMarker(component, MarkerStyle.Tholos.Color, MarkerStyle.Tholos.Sign, Strings.Tholos);
+                view.TryAddMapMarker(component, MarkerStyle.Tholos.Color, MarkerStyle.Tholos.Sign, Strings.Tholos);
             }
         }
 
