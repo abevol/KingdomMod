@@ -159,7 +159,7 @@ internal static class MapperInitializer
             { MapMarkerType.HephaestusForge, new Mappers.HephaestusForgeMapper(view) },
             { MapMarkerType.PersephoneCage, new Mappers.PersephoneCageMapper(view) },
             { MapMarkerType.MerchantSpawner, new Mappers.MerchantSpawnerMapper(view) },
-            { MapMarkerType.Teleporter, new Mappers.PayableTeleporterMapper(view) },
+            { MapMarkerType.Teleporter, new Mappers.TeleporterMapper(view) },
         };
 
         // 5. 将初始化结果设置到 TopMapView
