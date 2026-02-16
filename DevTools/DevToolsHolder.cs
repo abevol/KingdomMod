@@ -521,32 +521,19 @@ public class DevToolsHolder : MonoBehaviour
         var objects = GameObject.FindObjectsByType<GameObject>(FindObjectsSortMode.None);
         foreach (var obj in objects)
         {
+            if (obj.transform == null) continue;
+            if (obj.transform.parent == null) continue;
+            if (obj.transform.parent.name != "GameLayer") continue;
+
+            if (obj.tag == "Fish") continue;
+            if (obj.tag == "Grass") continue;
+            if (obj.tag == "Tree") continue;
+
             var renderer = obj.GetComponent<Renderer>();
             if (!renderer || renderer.isVisible == false) continue;
-            if (obj.GetComponent<Bird>()) continue;
-            if (obj.GetComponent<Cloud>()) continue;
-            if (obj.GetComponent<Grass>()) continue;
-            if (obj.GetComponent<Flame>()) continue;
             if (obj.GetComponent<Tile>()) continue;
-            if (obj.GetComponent<Foliage>()) continue;
-            if (obj.GetComponent<ParticleSystem>()) continue;
-            if (obj.GetComponent<BackgroundWall>()) continue;
-            if (obj.GetComponent<ReflectedLight>()) continue;
-            if (obj.GetComponent<Monument>()) continue;
-            if (obj.GetComponent<Fish>()) continue;
-            if (obj.GetComponent<Parallax2DChild>()) continue;
-            // if (obj.GetComponent<Rigidbody2D>()) continue;
-            // if (obj.GetComponent<PolygonCollider2D>()) continue;
-            if (obj.GetComponent<WorkableTree>()) continue;
 
-            if (obj.name.StartsWith("Haze")) continue;
             if (obj.name.StartsWith("castle_back")) continue;
-
-            if (obj.name == "Glow") continue;
-            if (obj.name == "Puff") continue;
-            if (obj.name == "trunk") continue;
-            if (obj.name == "sparkles") continue;
-            if (obj.name == "highlight") continue;
             if (obj.name == "Roots(Clone)") continue;
 
             Vector3 screenPos = worldCam.WorldToScreenPoint(obj.transform.position);
@@ -556,11 +543,13 @@ public class DevToolsHolder : MonoBehaviour
                 objectsInfoList.Add(new ObjectsInfo(new Rect(uiPos.x, uiPos.y, 100, 100), obj.transform.position, obj.name));
                 //  + " (" + obj.transform.position.ToString() + ")(" + uiPos.ToString() + ")"
                 if (!_objectsInfoLogged)
-                {
                     log.LogInfo(obj.name);
-                    _objectsInfoLogged = true;
-                }
             }
+        }
+
+        if (!_objectsInfoLogged)
+        {
+            _objectsInfoLogged = true;
         }
     }
 
