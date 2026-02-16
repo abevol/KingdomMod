@@ -166,7 +166,7 @@ Sign =
 ### 步骤 5: 更新语言配置文件
 
 #### 英文配置（en-US）
-位置：`OverlayMap/ConfigPrefabs/KingdomMod.OverlayMap.Language_en-US.cfg`
+位置：`OverlayMap/ConfigPrefabs/KingdomMod.OverlayMap.Language.en-US.cfg`
 
 ```ini
 # Setting type: String
@@ -183,7 +183,7 @@ Sleipnir = Sleipnir
 ```
 
 #### 中文配置（zh-CN）
-位置：`OverlayMap/ConfigPrefabs/KingdomMod.OverlayMap.Language_zh-CN.cfg`
+位置：`OverlayMap/ConfigPrefabs/KingdomMod.OverlayMap.Language.zh-CN.cfg`
 
 ```ini
 # Setting type: String

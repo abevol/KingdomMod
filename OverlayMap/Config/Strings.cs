@@ -134,6 +134,7 @@ public class Strings
     public static ConfigEntryWrapper<string> Lighthouse;
     public static ConfigEntryWrapper<string> Wharf;
     public static ConfigEntryWrapper<string> Teleporter;
+    public static ConfigEntryWrapper<string> Tholos;
 
     public static void ConfigBind(ConfigFile config)
     {
@@ -263,6 +264,7 @@ public class Strings
         Lighthouse = config.Bind("Strings", "Lighthouse", "Lighthouse", "");
         Wharf = config.Bind("Strings", "Wharf", "Wharf", "");
         Teleporter = config.Bind("Strings", "Teleporter", "Teleporter", "");
+        Tholos = config.Bind("Strings", "Tholos", "Tholos", "");
 
         LogDebug($"Loaded config: {Path.GetFileName(ConfigFile.ConfigFilePath)}");
 

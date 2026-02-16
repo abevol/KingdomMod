@@ -13,9 +13,8 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
             var scaffolding = component.Cast<Scaffolding>();
             var building = scaffolding.Building;
             if (building == null) return;
-            
-            var wall = building.GetComponent<Wall>();
-            if (wall != null)
+
+            if (building.gameObject.tag == Tags.Wall)
             {
                 // 使用 Wall 组件作为 target，确保使用正确的位置
                 var marker = view.TryAddMapMarker(component, MarkerStyle.Wall.Building.Color, MarkerStyle.Wall.Sign, null);

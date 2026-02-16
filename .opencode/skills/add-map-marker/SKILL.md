@@ -49,7 +49,7 @@ description: 用于在 OverlayMap 模组中添加新的地图标记。涵盖所�
 - `OverlayMap/Config/Strings.cs` - 添加字符串字段
 - `OverlayMap/Gui/TopMap/Mappers/*.cs` - 实现 Mapper 逻辑
 - `OverlayMap/ConfigPrefabs/KingdomMod.OverlayMap.MarkerStyle.cfg` - 添加配置节
-- `OverlayMap/ConfigPrefabs/KingdomMod.OverlayMap.Language_*.cfg` - 添加多语言字符串
+- `OverlayMap/ConfigPrefabs/KingdomMod.OverlayMap.Language.*.cfg` - 添加多语言字符串
 
 **完整步骤**：[references/simple-marker.md](references/simple-marker.md)
 
@@ -62,7 +62,7 @@ description: 用于在 OverlayMap 模组中添加新的地图标记。涵盖所�
 - `OverlayMap/Config/Strings.cs` - 添加字符串字段
 - `OverlayMap/Gui/TopMap/Mappers/*.cs` - 实现 Mapper 逻辑（需处理状态逻辑）
 - `OverlayMap/ConfigPrefabs/KingdomMod.OverlayMap.MarkerStyle.cfg` - 添加多状态配置节
-- `OverlayMap/ConfigPrefabs/KingdomMod.OverlayMap.Language_*.cfg` - 添加多语言字符串
+- `OverlayMap/ConfigPrefabs/KingdomMod.OverlayMap.Language.*.cfg` - 添加多语言字符串
 
 **完整步骤**：[references/stated-marker.md](references/stated-marker.md)
 
