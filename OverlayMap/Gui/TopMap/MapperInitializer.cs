@@ -1,4 +1,4 @@
-
+﻿
 using System;
 using System.Collections.Generic;
 
@@ -33,6 +33,7 @@ internal static class MapperInitializer
         // 简单 Resolver - 建筑类
         RegisterResolver(resolvers, new Resolvers.CastleResolver());
         RegisterResolver(resolvers, new Resolvers.ScaffoldingResolver());
+        RegisterResolver(resolvers, new Resolvers.WorkableBuildingResolver());
         RegisterResolver(resolvers, new Resolvers.CabinResolver());
         RegisterResolver(resolvers, new Resolvers.FarmhouseResolver());
         RegisterResolver(resolvers, new Resolvers.CitizenHousePayableResolver());
@@ -100,6 +101,7 @@ internal static class MapperInitializer
             { MapMarkerType.Castle, new Mappers.CastleMapper(view) },
             { MapMarkerType.Wall, new Mappers.WallMapper(view) },
             { MapMarkerType.Scaffolding, new Mappers.ScaffoldingMapper(view) },
+            { MapMarkerType.WorkableBuilding, new Mappers.WorkableBuildingMapper(view) },
             { MapMarkerType.Cabin, new Mappers.CabinMapper(view) },
             { MapMarkerType.Farmhouse, new Mappers.FarmhouseMapper(view) },
             { MapMarkerType.CitizenHouse, new Mappers.CitizenHousePayableMapper(view) },
