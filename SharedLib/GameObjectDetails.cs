@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -18,6 +18,7 @@ namespace KingdomMod.SharedLib
         public int instanceID = 0;
         public string position = "";
         public string localPosition = "";
+        public string building = "";
         public System.Collections.Generic.List<string> components = new();
         public System.Collections.Generic.List<GameObjectDetails> children = new();
 
@@ -48,6 +49,10 @@ namespace KingdomMod.SharedLib
             var prefabIdComp = rootObject.GetComponent<PrefabID>();
             if (prefabIdComp != null)
                 this.prefabID = prefabIdComp.prefabID;
+
+            var scaffoldingComp = rootObject.GetComponent<Scaffolding>();
+            if (scaffoldingComp != null && scaffoldingComp.Building != null)
+                this.building = scaffoldingComp.Building.name;
 
             var tmpComps = rootObject.GetComponents<Component>();
             foreach(var comp in tmpComps)
@@ -147,6 +152,8 @@ namespace KingdomMod.SharedLib
             xml += "<instanceID value=\"" + obj.instanceID.ToString() + "\" />\r\n";
             xml += "<position value=\"" + obj.position + "\" />\r\n";
             xml += "<localPosition value=\"" + obj.localPosition + "\" />\r\n";
+            if (!string.IsNullOrEmpty(obj.building))
+                xml += "<building value=\"" + obj.building + "\" />\r\n";
 
             xml += "<components>\r\n";
             foreach (var comp in obj.components)
@@ -211,6 +218,8 @@ namespace KingdomMod.SharedLib
 
             json += "\"position\":\"" + obj.position + "\",";
             json += "\"localPosition\":\"" + obj.localPosition + "\",";
+            if (!string.IsNullOrEmpty(obj.building))
+                json += "\"building\":\"" + obj.building + "\",";
 
             json += "\"components\":[";
             foreach (var comp in obj.components)
