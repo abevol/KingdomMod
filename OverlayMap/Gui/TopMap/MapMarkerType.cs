@@ -1,4 +1,4 @@
-namespace KingdomMod.OverlayMap.Gui.TopMap
+﻿namespace KingdomMod.OverlayMap.Gui.TopMap
 {
     /// <summary>
     /// 地图标记类型枚举。
@@ -23,7 +23,10 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
         
         /// <summary>脚手架（建造中）</summary>
         Scaffolding,
-        
+
+        /// <summary>可建造建筑（通用）</summary>
+        WorkableBuilding,
+
         /// <summary>小屋</summary>
         Cabin,
         

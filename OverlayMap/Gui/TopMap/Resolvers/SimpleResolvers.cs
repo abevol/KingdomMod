@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using UnityEngine;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap.Resolvers
@@ -68,6 +68,12 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Resolvers
     public class ScaffoldingResolver : SimpleResolver
     {
         public ScaffoldingResolver() : base(typeof(Scaffolding), MapMarkerType.Scaffolding) { }
+    }
+
+    /// <summary>可建造建筑解析器</summary>
+    public class WorkableBuildingResolver : SimpleResolver
+    {
+        public WorkableBuildingResolver() : base(typeof(WorkableBuilding), MapMarkerType.WorkableBuilding) { }
     }
 
     /// <summary>小屋解析器</summary>
