@@ -224,9 +224,23 @@ public class DevToolsHolder : MonoBehaviour
         int campaignIndex = GlobalSaveData.loaded?.currentCampaign ?? -1;
         int land = CampaignSaveData.current?.CurrentLand ?? -1;
         
-        string filename = $"Challenge{challengeId}-Campaign{campaignIndex}-Land{land}.json";
+        string baseFilename = $"Challenge{challengeId}-Campaign{campaignIndex}-Land{land}";
+        string directory = Path.Combine(prefixPath, biomePath);
         
-        return Path.Combine(prefixPath, biomePath, filename);
+        string filepath = Path.Combine(directory, $"{baseFilename}.json");
+        if (!File.Exists(filepath))
+        {
+            return filepath;
+        }
+        
+        int counter = 1;
+        do
+        {
+            filepath = Path.Combine(directory, $"{baseFilename}_{counter}.json");
+            counter++;
+        } while (File.Exists(filepath));
+        
+        return filepath;
     }
 
     private void Update()
