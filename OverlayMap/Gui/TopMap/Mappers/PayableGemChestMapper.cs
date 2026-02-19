@@ -7,8 +7,13 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
     public class PayableGemChestMapper(TopMapView view) : IComponentMapper
     {
-        public void Map(Component component)
+        public MapMarkerType? MarkerType => MapMarkerType.GemChest;
+
+        public void Map(Component component, NotifierType notifierType, ResolverType resolverType)
         {
+            if (notifierType != NotifierType.Payable)
+                return;
+
             view.TryAddMapMarker(component, MarkerStyle.GemMerchant.Color, MarkerStyle.GemMerchant.Sign, Strings.GemMerchant,
                 comp =>
                 {
@@ -16,7 +21,5 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                     return payableGemChest.infiniteGems ? payableGemChest.guardRef.Price : payableGemChest.gemsStored;
                 });
         }
-
-        // 已由 PayableMapper 中的父类方法补丁通知组件的启用和禁用事件
     }
 }

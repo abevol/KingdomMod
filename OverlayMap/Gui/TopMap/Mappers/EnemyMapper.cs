@@ -1,4 +1,4 @@
-using HarmonyLib;
+﻿using HarmonyLib;
 using KingdomMod.OverlayMap.Config;
 using System;
 using System.Collections.Generic;
@@ -20,6 +20,8 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
     /// </summary>
     public class EnemyMapper : IComponentMapper
     {
+        public MapMarkerType? MarkerType => MapMarkerType.Enemy;
+
         /// <summary>
         /// 敌人分组的最大距离(游戏单位)
         /// </summary>

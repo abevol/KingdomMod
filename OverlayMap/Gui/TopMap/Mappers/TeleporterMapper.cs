@@ -7,16 +7,14 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
     public class TeleporterMapper(TopMapView view) : IComponentMapper
     {
-        public void Map(Component component)
-        {
-            view.TryAddMapMarker(
-                component,
-                MarkerStyle.Teleporter.Color,
-                MarkerStyle.Teleporter.Sign,
-                Strings.Teleporter
-            );
-        }
+        public MapMarkerType? MarkerType => MapMarkerType.Teleporter;
 
-        // 已由 PayableMapper 中的父类方法补丁通知组件的启用和禁用事件
+        public void Map(Component component, NotifierType notifierType, ResolverType resolverType)
+        {
+            if (notifierType == NotifierType.Payable)
+                view.TryAddMapMarker(component, MarkerStyle.Teleporter.Color, MarkerStyle.Teleporter.Sign, Strings.Teleporter);
+            else if (resolverType == ResolverType.Scaffolding)
+                view.TryAddMapMarker(component, MarkerStyle.Teleporter.Building.Color, MarkerStyle.Teleporter.Sign, Strings.Teleporter);
+        }
     }
 }

@@ -40,14 +40,14 @@
         /// <summary>灯塔</summary>
         Lighthouse,
         
-        /// <summary>矿井</summary>
+        /// <summary>铁矿</summary>
         Mine,
         
-        /// <summary>采石场</summary>
+        /// <summary>石矿</summary>
         Quarry,
         
         /// <summary>商店</summary>
-        Shop,
+        PayableShop,
         
         /// <summary>宝箱</summary>
         Chest,
@@ -84,6 +84,9 @@
         
         /// <summary>篝火</summary>
         Campfire,
+
+        /// <summary>商人刷新点</summary>
+        MerchantSpawner,
 
         // ===== 单位类 (Units) =====
         /// <summary>玩家</summary>
@@ -128,7 +131,7 @@
         /// <summary>可付费阻挡物</summary>
         PayableBlocker,
         
-        /// <summary>可付费灌木</summary>
+        /// <summary>灌木</summary>
         PayableBush,
         
         /// <summary>可付费升级物（通用）</summary>
@@ -144,14 +147,14 @@
         
         /// <summary>托尔谜题控制器（Norse Lands DLC）</summary>
         ThorPuzzleController,
-        
+
+        /// <summary>神殿（Olympus DLC）</summary>
+        Tholos,
+
         /// <summary>赫菲斯托斯熔炉（Olympus DLC）</summary>
         HephaestusForge,
         
         /// <summary>珀尔塞福涅牢笼（Olympus DLC）</summary>
         PersephoneCage,
-        
-        /// <summary>商人刷新点</summary>
-        MerchantSpawner,
     }
 }

@@ -25,6 +25,14 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
         /// 将组件映射为地图标记。
         /// </summary>
         /// <param name="component">游戏组件</param>
-        void Map(Component component);
+        void Map(Component component) { }
+
+        /// <summary>
+        /// 将组件映射为地图标记。
+        /// </summary>
+        /// <param name="component">游戏组件</param>
+        /// <param name="notifierType">通知类型</param>
+        /// <param name="resolverType">解析器类型</param>
+        void Map(Component component, NotifierType notifierType, ResolverType resolverType) => Map(component);
     }
 }

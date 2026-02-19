@@ -11,7 +11,9 @@ using KingdomMod.Shared.Attributes;
 
 namespace KingdomMod.OverlayMap.Gui
 {
+#if IL2CPP
     [RegisterTypeInIl2Cpp]
+#endif
     public class PlayerOverlay : MonoBehaviour
     {
         private RectTransform _rectTransform;

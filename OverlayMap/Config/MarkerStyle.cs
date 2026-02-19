@@ -256,6 +256,7 @@ public class MarkerStyle
 
         Tholos.Color = config.Bind("Tholos", "Color", "1,1,1,1", "");
         Tholos.Sign = config.Bind("Tholos", "Sign", "", "");
+        Tholos.Unpaid.Color = config.Bind("Tholos.Unpaid", "Color", "1,0,0,1", "");
         Tholos.Building.Color = config.Bind("Tholos.Building", "Color", "0,0,1,1", "");
 
         LogDebug($"Loaded config: {Path.GetFileName(ConfigFile.ConfigFilePath)}");

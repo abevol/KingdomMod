@@ -1,5 +1,4 @@
-#if IL2CPP
-using Il2CppInterop.Runtime.Injection;
+﻿#if IL2CPP
 using KingdomMod.Shared.Attributes;
 #endif
 
@@ -9,25 +8,27 @@ using static KingdomMod.OverlayMap.OverlayMapHolder;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap
 {
+#if IL2CPP
     [RegisterTypeInIl2Cpp]
+#endif
     public class ConstructionEventHandler : MonoBehaviour
     {
         private MapMarker _owner;
         private RectTransform _rectTransform;
         private Color _normalColor;
-        private Color _constructionalColor;
+        private Color _buildingColor;
         private ConstructionBuildingComponent _constructionBuildingComponent;
 
 #if IL2CPP
         public ConstructionEventHandler(IntPtr ptr) : base(ptr) { }
 #endif
 
-        public static void Create(MapMarker marker, Color normalColor, Color constructionalColor)
+        public static void Create(MapMarker marker, Color normalColor, Color buildingColor)
         {
             GameObject obj = new GameObject(nameof(ConstructionEventHandler));
             obj.transform.SetParent(marker.transform, false);
             var comp = obj.AddComponent<ConstructionEventHandler>();
-            comp.Init(normalColor, constructionalColor);
+            comp.Init(normalColor, buildingColor);
         }
 
         private void Init(Color normalColor, Color constructionalColor)
@@ -36,7 +37,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
             _rectTransform = this.gameObject.AddComponent<RectTransform>();
             _owner = _rectTransform.parent.GetComponent<MapMarker>();
             _normalColor = normalColor;
-            _constructionalColor = constructionalColor;
+            _buildingColor = constructionalColor;
         }
 
         private void Awake()
@@ -62,7 +63,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
             _constructionBuildingComponent.OnManualConstructionStarted -= (System.Action)OnManualConstructionStarted;
 
             // 更新 marker 颜色
-            _owner.UpdateColor(_constructionalColor);
+            _owner.UpdateColor(_buildingColor);
         }
 
         public void OnConstructionComplete()

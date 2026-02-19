@@ -14,7 +14,9 @@ using KingdomMod.Shared.Attributes;
 
 namespace KingdomMod.OverlayMap;
 
+#if IL2CPP
 [RegisterTypeInIl2Cpp]
+#endif
 public class OverlayMapHolder : MonoBehaviour
 {
     public delegate void GameStateEventHandler(Game.State state);

@@ -8,6 +8,8 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
     public class FarmhouseMapper(TopMapView view) : IComponentMapper
     {
+        public MapMarkerType? MarkerType => MapMarkerType.Farmhouse;
+
         public void Map(Component component)
         {
             view.TryAddMapMarker(component, MarkerStyle.Farmhouse.Color, MarkerStyle.Farmhouse.Sign, Strings.Farmhouse);

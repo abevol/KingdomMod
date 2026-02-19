@@ -8,6 +8,8 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
     public class ChestMapper(TopMapView view) : IComponentMapper
     {
+        public MapMarkerType? MarkerType => MapMarkerType.Chest;
+
         public void Map(Component component)
         {
             var obj = component.Cast<Chest>();

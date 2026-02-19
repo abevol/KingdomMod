@@ -17,7 +17,9 @@ namespace KingdomMod.OverlayMap.Gui.Debugging
     /// <summary>
     /// 简化版字体调试面板，用于测试字体的UI显示效果
     /// </summary>
+#if IL2CPP
     [RegisterTypeInIl2Cpp]
+#endif
     public class SimpleFontDebugPanel : MonoBehaviour
     {
         private Canvas _canvas;

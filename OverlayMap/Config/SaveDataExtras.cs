@@ -97,7 +97,7 @@ public class SaveDataExtras
         var challengeId = GlobalSaveData.loaded.currentChallenge;
         var archiveFilename = IslandSaveData.GetFilePropsForLand(campaignIndex, land, challengeId).filename;
 
-        LogDebug($"OnGameStart: _archiveFilename {archiveFilename}, Campaign {campaignIndex}, CurrentLand {land}, currentChallenge {challengeId}");
+        LogInfo($"ArchiveFilename {archiveFilename}, Campaign {campaignIndex}, CurrentLand {land}, currentChallenge {challengeId}");
 
         return archiveFilename;
     }

@@ -8,7 +8,9 @@ using static KingdomMod.OverlayMap.OverlayMapHolder;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap
 {
+#if IL2CPP
     [RegisterTypeInIl2Cpp]
+#endif
     public class MapMarker : MonoBehaviour
     {
         private TopMapView _owner;

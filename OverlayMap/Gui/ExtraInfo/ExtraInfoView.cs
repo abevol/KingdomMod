@@ -11,7 +11,9 @@ namespace KingdomMod.OverlayMap.Gui.ExtraInfo;
 /// 额外信息显示组件 (UGUI)
 /// 显示岛屿编号、天数、当前时间、宝石和金币数量
 /// </summary>
+#if IL2CPP
 [RegisterTypeInIl2Cpp]
+#endif
 public class ExtraInfoView : MonoBehaviour
 {
     private RectTransform _rectTransform;

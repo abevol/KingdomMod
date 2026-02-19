@@ -23,6 +23,8 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Resolvers
             _markerType = markerType;
         }
 
+        public ResolverType ResolverType => ResolverType.Standard;
+
         public Type TargetComponentType => _targetType;
 
         public virtual MapMarkerType? Resolve(Component component)
@@ -62,18 +64,6 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Resolvers
     public class TeleporterExitResolver : SimpleResolver
     {
         public TeleporterExitResolver() : base(typeof(TeleporterExit), MapMarkerType.TeleporterExit) { }
-    }
-
-    /// <summary>脚手架解析器</summary>
-    public class ScaffoldingResolver : SimpleResolver
-    {
-        public ScaffoldingResolver() : base(typeof(Scaffolding), MapMarkerType.Scaffolding) { }
-    }
-
-    /// <summary>可建造建筑解析器</summary>
-    public class WorkableBuildingResolver : SimpleResolver
-    {
-        public WorkableBuildingResolver() : base(typeof(WorkableBuilding), MapMarkerType.WorkableBuilding) { }
     }
 
     /// <summary>小屋解析器</summary>
@@ -148,6 +138,12 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Resolvers
         public PlayerResolver() : base(typeof(Player), MapMarkerType.Player) { }
     }
 
+    /// <summary>骑士解析器</summary>
+    public class KnightResolver : SimpleResolver
+    {
+        public KnightResolver() : base(typeof(Knight), MapMarkerType.Knight) { }
+    }
+
     /// <summary>乞丐解析器</summary>
     public class BeggarResolver : SimpleResolver
     {
@@ -190,10 +186,16 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Resolvers
         public BoatResolver() : base(typeof(Boat), MapMarkerType.Boat) { }
     }
 
-    /// <summary>可付费阻挡物解析器</summary>
-    public class PayableBlockerResolver : SimpleResolver
+    /// <summary>船坞解析器</summary>
+    public class WharfResolver : SimpleResolver
     {
-        public PayableBlockerResolver() : base(typeof(PayableBlocker), MapMarkerType.PayableBlocker) { }
+        public WharfResolver() : base(typeof(Wharf), MapMarkerType.Wharf) { }
+    }
+
+    /// <summary>可付费商店解析器</summary>
+    public class PayableShopResolver : SimpleResolver
+    {
+        public PayableShopResolver() : base(typeof(PayableShop), MapMarkerType.PayableShop) { }
     }
 
     /// <summary>可付费灌木解析器</summary>

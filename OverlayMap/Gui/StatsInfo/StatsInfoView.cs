@@ -14,7 +14,9 @@ namespace KingdomMod.OverlayMap.Gui.StatsInfo;
 /// 统计信息面板视图组件 (UGUI)
 /// 显示游戏统计信息：农民、工人、弓箭手、骑士、农夫、农田等数量
 /// </summary>
+#if IL2CPP
 [RegisterTypeInIl2Cpp]
+#endif
 public class StatsInfoView : MonoBehaviour
 {
     private RectTransform _rectTransform;

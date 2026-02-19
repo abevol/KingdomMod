@@ -6,13 +6,11 @@ using HarmonyLib;
 using KingdomMod.SharedLib;
 using KingdomMod.Shared.Attributes;
 
-#if IL2CPP
-using Il2CppInterop.Runtime.Injection;
-#endif
-
 namespace KingdomMod.BetterPayableUpgrade;
 
+#if IL2CPP
 [RegisterTypeInIl2Cpp]
+#endif
 public class BetterPayableUpgradeHolder : MonoBehaviour
 {
     public static BetterPayableUpgradeHolder Instance { get; private set; }

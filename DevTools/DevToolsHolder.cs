@@ -4,22 +4,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using File = System.IO.File;
 using HarmonyLib;
-using Coatsink.Common;
 using System.Reflection;
 using KingdomMod.SharedLib;
 using KingdomMod.Shared.Attributes;
 
-#if IL2CPP
-using Il2CppInterop.Runtime.Injection;
-#endif
-
 namespace KingdomMod.DevTools;
 
+#if IL2CPP
 [RegisterTypeInIl2Cpp]
+#endif
 public class DevToolsHolder : MonoBehaviour
 {
     public static DevToolsHolder Instance { get; private set; }
     private static ManualLogSource log;
+    private static BepInEx.Configuration.ConfigFile _config;
     private bool enabledDebugInfo = false;
     private bool enabledObjectsInfo = false;
     private bool enableDevTools = false;
@@ -37,6 +35,7 @@ public class DevToolsHolder : MonoBehaviour
     public static void Initialize(DevToolsPlugin plugin)
     {
         log = plugin.LogSource;
+        _config = plugin.Config;
         GameObject obj = new(nameof(DevToolsHolder));
         DontDestroyOnLoad(obj);
         obj.hideFlags = HideFlags.HideAndDontSave;
