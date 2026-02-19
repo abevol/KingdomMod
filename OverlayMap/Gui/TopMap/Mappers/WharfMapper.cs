@@ -18,7 +18,6 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
             var wharf = component.Cast<Wharf>();
             if (wharf == null) return;
 
-            // 船坞使用蓝色，标识为空
             view.TryAddMapMarker(component, MarkerStyle.Wharf.Color, MarkerStyle.Wharf.Sign, Strings.Wharf,
                 comp =>
                 {

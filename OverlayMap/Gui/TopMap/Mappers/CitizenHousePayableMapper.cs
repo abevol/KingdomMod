@@ -8,6 +8,8 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
     public class CitizenHousePayableMapper(TopMapView view) : IComponentMapper
     {
+        public MapMarkerType? MarkerType => MapMarkerType.CitizenHouse;
+
         public void Map(Component component)
         {
             view.TryAddMapMarker(component, MarkerStyle.CitizenHouse.Building.Color, MarkerStyle.CitizenHouse.Sign, Strings.CitizenHouse,

@@ -7,6 +7,8 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
     public class UnlockNewRulerStatueMapper(TopMapView view) : IComponentMapper
     {
+        public MapMarkerType? MarkerType => MapMarkerType.UnlockNewRulerStatue;
+
         public void Map(Component component)
         {
             var obj = component.Cast<UnlockNewRulerStatue>();

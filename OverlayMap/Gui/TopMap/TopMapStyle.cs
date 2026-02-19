@@ -10,7 +10,9 @@ using Il2CppInterop.Runtime.Attributes;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap
 {
+#if IL2CPP
     [RegisterTypeInIl2Cpp]
+#endif
     public class TopMapStyle : MonoBehaviour
     {
         public FontData SignFont;

@@ -7,6 +7,8 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
     public class PersephoneCageMapper(TopMapView view) : IComponentMapper
     {
+        public MapMarkerType? MarkerType => MapMarkerType.PersephoneCage;
+
         public void Map(Component component)
         {
             view.TryAddMapMarker(component, null, MarkerStyle.PersephoneCage.Sign, Strings.HermitPersephone, null,

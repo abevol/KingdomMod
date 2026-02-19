@@ -10,6 +10,8 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
     public class PlayerMapper(TopMapView view) : IComponentMapper
     {
+        public MapMarkerType? MarkerType => MapMarkerType.Player;
+
         public Component[] GetComponents()
         {
             return new Component[]

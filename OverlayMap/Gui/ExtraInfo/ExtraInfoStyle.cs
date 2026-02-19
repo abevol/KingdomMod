@@ -13,7 +13,9 @@ namespace KingdomMod.OverlayMap.Gui.ExtraInfo
     /// ExtraInfoView 风格配置组件
     /// 管理额外信息显示的字体等样式
     /// </summary>
+#if IL2CPP
     [RegisterTypeInIl2Cpp]
+#endif
     public class ExtraInfoStyle : MonoBehaviour
     {
         public FontData TextFont;

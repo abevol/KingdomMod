@@ -13,7 +13,9 @@ namespace KingdomMod.OverlayMap.Gui.StatsInfo
     /// StatsInfoView 风格配置组件
     /// 管理统计信息面板的字体、背景等样式
     /// </summary>
+#if IL2CPP
     [RegisterTypeInIl2Cpp]
+#endif
     public class StatsInfoStyle : MonoBehaviour
     {
         public FontData TextFont;

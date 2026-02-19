@@ -14,7 +14,9 @@ using Il2CppInterop.Runtime.Attributes;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap;
 
+#if IL2CPP
 [RegisterTypeInIl2Cpp]
+#endif
 public class TopMapView : MonoBehaviour
 {
     private RectTransform _rectTransform;
@@ -115,6 +117,19 @@ public class TopMapView : MonoBehaviour
     internal void SetMappers(Dictionary<MapMarkerType, IComponentMapper> mappers)
     {
         _mappers = mappers;
+    }
+
+    /// <summary>
+    /// 获取指定类型的映射器
+    /// </summary>
+#if IL2CPP
+    [HideFromIl2Cpp]
+#endif
+    public IComponentMapper GetMapper(MapMarkerType type)
+    {
+        if (_mappers != null && _mappers.TryGetValue(type, out var mapper))
+            return mapper;
+        return null;
     }
 
 
@@ -316,9 +331,9 @@ public class TopMapView : MonoBehaviour
 #if IL2CPP
     [HideFromIl2Cpp]
 #endif
-    public void OnComponentCreated(Component comp)
+    public void OnComponentCreated(Component comp, NotifierType notifierType = NotifierType.Standard)
     {
-        TryResolveAndMap(comp);
+        TryResolveAndMap(comp, notifierType);
     }
 
     /// <summary>
@@ -328,7 +343,7 @@ public class TopMapView : MonoBehaviour
 #if IL2CPP
     [HideFromIl2Cpp]
 #endif
-    private bool TryResolveAndMap(Component comp)
+    private bool TryResolveAndMap(Component comp, NotifierType notifierType)
     {
         // 1. 获取组件的类型指针
         var il2cppType = comp.GetIl2CppType();
@@ -347,7 +362,7 @@ public class TopMapView : MonoBehaviour
             if (markerType.HasValue && _mappers.TryGetValue(markerType.Value, out var mapper))
             {
                 LogDebug($"Resolved {il2cppType.Name} -> {markerType.Value}, mapping...");
-                mapper.Map(comp);
+                mapper.Map(comp, notifierType, resolver.ResolverType);
                 return true;  // 成功识别并映射
             }
         }

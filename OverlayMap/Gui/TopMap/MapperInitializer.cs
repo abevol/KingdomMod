@@ -23,7 +23,7 @@ internal static class MapperInitializer
         
         // 复杂 Resolver（一对多映射）
         RegisterResolver(resolvers, new Resolvers.PayableUpgradeResolver());  // Wall, Lighthouse, Mine, Quarry
-        RegisterResolver(resolvers, new Resolvers.PayableShopResolver());     // Shop
+        RegisterResolver(resolvers, new Resolvers.PayableShopResolver());     // PayableShop
         RegisterResolver(resolvers, new Resolvers.WharfResolver());           // Wharf
 
         // 简单 Resolver（一对一映射）- 地形类
@@ -100,8 +100,6 @@ internal static class MapperInitializer
             // 建筑类
             { MapMarkerType.Castle, new Mappers.CastleMapper(view) },
             { MapMarkerType.Wall, new Mappers.WallMapper(view) },
-            { MapMarkerType.Scaffolding, new Mappers.ScaffoldingMapper(view) },
-            { MapMarkerType.WorkableBuilding, new Mappers.WorkableBuildingMapper(view) },
             { MapMarkerType.Cabin, new Mappers.CabinMapper(view) },
             { MapMarkerType.Farmhouse, new Mappers.FarmhouseMapper(view) },
             { MapMarkerType.CitizenHouse, new Mappers.CitizenHousePayableMapper(view) },
@@ -110,11 +108,12 @@ internal static class MapperInitializer
             { MapMarkerType.Lighthouse, new Mappers.LighthouseMapper(view) },
             { MapMarkerType.Mine, new Mappers.MineMapper(view) },
             { MapMarkerType.Quarry, new Mappers.QuarryMapper(view) },
-            { MapMarkerType.Shop, new Mappers.PayableShopMapper(view) },
+            { MapMarkerType.PayableShop, new Mappers.PayableShopMapper(view) },
             { MapMarkerType.Chest, new Mappers.ChestMapper(view) },
             { MapMarkerType.GemChest, new Mappers.PayableGemChestMapper(view) },
             { MapMarkerType.BoatSummoningBell, new Mappers.BoatSummoningBellMapper(view) },
             { MapMarkerType.Wharf, new Mappers.WharfMapper(view) },
+            { MapMarkerType.Teleporter, new Mappers.TeleporterMapper(view) },
 
             // 传送点
             { MapMarkerType.Portal, new Mappers.PortalMapper(view) },
@@ -147,7 +146,6 @@ internal static class MapperInitializer
             { MapMarkerType.BoatWreck, new Mappers.BoatWreckMapper(view) },
             
             // 障碍物
-            { MapMarkerType.PayableBlocker, new Mappers.PayableBlockerMapper(view) },
             { MapMarkerType.PayableBush, new Mappers.PayableBushMapper(view) },
             
             // 武器
@@ -159,7 +157,7 @@ internal static class MapperInitializer
             { MapMarkerType.HephaestusForge, new Mappers.HephaestusForgeMapper(view) },
             { MapMarkerType.PersephoneCage, new Mappers.PersephoneCageMapper(view) },
             { MapMarkerType.MerchantSpawner, new Mappers.MerchantSpawnerMapper(view) },
-            { MapMarkerType.Teleporter, new Mappers.TeleporterMapper(view) },
+            { MapMarkerType.Tholos, new Mappers.TholosMapper(view) },
         };
 
         // 5. 将初始化结果设置到 TopMapView

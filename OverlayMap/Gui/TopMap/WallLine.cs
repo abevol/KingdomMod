@@ -14,7 +14,9 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
     /// UGUI 墙体连接线组件
     /// 使用 Image + RectTransform 绘制连接相邻墙体（或城堡）的线条
     /// </summary>
+#if IL2CPP
     [RegisterTypeInIl2Cpp]
+#endif
     public class WallLine : MonoBehaviour
     {
         private MapMarker _ownerMarker;      // 当前墙的 marker

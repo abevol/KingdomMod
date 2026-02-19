@@ -9,6 +9,8 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
     public class TeleporterExitMapper(TopMapView view) : IComponentMapper
     {
+        public MapMarkerType? MarkerType => MapMarkerType.TeleporterExit;
+
         public void Map(Component component)
         {
             var teleExit = component.Cast<TeleporterExit>();

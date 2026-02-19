@@ -7,6 +7,8 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
     public class MerchantSpawnerMapper(TopMapView view) : IComponentMapper
     {
+        public MapMarkerType? MarkerType => MapMarkerType.MerchantSpawner;
+
         public void Map(Component component)
         {
             view.TryAddMapMarker(component, MarkerStyle.MerchantHouse.Color, MarkerStyle.MerchantHouse.Sign, Strings.MerchantHouse);

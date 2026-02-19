@@ -11,6 +11,11 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
     public interface IMarkerResolver
     {
         /// <summary>
+        /// 该解析器的类型
+        /// </summary>
+        ResolverType ResolverType { get; }
+
+        /// <summary>
         /// 该解析器关注的游戏组件类型。
         /// </summary>
         Type TargetComponentType { get; }

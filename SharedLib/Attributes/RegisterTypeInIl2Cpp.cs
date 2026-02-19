@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+#if IL2CPP
 using Il2CppInterop.Runtime.Injection;
+#endif
 
 // TODO: 将 RegisterTypeInIl2Cpp 属性应用到所有需要注册的类型上，确保它们在 IL2CPP 中正确注册
 

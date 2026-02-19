@@ -7,6 +7,8 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
     public class StatueMapper(TopMapView view) : IComponentMapper
     {
+        public MapMarkerType? MarkerType => MapMarkerType.Statue;
+
         public void Map(Component component)
         {
             var obj = component.Cast<Statue>();

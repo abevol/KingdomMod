@@ -5,6 +5,8 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
     public class TimeStatueMapper(TopMapView view) : IComponentMapper
     {
+        public MapMarkerType? MarkerType => MapMarkerType.TimeStatue;
+
         public void Map(Component component)
         {
             view.TryAddMapMarker(component, MarkerStyle.StatueTime.Color, MarkerStyle.StatueTime.Sign, Strings.StatueTime,

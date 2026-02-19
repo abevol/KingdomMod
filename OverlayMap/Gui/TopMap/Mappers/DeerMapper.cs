@@ -11,6 +11,8 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
     public class DeerMapper(TopMapView view) : IComponentMapper
     {
+        public MapMarkerType? MarkerType => MapMarkerType.Deer;
+
         public Component[] GetComponents()
         {
             return GameExtensions.FindObjectsWithTagOfType<Deer>(Tags.Wildlife).Cast<Component>().ToArray();

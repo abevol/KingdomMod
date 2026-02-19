@@ -8,6 +8,8 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
     public class RiverMapper(TopMapView view) : IComponentMapper
     {
+        public MapMarkerType? MarkerType => MapMarkerType.River;
+
         public void Map(Component component)
         {
             view.TryAddMapMarker(component, MarkerStyle.River.Color, MarkerStyle.River.Sign, null);

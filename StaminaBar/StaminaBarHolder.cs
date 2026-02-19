@@ -4,13 +4,11 @@ using KingdomMod.SharedLib;
 using UnityEngine;
 using KingdomMod.Shared.Attributes;
 
-#if IL2CPP
-using Il2CppInterop.Runtime.Injection;
-#endif
-
 namespace KingdomMod.StaminaBar;
 
+#if IL2CPP
 [RegisterTypeInIl2Cpp]
+#endif
 public class StaminaBarHolder : MonoBehaviour
 {
     public static StaminaBarHolder Instance { get; private set; }
