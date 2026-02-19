@@ -1,6 +1,8 @@
-﻿using BepInEx.Logging;
+using BepInEx.Logging;
+using BepInEx.Configuration;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using File = System.IO.File;
 using HarmonyLib;
@@ -17,7 +19,8 @@ public class DevToolsHolder : MonoBehaviour
 {
     public static DevToolsHolder Instance { get; private set; }
     private static ManualLogSource log;
-    private static BepInEx.Configuration.ConfigFile _config;
+    private static ConfigFile _config;
+    private static ConfigEntry<string> _dumpDir;
     private bool enabledDebugInfo = false;
     private bool enabledObjectsInfo = false;
     private bool enableDevTools = false;
@@ -36,6 +39,12 @@ public class DevToolsHolder : MonoBehaviour
     {
         log = plugin.LogSource;
         _config = plugin.Config;
+        
+        // 初始化 dump 目录配置
+        _dumpDir = _config.Bind("Global", "DumpDir", 
+            Path.Combine("D:", "workspace", "games", "KingdomTwoCrowns", "Dumps"), 
+            "Directory to save dump files");
+        
         GameObject obj = new(nameof(DevToolsHolder));
         DontDestroyOnLoad(obj);
         obj.hideFlags = HideFlags.HideAndDontSave;
@@ -196,6 +205,30 @@ public class DevToolsHolder : MonoBehaviour
         return kingdom.GetPlayer(NetworkBigBoss.HasWorldAuth ? 0 : 1);
     }
 
+    private static string GetDumpFilePath()
+    {
+        string prefixPath = _dumpDir.Value;
+        
+        string biomePath = "Unknown";
+        var biomeHelper = GameObject.Find("BiomeHelper");
+        if (biomeHelper != null)
+        {
+            var biomeHolder = biomeHelper.GetComponent<BiomeHolder>();
+            if (biomeHolder != null)
+            {
+                biomePath = biomeHolder.GetBiomePathByIndex();
+            }
+        }
+        
+        int challengeId = GlobalSaveData.loaded?.currentChallenge ?? -1;
+        int campaignIndex = GlobalSaveData.loaded?.currentCampaign ?? -1;
+        int land = CampaignSaveData.current?.CurrentLand ?? -1;
+        
+        string filename = $"Challenge{challengeId}-Campaign{campaignIndex}-Land{land}.json";
+        
+        return Path.Combine(prefixPath, biomePath, filename);
+    }
+
     private void Update()
     {
         // 检测Ctrl+D组合键
@@ -252,14 +285,20 @@ public class DevToolsHolder : MonoBehaviour
                 objectTree.Add(new GameObjectDetails(obj));
             }
 
-            File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + "\\AllObjectsDump.json",
-                GameObjectDetails.JsonSerialize(objectTree));
+            string dumpPath = GetDumpFilePath();
+            string dumpDirectory = Path.GetDirectoryName(dumpPath);
+            
+            if (!Directory.Exists(dumpDirectory))
+            {
+                Directory.CreateDirectory(dumpDirectory);
+            }
+
+            File.WriteAllText(dumpPath, GameObjectDetails.JsonSerialize(objectTree));
 
             log.LogMessage("Complete!");
-            log.LogMessage("JSON written to " + (AppDomain.CurrentDomain.BaseDirectory + "\\AllObjectsDump.json").Replace("\\\\", "\\"));
+            log.LogMessage($"JSON written to {dumpPath}");
 
-            string path = (AppDomain.CurrentDomain.BaseDirectory + "\\AllObjectsDump.json").Replace("\\\\", "\\");
-            Application.OpenURL("file:///" + path.Replace("\\", "/"));
+            Application.OpenURL("file:///" + dumpPath.Replace("\\", "/"));
         }
 
         if (Input.GetKeyDown(KeyCode.P))
