@@ -21,6 +21,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Notifiers
         [HarmonyPostfix]
         public static void OnEnable(PayableBlocker __instance)
         {
+            LogGameObject(__instance.gameObject);
             Component target = null;
             foreach (var type in PuzzleTypes)
             {
@@ -35,6 +36,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Notifiers
         [HarmonyPrefix]
         public static void OnDisable(PayableBlocker __instance)
         {
+            LogGameObject(__instance.gameObject);
             Component target = null;
             foreach (var type in PuzzleTypes)
             {

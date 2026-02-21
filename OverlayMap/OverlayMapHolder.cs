@@ -505,6 +505,17 @@ public class OverlayMapHolder : MonoBehaviour
         _log.LogError($"[{Path.GetFileName(sourceFilePath)}][{sourceLineNumber.ToString("0000")}][{memberName}] {message}");
     }
 
+    public static void LogGameObject(GameObject gameObject,
+        [System.Runtime.CompilerServices.CallerMemberName]
+        string memberName = "",
+        [System.Runtime.CompilerServices.CallerFilePath]
+        string sourceFilePath = "",
+        [System.Runtime.CompilerServices.CallerLineNumber]
+        int sourceLineNumber = 0)
+    {
+        _log.LogDebug($"[{Path.GetFileName(sourceFilePath)}][{sourceLineNumber.ToString("0000")}][{memberName}] ID: {gameObject.GetInstanceID()}, Tag: {gameObject.tag}, GameObject: {gameObject.name}");
+    }
+
     public static void ForEachPlayerOverlay(System.Action<PlayerOverlay> action)
     {
         var p1 = Instance?.PlayerOverlays.P1;

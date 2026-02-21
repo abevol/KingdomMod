@@ -156,5 +156,11 @@
         
         /// <summary>珀尔塞福涅牢笼（Olympus DLC）</summary>
         PersephoneCage,
+
+        /// <summary>玩家货物（Olympus DLC）</summary>
+        PlayerCargo,
+
+        /// <summary>神像（Olympus DLC）</summary>
+        GodIdol,
     }
 }

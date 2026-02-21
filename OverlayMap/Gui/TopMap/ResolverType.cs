@@ -21,6 +21,9 @@
         /// <summary>可付费升级</summary>
         PayableUpgrade,
 
+        /// <summary>玩家货物</summary>
+        PlayerCargo,
+
         /// <summary>脚手架（建造中）</summary>
         Scaffolding,
 
