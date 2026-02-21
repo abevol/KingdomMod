@@ -87,6 +87,9 @@ internal static class MapperInitializer
         RegisterResolver(resolvers, new Resolvers.MerchantSpawnerResolver());
         RegisterResolver(resolvers, new Resolvers.PayableTeleporterResolver());
 
+        // 玩家货物
+        RegisterResolver(resolvers, new Resolvers.PlayerCargoResolver());
+
         // 3. 构建 IL2CPP 指针查找缓存
         var resolverLookup = BuildResolverCache(resolvers);
 

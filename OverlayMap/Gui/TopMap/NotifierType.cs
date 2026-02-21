@@ -18,6 +18,9 @@
         /// <summary>可付费对象</summary>
         Payable,
 
+        /// <summary>玩家货物</summary>
+        PlayerCargo,
+
         /// <summary>脚手架（建造中）</summary>
         Scaffolding,
 

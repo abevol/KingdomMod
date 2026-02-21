@@ -1,4 +1,4 @@
-using HarmonyLib;
+﻿using HarmonyLib;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap.Notifiers
@@ -10,6 +10,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Notifiers
         [HarmonyPostfix]
         public static void StartPostfix(WorkableBuilding __instance)
         {
+            LogGameObject(__instance.gameObject);
             ForEachTopMapView(view => view.OnComponentCreated(__instance, NotifierType.WorkableBuilding));
         }
 
@@ -17,6 +18,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Notifiers
         [HarmonyPrefix]
         public static void OnDestroyPrefix(WorkableBuilding __instance)
         {
+            LogGameObject(__instance.gameObject);
             ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
         }
     }

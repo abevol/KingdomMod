@@ -19,7 +19,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Resolvers
             if (component.gameObject.tag == Tags.Tholos)
                 return MapMarkerType.Tholos;
 
-            LogError($"Unrecognized WorkableBuilding {component.gameObject.name}, tag: {component.gameObject.tag}");
+            // LogDebug($"Unrecognized WorkableBuilding {component.gameObject.name}, tag: {component.gameObject.tag}");
             return MapMarkerType.WorkableBuilding;
         }
     }
