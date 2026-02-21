@@ -7,217 +7,146 @@ description: 用于在 OverlayMap 模组中添加新的地图标记。涵盖所�
 
 本技能指导如何在 KingdomMod.OverlayMap 项目中添加新的地图标记。
 
-## 快速开始
+## 核心架构
 
-### 确定标记类型
+```
+游戏组件 → Resolver → MapMarkerType → Mapper → MapMarker
+                ↓                        ↓
+         识别组件类型              创建标记并配置样式
+```
 
-在添加标记前，首先确定需要的标记类型：
+- **Resolver**: 识别游戏组件，返回对应的 `MapMarkerType`
+- **Mapper**: 根据标记类型和组件状态，调用 `TryAddMapMarker` 创建标记
+- **MarkerStyle**: 配置标记的颜色、符号等样式
+- **Strings**: 配置标记的显示名称（多语言）
 
-1. **简单标记 (MarkerConfig)** - 基础的颜色+符号配置
-   - 示例：ShopForge, Beach, Portal
-   - 参考：[references/simple-marker.md](references/simple-marker.md)
+## 标记类型选择
 
-2. **带状态标记 (MarkerConfigStated)** - 支持多状态（锁定/解锁/建造中/损坏等）
-   - 示例：Castle, Wall, Lighthouse, Mine, Quarry
-   - 参考：[references/stated-marker.md](references/stated-marker.md)
-
-3. **纯颜色标记 (MarkerConfigColor)** - 仅颜色配置
-   - 示例：StatsInfo, ExtraInfo
-   - 参考：[references/color-marker.md](references/color-marker.md)
+| 类型 | 结构 | 适用场景 | 示例 |
+|------|------|----------|------|
+| **MarkerConfig** | Color + Sign | 单一状态标记 | Beach, Portal, Shop |
+| **MarkerConfigStated** | Color + Sign + 状态子配置 | 多状态标记（锁定/建造/损坏等） | Wall, Lighthouse, Mine |
+| **MarkerConfigColor** | Color only | 仅颜色（用于线条/文字） | StatsInfo, ExtraInfo |
 
 ## 通用添加流程
 
 所有标记类型都遵循以下核心流程：
 
-```
-1. 在 MapMarkerType.cs 中添加枚举值（如需要新类型）
-2. 在 MarkerStyle.cs 中添加配置定义
-3. 在 Strings.cs 中添加显示字符串
-4. 在 Mapper 中实现标记逻辑
-5. 更新配置文件（KingdomMod.OverlayMap.MarkerStyle.cfg）
-6. 更新语言配置文件（多语言支持）
-```
+1. 在 `MarkerStyle.cs` 中添加配置字段和绑定
+2. 在 `Strings.cs` 中添加显示名称（可选）
+3. 在 Mapper 中实现标记逻辑
+4. 更新配置文件 `KingdomMod.OverlayMap.MarkerStyle.cfg`
+5. 更新语言配置文件（多语言支持）
 
-## 按标记类型的详细流程
-
-### 简单标记 (MarkerConfig)
-
-适用于大多数普通标记，配置包含 Color 和 Sign。
-
-**修改文件清单：**
-- `OverlayMap/Config/MarkerStyle.cs` - 添加 `MarkerConfig` 字段
-- `OverlayMap/Config/Strings.cs` - 添加字符串字段
-- `OverlayMap/Gui/TopMap/Mappers/*.cs` - 实现 Mapper 逻辑
-- `OverlayMap/ConfigPrefabs/KingdomMod.OverlayMap.MarkerStyle.cfg` - 添加配置节
-- `OverlayMap/ConfigPrefabs/KingdomMod.OverlayMap.Language.*.cfg` - 添加多语言字符串
-
-**完整步骤**：[references/simple-marker.md](references/simple-marker.md)
-
-### 带状态标记 (MarkerConfigStated)
-
-适用于有多个状态的标记（如锁定、解锁、建造中、损坏等）。
-
-**修改文件清单：**
-- `OverlayMap/Config/MarkerStyle.cs` - 添加 `MarkerConfigStated` 字段
-- `OverlayMap/Config/Strings.cs` - 添加字符串字段
-- `OverlayMap/Gui/TopMap/Mappers/*.cs` - 实现 Mapper 逻辑（需处理状态逻辑）
-- `OverlayMap/ConfigPrefabs/KingdomMod.OverlayMap.MarkerStyle.cfg` - 添加多状态配置节
-- `OverlayMap/ConfigPrefabs/KingdomMod.OverlayMap.Language.*.cfg` - 添加多语言字符串
-
-**完整步骤**：[references/stated-marker.md](references/stated-marker.md)
-
-### 纯颜色标记 (MarkerConfigColor)
-
-适用于只需要颜色配置的标记。
-
-**修改文件清单：**
-- `OverlayMap/Config/MarkerStyle.cs` - 添加 `MarkerConfigColor` 字段
-- `OverlayMap/Gui/TopMap/Mappers/*.cs` - 实现 Mapper 逻辑
-- `OverlayMap/ConfigPrefabs/KingdomMod.OverlayMap.MarkerStyle.cfg` - 添加配置节
-
-**完整步骤**：[references/color-marker.md](references/color-marker.md)
-
-## 架构说明
-
-### 核心组件关系
-
-```
-MapMarkerType (枚举)
-    ↓
-IMarkerResolver (解析器) → 游戏组件 → MapMarkerType
-    ↓
-IComponentMapper (映射器) → MapMarkerType → 地图标记
-    ↓
-MarkerStyle (样式配置) + Strings (显示字符串)
-```
-
-### 关键文件位置
+## 关键文件位置
 
 | 文件 | 用途 |
 |------|------|
-| `OverlayMap/Gui/TopMap/MapMarkerType.cs` | 标记类型枚举定义 |
-| `OverlayMap/Config/MarkerStyle.cs` | 标记样式配置类 |
-| `OverlayMap/Config/Strings.cs` | 本地化字符串配置 |
-| `OverlayMap/Gui/TopMap/Mappers/*.cs` | 标记映射器实现 |
-| `OverlayMap/Gui/TopMap/Resolvers/*.cs` | 组件解析器实现 |
+| `OverlayMap/Config/MarkerStyle.cs` | 标记样式配置 |
+| `OverlayMap/Config/Strings.cs` | 本地化字符串 |
+| `OverlayMap/Gui/TopMap/MapMarkerType.cs` | 标记类型枚举 |
+| `OverlayMap/Gui/TopMap/Mappers/*.cs` | 标记映射器 |
+| `OverlayMap/Gui/TopMap/Resolvers/*.cs` | 组件解析器 |
+| `OverlayMap/Gui/TopMap/TopMapView.cs` | TryAddMapMarker 方法 |
+
+## TryAddMapMarker 方法签名
+
+```csharp
+public MapMarker TryAddMapMarker(
+    Component target,
+    ConfigEntryWrapper<string> color,       // 颜色 (RGBA: "1,1,1,1")
+    ConfigEntryWrapper<string> sign,        // 符号 (如 "♜")
+    ConfigEntryWrapper<string> title,       // 标题/名称
+    CountUpdaterFn countUpdater = null,     // 动态数量更新器
+    ColorUpdaterFn colorUpdater = null,     // 动态颜色更新器
+    VisibleUpdaterFn visibleUpdater = null, // 可见性更新器
+    MarkerRow row = MarkerRow.Settled)      // 行位置
+```
+
+**回调函数签名**：
+```csharp
+Func<Component, int> CountUpdaterFn;      // 返回显示数量
+Func<Component, ConfigEntryWrapper<string>> ColorUpdaterFn;  // 返回颜色配置
+Func<Component, bool> VisibleUpdaterFn;   // 返回是否可见
+```
+
+## IComponentMapper 接口
+
+```csharp
+public interface IComponentMapper
+{
+    MapMarkerType? MarkerType => null;  // 处理的标记类型
+    
+    // 旧方法（逐步废弃）
+    void Map(Component component) { }
+    
+    // 新方法（推荐）
+    void Map(Component component, NotifierType notifierType, ResolverType resolverType) 
+        => Map(component);
+}
+```
+
+## 颜色格式
+
+RGBA 格式，值范围 0-1：
+
+| 颜色 | 值 | 含义 |
+|------|------|------|
+| 绿色 | `0,1,0,1` | 正常/已解锁/安全 |
+| 红色 | `1,0,0,1` | 损坏/危险/未付款/敌人 |
+| 蓝色 | `0,0,1,1` | 建造中/进行中 |
+| 灰色 | `0.5,0.5,0.5,1` | 锁定/不可用 |
+| 紫色 | `0.62,0,1,1` | 传送门/魔法 |
+| 白色 | `1,1,1,1` | 默认/中立 |
+
+## 参考文档
+
+- [简单标记 (MarkerConfig)](references/simple-marker.md)
+- [带状态标记 (MarkerConfigStated)](references/stated-marker.md)
+- [纯颜色标记 (MarkerConfigColor)](references/color-marker.md)
+- [完整示例](references/examples.md)
 
 ## 常见问题
 
-### Q: 如何确定使用哪种标记类型？
+### Q: 标记不显示？
 
-A: 根据游戏对象的特性：
-- 只有单一外观 → **简单标记**
-- 有锁定/解锁/建造中等状态 → **带状态标记**
-- 只需要颜色区分 → **纯颜色标记**
+检查清单：
+1. Resolver 是否正确返回 `MapMarkerType`
+2. Mapper 是否已在 `MapperInitializer` 中注册
+3. 配置文件是否包含该标记的配置
+4. **如果组件继承其他类型并重写了 OnEnable/OnDisable**：必须在 Mapper 中单独 Patch
 
-### Q: 已有标记类型可以复用吗？
+### Q: 什么时候需要添加 OnEnable/OnDisable Patch？
 
-A: 可以。如果新对象与现有对象行为相同，可以在 Resolver 中返回相同的 `MapMarkerType`，只需在 Mapper 中根据子类型使用不同的样式配置。
-
-例如：`PayableShopResolver` 中 Forge、Bow、Hammer、Scythe 都返回 `MapMarkerType.Shop`，但在 `PayableShopMapper` 中根据 `shopType` 使用不同的样式。
-
-### Q: 需要添加新的 MapMarkerType 吗？
-
-A: 如果现有类型无法区分（如 Forge 和 Scythe 都需要独立配置），则需要：
-1. 在 `MapMarkerType.cs` 中添加新枚举值
-2. 在 `PayableShopResolver` 中返回不同的类型
-3. 创建独立的 Mapper 或修改现有 Mapper
-
-如果现有类型足够（如多个商店共用一个类型但不同样式），则不需要。
-
-### Q: 继承类型的 OnEnable/OnDisable Patch 注意事项？
-
-A: **重要**：如果目标类型继承自某个基类（如 `Wharf : Payable`），并且**重写了** `OnEnable` 或 `OnDisable` 方法，则不能复用基类的 Patch。
-
-**示例**：`Wharf` 继承自 `Payable`，但重写了 `OnEnable`/`OnDisable`，因此 `Payable.OnEnable` 的 Patch 对 `Wharf` 无效。必须在 `WharfMapper` 中单独 Patch：
+当目标组件**继承**自其他类型并**重写**了 `OnEnable`/`OnDisable` 方法时：
 
 ```csharp
-[HarmonyPatch(typeof(Wharf), nameof(Wharf.OnEnable))]
-private class OnEnablePatch
+public class WharfMapper(TopMapView view) : IComponentMapper
 {
-    public static void Postfix(Wharf __instance)
+    public void Map(Component component) { /* ... */ }
+
+    // Wharf 继承自 Payable，但重写了 OnEnable/OnDisable
+    [HarmonyPatch(typeof(Wharf), nameof(Wharf.OnEnable))]
+    private class OnEnablePatch
     {
-        ForEachTopMapView(view => view.OnComponentCreated(__instance));
+        public static void Postfix(Wharf __instance)
+        {
+            ForEachTopMapView(view => view.OnComponentCreated(__instance));
+        }
+    }
+
+    [HarmonyPatch(typeof(Wharf), nameof(Wharf.OnDisable))]
+    private class OnDisablePatch
+    {
+        public static void Prefix(Wharf __instance)
+        {
+            ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
+        }
     }
 }
-
-[HarmonyPatch(typeof(Wharf), nameof(Wharf.OnDisable))]
-private class OnDisablePatch
-{
-    public static void Prefix(Wharf __instance)
-    {
-        ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
-    }
-}
 ```
 
-## 示例场景
+### Q: 复用现有标记类型还是创建新类型？
 
-### 场景 1: 添加新商店（已有 Shop 类型）
-
-参考 ShopScythe 的实现：
-- 复用 `MapMarkerType.Shop`
-- 在 `PayableShopMapper` 中添加 case
-- 添加独立的 `ShopScythe` 配置
-
-详见 [references/example-shop.md](references/example-shop.md)
-
-### 场景 2: 添加全新类型的标记
-
-如添加一个 "Windmill"（风车）：
-- 在 `MapMarkerType.cs` 添加 `Windmill`
-- 创建 `WindmillResolver`
-- 创建 `WindmillMapper`
-- 添加配置和字符串
-
-详见 [references/example-new-type.md](references/example-new-type.md)
-
-## 配置文件模板
-
-### MarkerStyle.cfg 模板
-
-```ini
-[SectionName]
-# Setting type: String
-# Default value: 1,1,1,1
-Color = 1,1,1,1
-
-# Setting type: String
-# Default value: 
-Sign = 
-```
-
-### Language.cfg 模板
-
-```ini
-# Setting type: String
-# Default value: DisplayName
-KeyName = DisplayName
-```
-
-## 故障排除
-
-### 标记不显示
-1. 检查 Resolver 是否正确识别组件
-2. 检查 Mapper 是否正确处理该类型
-3. 检查配置文件是否包含该标记的配置
-4. **检查是否需要在 Mapper 中添加 OnEnable/OnDisable Patch**：如果目标类型继承自其他类型并重写了这些方法（如 `Wharf : Payable`），必须在 Mapper 中单独 Patch，不能复用基类的 Patch
-
-### 颜色/符号不正确
-1. 检查 `MarkerStyle.cs` 中的配置绑定是否正确
-2. 检查配置文件的配置节名称是否匹配
-3. 检查 Mapper 中使用的样式字段是否正确
-
-### 多语言不生效
-1. 检查 `Strings.cs` 中的配置绑定
-2. 检查语言文件中的键名是否匹配
-3. 检查游戏设置的语言是否与配置文件匹配
-
-## 参考资源
-
-- [简单标记完整指南](references/simple-marker.md)
-- [带状态标记完整指南](references/stated-marker.md)
-- [纯颜色标记完整指南](references/color-marker.md)
-- [商店标记示例](references/example-shop.md)
-- [新类型标记示例](references/example-new-type.md)
-- [现有标记类型参考](references/marker-types-reference.md)
+- **复用**：如果新对象与现有对象行为相同，只是样式不同（如不同类型的商店）
+- **新建**：如果需要独立的状态管理或与其他标记完全区分
