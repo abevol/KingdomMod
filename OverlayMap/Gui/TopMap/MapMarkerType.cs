@@ -64,6 +64,8 @@
 
         /// <summary>传送阵</summary>
         Teleporter,
+        /// <summary>传送阵裂隙</summary>
+        TeleporterRift,
 
         /// <summary>船只召唤铃</summary>
         BoatSummoningBell,

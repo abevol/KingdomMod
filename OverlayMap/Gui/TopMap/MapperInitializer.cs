@@ -86,6 +86,7 @@ internal static class MapperInitializer
         RegisterResolver(resolvers, new Resolvers.PersephoneCageResolver());
         RegisterResolver(resolvers, new Resolvers.MerchantSpawnerResolver());
         RegisterResolver(resolvers, new Resolvers.PayableTeleporterResolver());
+        RegisterResolver(resolvers, new Resolvers.TeleporterRiftResolver());
 
         // 玩家货物
         RegisterResolver(resolvers, new Resolvers.PlayerCargoResolver());
@@ -117,6 +118,7 @@ internal static class MapperInitializer
             { MapMarkerType.BoatSummoningBell, new Mappers.BoatSummoningBellMapper(view) },
             { MapMarkerType.Wharf, new Mappers.WharfMapper(view) },
             { MapMarkerType.Teleporter, new Mappers.TeleporterMapper(view) },
+            { MapMarkerType.TeleporterRift, new Mappers.TeleporterRiftMapper(view) },
 
             // 传送点
             { MapMarkerType.Portal, new Mappers.PortalMapper(view) },

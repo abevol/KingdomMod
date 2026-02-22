@@ -251,4 +251,11 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Resolvers
     {
         public PayableTeleporterResolver() : base(typeof(PayableTeleporter), MapMarkerType.Teleporter) { }
     }
+
+    /// <summary>传送阵裂隙解析器</summary>
+    public class TeleporterRiftResolver : SimpleResolver
+    {
+        public TeleporterRiftResolver() : base(typeof(TeleporterRift), MapMarkerType.TeleporterRift) { }
+    }
 }
+
