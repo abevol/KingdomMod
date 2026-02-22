@@ -1,7 +1,15 @@
 <Project>
-    <PropertyGroup>
+    <!-- Windows 平台路径 -->
+    <PropertyGroup Condition="'$(OS)' == 'Windows_NT'">
         <BepInExPath>D:\SteamLibrary\steamapps\common\Kingdom Two Crowns\BepInEx\</BepInExPath>
         <BepInExConfigPath>$(BepInExPath)config\</BepInExConfigPath>
         <BepInExPluginsPath>$(BepInExPath)plugins\</BepInExPluginsPath>
+    </PropertyGroup>
+
+    <!-- Linux/macOS 平台路径 -->
+    <PropertyGroup Condition="'$(OS)' != 'Windows_NT'">
+        <BepInExPath>/mnt/d/SteamLibrary/steamapps/common/Kingdom Two Crowns/BepInEx/</BepInExPath>
+        <BepInExConfigPath>$(BepInExPath)config/</BepInExConfigPath>
+        <BepInExPluginsPath>$(BepInExPath)plugins/</BepInExPluginsPath>
     </PropertyGroup>
 </Project>
