@@ -1,228 +1,131 @@
-# AGENTS.md - KingdomMod Repository Guidelines
+# AGENTS.md - KingdomMod 仓库指南
 
 ---
 
-## ⚡ Current Branch Work Context
+## 项目概述
 
-**Branch:** `dev`  
-**Task:**
+这是一个基于 BepInEx 插件框架为游戏 **Kingdom Two Crowns** 开发的 C# .NET 模组项目。
+同时支持 IL2CPP 和 Mono 版本的游戏。
 
-**Current Status:**
-
-**Key Points:**
-
-**完成条件:**
-
----
-
-## Project Overview
-
-A C# .NET modding project for the game **Kingdom Two Crowns** using BepInEx plugin framework.
-Supports both IL2CPP and Mono game versions.
-
-**Projects**: OverlayMap, StaminaBar, DevTools, BetterPayableUpgrade, SharedLib
-
-**Game Reference Source Code**: `~\Documents\ILSpy\KingdomTwoCrowns\2.3.2\Assembly-CSharp`  
-This directory contains decompiled game source code for reference when implementing mod features.
+**项目**：OverlayMap, StaminaBar, DevTools, BetterPayableUpgrade, SharedLib
+**游戏托管库**：`_libs/BIE6_Mono/Managed/`
+**游戏参考源代码**：`_libs/BIE6_Mono/Decompiled/v2.3.1/Assembly-CSharp/`  
+此目录包含反编译的游戏源代码，用于实现模组功能时参考。
 
 ---
 
-## Build Commands
+## 构建命令
 
 ```bash
-# Build Debug version (uses IL2CPP libs)
+# 构建 Debug 版本（使用 IL2CPP 库）
 dotnet build -c Debug
 
-# Build all projects for IL2CPP version (release)
+# 为 IL2CPP 版本构建所有项目（发布版）
 dotnet build -c BIE6_IL2CPP
 
-# Build all projects for Mono version (release)
+# 为 Mono 版本构建所有项目（发布版）
 dotnet build -c BIE6_Mono
 
-# Build specific project
-dotnet build OverlayMap/OverlayMap.csproj -c BIE6_IL2CPP
-
-# Restore packages
-dotnet restore
-
-# Clean
-dotnet clean
+# 构建特定项目
+dotnet build OverlayMap/OverlayMap.csproj -c Debug
 ```
 
-**Build Configurations**:
+**构建配置**：
 
-- `Debug`: Development build with IL2CPP
-- `BIE6_IL2CPP`: Release for IL2CPP game version
-- `BIE6_Mono`: Release for Mono game version (netstandard2.1)
+- `Debug`：使用 IL2CPP 的开发构建
+- `BIE6_IL2CPP`：IL2CPP 游戏版本的发布版
+- `BIE6_Mono`：Mono 游戏版本的发布版（netstandard2.1）
 
-**Build Artifacts**: Automatically copied to game plugins folder via MSBuild target.
+**构建产物**：通过 MSBuild 目标自动复制到游戏插件文件夹。
 
 ---
 
-## Code Style Guidelines
+## 代码风格指南
 
-### Formatting (from .editorconfig)
+### 格式化（来自 .editorconfig）
 
-- **Indent**: 4 spaces (no tabs)
-- **Line endings**: CRLF (Windows-style)
-- **Encoding**: UTF-8 with BOM for .cs files
-- **Trim trailing whitespace**: Yes
-- **Braces**: Required (csharp_prefer_braces = true)
-- **Namespace**: Block-scoped (not file-scoped)
+- **缩进**：4 个空格（不使用制表符）
+- **行尾**：CRLF（Windows 风格）
+- **编码**：.cs 文件使用带 BOM 的 UTF-8
+- **删除行尾空白**：是
+- **大括号**：必需（csharp_prefer_braces = true）
+- **命名空间**：块作用域（非文件作用域）
 
-### Naming Conventions
+### 命名约定
 
-- **Types** (classes, structs, interfaces, enums): PascalCase
-- **Interfaces**: Prefix with `I` (e.g., `IComponentMapper`)
-- **Methods/Properties/Events**: PascalCase
-- **Fields/Parameters/Variables**: camelCase
-- **Private fields**: `_camelCase` (underscore prefix)
+- **类型**（类、结构、接口、枚举）：PascalCase
+- **接口**：使用 `I` 前缀（例如 `IComponentMapper`）
+- **方法/属性/事件**：PascalCase
+- **字段/参数/变量**：camelCase
+- **私有字段**：`_camelCase`（下划线前缀）
 
-### Using Directives
+### 语言特性
 
-```csharp
-// Order: System -> Third-party -> Project
-using System;
-using System.Collections.Generic;
-using BepInEx;
-using UnityEngine;
-using KingdomMod.SharedLib;
-using static KingdomMod.OverlayMap.OverlayMapHolder;
-
-// Place outside namespace
-```
-
-### Project-Specific Patterns
-
-**Conditional Compilation**:
-
-```csharp
-#if IL2CPP
-using BepInEx.Unity.IL2CPP;
-#endif
-
-#if MONO
-using BepInEx.Unity.Mono;
-#endif
-```
-
-**Plugin Structure**:
-
-```csharp
-[BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
-[BepInProcess("KingdomTwoCrowns.exe")]
-public class MyPlugin : BasePlugin  // or BaseUnityPlugin for Mono
-```
-
-**Logging**:
-
-```csharp
-// Use BepInEx ManualLogSource
-public ManualLogSource LogSource => Log;  // IL2CPP
-public ManualLogSource LogSource => Logger;  // Mono
-
-// Log levels
-LogSource.LogInfo($"Message");
-LogSource.LogWarning($"Warning");
-LogSource.LogError($"Error");
-```
-
-**Harmony Patching**:
-
-```csharp
-[HarmonyPatch(typeof(TargetClass), nameof(TargetClass.Method))]
-public class MyPatcher
-{
-    [HarmonyPostfix]
-    static void Postfix(ref ReturnType __result, ParamType __0)
-    {
-        // Patch logic
-    }
-}
-```
-
-### Language Features
-
-- Use latest C# version (`<LangVersion>latest</LangVersion>`)
-- Use expression-bodied members for simple properties/indexers
-- Prefer simple using statements
-- Use pattern matching where appropriate
-- Nullable reference types enabled (with polyfill attributes)
-
-### Error Handling
-
-```csharp
-try
-{
-    // Risky operation
-}
-catch (Exception ex)
-{
-    LogSource.LogError($"HResult: {ex.HResult:X}, {ex.Message}");
-    // Re-throw if critical
-    throw;
-}
-```
+- 使用最新的 C# 版本（`<LangVersion>latest</LangVersion>`）
+- 对简单属性/索引器使用表达式主体成员
+- 优先使用简单的 using 语句
+- 在适当的地方使用模式匹配
+- 启用可空引用类型（使用 polyfill 属性）
 
 ---
 
-## Architecture Guidelines
+## 架构指南
 
-### Namespace Structure
+### 命名空间结构
 
 ```txt
-KingdomMod.{ModName}           - Root namespace
-KingdomMod.{ModName}.Config    - Configuration
-KingdomMod.{ModName}.Gui       - UI components
-KingdomMod.{ModName}.Patchers  - Harmony patches
-KingdomMod.SharedLib           - Shared utilities
+KingdomMod.{ModName}           - 根命名空间
+KingdomMod.{ModName}.Config    - 配置
+KingdomMod.{ModName}.Gui       - UI 组件
+KingdomMod.{ModName}.Patchers  - Harmony 补丁
+KingdomMod.SharedLib           - 共享工具
 ```
 
-### Key Design Patterns
+### 关键设计模式
 
-1. **Plugin Pattern**: Each mod has a main Plugin class inheriting from BasePlugin/BaseUnityPlugin
-2. **Holder Pattern**: Static holder classes manage mod state (e.g., `OverlayMapHolder`)
-3. **Patcher Pattern**: Harmony patches in separate files under `Patchers/` folder
-4. **Mapper Pattern**: Component mappers for game object visualization
+1. **插件模式**：每个模组都有一个继承自 BasePlugin/BaseUnityPlugin 的主 Plugin 类
+2. **持有者模式**：静态持有者类管理模组状态（例如 `OverlayMapHolder`）
+3. **补丁模式**：Harmony 补丁放在 `Patchers/` 文件夹下的独立文件中
+4. **映射器模式**：组件映射器用于游戏对象可视化
 
-### IL2CPP vs Mono Compatibility
+### IL2CPP 与 Mono 兼容性
 
-- Use conditional compilation symbols: `IL2CPP`, `MONO`, `BIE`, `BIE6`
-- IL2CPP requires `RegisterTypeInIl2Cpp.RegisterAssembly()`
-- IL2CPP: Inherit from `BasePlugin`, override `Load()`
-- Mono: Inherit from `BaseUnityPlugin`, use `Awake()`
-
----
-
-## AI Code Generation Rules (from .cursor/rules)
-
-When generating C# code:
-
-1. **Follow SOLID principles** and object-oriented design
-2. **Single responsibility**: Each class has one clear purpose
-3. **Use BepInEx logging** (ManualLogSource) - never Console.WriteLine
-4. **Add XML documentation** (`///`) for public APIs
-5. **Proper error handling** with try-catch blocks
-6. **Follow existing patterns** for IL2CPP/Mono compatibility
-7. **Use PascalCase/camelCase** per .NET conventions
-8. **Include namespace declarations** and proper using order
+- 使用条件编译符号：`IL2CPP`、`MONO`、`BIE`、`BIE6`
+- IL2CPP 需要 `RegisterTypeInIl2Cpp.RegisterAssembly()`
+- IL2CPP：继承自 `BasePlugin`，重写 `Load()`
+- Mono：继承自 `BaseUnityPlugin`，使用 `Awake()`
 
 ---
 
-## Project References
+## AI 代码生成规则（来自 .cursor/rules）
 
-- Uses local DLL references from `../_libs/` (BepInEx, Unity, Game assemblies)
-- NuGet: BepInEx.PluginInfoProps
-- SharedLib referenced by all mod projects
+生成 C# 代码时：
+
+1. **遵循 SOLID 原则**和面向对象设计
+2. **单一职责**：每个类都有一个明确的目的
+3. **使用 BepInEx 日志**（ManualLogSource）- 禁止使用 Console.WriteLine
+4. **添加 XML 文档**（`///`）为公共 API
+5. **正确的错误处理**，使用 try-catch 块
+6. **遵循现有模式**以保持 IL2CPP/Mono 兼容性
+7. **使用 PascalCase/camelCase**，遵循 .NET 约定
+8. **包含命名空间声明**和正确的 using 顺序
 
 ---
 
-## Testing
+## 项目引用
 
-No unit test projects currently configured. Test by:
+- 使用来自 `../_libs/` 的本地 DLL 引用（BepInEx、Unity、游戏程序集）
+- NuGet：BepInEx.PluginInfoProps
+- SharedLib 被所有模组项目引用
 
-1. Build the project
-2. Copy DLLs to game's BepInEx/plugins folder
-3. Run the game and check BepInEx logs
+---
+
+## 测试
+
+目前没有配置单元测试项目。测试方法：
+
+1. 构建项目
+2. 将 DLL 复制到游戏的 BepInEx/plugins 文件夹
+3. 运行游戏并检查 BepInEx 日志
 
 ---
