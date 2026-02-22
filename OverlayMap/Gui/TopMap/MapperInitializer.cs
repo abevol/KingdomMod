@@ -1,4 +1,4 @@
-﻿
+
 using System;
 using System.Collections.Generic;
 
@@ -161,6 +161,7 @@ internal static class MapperInitializer
             { MapMarkerType.PersephoneCage, new Mappers.PersephoneCageMapper(view) },
             { MapMarkerType.MerchantSpawner, new Mappers.MerchantSpawnerMapper(view) },
             { MapMarkerType.Tholos, new Mappers.TholosMapper(view) },
+            { MapMarkerType.GodIdol, new Mappers.GodIdolMapper(view) },
         };
 
         // 5. 将初始化结果设置到 TopMapView
