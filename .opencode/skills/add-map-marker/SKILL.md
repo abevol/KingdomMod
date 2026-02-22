@@ -33,10 +33,10 @@ description: 用于在 OverlayMap 模组中添加新的地图标记。涵盖所�
 所有标记类型都遵循以下核心流程：
 
 1. 在 `MarkerStyle.cs` 中添加配置字段和绑定
-2. 在 `Strings.cs` 中添加显示名称（可选）
+2. 在 `Strings.cs` 中添加显示名称
 3. 在 Mapper 中实现标记逻辑
-4. 更新配置文件 `KingdomMod.OverlayMap.MarkerStyle.cfg`
-5. 更新语言配置文件（多语言支持）
+4. 更新风格配置文件 `MarkerStyle.cfg`
+5. 更新语言配置文件 `Language.en-US.cfg`（en-US、ru-RU、zh-CN 多语言支持）
 
 ## 关键文件位置
 
@@ -48,6 +48,9 @@ description: 用于在 OverlayMap 模组中添加新的地图标记。涵盖所�
 | `OverlayMap/Gui/TopMap/Mappers/*.cs` | 标记映射器 |
 | `OverlayMap/Gui/TopMap/Resolvers/*.cs` | 组件解析器 |
 | `OverlayMap/Gui/TopMap/TopMapView.cs` | TryAddMapMarker 方法 |
+| `OverlayMap/ConfigPrefabs/MarkerStyle.cfg` | 风格配置文件 |
+| `OverlayMap/ConfigPrefabs/Language.en-US.cfg` | 英文本地化配置文件 |
+| `OverlayMap/Gui/TopMap/MapperInitializer.cs` | 注册组件解析器和标记映射器 |
 
 ## TryAddMapMarker 方法签名
 

@@ -39,7 +39,7 @@ public class SaveDataExtras
         if (ConfigFile != null)
             return;
 
-        var configFilePath = Path.Combine(BepInExDir, "config", "KingdomMod.OverlayMap.SaveDataExtras.cfg");
+        var configFilePath = Path.Combine(BepInExDir, "config", "KingdomMod.OverlayMap", "SaveDataExtras.cfg");
         LogDebug($"SaveDataExtras file: {configFilePath}");
 
         ConfigFile = new ConfigFile(configFilePath, true);

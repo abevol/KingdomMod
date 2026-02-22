@@ -1,6 +1,6 @@
 ---
 name: game-type-browser
-description: 浏览 Kingdom Two Crowns 游戏程序集。搜索类型、提取成员、查看方法实现。触发："查找游戏类型"、"提取某类成员"、"查看方法实现"。
+description: 浏览 Kingdom Two Crowns 游戏程序集。搜索类型、提取成员、查看方法实现。触发："查找游戏类型"、"查找游戏组件"、"提取某类成员"、"查看方法实现"。
 ---
 
 # Game Type Browser

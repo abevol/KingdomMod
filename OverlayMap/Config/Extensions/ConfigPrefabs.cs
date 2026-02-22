@@ -17,33 +17,33 @@ public class ConfigPrefabs
             {
                 new ConfigPrefab
                 {
-                    ResName = "KingdomMod.OverlayMap.ConfigPrefabs.KingdomMod.OverlayMap.GuiStyle.cfg",
-                    FileName = "KingdomMod.OverlayMap.GuiStyle.cfg"
+                    ResName = "KingdomMod.OverlayMap.ConfigPrefabs.GuiStyle.cfg",
+                    FileName = "GuiStyle.cfg"
                 },
                 new ConfigPrefab
                 {
-                    ResName = "KingdomMod.OverlayMap.ConfigPrefabs.KingdomMod.OverlayMap.MarkerStyle.cfg",
-                    FileName = "KingdomMod.OverlayMap.MarkerStyle.cfg"
+                    ResName = "KingdomMod.OverlayMap.ConfigPrefabs.MarkerStyle.cfg",
+                    FileName = "MarkerStyle.cfg"
                 },
                 new ConfigPrefab
                 {
-                    ResName = "KingdomMod.OverlayMap.ConfigPrefabs.KingdomMod.OverlayMap.Language.en-US.cfg",
-                    FileName = "KingdomMod.OverlayMap.Language.en-US.cfg"
+                    ResName = "KingdomMod.OverlayMap.ConfigPrefabs.Language.en-US.cfg",
+                    FileName = "Language.en-US.cfg"
                 },
                 new ConfigPrefab
                 {
-                    ResName = "KingdomMod.OverlayMap.ConfigPrefabs.KingdomMod.OverlayMap.Language.ru-RU.cfg",
-                    FileName = "KingdomMod.OverlayMap.Language.ru-RU.cfg"
+                    ResName = "KingdomMod.OverlayMap.ConfigPrefabs.Language.ru-RU.cfg",
+                    FileName = "Language.ru-RU.cfg"
                 },
                 new ConfigPrefab
                 {
-                    ResName = "KingdomMod.OverlayMap.ConfigPrefabs.KingdomMod.OverlayMap.Language.zh-CN.cfg",
-                    FileName = "KingdomMod.OverlayMap.Language.zh-CN.cfg"
+                    ResName = "KingdomMod.OverlayMap.ConfigPrefabs.Language.zh-CN.cfg",
+                    FileName = "Language.zh-CN.cfg"
                 },
                 new ConfigPrefab
                 {
                     ResName = "KingdomMod.OverlayMap.Assets.Background.png",
-                    FileName = "KingdomMod.OverlayMap.Assets\\Background.png"
+                    FileName = "Assets\\Background.png"
                 }
             };
 
@@ -51,7 +51,7 @@ public class ConfigPrefabs
     {
         foreach (var prefab in _prefabs)
         {
-            var configFile = Path.Combine(BepInExDir, "config", prefab.FileName);
+            var configFile = Path.Combine(BepInExDir, "config", "KingdomMod.OverlayMap", prefab.FileName);
             LogDebug($"Config prefab file: {configFile}");
             if (!File.Exists(configFile))
             {

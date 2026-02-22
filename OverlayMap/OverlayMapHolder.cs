@@ -50,7 +50,7 @@ public class OverlayMapHolder : MonoBehaviour
         LogDebug("OverlayMapHolder.Initialize");
 
         BepInExDir = GetBepInExDir();
-        AssetsDir = Path.Combine(BepInExDir, "config", "KingdomMod.OverlayMap.Assets");
+        AssetsDir = Path.Combine(BepInExDir, "config", "KingdomMod.OverlayMap", "Assets");
 
         GameObject obj = new(nameof(OverlayMapHolder));
         DontDestroyOnLoad(obj);

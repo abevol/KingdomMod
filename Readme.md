@@ -127,7 +127,7 @@ A map mod. It marks points of interest, along with some extra details. There's a
 Map mods now support custom styles and languages, and you can find their configuration files in the game directory `Kingdom Two Crowns\BepInEx\config`.
 
 * `KingdomMod.OverlayMap.cfg`, configure the current language and style file name,
-* `KingdomMod.OverlayMap.Style.cfg`, the style file of the map mod. You can modify the text color and marker symbols in it.
+* `KingdomMod.OverlayMap.MarkerStyle.cfg`, the style file of the map mod. You can modify the text color and marker symbols in it.
 * `KingdomMod.OverlayMap.Language.en-US.cfg`, the language file of the map mod. You can use this file as a template to make your native language files. Copy the file, change the `en-US` part of the file name to the language code of your own country, such as `KingdomMod.OverlayMap.Language.ru-RU.cfg`, and then localize the strings in the file translate.
 * Welcome to share your language and style files: [Share Entry](https://github.com/abevol/KingdomMod/issues/3).
 
