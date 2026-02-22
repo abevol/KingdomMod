@@ -1,4 +1,4 @@
-using BepInEx.Configuration;
+﻿using BepInEx.Configuration;
 using System.IO;
 using System;
 using KingdomMod.OverlayMap.Config.Extensions;
@@ -260,7 +260,7 @@ public class MarkerStyle
         Tholos.Unpaid.Color = config.Bind("Tholos.Unpaid", "Color", "1,0,0,1", "");
         Tholos.Building.Color = config.Bind("Tholos.Building", "Color", "0,0,1,1", "");
 
-        GodIdol.Color = config.Bind("GodIdol", "Color", "1,0.84,0,1", "");
+        GodIdol.Color = config.Bind("GodIdol", "Color", "1,0.9,0,1", "");
         GodIdol.Sign = config.Bind("GodIdol", "Sign", "", "");
 
         LogDebug($"Loaded config: {Path.GetFileName(ConfigFile.ConfigFilePath)}");
