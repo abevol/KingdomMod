@@ -134,6 +134,7 @@ public class Strings
     public static ConfigEntryWrapper<string> Lighthouse;
     public static ConfigEntryWrapper<string> Wharf;
     public static ConfigEntryWrapper<string> Teleporter;
+    public static ConfigEntryWrapper<string> TeleporterRift;
     public static ConfigEntryWrapper<string> Tholos;
     public static ConfigEntryWrapper<string> GodIdol;
 
@@ -265,6 +266,7 @@ public class Strings
         Lighthouse = config.Bind("Strings", "Lighthouse", "Lighthouse", "");
         Wharf = config.Bind("Strings", "Wharf", "Wharf", "");
         Teleporter = config.Bind("Strings", "Teleporter", "Teleporter", "");
+        TeleporterRift = config.Bind("Strings", "TeleporterRift", "TeleporterRift", "");
         Tholos = config.Bind("Strings", "Tholos", "Tholos", "");
         GodIdol = config.Bind("Strings", "GodIdol", "GodIdol", "");
 

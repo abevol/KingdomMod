@@ -65,6 +65,7 @@ public class MarkerStyle
     public static MarkerConfigStated Lighthouse;
     public static MarkerConfigStated Wharf;
     public static MarkerConfigStated Teleporter;
+    public static MarkerConfig TeleporterRift;
     public static MarkerConfigStated Tholos;
     public static MarkerConfig GodIdol;
 
@@ -254,6 +255,8 @@ public class MarkerStyle
         Teleporter.Color = config.Bind("Teleporter", "Color", "0.62,0,1,1", "");
         Teleporter.Sign = config.Bind("Teleporter", "Sign", "۞", "");
         Teleporter.Building.Color = config.Bind("Teleporter.Building", "Color", "0,0,1,1", "");
+        TeleporterRift.Color = config.Bind("TeleporterRift", "Color", "0.62,0,1,1", "");
+        TeleporterRift.Sign = config.Bind("TeleporterRift", "Sign", "✧", "");
 
         Tholos.Color = config.Bind("Tholos", "Color", "1,1,1,1", "");
         Tholos.Sign = config.Bind("Tholos", "Sign", "", "");
