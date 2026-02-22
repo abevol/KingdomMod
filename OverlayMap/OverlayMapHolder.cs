@@ -87,16 +87,30 @@ public class OverlayMapHolder : MonoBehaviour
         Level.OnLoaded -= (System.Action<bool>)OnLevelLoaded;
         Game.OnGameStart -= (Action)OnGameStart;
         Game.OnGameEnd -= (Action)OnGameEnd;
-
 #if IL2CPP
-        Managers.Inst.game.run.GetOverrideMethodDelegate<IHagletCallable, System.Action<Il2CppSystem.Action<int, int>>>("remove_onGoto")
-            .Invoke(new System.Action<int, int>(OnGameGoto));
-        ProgramDirector.run.GetOverrideMethodDelegate<IHagletCallable, System.Action<Il2CppSystem.Action<int, int>>>("remove_onGoto")
-            .Invoke(new System.Action<int, int>(OnProgramDirectorGoto));
+        var gameRun = Managers.Inst?.game?.run;
+        if (gameRun != null)
+        {
+            gameRun.GetOverrideMethodDelegate<IHagletCallable, System.Action<Il2CppSystem.Action<int, int>>>("remove_onGoto")
+                .Invoke(new System.Action<int, int>(OnGameGoto));
+        }
+
+        var programDirectorRun = ProgramDirector.run;
+        if (programDirectorRun != null)
+        {
+            programDirectorRun.GetOverrideMethodDelegate<IHagletCallable, System.Action<Il2CppSystem.Action<int, int>>>("remove_onGoto")
+                .Invoke(new System.Action<int, int>(OnProgramDirectorGoto));
+        }
         SceneManager.remove_sceneLoaded(new System.Action<Scene, LoadSceneMode>(OnSceneLoaded));
 #else
-        Managers.Inst.game.run.onGoto -= OnGameGoto;
-        ProgramDirector.run.onGoto -= OnProgramDirectorGoto;
+        if (Managers.Inst?.game?.run != null)
+        {
+            Managers.Inst.game.run.onGoto -= OnGameGoto;
+        }
+        if (ProgramDirector.run != null)
+        {
+            ProgramDirector.run.onGoto -= OnProgramDirectorGoto;
+        }
         SceneManager.sceneLoaded -= OnSceneLoaded;
 #endif
     }

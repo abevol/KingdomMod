@@ -111,9 +111,9 @@
 
     <Target Name="CopyOutput" AfterTargets="Build">
         <Copy SourceFiles="$(OutputPath)\$(AssemblyName).dll"
-              DestinationFolder="$(BepInExPluginsPath)\$(AssemblyName)\" OverwriteReadOnlyFiles="true" />
+              DestinationFolder="$(BepInExPluginsPath)$(AssemblyName)\" OverwriteReadOnlyFiles="true" />
         <Copy SourceFiles="$(OutputPath)\$(AssemblyName).pdb"
-              DestinationFolder="$(BepInExPluginsPath)\$(AssemblyName)\" OverwriteReadOnlyFiles="true" />
-        <Message Text="Copied output to: $(BepInExPluginsPath)\" Importance="high" />
+              DestinationFolder="$(BepInExPluginsPath)$(AssemblyName)\" OverwriteReadOnlyFiles="true" />
+        <Message Text="Copied output to: $(BepInExPluginsPath)$(AssemblyName)\" Importance="high" />
     </Target>
 </Project>
