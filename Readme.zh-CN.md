@@ -126,7 +126,7 @@
 现在地图模组已支持自定义风格和语言，您可以在游戏目录`Kingdom Two Crowns\BepInEx\config`找到它们的配置文件。
 
 * `KingdomMod.OverlayMap.cfg`，配置当前使用的语言和风格文件名，
-* `KingdomMod.OverlayMap.Style.cfg`，地图模组的风格文件。您可以修改其中的文本颜色及标记符号。
+* `KingdomMod.OverlayMap.MarkerStyle.cfg`，地图模组的风格文件。您可以修改其中的文本颜色及标记符号。
 * `KingdomMod.OverlayMap.Language.en-US.cfg`，地图模组的语言文件。您可以以该文件为模板制作您的母语语言文件。复制该文件，将文件名的`en-US`部分改为您自己国家/地区的语言代码，比如`KingdomMod.OverlayMap.Language.ru-RU.cfg`，然后对文件内的字符串进行本地化翻译。
 * 欢迎分享您的语言和风格文件：[分享入口](https://github.com/abevol/KingdomMod/issues/3)。
 
