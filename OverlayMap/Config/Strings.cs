@@ -137,6 +137,7 @@ public class Strings
     public static ConfigEntryWrapper<string> TeleporterRift;
     public static ConfigEntryWrapper<string> Tholos;
     public static ConfigEntryWrapper<string> GodIdol;
+    public static ConfigEntryWrapper<string> HermesShade;
 
     public static void ConfigBind(ConfigFile config)
     {
@@ -269,6 +270,7 @@ public class Strings
         TeleporterRift = config.Bind("Strings", "TeleporterRift", "TeleporterRift", "");
         Tholos = config.Bind("Strings", "Tholos", "Tholos", "");
         GodIdol = config.Bind("Strings", "GodIdol", "GodIdol", "");
+        HermesShade = config.Bind("Strings", "HermesShade", "Shade", "");
 
         LogDebug($"Loaded config: {Path.GetFileName(ConfigFile.ConfigFilePath)}");
 

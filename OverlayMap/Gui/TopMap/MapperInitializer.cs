@@ -87,6 +87,7 @@ internal static class MapperInitializer
         RegisterResolver(resolvers, new Resolvers.MerchantSpawnerResolver());
         RegisterResolver(resolvers, new Resolvers.PayableTeleporterResolver());
         RegisterResolver(resolvers, new Resolvers.TeleporterRiftResolver());
+        RegisterResolver(resolvers, new Resolvers.HermesShadeResolver());
 
         // 玩家货物
         RegisterResolver(resolvers, new Resolvers.PlayerCargoResolver());
@@ -164,6 +165,7 @@ internal static class MapperInitializer
             { MapMarkerType.MerchantSpawner, new Mappers.MerchantSpawnerMapper(view) },
             { MapMarkerType.Tholos, new Mappers.TholosMapper(view) },
             { MapMarkerType.GodIdol, new Mappers.GodIdolMapper(view) },
+            { MapMarkerType.HermesShade, new Mappers.HermesShadeMapper(view) },
         };
 
         // 5. 将初始化结果设置到 TopMapView
