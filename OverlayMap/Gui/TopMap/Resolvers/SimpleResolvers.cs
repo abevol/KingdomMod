@@ -252,6 +252,12 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Resolvers
         public PayableTeleporterResolver() : base(typeof(PayableTeleporter), MapMarkerType.Teleporter) { }
     }
 
+    /// <summary>幽魂解析器</summary>
+    public class HermesShadeResolver : SimpleResolver
+    {
+        public HermesShadeResolver() : base(typeof(HermesShade), MapMarkerType.HermesShade) { }
+    }
+
     /// <summary>传送阵裂隙解析器</summary>
     public class TeleporterRiftResolver : SimpleResolver
     {

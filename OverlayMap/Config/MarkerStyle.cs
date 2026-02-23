@@ -68,6 +68,7 @@ public class MarkerStyle
     public static MarkerConfig TeleporterRift;
     public static MarkerConfigStated Tholos;
     public static MarkerConfig GodIdol;
+    public static MarkerConfig HermesShade;
 
     public static void ConfigBind(ConfigFile config)
     {
@@ -265,6 +266,9 @@ public class MarkerStyle
 
         GodIdol.Color = config.Bind("GodIdol", "Color", "1,0.9,0,1", "");
         GodIdol.Sign = config.Bind("GodIdol", "Sign", "", "");
+
+        HermesShade.Color = config.Bind("HermesShade", "Color", "0.62,0,1,1", "");
+        HermesShade.Sign = config.Bind("HermesShade", "Sign", "₤", "");
 
         LogDebug($"Loaded config: {Path.GetFileName(ConfigFile.ConfigFilePath)}");
 

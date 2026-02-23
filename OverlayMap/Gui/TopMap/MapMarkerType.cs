@@ -162,6 +162,9 @@
         /// <summary>玩家货物（Olympus DLC）</summary>
         PlayerCargo,
 
+        /// <summary>幽魂（Olympus DLC）</summary>
+        HermesShade,
+
         /// <summary>神像（Olympus DLC）</summary>
         GodIdol,
     }
