@@ -44,7 +44,7 @@ public class Global
         OnGuiStyleFileChanged();
 
         SetConfigDelegates();
-        _configFileWatcher.Set(Path.GetFileName(config.ConfigFilePath), OnConfigFileChanged);
+        _configFileWatcher.Set(config.ConfigFilePath, OnConfigFileChanged);
     }
 
     private static void OnConfigFileChanged(object source, FileSystemEventArgs e)
