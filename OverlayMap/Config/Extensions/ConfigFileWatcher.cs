@@ -15,11 +15,11 @@ public class ConfigFileWatcher
     private string _configFileHash;
     private FileSystemEventHandler _changedEventHandler;
 
-    public void Set(string fileName, FileSystemEventHandler changed)
+    public void Set(string filePath, FileSystemEventHandler changed)
     {
-        _watcher.Path = Path.Combine(BepInExDir, "config");
+        _watcher.Path = Path.GetDirectoryName(filePath);
         _watcher.NotifyFilter = NotifyFilters.LastWrite;
-        _watcher.Filter = fileName ?? "*.cfg";
+        _watcher.Filter = Path.GetFileName(filePath) ?? "*.cfg";
         _watcher.Changed += OnConfigFileChanged;
         _watcher.IncludeSubdirectories = false;
         _watcher.EnableRaisingEvents = true;
