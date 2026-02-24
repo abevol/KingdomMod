@@ -38,6 +38,12 @@ dotnet build OverlayMap/OverlayMap.csproj -c Debug
 
 **构建产物**：通过 MSBuild 目标自动复制到游戏插件文件夹。
 
+## 发布新版本
+
+1. 确认 ProjectSettings.shared.props 中 `<Version>` 已更新。
+2. 执行 `git tag vx.x.x` 为当前提交添加标签。
+3. 执行 `git push origin vx.x.x` 推送标签到远程仓库。
+
 ---
 
 ## 代码风格指南

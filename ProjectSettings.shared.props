@@ -1,6 +1,6 @@
 <Project>
     <PropertyGroup>
-        <Version>2.4.3</Version>
+        <Version>2.4.4</Version>
         <WarningsAsErrors>$(WarningsAsErrors);NU1605</WarningsAsErrors>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

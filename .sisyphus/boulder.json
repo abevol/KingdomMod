@@ -1,9 +1,9 @@
 {
-  "active_plan": "/mnt/d/workspace/games/KingdomTwoCrowns/KingdomMapModDev/.sisyphus/plans/guistyle-multilang-simple.md",
-  "started_at": "2026-02-24T14:52:36.989Z",
+  "active_plan": "/mnt/d/workspace/games/KingdomTwoCrowns/KingdomMapModDev/.sisyphus/plans/version-cicd.md",
+  "started_at": "2026-02-24T21:50:03.730Z",
   "session_ids": [
-    "ses_370053da5ffek0AjrDGWkaMKt3"
+    "ses_36ea3490dffeYBanE64RPnMfdK"
   ],
-  "plan_name": "guistyle-multilang-simple",
+  "plan_name": "version-cicd",
   "agent": "atlas"
 }
