@@ -22,11 +22,19 @@
     </ItemGroup>
     <ItemGroup>
         <EmbeddedResource Include="Assets\Background.png" />
-        <EmbeddedResource Include="ConfigPrefabs\GuiStyle.cfg" />
-        <EmbeddedResource Include="ConfigPrefabs\Language.ru-RU.cfg">
+        <EmbeddedResource Include="ConfigPrefabs\GuiStyle.en-US.cfg">
+            <WithCulture>false</WithCulture>
+        </EmbeddedResource>
+        <EmbeddedResource Include="ConfigPrefabs\GuiStyle.ru-RU.cfg">
+            <WithCulture>false</WithCulture>
+        </EmbeddedResource>
+        <EmbeddedResource Include="ConfigPrefabs\GuiStyle.zh-CN.cfg">
             <WithCulture>false</WithCulture>
         </EmbeddedResource>
         <EmbeddedResource Include="ConfigPrefabs\Language.en-US.cfg">
+            <WithCulture>false</WithCulture>
+        </EmbeddedResource>
+        <EmbeddedResource Include="ConfigPrefabs\Language.ru-RU.cfg">
             <WithCulture>false</WithCulture>
         </EmbeddedResource>
         <EmbeddedResource Include="ConfigPrefabs\Language.zh-CN.cfg">
@@ -222,7 +230,9 @@
     </Target>
 
     <Target Name="CopyConfigPrefabs" AfterTargets="Build">
-        <Copy SourceFiles="$(ProjectDir)ConfigPrefabs\GuiStyle.cfg" DestinationFolder="$(BepInExConfigPath)$(AssemblyName)\" OverwriteReadOnlyFiles="true" />
+        <Copy SourceFiles="$(ProjectDir)ConfigPrefabs\GuiStyle.en-US.cfg" DestinationFolder="$(BepInExConfigPath)$(AssemblyName)\" OverwriteReadOnlyFiles="true" />
+        <Copy SourceFiles="$(ProjectDir)ConfigPrefabs\GuiStyle.ru-RU.cfg" DestinationFolder="$(BepInExConfigPath)$(AssemblyName)\" OverwriteReadOnlyFiles="true" />
+        <Copy SourceFiles="$(ProjectDir)ConfigPrefabs\GuiStyle.zh-CN.cfg" DestinationFolder="$(BepInExConfigPath)$(AssemblyName)\" OverwriteReadOnlyFiles="true" />
         <Copy SourceFiles="$(ProjectDir)ConfigPrefabs\Language.en-US.cfg" DestinationFolder="$(BepInExConfigPath)$(AssemblyName)\" OverwriteReadOnlyFiles="true" />
         <Copy SourceFiles="$(ProjectDir)ConfigPrefabs\Language.ru-RU.cfg" DestinationFolder="$(BepInExConfigPath)$(AssemblyName)\" OverwriteReadOnlyFiles="true" />
         <Copy SourceFiles="$(ProjectDir)ConfigPrefabs\Language.zh-CN.cfg" DestinationFolder="$(BepInExConfigPath)$(AssemblyName)\" OverwriteReadOnlyFiles="true" />

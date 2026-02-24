@@ -1,4 +1,4 @@
-using BepInEx.Configuration;
+﻿using BepInEx.Configuration;
 using System.IO;
 using System;
 using KingdomMod.OverlayMap.Config.Extensions;
@@ -107,9 +107,9 @@ public class Strings
     public static ConfigEntryWrapper<string> MolossianHound;
     public static ConfigEntryWrapper<string> Chimera;
     public static ConfigEntryWrapper<string> Total;
-        public static ConfigEntryWrapper<string> ShopForge;
-        public static ConfigEntryWrapper<string> ShopScythe;
-        public static ConfigEntryWrapper<string> Sleipnir;
+    public static ConfigEntryWrapper<string> ShopForge;
+    public static ConfigEntryWrapper<string> ShopScythe;
+    public static ConfigEntryWrapper<string> Sleipnir;
     public static ConfigEntryWrapper<string> Spookyhorse;
     public static ConfigEntryWrapper<string> Stag;
     public static ConfigEntryWrapper<string> StatueArcher;
@@ -372,5 +372,49 @@ public class Strings
         {
             LogError($"HResult: {exception.HResult:X}, {exception.Message}");
         }
+    }
+
+    public static void LoadLanguageConfig(string languageCode)
+    {
+        var langFile = Path.Combine(BepInExDir, "config", "KingdomMod.OverlayMap", $"Language.{languageCode}.cfg");
+        LogDebug($"Language file: {langFile}");
+
+        if (!File.Exists(langFile))
+        {
+            LogWarning($"Language file do not exist: {langFile}");
+            var lang = languageCode.Split('-')[0];
+            var files = Directory.GetFiles(Path.Combine(BepInExDir, "config", "KingdomMod.OverlayMap"), $"Language.{lang}*.cfg");
+            foreach (var file in files)
+            {
+                if (File.Exists(file))
+                {
+                    langFile = file;
+                    LogWarning($"Try to use the sub language file: {langFile}");
+                    break;
+                }
+            }
+        }
+
+        if (!File.Exists(langFile))
+        {
+            LogWarning($"Language file do not exist: {langFile}");
+            if (ConfigFile != null)
+                return;
+            languageCode = "en-US";
+            langFile = Path.Combine(BepInExDir, "config", "KingdomMod.OverlayMap", $"Language.{languageCode}.cfg");
+            LogWarning($"Try to use the default english language file: {langFile}");
+        }
+
+        if (ConfigFile != null)
+        {
+            if (Path.GetFileName(ConfigFile.ConfigFilePath) == Path.GetFileName(langFile))
+            {
+                LogDebug("Attempt to load the same configuration file. Skip.");
+                return;
+            }
+        }
+
+        LogDebug($"Try to bind Language file: {Path.GetFileName(langFile)}");
+        ConfigBind(new ConfigFile(langFile, true));
     }
 }
