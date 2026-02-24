@@ -1,0 +1,185 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Validate Tag
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.extract.outputs.version }}
+    steps:
+      - name: Validate and extract version
+        id: extract
+        run: |
+          TAG="${{ github.ref_name }}"
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "ERROR: Tag '$TAG' does not match v*.*.* format"
+            exit 1
+          fi
+          VERSION="${TAG#v}"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Releasing version: $VERSION"
+
+  build:
+    name: Build (${{ matrix.config }})
+    needs: validate
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        config: [BIE6_IL2CPP, BIE6_Mono]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '6.0.x'
+
+      - name: Generate CI custom props
+        run: |
+          CI_OUT="${{ github.workspace }}/ci-bepinex"
+          mkdir -p "$CI_OUT/plugins" "$CI_OUT/config"
+          cat > ProjectSettings.custom.props << 'PROPS_EOF'
+          <Project>
+            <PropertyGroup>
+              <BepInExPath>__CI_OUT__/</BepInExPath>
+              <BepInExConfigPath>__CI_OUT__/config/</BepInExConfigPath>
+              <BepInExPluginsPath>__CI_OUT__/plugins/</BepInExPluginsPath>
+            </PropertyGroup>
+          </Project>
+          PROPS_EOF
+          sed -i "s|__CI_OUT__|$CI_OUT|g" ProjectSettings.custom.props
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
+      - name: Restore dependencies
+        run: dotnet restore KingdomMod.sln
+
+      - name: Build solution
+        run: dotnet build KingdomMod.sln -c ${{ matrix.config }} --no-restore -p:Version=${{ needs.validate.outputs.version }}
+
+      - name: Stage and package mod DLLs
+        run: |
+          CONFIG="${{ matrix.config }}"
+          VERSION="${{ needs.validate.outputs.version }}"
+          STAGING="${{ github.workspace }}/_staging"
+          MODS=(BetterPayableUpgrade DevTools OverlayMap StaminaBar)
+          for MOD in "${MODS[@]}"; do
+            MOD_DIR="$STAGING/KingdomMod.$MOD"
+            mkdir -p "$MOD_DIR"
+            cp "$MOD/bin/$CONFIG/KingdomMod.$MOD.dll" "$MOD_DIR/"
+            cp "SharedLib/bin/$CONFIG/KingdomMod.SharedLib.dll" "$MOD_DIR/"
+          done
+          ZIP_NAME="KingdomMod.All-${CONFIG}-v${VERSION}.zip"
+          cd "$STAGING"
+          zip -r "${{ github.workspace }}/$ZIP_NAME" .
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: all-zip-${{ matrix.config }}
+          path: KingdomMod.All-${{ matrix.config }}-v${{ needs.validate.outputs.version }}.zip
+          retention-days: 1
+
+  package-with-bepinex:
+    name: Package with BepInEx
+    needs: [build, validate]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: all-zip-*
+          path: zips
+          merge-multiple: true
+
+      - name: Download BepInEx and patches
+        run: |
+          mkdir -p _bepinex_zips
+          curl -fsSL -o _bepinex_zips/BepInEx-IL2CPP.zip \
+            'https://builds.bepinex.dev/projects/bepinex_be/753/BepInEx-Unity.IL2CPP-win-x64-6.0.0-be.753%2B0d275a4.zip'
+          curl -fsSL -o _bepinex_zips/BepInEx-Mono.zip \
+            'https://builds.bepinex.dev/projects/bepinex_be/753/BepInEx-Unity.Mono-win-x64-6.0.0-be.753%2B0d275a4.zip'
+          curl -fsSL -L -o _bepinex_zips/Cpp2IL.Patch.zip \
+            'https://github.com/abevol/KingdomMod/releases/download/2.4.0/Cpp2IL.Patch.zip'
+          curl -fsSL -L -o _bepinex_zips/Il2CppInterop.Patch.zip \
+            'https://github.com/abevol/KingdomMod/releases/download/2.4.3/Il2CppInterop.Patch.zip'
+
+      - name: Package IL2CPP with-BepInEx
+        run: |
+          VERSION="${{ needs.validate.outputs.version }}"
+          TMPDIR_IL2CPP="$RUNNER_TEMP/merge_il2cpp"
+          mkdir -p "$TMPDIR_IL2CPP"
+          unzip -q _bepinex_zips/BepInEx-IL2CPP.zip -d "$TMPDIR_IL2CPP"
+          unzip -q -o _bepinex_zips/Cpp2IL.Patch.zip -d "$TMPDIR_IL2CPP"
+          unzip -q -o _bepinex_zips/Il2CppInterop.Patch.zip -d "$TMPDIR_IL2CPP"
+          mkdir -p "$TMPDIR_IL2CPP/BepInEx/plugins"
+          unzip -q "zips/KingdomMod.All-BIE6_IL2CPP-v${VERSION}.zip" \
+            -d "$TMPDIR_IL2CPP/BepInEx/plugins"
+          cd "$TMPDIR_IL2CPP"
+          zip -r "${{ github.workspace }}/KingdomMod.All-BIE6_IL2CPP-v${VERSION}-with-BepInEx.zip" .
+          cd "${{ github.workspace }}"
+          rm -rf "$TMPDIR_IL2CPP"
+
+      - name: Package Mono with-BepInEx
+        run: |
+          VERSION="${{ needs.validate.outputs.version }}"
+          TMPDIR_MONO="$RUNNER_TEMP/merge_mono"
+          mkdir -p "$TMPDIR_MONO"
+          unzip -q _bepinex_zips/BepInEx-Mono.zip -d "$TMPDIR_MONO"
+          mkdir -p "$TMPDIR_MONO/BepInEx/plugins"
+          unzip -q "zips/KingdomMod.All-BIE6_Mono-v${VERSION}.zip" \
+            -d "$TMPDIR_MONO/BepInEx/plugins"
+          cd "$TMPDIR_MONO"
+          zip -r "${{ github.workspace }}/KingdomMod.All-BIE6_Mono-v${VERSION}-with-BepInEx.zip" .
+          cd "${{ github.workspace }}"
+          rm -rf "$TMPDIR_MONO"
+
+      - name: Upload Final Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-zips
+          path: |
+            KingdomMod.All-BIE6_IL2CPP-v*.zip
+            KingdomMod.All-BIE6_Mono-v*.zip
+            KingdomMod.All-BIE6_IL2CPP-v*-with-BepInEx.zip
+            KingdomMod.All-BIE6_Mono-v*-with-BepInEx.zip
+          retention-days: 1
+
+  release:
+    name: Create Release
+    needs: [package-with-bepinex, validate]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Release Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: release-zips
+          path: release-assets
+
+      - name: Create GitHub Release
+        run: |
+          gh release create "${{ github.ref_name }}" \
+            --title "KingdomMod ${{ github.ref_name }}" \
+            --generate-notes \
+            release-assets/*.zip
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

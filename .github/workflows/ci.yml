@@ -1,0 +1,59 @@
+name: CI Build Check
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-check:
+    name: Build Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '6.0.x'
+
+      - name: Generate ProjectSettings.custom.props and Pre-build directories
+        run: |
+          CI_OUT="${{ github.workspace }}/ci-bepinex"
+          mkdir -p "$CI_OUT/plugins" "$CI_OUT/config"
+          cat > ProjectSettings.custom.props << 'PROPS_EOF'
+          <Project>
+            <PropertyGroup>
+              <BepInExPath>__CI_OUT__/</BepInExPath>
+              <BepInExConfigPath>__CI_OUT__/config/</BepInExConfigPath>
+              <BepInExPluginsPath>__CI_OUT__/plugins/</BepInExPluginsPath>
+            </PropertyGroup>
+          </Project>
+          PROPS_EOF
+          sed -i "s|__CI_OUT__|$CI_OUT|g" ProjectSettings.custom.props
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
+      - name: Restore dependencies
+        run: dotnet restore KingdomMod.sln
+
+      - name: Build BIE6_IL2CPP
+        run: dotnet build KingdomMod.sln -c BIE6_IL2CPP --no-restore
+
+      - name: Build BIE6_Mono
+        run: dotnet build KingdomMod.sln -c BIE6_Mono --no-restore
