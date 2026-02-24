@@ -20,6 +20,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
             // 如果已被收集，不显示标记
             if (shade._collected) return;
             if (!shade._shade.enabled) return;
+            if (!shade.gameObject.activeSelf) return;
 
             view.TryAddMapMarker(component, MarkerStyle.HermesShade.Color, MarkerStyle.HermesShade.Sign, Strings.HermesShade);
         }
