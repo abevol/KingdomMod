@@ -9,7 +9,7 @@
 
 **项目**：OverlayMap, StaminaBar, DevTools, BetterPayableUpgrade, SharedLib
 **游戏托管库**：`_libs/BIE6_Mono/Managed/`
-**游戏参考源代码**：`_libs/BIE6_Mono/Decompiled/v2.3.1/Assembly-CSharp/`  
+**游戏参考源代码**：`_libs/BIE6_Mono/Decompiled/2.3.2/Assembly-CSharp/`  
 此目录包含反编译的游戏源代码，用于实现模组功能时参考。
 
 ---
