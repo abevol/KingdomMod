@@ -84,9 +84,9 @@ public class GuiStyle
 
         TopMap.Sign.Font = config.Bind("TopMap.Sign", "Font", "arial.ttf", "");
         TopMap.Sign.FontSize = config.Bind("TopMap.Sign", "FontSize", 12.0f, "");
-        TopMap.Sign.FallbackFonts = config.Bind("TopMap.Sign", "FallbackFonts", "msgothic.ttc", "");
+        TopMap.Sign.FallbackFonts = config.Bind("TopMap.Sign", "FallbackFonts", "seguisym.ttf", "");
 
-        TopMap.Title.Font = config.Bind("TopMap.Title", "Font", "msyh.ttc", "");
+        TopMap.Title.Font = config.Bind("TopMap.Title", "Font", "fonts/notosanssc-medium", "");
         TopMap.Title.FontSize = config.Bind("TopMap.Title", "FontSize", 12.0f, "");
         TopMap.Title.FallbackFonts = config.Bind("TopMap.Title", "FallbackFonts", "", "");
 
