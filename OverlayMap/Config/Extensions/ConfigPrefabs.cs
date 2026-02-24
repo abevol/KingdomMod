@@ -14,38 +14,48 @@ public struct ConfigPrefab
 public class ConfigPrefabs
 {
     private static readonly List<ConfigPrefab> _prefabs = new()
-            {
-                new ConfigPrefab
-                {
-                    ResName = "KingdomMod.OverlayMap.ConfigPrefabs.GuiStyle.cfg",
-                    FileName = "GuiStyle.cfg"
-                },
-                new ConfigPrefab
-                {
-                    ResName = "KingdomMod.OverlayMap.ConfigPrefabs.MarkerStyle.cfg",
-                    FileName = "MarkerStyle.cfg"
-                },
-                new ConfigPrefab
-                {
-                    ResName = "KingdomMod.OverlayMap.ConfigPrefabs.Language.en-US.cfg",
-                    FileName = "Language.en-US.cfg"
-                },
-                new ConfigPrefab
-                {
-                    ResName = "KingdomMod.OverlayMap.ConfigPrefabs.Language.ru-RU.cfg",
-                    FileName = "Language.ru-RU.cfg"
-                },
-                new ConfigPrefab
-                {
-                    ResName = "KingdomMod.OverlayMap.ConfigPrefabs.Language.zh-CN.cfg",
-                    FileName = "Language.zh-CN.cfg"
-                },
-                new ConfigPrefab
-                {
-                    ResName = "KingdomMod.OverlayMap.Assets.Background.png",
-                    FileName = "Assets\\Background.png"
-                }
-            };
+    {
+        new ConfigPrefab
+        {
+            ResName = "KingdomMod.OverlayMap.ConfigPrefabs.GuiStyle.en-US.cfg",
+            FileName = "GuiStyle.en-US.cfg"
+        },
+        new ConfigPrefab
+        {
+            ResName = "KingdomMod.OverlayMap.ConfigPrefabs.GuiStyle.ru-RU.cfg",
+            FileName = "GuiStyle.ru-RU.cfg"
+        },
+        new ConfigPrefab
+        {
+            ResName = "KingdomMod.OverlayMap.ConfigPrefabs.GuiStyle.zh-CN.cfg",
+            FileName = "GuiStyle.zh-CN.cfg"
+        },
+        new ConfigPrefab
+        {
+            ResName = "KingdomMod.OverlayMap.ConfigPrefabs.MarkerStyle.cfg",
+            FileName = "MarkerStyle.cfg"
+        },
+        new ConfigPrefab
+        {
+            ResName = "KingdomMod.OverlayMap.ConfigPrefabs.Language.en-US.cfg",
+            FileName = "Language.en-US.cfg"
+        },
+        new ConfigPrefab
+        {
+            ResName = "KingdomMod.OverlayMap.ConfigPrefabs.Language.ru-RU.cfg",
+            FileName = "Language.ru-RU.cfg"
+        },
+        new ConfigPrefab
+        {
+            ResName = "KingdomMod.OverlayMap.ConfigPrefabs.Language.zh-CN.cfg",
+            FileName = "Language.zh-CN.cfg"
+        },
+        new ConfigPrefab
+        {
+            ResName = "KingdomMod.OverlayMap.Assets.Background.png",
+            FileName = "Assets\\Background.png"
+        }
+    };
 
     public static void Initialize()
     {

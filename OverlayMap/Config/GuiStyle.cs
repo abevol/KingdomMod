@@ -1,4 +1,5 @@
-﻿using BepInEx.Configuration;
+﻿using System.Globalization;
+using BepInEx.Configuration;
 using System.IO;
 using System;
 using KingdomMod.OverlayMap.Config.Extensions;
@@ -123,4 +124,49 @@ public class GuiStyle
             LogError($"HResult: {exception.HResult:X}, {exception.Message}");
         }
     }
+
+    public static void LoadLanguageConfig(string languageCode)
+    {
+        var langFile = Path.Combine(BepInExDir, "config", "KingdomMod.OverlayMap", $"GuiStyle.{languageCode}.cfg");
+        LogDebug($"GuiStyle language file: {langFile}");
+
+        if (!File.Exists(langFile))
+        {
+            LogWarning($"GuiStyle language file do not exist: {langFile}");
+            var lang = languageCode.Split('-')[0];
+            var files = Directory.GetFiles(Path.Combine(BepInExDir, "config", "KingdomMod.OverlayMap"), $"GuiStyle.{lang}*.cfg");
+            foreach (var file in files)
+            {
+                if (File.Exists(file))
+                {
+                    langFile = file;
+                    LogWarning($"Try to use the sub language file: {langFile}");
+                    break;
+                }
+            }
+        }
+
+        if (!File.Exists(langFile))
+        {
+            LogWarning($"GuiStyle language file do not exist: {langFile}");
+            if (ConfigFile != null)
+                return;
+            languageCode = "en-US";
+            langFile = Path.Combine(BepInExDir, "config", "KingdomMod.OverlayMap", $"GuiStyle.{languageCode}.cfg");
+            LogWarning($"Try to use the default english language file: {langFile}");
+        }
+
+        if (ConfigFile != null)
+        {
+            if (Path.GetFileName(ConfigFile.ConfigFilePath) == Path.GetFileName(langFile))
+            {
+                LogDebug("Attempt to load the same configuration file. Skip.");
+                return;
+            }
+        }
+
+        LogDebug($"Try to bind GuiStyle language file: {Path.GetFileName(langFile)}");
+        ConfigBind(new ConfigFile(langFile, true));
+    }
+
 }
