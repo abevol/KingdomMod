@@ -13,12 +13,12 @@ Both `IL2CPP` and `Mono` versions of the game are now supported!
 
 ## Preview
 
-![Preview](https://github.com/abevol/KingdomMod/blob/master/preview.png?raw=true)
+![Preview](https://github.com/abevol/KingdomMod/blob/main/preview.png?raw=true)
 
 ## Supported languages
 
-1. [中文](https://github.com/abevol/KingdomMod/blob/master/Readme.zh-CN.md)
-2. [English](https://github.com/abevol/KingdomMod/blob/master/Readme.md)
+1. [中文](https://github.com/abevol/KingdomMod/blob/main/Readme.zh-CN.md)
+2. [English](https://github.com/abevol/KingdomMod/blob/main/Readme.md)
 
 ## Install
 
@@ -83,8 +83,8 @@ Developer tools mod. Contains some functions that are convenient for making MODs
 8. `Delete` Cut down the currently selected tree
 9. `F1` Add vagrant
 10. `F2` Add Griffin
-11. `F9` Activate the Game Developer Debug Toolkit
-12. `F10` Set coin limit to 1000
+11. ~~`F9` Activate the Game Developer Debug Toolkit~~ (Disabled)
+12. ~~`F10` Set coin limit to 1000~~ (Invalid)
 13. `Space` Throws a boulder
 
 ## OverlayMap

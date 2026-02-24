@@ -1,4 +1,4 @@
-using BepInEx.Logging;
+﻿using BepInEx.Logging;
 using BepInEx.Configuration;
 using System;
 using System.Collections.Generic;
@@ -443,45 +443,45 @@ public class DevToolsHolder : MonoBehaviour
         //     }
         // }
 
-        if (Input.GetKeyDown(KeyCode.F9))
-        {
-            log.LogMessage($"F9 key pressed.");
-
-            var array = Resources.FindObjectsOfTypeAll<Transform>();
-            for (int i = 0; i < array.Length; i++)
-            {
-                if (array[i].name == "DebugTools")
-                {
-                    array[i].gameObject.SetActive(true);
-                    var componentsInChildren = array[i].gameObject.GetComponentsInChildren<UnityEngine.UI.Text>(true);
-                    for (int j = 0; j < componentsInChildren.Length; j++)
-                    {
-                        componentsInChildren[j].font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-                        componentsInChildren[j].fontSize = 4;
-                        componentsInChildren[j].fontStyle = FontStyle.Bold;
-                        componentsInChildren[j].text = componentsInChildren[j].text.ToLower();
-                    }
-#if IL2CPP
-                    IDebugTools iDebugTools = null;
-                    var tmpComps = array[i].GetComponents<Component>();
-                    foreach (var comp in tmpComps)
-                    {
-                        if (comp.name == "DebugTools")
-                        {
-                            iDebugTools = new IDebugTools(comp.Pointer);
-                        }
-                    }
-#else
-                    var iDebugTools = (IDebugTools)(array[i].GetComponent("DebugTools"));
-#endif
-                    var cursorSystem = GameObject.FindFirstObjectByType<CursorSystem>();
-                    if (cursorSystem)
-                        cursorSystem.SetForceVisibleCursor(!iDebugTools.IsOpen());
-
-                    iDebugTools.OpenButtonPressed();
-                }
-            }
-        }
+//         if (Input.GetKeyDown(KeyCode.F9))
+//         {
+//             log.LogMessage($"F9 key pressed.");
+//
+//             var array = Resources.FindObjectsOfTypeAll<Transform>();
+//             for (int i = 0; i < array.Length; i++)
+//             {
+//                 if (array[i].name == "DebugTools")
+//                 {
+//                     array[i].gameObject.SetActive(true);
+//                     var componentsInChildren = array[i].gameObject.GetComponentsInChildren<UnityEngine.UI.Text>(true);
+//                     for (int j = 0; j < componentsInChildren.Length; j++)
+//                     {
+//                         componentsInChildren[j].font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+//                         componentsInChildren[j].fontSize = 4;
+//                         componentsInChildren[j].fontStyle = FontStyle.Bold;
+//                         componentsInChildren[j].text = componentsInChildren[j].text.ToLower();
+//                     }
+// #if IL2CPP
+//                     IDebugTools iDebugTools = null;
+//                     var tmpComps = array[i].GetComponents<Component>();
+//                     foreach (var comp in tmpComps)
+//                     {
+//                         if (comp.name == "DebugTools")
+//                         {
+//                             iDebugTools = new IDebugTools(comp.Pointer);
+//                         }
+//                     }
+// #else
+//                     var iDebugTools = (IDebugTools)(array[i].GetComponent("DebugTools"));
+// #endif
+//                     var cursorSystem = GameObject.FindFirstObjectByType<CursorSystem>();
+//                     if (cursorSystem)
+//                         cursorSystem.SetForceVisibleCursor(!iDebugTools.IsOpen());
+//
+//                     iDebugTools.OpenButtonPressed();
+//                 }
+//             }
+//         }
 
         if (Input.GetKeyDown(KeyCode.F10))
         {

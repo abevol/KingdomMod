@@ -12,12 +12,12 @@
 
 ## 预览
 
-![预览](https://github.com/abevol/KingdomMod/blob/master/preview.png?raw=true)
+![预览](https://github.com/abevol/KingdomMod/blob/main/preview.png?raw=true)
 
 ## 支持的语言
 
-1. [中文](https://github.com/abevol/KingdomMod/blob/master/Readme.zh-CN.md)
-2. [English](https://github.com/abevol/KingdomMod/blob/master/Readme.md)
+1. [中文](https://github.com/abevol/KingdomMod/blob/main/Readme.zh-CN.md)
+2. [English](https://github.com/abevol/KingdomMod/blob/main/Readme.md)
 
 ## 安装
 
@@ -82,8 +82,8 @@
 8. `Delete` 砍伐当前选中的树木
 9. `F1` 添加游民
 10. `F2` 添加格里芬
-11. `F9` 激活游戏开发者调试工具箱
-12. `F10` 将硬币上限设置为1000
+11. ~~`F9` 激活游戏开发者调试工具箱~~（已禁用）
+12. ~~`F10` 将硬币上限设置为1000~~（已失效）
 13. `Space` 扔出巨石
 
 ## OverlayMap
