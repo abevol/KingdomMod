@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using KingdomMod.OverlayMap.Config;
 using KingdomMod.OverlayMap.Config.Extensions;
+using KingdomMod.SharedLib;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
 
 #if IL2CPP

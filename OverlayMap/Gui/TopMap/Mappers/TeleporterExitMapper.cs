@@ -2,6 +2,7 @@
 using KingdomMod.OverlayMap.Config;
 using KingdomMod.OverlayMap.Patchers;
 using System.Collections.Generic;
+using KingdomMod.SharedLib;
 using UnityEngine;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
 

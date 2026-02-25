@@ -292,5 +292,21 @@ namespace KingdomMod.SharedLib
             // var BaseFoo = (Action<object>)dm.CreateDelegate(typeof(Action<object>));
             // BaseFoo(@this);
         }
+
+#if MONO
+        /// <summary>
+        /// Mono 兼容性替代方法，用于替代 IL2CPP 中 <c>Il2CppObjectBase.Cast&lt;T&gt;()</c>。
+        /// 使用 <c>as</c> 运算符将对象转换为指定类型，转换失败时抛出 <see cref="InvalidCastException"/>。
+        /// </summary>
+        /// <typeparam name="T">目标类型，必须为引用类型。</typeparam>
+        /// <param name="this">要转换的对象。</param>
+        /// <returns>转换后的目标类型实例。</returns>
+        /// <exception cref="InvalidCastException">对象无法转换为目标类型时抛出。</exception>
+        public static T Cast<T>(this object @this) where T : class
+        {
+            return @this as T ?? throw new InvalidCastException(
+                $"Can't cast object of type {@this?.GetType()} to type {typeof(T)}");
+        }
+#endif
     }
 }

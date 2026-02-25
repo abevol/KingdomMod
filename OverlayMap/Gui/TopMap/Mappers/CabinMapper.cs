@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using KingdomMod.OverlayMap.Config;
 using KingdomMod.OverlayMap.Config.Extensions;
+using KingdomMod.SharedLib;
 using UnityEngine;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
 

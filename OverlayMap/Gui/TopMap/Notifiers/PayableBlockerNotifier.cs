@@ -1,5 +1,7 @@
 ﻿using HarmonyLib;
+#if IL2CPP
 using Il2CppInterop.Runtime;
+#endif
 using UnityEngine;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
 

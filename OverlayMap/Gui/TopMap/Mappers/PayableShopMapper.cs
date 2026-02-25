@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using KingdomMod.OverlayMap.Config;
 using KingdomMod.OverlayMap.Patchers;
+using KingdomMod.SharedLib;
 using UnityEngine;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
 
