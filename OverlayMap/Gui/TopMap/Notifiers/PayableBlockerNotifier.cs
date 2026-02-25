@@ -10,28 +10,12 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Notifiers
     [HarmonyPatch(typeof(PayableBlocker))]
     public static class PayableBlockerNotifier
     {
-        private static readonly Il2CppSystem.Type[] PuzzleTypes =
-        [
-            Il2CppType.Of<CerberusPuzzleController>(),
-            Il2CppType.Of<ChariotPuzzleController>(),
-            Il2CppType.Of<HeimdallPuzzleController>(),
-            Il2CppType.Of<HelPuzzleController>(),
-            Il2CppType.Of<ThorPuzzleController>()
-        ];
-
         [HarmonyPatch(nameof(PayableBlocker.OnEnable))]
         [HarmonyPostfix]
         public static void OnEnable(PayableBlocker __instance)
         {
             LogGameObject(__instance.gameObject);
-            Component target = null;
-            foreach (var type in PuzzleTypes)
-            {
-                target = __instance.GetComponent(type);
-                if (target != null) break;
-            }
-            target ??= __instance;
-            ForEachTopMapView(view => view.OnComponentCreated(target, NotifierType.PayableBlocker));
+            ForEachTopMapView(view => view.OnComponentCreated(__instance, NotifierType.PayableBlocker));
         }
 
         [HarmonyPatch(nameof(PayableBlocker.OnDisable))]
@@ -39,14 +23,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Notifiers
         public static void OnDisable(PayableBlocker __instance)
         {
             LogGameObject(__instance.gameObject);
-            Component target = null;
-            foreach (var type in PuzzleTypes)
-            {
-                target = __instance.GetComponent(type);
-                if (target != null) break;
-            }
-            target ??= __instance;
-            ForEachTopMapView(view => view.OnComponentDestroyed(target));
+            ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
         }
     }
 }
