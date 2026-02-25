@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using KingdomMod.Shared.Attributes;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,6 +9,7 @@ using FontData = KingdomMod.OverlayMap.Assets.FontData;
 using FontManager = KingdomMod.OverlayMap.Assets.FontManager;
 #if IL2CPP
 using Il2CppInterop.Runtime.Attributes;
+using KingdomMod.SharedLib.Attributes;
 #endif
 
 namespace KingdomMod.OverlayMap.Gui.Debugging
@@ -434,7 +434,7 @@ namespace KingdomMod.OverlayMap.Gui.Debugging
                         // 添加中文字符到字体
                         AddChineseCharactersToFont(fontData);
                         _availableFonts.Add(fontData);
-                        LogDebug($"Loaded font: {fontName}, {fontData.Font?.faceInfo?.familyName ?? "null"}");
+                        LogDebug($"Loaded font: {fontName}, {fontData.Font?.faceInfo.familyName ?? "null"}");
                     }
                 }
                 catch (Exception ex)

@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using KingdomMod.Shared.Attributes;
 using KingdomMod.SharedLib;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
+#if IL2CPP
+using KingdomMod.SharedLib.Attributes;
+#endif
 
 namespace KingdomMod.OverlayMap.Gui.StatsInfo;
 

@@ -4,7 +4,9 @@ using Coatsink.Common;
 using UnityEngine;
 using HarmonyLib;
 using KingdomMod.SharedLib;
-using KingdomMod.Shared.Attributes;
+#if IL2CPP
+using KingdomMod.SharedLib.Attributes;
+#endif
 
 namespace KingdomMod.BetterPayableUpgrade;
 
