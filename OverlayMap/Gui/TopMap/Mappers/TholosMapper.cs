@@ -1,5 +1,4 @@
-﻿using Il2CppSystem.Security.Util;
-using KingdomMod.OverlayMap.Config;
+﻿using KingdomMod.OverlayMap.Config;
 using KingdomMod.SharedLib;
 using UnityEngine;
 

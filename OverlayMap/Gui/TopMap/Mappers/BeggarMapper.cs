@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using KingdomMod.OverlayMap.Config;
+using KingdomMod.SharedLib;
 using UnityEngine;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers

@@ -45,7 +45,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                     case GamePrefabID.Lighthouse_Stone:
                     case GamePrefabID.Lighthouse_Iron:
                         // 已开发状态：根据锁定状态显示不同颜色
-                        if (component.TryCast<PayableUpgrade>() != null) return;
+                        if (component.Cast<PayableUpgrade>() != null) return;
                         view.TryAddMapMarker(component, null, MarkerStyle.Lighthouse.Sign, Strings.Lighthouse,
                             comp =>
                             {
