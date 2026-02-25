@@ -5,7 +5,7 @@ using BepInEx.Logging;
 #if IL2CPP
 using System.Reflection;
 using BepInEx.Unity.IL2CPP;
-using KingdomMod.Shared.Attributes;
+using KingdomMod.SharedLib.Attributes;
 #endif
 
 #if MONO

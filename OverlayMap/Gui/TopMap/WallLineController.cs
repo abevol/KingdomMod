@@ -1,7 +1,6 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using KingdomMod.Shared.Attributes;
 
 #if IL2CPP
 using Il2CppInterop.Runtime.Attributes;

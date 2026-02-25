@@ -8,7 +8,9 @@ using File = System.IO.File;
 using HarmonyLib;
 using System.Reflection;
 using KingdomMod.SharedLib;
-using KingdomMod.Shared.Attributes;
+#if IL2CPP
+using KingdomMod.SharedLib.Attributes;
+#endif
 
 namespace KingdomMod.DevTools;
 

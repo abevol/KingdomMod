@@ -6,10 +6,10 @@ using UnityEngine.UI;
 using KingdomMod.OverlayMap.Config;
 using KingdomMod.OverlayMap.Config.Extensions;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
-using KingdomMod.Shared.Attributes;
 
 #if IL2CPP
 using Il2CppInterop.Runtime.Attributes;
+using KingdomMod.SharedLib.Attributes;
 #endif
 
 namespace KingdomMod.OverlayMap.Gui.TopMap;

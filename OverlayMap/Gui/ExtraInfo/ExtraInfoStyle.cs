@@ -1,10 +1,10 @@
 ﻿using KingdomMod.OverlayMap.Assets;
-using KingdomMod.Shared.Attributes;
 using System;
 using UnityEngine;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
 #if IL2CPP
 using Il2CppInterop.Runtime.Attributes;
+using KingdomMod.SharedLib.Attributes;
 #endif
 
 namespace KingdomMod.OverlayMap.Gui.ExtraInfo

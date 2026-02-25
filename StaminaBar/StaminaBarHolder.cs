@@ -2,7 +2,9 @@
 using System;
 using KingdomMod.SharedLib;
 using UnityEngine;
-using KingdomMod.Shared.Attributes;
+#if IL2CPP
+using KingdomMod.SharedLib.Attributes;
+#endif
 
 namespace KingdomMod.StaminaBar;
 

@@ -1,10 +1,12 @@
 ﻿using KingdomMod.OverlayMap.Gui.TopMap;
 using KingdomMod.OverlayMap.Gui.StatsInfo;
 using KingdomMod.OverlayMap.Gui.ExtraInfo;
-using KingdomMod.Shared.Attributes;
 using System;
 using UnityEngine;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
+#if IL2CPP
+using KingdomMod.SharedLib.Attributes;
+#endif
 
 namespace KingdomMod.OverlayMap.Gui
 {

@@ -2,11 +2,11 @@
 using System.Globalization;
 using BepInEx;
 using BepInEx.Logging;
-using KingdomMod.Shared.Attributes;
 
 #if IL2CPP
 using System.Reflection;
 using BepInEx.Unity.IL2CPP;
+using KingdomMod.SharedLib.Attributes;
 #endif
 
 #if MONO

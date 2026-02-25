@@ -1,8 +1,8 @@
 ﻿#if IL2CPP
 using Il2CppInterop.Runtime.Injection;
-#endif
-using KingdomMod.Shared.Attributes;
 using Il2CppInterop.Runtime.Attributes;
+using KingdomMod.SharedLib.Attributes;
+#endif
 using System;
 using UnityEngine;
 using UnityEngine.UI;

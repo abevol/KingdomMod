@@ -10,7 +10,9 @@ using Coatsink.Common;
 using KingdomMod.OverlayMap.Gui.Debugging;
 using KingdomMod.OverlayMap.Gui.TopMap;
 using KingdomMod.SharedLib;
-using KingdomMod.Shared.Attributes;
+#if IL2CPP
+using KingdomMod.SharedLib.Attributes;
+#endif
 
 namespace KingdomMod.OverlayMap;
 

@@ -1,10 +1,9 @@
-﻿#if IL2CPP
-using KingdomMod.Shared.Attributes;
-#endif
-
-using System;
+﻿using System;
 using UnityEngine;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
+#if IL2CPP
+using KingdomMod.SharedLib.Attributes;
+#endif
 
 namespace KingdomMod.OverlayMap.Gui.TopMap
 {

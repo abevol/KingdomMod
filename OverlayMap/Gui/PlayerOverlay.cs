@@ -1,13 +1,13 @@
-﻿#if IL2CPP
-using Il2CppInterop.Runtime.Injection;
-#endif
-using System;
+﻿using System;
 using KingdomMod.OverlayMap.Gui.TopMap;
 using KingdomMod.OverlayMap.Gui.StatsInfo;
 using KingdomMod.OverlayMap.Gui.ExtraInfo;
 using UnityEngine;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
-using KingdomMod.Shared.Attributes;
+#if IL2CPP
+using Il2CppInterop.Runtime.Injection;
+using KingdomMod.SharedLib.Attributes;
+#endif
 
 namespace KingdomMod.OverlayMap.Gui
 {
