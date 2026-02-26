@@ -44,6 +44,11 @@ dotnet build OverlayMap/OverlayMap.csproj -c Debug
 2. 执行 `git tag vx.x.x` 为当前提交添加标签。
 3. 执行 `git push origin vx.x.x` 推送标签到远程仓库。
 
+## 撤销标签
+
+1. 删除远程标签: git push origin --delete vx.x.x
+2. 删除本地标签: git tag -d vx.x.x
+
 ---
 
 ## 代码风格指南
