@@ -69,6 +69,7 @@ public class MarkerStyle
     public static MarkerConfigStated Tholos;
     public static MarkerConfig GodIdol;
     public static MarkerConfig HermesShade;
+    public static MarkerConfig WeakPoint;
 
     public static void ConfigBind(ConfigFile config)
     {
@@ -269,6 +270,9 @@ public class MarkerStyle
 
         HermesShade.Color = config.Bind("HermesShade", "Color", "0.62,0,1,1", "");
         HermesShade.Sign = config.Bind("HermesShade", "Sign", "₤", "");
+
+        WeakPoint.Color = config.Bind("WeakPoint", "Color", "1,0,0,1", "");
+        WeakPoint.Sign = config.Bind("WeakPoint", "Sign", "◎", "");
 
         LogDebug($"Loaded config: {Path.GetFileName(ConfigFile.ConfigFilePath)}");
 

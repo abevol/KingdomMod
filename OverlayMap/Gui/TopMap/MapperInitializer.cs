@@ -87,6 +87,7 @@ internal static class MapperInitializer
         RegisterResolver(resolvers, new Resolvers.PayableTeleporterResolver());
         RegisterResolver(resolvers, new Resolvers.TeleporterRiftResolver());
         RegisterResolver(resolvers, new Resolvers.HermesShadeResolver());
+        RegisterResolver(resolvers, new Resolvers.WeakPointResolver());
 
         // 玩家货物
         RegisterResolver(resolvers, new Resolvers.PlayerCargoResolver());
@@ -168,6 +169,7 @@ internal static class MapperInitializer
         RegisterMapper(mappers, new Mappers.TholosMapper(view));
         RegisterMapper(mappers, new Mappers.GodIdolMapper(view));
         RegisterMapper(mappers, new Mappers.HermesShadeMapper(view));
+        RegisterMapper(mappers, new Mappers.WeakPointMapper(view));
 
         // 5. 将初始化结果设置到 TopMapView
         view.SetResolvers(resolvers, resolverLookup);

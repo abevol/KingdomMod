@@ -138,6 +138,7 @@ public class Strings
     public static ConfigEntryWrapper<string> Tholos;
     public static ConfigEntryWrapper<string> GodIdol;
     public static ConfigEntryWrapper<string> HermesShade;
+    public static ConfigEntryWrapper<string> WeakPoint;
 
     public static void ConfigBind(ConfigFile config)
     {
@@ -271,6 +272,7 @@ public class Strings
         Tholos = config.Bind("Strings", "Tholos", "Tholos", "");
         GodIdol = config.Bind("Strings", "GodIdol", "GodIdol", "");
         HermesShade = config.Bind("Strings", "HermesShade", "Shade", "");
+        WeakPoint = config.Bind("Strings", "WeakPoint", "WeakPoint", "");
 
         LogDebug($"Loaded config: {Path.GetFileName(ConfigFile.ConfigFilePath)}");
 

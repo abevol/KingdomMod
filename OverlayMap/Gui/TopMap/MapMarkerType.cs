@@ -166,6 +166,10 @@
         HermesShade,
 
         /// <summary>神像（Olympus DLC）</summary>
+        /// <summary>神像（Olympus DLC）</summary>
         GodIdol,
+        
+        /// <summary>弱点</summary>
+        WeakPoint,
     }
 }
