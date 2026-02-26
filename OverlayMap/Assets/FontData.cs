@@ -90,9 +90,9 @@ namespace KingdomMod.OverlayMap.Assets
 
             if (!Font.sourceFontFile)
             {
-                LogDebug($"Font.sourceFontFile is null, try to re-create it.");
-                SourceFont = FontManager.CreateSourceFont(FontName);
-                Font.sourceFontFile = SourceFont;
+                LogError($"Font.sourceFontFile is null.");
+                // SourceFont = FontManager.CreateSourceFont(FontName);
+                // Font.sourceFontFile = SourceFont;
             }
 
             if (Font.HasCharacters(characters, out var notOwnedChars))
