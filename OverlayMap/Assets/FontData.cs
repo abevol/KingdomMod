@@ -88,12 +88,12 @@ namespace KingdomMod.OverlayMap.Assets
 
             LogDebug($"TryAddCharacters: {FontName}, {Font.faceInfo.familyName}, chars: {characters}");
 
-            if (!Font.sourceFontFile)
-            {
-                LogError($"Font.sourceFontFile is null.");
-                // SourceFont = FontManager.CreateSourceFont(FontName);
-                // Font.sourceFontFile = SourceFont;
-            }
+            // if (!Font.sourceFontFile)
+            // {
+            //     LogError($"Font.sourceFontFile is null.");
+            //     // SourceFont = FontManager.CreateSourceFont(FontName);
+            //     // Font.sourceFontFile = SourceFont;
+            // }
 
             if (Font.HasCharacters(characters, out var notOwnedChars))
                 return;
