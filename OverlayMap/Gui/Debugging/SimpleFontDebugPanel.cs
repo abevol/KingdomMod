@@ -173,7 +173,7 @@ namespace KingdomMod.OverlayMap.Gui.Debugging
             _testTextComponent.alignment = _textAlignment;
             _testTextComponent.fontStyle = _fontStyle;
             _testTextComponent.richText = _enableRichText;
-            _testTextComponent.enableWordWrapping = _enableWordWrapping;
+            _testTextComponent.textWrappingMode = _enableWordWrapping ? TextWrappingModes.Normal : TextWrappingModes.NoWrap;
             _testTextComponent.lineSpacing = _lineSpacing;
             _testTextComponent.characterSpacing = _characterSpacing;
 
@@ -196,7 +196,7 @@ namespace KingdomMod.OverlayMap.Gui.Debugging
             _infoTextComponent.fontSize = 16;
             _infoTextComponent.color = Color.white;
             _infoTextComponent.alignment = TextAlignmentOptions.TopLeft;
-            _infoTextComponent.enableWordWrapping = true;
+            _infoTextComponent.textWrappingMode = TextWrappingModes.Normal;
 
             // 设置字体（如果有当前字体的话）
             if (_currentFontData?.Font)
@@ -527,7 +527,7 @@ namespace KingdomMod.OverlayMap.Gui.Debugging
             _testTextComponent.alignment = _textAlignment;
             _testTextComponent.fontStyle = _fontStyle;
             _testTextComponent.richText = _enableRichText;
-            _testTextComponent.enableWordWrapping = _enableWordWrapping;
+            _testTextComponent.textWrappingMode = _enableWordWrapping ? TextWrappingModes.Normal : TextWrappingModes.NoWrap;
             _testTextComponent.lineSpacing = _lineSpacing;
             _testTextComponent.characterSpacing = _characterSpacing;
         }

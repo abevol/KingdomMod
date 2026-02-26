@@ -137,7 +137,7 @@ public class ExtraInfoView : MonoBehaviour
         // 配置文本样式
         _landAndDaysText.color = Config.MarkerStyle.ExtraInfo.Color;
         _landAndDaysText.alignment = TextAlignmentOptions.TopLeft;
-        _landAndDaysText.enableWordWrapping = false;
+        _landAndDaysText.textWrappingMode = TextWrappingModes.NoWrap;
         _landAndDaysText.overflowMode = TextOverflowModes.Overflow;
 
         // 使用配置文件中的默认字体大小（字体在 Start() 中加载）
@@ -164,7 +164,7 @@ public class ExtraInfoView : MonoBehaviour
         // 配置文本样式
         _timeText.color = Config.MarkerStyle.ExtraInfo.Color;
         _timeText.alignment = TextAlignmentOptions.TopLeft;
-        _timeText.enableWordWrapping = false;
+        _timeText.textWrappingMode = TextWrappingModes.NoWrap;
         _timeText.overflowMode = TextOverflowModes.Overflow;
 
         // 使用配置文件中的默认字体大小（字体在 Start() 中加载）
@@ -190,7 +190,7 @@ public class ExtraInfoView : MonoBehaviour
 
         _gemsText.color = Config.MarkerStyle.ExtraInfo.Color;
         _gemsText.alignment = TextAlignmentOptions.TopRight;
-        _gemsText.enableWordWrapping = false;
+        _gemsText.textWrappingMode = TextWrappingModes.NoWrap;
         _gemsText.overflowMode = TextOverflowModes.Overflow;
 
         // 使用配置文件中的默认字体大小（字体在 Start() 中加载）
@@ -210,7 +210,7 @@ public class ExtraInfoView : MonoBehaviour
 
         _coinsText.color = Config.MarkerStyle.ExtraInfo.Color;
         _coinsText.alignment = TextAlignmentOptions.TopRight;
-        _coinsText.enableWordWrapping = false;
+        _coinsText.textWrappingMode = TextWrappingModes.NoWrap;
         _coinsText.overflowMode = TextOverflowModes.Overflow;
 
         // 使用配置文件中的默认字体大小（字体在 Start() 中加载）
