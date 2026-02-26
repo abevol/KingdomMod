@@ -7,7 +7,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
     public class TeleporterMapper(TopMapView view) : IComponentMapper
     {
-        public MapMarkerType? MarkerType => MapMarkerType.Teleporter;
+        public MapMarkerType MarkerType => MapMarkerType.Teleporter;
 
         public void Map(Component component, NotifierType notifierType, ResolverType resolverType)
         {

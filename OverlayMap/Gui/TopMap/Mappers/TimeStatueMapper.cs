@@ -6,7 +6,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
     public class TimeStatueMapper(TopMapView view) : IComponentMapper
     {
-        public MapMarkerType? MarkerType => MapMarkerType.TimeStatue;
+        public MapMarkerType MarkerType => MapMarkerType.TimeStatue;
 
         public void Map(Component component)
         {

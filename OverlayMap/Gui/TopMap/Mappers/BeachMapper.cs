@@ -6,7 +6,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
     public class BeachMapper(TopMapView view) : IComponentMapper
     {
-        public MapMarkerType? MarkerType => MapMarkerType.Beach;
+        public MapMarkerType MarkerType => MapMarkerType.Beach;
 
         public void Map(Component component)
         {

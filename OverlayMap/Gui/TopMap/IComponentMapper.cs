@@ -11,10 +11,10 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
     public interface IComponentMapper
     {
         /// <summary>
-        /// 该 Mapper 负责的标记类型（可选）。
-        /// 新架构中，Mapper 应该明确声明自己处理的标记类型。
+        /// 标记类型。
+        /// Mapper 应该明确声明自己处理的标记类型。
         /// </summary>
-        MapMarkerType? MarkerType => null;
+        MapMarkerType MarkerType { get; }
 
         /// <summary>
         /// 获取需要映射的组件列表（旧方法，逐步废弃）。

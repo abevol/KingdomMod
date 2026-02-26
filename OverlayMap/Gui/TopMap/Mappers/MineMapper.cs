@@ -9,7 +9,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
     /// </summary>
     public class MineMapper(TopMapView view) : IComponentMapper
     {
-        public MapMarkerType? MarkerType => MapMarkerType.Mine;
+        public MapMarkerType MarkerType => MapMarkerType.Mine;
 
         public void Map(Component component, NotifierType notifierType, ResolverType resolverType)
         {

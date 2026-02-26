@@ -7,7 +7,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
     public class BeggarMapper(TopMapView view) : IComponentMapper
     {
-        public MapMarkerType? MarkerType => MapMarkerType.Beggar;
+        public MapMarkerType MarkerType => MapMarkerType.Beggar;
 
         public void Map(Component component)
         {

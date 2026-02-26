@@ -11,7 +11,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
     /// </summary>
     public class HermesShadeMapper(TopMapView view) : IComponentMapper
     {
-        public MapMarkerType? MarkerType => MapMarkerType.HermesShade;
+        public MapMarkerType MarkerType => MapMarkerType.HermesShade;
 
         public void Map(Component component)
         {

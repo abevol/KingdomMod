@@ -10,7 +10,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
     /// </summary>
     public class LighthouseMapper(TopMapView view) : IComponentMapper
     {
-        public MapMarkerType? MarkerType => MapMarkerType.Lighthouse;
+        public MapMarkerType MarkerType => MapMarkerType.Lighthouse;
 
         public void Map(Component component, NotifierType notifierType, ResolverType resolverType)
         {

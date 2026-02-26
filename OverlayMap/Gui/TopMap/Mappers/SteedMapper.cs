@@ -10,7 +10,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
     public class SteedMapper(TopMapView view) : IComponentMapper
     {
-        public MapMarkerType? MarkerType => MapMarkerType.Steed;
+        public MapMarkerType MarkerType => MapMarkerType.Steed;
 
         public void Map(Component component)
         {

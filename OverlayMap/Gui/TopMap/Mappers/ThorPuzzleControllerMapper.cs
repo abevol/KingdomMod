@@ -6,7 +6,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
     public class ThorPuzzleControllerMapper(TopMapView view) : IComponentMapper
     {
-        public MapMarkerType? MarkerType => MapMarkerType.ThorPuzzleController;
+        public MapMarkerType MarkerType => MapMarkerType.ThorPuzzleController;
 
         public void Map(Component component)
         {
