@@ -1,4 +1,4 @@
-using HarmonyLib;
+﻿using HarmonyLib;
 using KingdomMod.OverlayMap.Config;
 using UnityEngine;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
@@ -11,7 +11,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
     /// </summary>
     public class TeleporterRiftMapper(TopMapView view) : IComponentMapper
     {
-        public MapMarkerType? MarkerType => MapMarkerType.TeleporterRift;
+        public MapMarkerType MarkerType => MapMarkerType.TeleporterRift;
 
         public void Map(Component component)
         {

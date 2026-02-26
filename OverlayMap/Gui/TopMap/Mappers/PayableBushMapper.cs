@@ -10,7 +10,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
     public class PayableBushMapper(TopMapView view) : IComponentMapper
     {
-        public MapMarkerType? MarkerType => MapMarkerType.PayableBush;
+        public MapMarkerType MarkerType => MapMarkerType.PayableBush;
 
         public void Map(Component component, NotifierType notifierType, ResolverType resolverType)
         {

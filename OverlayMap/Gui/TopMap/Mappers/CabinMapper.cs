@@ -9,7 +9,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
     public class CabinMapper(TopMapView view) : IComponentMapper
     {
-        public MapMarkerType? MarkerType => MapMarkerType.Cabin;
+        public MapMarkerType MarkerType => MapMarkerType.Cabin;
 
         public void Map(Component component)
         {

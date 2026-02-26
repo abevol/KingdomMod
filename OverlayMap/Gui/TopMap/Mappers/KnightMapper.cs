@@ -8,7 +8,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
     public class KnightMapper(TopMapView view) : IComponentMapper
     {
-        public MapMarkerType? MarkerType => MapMarkerType.Knight;
+        public MapMarkerType MarkerType => MapMarkerType.Knight;
 
         public void Map(Component component)
         {

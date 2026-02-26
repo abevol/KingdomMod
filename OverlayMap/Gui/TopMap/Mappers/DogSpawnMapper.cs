@@ -9,7 +9,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
     public class DogSpawnMapper(TopMapView view) : IComponentMapper
     {
-        public MapMarkerType? MarkerType => MapMarkerType.DogSpawn;
+        public MapMarkerType MarkerType => MapMarkerType.DogSpawn;
 
         public void Map(Component component)
         {

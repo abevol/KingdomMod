@@ -11,7 +11,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
     public class DeerMapper(TopMapView view) : IComponentMapper
     {
-        public MapMarkerType? MarkerType => MapMarkerType.Deer;
+        public MapMarkerType MarkerType => MapMarkerType.Deer;
 
         public Component[] GetComponents()
         {

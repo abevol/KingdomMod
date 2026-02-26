@@ -9,7 +9,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
     /// </summary>
     public class GodIdolMapper(TopMapView view) : IComponentMapper
     {
-        public MapMarkerType? MarkerType => MapMarkerType.GodIdol;
+        public MapMarkerType MarkerType => MapMarkerType.GodIdol;
 
         public void Map(Component component, NotifierType notifierType, ResolverType resolverType)
         {

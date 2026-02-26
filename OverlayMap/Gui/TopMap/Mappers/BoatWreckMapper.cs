@@ -7,7 +7,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
     public class BoatWreckMapper(TopMapView view) : IComponentMapper
     {
-        public MapMarkerType? MarkerType => MapMarkerType.BoatWreck;
+        public MapMarkerType MarkerType => MapMarkerType.BoatWreck;
 
         public void Map(Component component)
         {

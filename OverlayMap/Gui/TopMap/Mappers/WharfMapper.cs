@@ -11,7 +11,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
     /// </summary>
     public class WharfMapper(TopMapView view) : IComponentMapper
     {
-        public MapMarkerType? MarkerType => MapMarkerType.Wharf;
+        public MapMarkerType MarkerType => MapMarkerType.Wharf;
 
         public void Map(Component component)
         {

@@ -11,7 +11,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
     /// </summary>
     public class WallMapper(TopMapView view) : IComponentMapper
     {
-        public MapMarkerType? MarkerType => MapMarkerType.Wall;
+        public MapMarkerType MarkerType => MapMarkerType.Wall;
 
         public void Map(Component component, NotifierType notifierType, ResolverType resolverType)
         {

@@ -9,7 +9,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
     /// </summary>
     public class QuarryMapper(TopMapView view) : IComponentMapper
     {
-        public MapMarkerType? MarkerType => MapMarkerType.Quarry;
+        public MapMarkerType MarkerType => MapMarkerType.Quarry;
 
         public void Map(Component component, NotifierType notifierType, ResolverType resolverType)
         {

@@ -7,7 +7,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
     public class HelPuzzleControllerMapper(TopMapView view) : IComponentMapper
     {
-        public MapMarkerType? MarkerType => MapMarkerType.HelPuzzleController;
+        public MapMarkerType MarkerType => MapMarkerType.HelPuzzleController;
 
         public void Map(Component component)
         {

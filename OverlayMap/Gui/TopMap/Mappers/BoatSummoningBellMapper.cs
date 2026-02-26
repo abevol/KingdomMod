@@ -6,7 +6,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
     public class BoatSummoningBellMapper(TopMapView view) : IComponentMapper
     {
-        public MapMarkerType? MarkerType => MapMarkerType.BoatSummoningBell;
+        public MapMarkerType MarkerType => MapMarkerType.BoatSummoningBell;
 
         public void Map(Component component)
         {

@@ -8,7 +8,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
     public class PayableGemChestMapper(TopMapView view) : IComponentMapper
     {
-        public MapMarkerType? MarkerType => MapMarkerType.GemChest;
+        public MapMarkerType MarkerType => MapMarkerType.GemChest;
 
         public void Map(Component component, NotifierType notifierType, ResolverType resolverType)
         {

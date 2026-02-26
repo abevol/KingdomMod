@@ -9,7 +9,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
     /// </summary>
     public class TholosMapper(TopMapView view) : IComponentMapper
     {
-        public MapMarkerType? MarkerType => MapMarkerType.Tholos;
+        public MapMarkerType MarkerType => MapMarkerType.Tholos;
 
         public void Map(Component component, NotifierType notifierType, ResolverType resolverType)
         {

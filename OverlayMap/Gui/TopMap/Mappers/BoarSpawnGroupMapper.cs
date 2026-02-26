@@ -7,7 +7,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
     public class BoarSpawnGroupMapper(TopMapView view) : IComponentMapper
     {
-        public MapMarkerType? MarkerType => MapMarkerType.BoarSpawnGroup;
+        public MapMarkerType MarkerType => MapMarkerType.BoarSpawnGroup;
 
         public void Map(Component component)
         {

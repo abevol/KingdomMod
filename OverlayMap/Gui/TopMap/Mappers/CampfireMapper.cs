@@ -8,7 +8,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
     public class CampfireMapper(TopMapView view) : IComponentMapper
     {
-        public MapMarkerType? MarkerType => MapMarkerType.Campfire;
+        public MapMarkerType MarkerType => MapMarkerType.Campfire;
 
         public void Map(Component component)
         {

@@ -10,7 +10,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
     public class PortalMapper(TopMapView view) : IComponentMapper
     {
-        public MapMarkerType? MarkerType => MapMarkerType.Portal;
+        public MapMarkerType MarkerType => MapMarkerType.Portal;
 
         public void Map(Component component)
         {
