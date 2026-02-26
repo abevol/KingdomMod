@@ -257,5 +257,10 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Resolvers
     {
         public TeleporterRiftResolver() : base(typeof(TeleporterRift), MapMarkerType.TeleporterRift) { }
     }
-}
 
+    /// <summary>弱点解析器</summary>
+    public class WeakPointResolver : SimpleResolver
+    {
+        public WeakPointResolver() : base(typeof(WorldEatingSerpentWeakPoint), MapMarkerType.WeakPoint) { }
+    }
+}
