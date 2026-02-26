@@ -96,77 +96,75 @@ internal static class MapperInitializer
         var resolverLookup = BuildResolverCache(resolvers);
 
         // 4. 初始化 Mapper 字典（基于 MapMarkerType）
-        var mappers = new Dictionary<MapMarkerType, IComponentMapper>()
-        {
-            // 地形类
-            { MapMarkerType.Beach, new Mappers.BeachMapper(view) },
-            { MapMarkerType.River, new Mappers.RiverMapper(view) },
-            
-            // 建筑类
-            { MapMarkerType.Castle, new Mappers.CastleMapper(view) },
-            { MapMarkerType.Wall, new Mappers.WallMapper(view) },
-            { MapMarkerType.Cabin, new Mappers.CabinMapper(view) },
-            { MapMarkerType.Farmhouse, new Mappers.FarmhouseMapper(view) },
-            { MapMarkerType.CitizenHouse, new Mappers.CitizenHousePayableMapper(view) },
-            
-            // 交互建筑
-            { MapMarkerType.Lighthouse, new Mappers.LighthouseMapper(view) },
-            { MapMarkerType.Mine, new Mappers.MineMapper(view) },
-            { MapMarkerType.Quarry, new Mappers.QuarryMapper(view) },
-            { MapMarkerType.PayableShop, new Mappers.PayableShopMapper(view) },
-            { MapMarkerType.Chest, new Mappers.ChestMapper(view) },
-            { MapMarkerType.GemChest, new Mappers.PayableGemChestMapper(view) },
-            { MapMarkerType.BoatSummoningBell, new Mappers.BoatSummoningBellMapper(view) },
-            { MapMarkerType.Wharf, new Mappers.WharfMapper(view) },
-            { MapMarkerType.Teleporter, new Mappers.TeleporterMapper(view) },
-            { MapMarkerType.TeleporterRift, new Mappers.TeleporterRiftMapper(view) },
+        var mappers = new Dictionary<MapMarkerType, IComponentMapper>();
 
-            // 传送点
-            { MapMarkerType.Portal, new Mappers.PortalMapper(view) },
-            { MapMarkerType.TeleporterExit, new Mappers.TeleporterExitMapper(view) },
-            
-            // 雕像类
-            { MapMarkerType.TimeStatue, new Mappers.TimeStatueMapper(view) },
-            { MapMarkerType.UnlockNewRulerStatue, new Mappers.UnlockNewRulerStatueMapper(view) },
-            { MapMarkerType.Statue, new Mappers.StatueMapper(view) },
-            
-            // 营地类
-            { MapMarkerType.BeggarCamp, new Mappers.BeggarCampMapper(view) },
-            { MapMarkerType.Campfire, new Mappers.CampfireMapper(view) },
-            
-            // 单位类
-            { MapMarkerType.Player, new Mappers.PlayerMapper(view) },
-            { MapMarkerType.Knight, new Mappers.KnightMapper(view) },
-            { MapMarkerType.Beggar, new Mappers.BeggarMapper(view) },
+        // 地形类
+        RegisterMapper(mappers, new Mappers.BeachMapper(view));
+        RegisterMapper(mappers, new Mappers.RiverMapper(view));
 
-            { MapMarkerType.Deer, new Mappers.DeerMapper(view) },
-            
-            // 坐骑类
-            { MapMarkerType.Steed, new Mappers.SteedMapper(view) },
-            { MapMarkerType.SteedSpawn, new Mappers.SteedSpawnMapper(view) },
-            { MapMarkerType.DogSpawn, new Mappers.DogSpawnMapper(view) },
-            { MapMarkerType.BoarSpawnGroup, new Mappers.BoarSpawnGroupMapper(view) },
-            
-            // 载具类
-            { MapMarkerType.Boat, new Mappers.BoatMapper(view) },
-            { MapMarkerType.BoatWreck, new Mappers.BoatWreckMapper(view) },
-            
-            // 障碍物
-            { MapMarkerType.PayableBush, new Mappers.PayableBushMapper(view) },
-            
-            // 武器
-            { MapMarkerType.Bomb, new Mappers.BombMapper(view) },
-            
-            // DLC 内容
-            { MapMarkerType.HelPuzzleController, new Mappers.HelPuzzleControllerMapper(view) },
-            { MapMarkerType.ThorPuzzleController, new Mappers.ThorPuzzleControllerMapper(view) },
-            { MapMarkerType.HephaestusForge, new Mappers.HephaestusForgeMapper(view) },
-            { MapMarkerType.PersephoneCage, new Mappers.PersephoneCageMapper(view) },
-            { MapMarkerType.MerchantSpawner, new Mappers.MerchantSpawnerMapper(view) },
-            { MapMarkerType.Tholos, new Mappers.TholosMapper(view) },
-            { MapMarkerType.GodIdol, new Mappers.GodIdolMapper(view) },
-            { MapMarkerType.HermesShade, new Mappers.HermesShadeMapper(view) },
-        };
+        // 建筑类
+        RegisterMapper(mappers, new Mappers.CastleMapper(view));
+        RegisterMapper(mappers, new Mappers.WallMapper(view));
+        RegisterMapper(mappers, new Mappers.CabinMapper(view));
+        RegisterMapper(mappers, new Mappers.FarmhouseMapper(view));
+        RegisterMapper(mappers, new Mappers.CitizenHousePayableMapper(view));
+
+        // 交互建筑
+        RegisterMapper(mappers, new Mappers.LighthouseMapper(view));
+        RegisterMapper(mappers, new Mappers.MineMapper(view));
+        RegisterMapper(mappers, new Mappers.QuarryMapper(view));
+        RegisterMapper(mappers, new Mappers.PayableShopMapper(view));
+        RegisterMapper(mappers, new Mappers.ChestMapper(view));
+        RegisterMapper(mappers, new Mappers.PayableGemChestMapper(view));
+        RegisterMapper(mappers, new Mappers.BoatSummoningBellMapper(view));
+        RegisterMapper(mappers, new Mappers.WharfMapper(view));
+        RegisterMapper(mappers, new Mappers.TeleporterMapper(view));
+        RegisterMapper(mappers, new Mappers.TeleporterRiftMapper(view));
+
+        // 传送点
+        RegisterMapper(mappers, new Mappers.PortalMapper(view));
+        RegisterMapper(mappers, new Mappers.TeleporterExitMapper(view));
+
+        // 雕像类
+        RegisterMapper(mappers, new Mappers.TimeStatueMapper(view));
+        RegisterMapper(mappers, new Mappers.UnlockNewRulerStatueMapper(view));
+        RegisterMapper(mappers, new Mappers.StatueMapper(view));
+
+        // 营地类
+        RegisterMapper(mappers, new Mappers.BeggarCampMapper(view));
+        RegisterMapper(mappers, new Mappers.CampfireMapper(view));
+
+        // 单位类
+        RegisterMapper(mappers, new Mappers.PlayerMapper(view));
+        RegisterMapper(mappers, new Mappers.KnightMapper(view));
+        RegisterMapper(mappers, new Mappers.BeggarMapper(view));
+        RegisterMapper(mappers, new Mappers.DeerMapper(view));
+
+        // 坐骑类
+        RegisterMapper(mappers, new Mappers.SteedMapper(view));
+        RegisterMapper(mappers, new Mappers.SteedSpawnMapper(view));
+        RegisterMapper(mappers, new Mappers.DogSpawnMapper(view));
+        RegisterMapper(mappers, new Mappers.BoarSpawnGroupMapper(view));
+
+        // 载具类
+        RegisterMapper(mappers, new Mappers.BoatMapper(view));
+        RegisterMapper(mappers, new Mappers.BoatWreckMapper(view));
+
+        // 障碍物
+        RegisterMapper(mappers, new Mappers.PayableBushMapper(view));
+
+        // 武器
+        RegisterMapper(mappers, new Mappers.BombMapper(view));
+
+        // DLC 内容
+        RegisterMapper(mappers, new Mappers.HelPuzzleControllerMapper(view));
+        RegisterMapper(mappers, new Mappers.ThorPuzzleControllerMapper(view));
+        RegisterMapper(mappers, new Mappers.HephaestusForgeMapper(view));
+        RegisterMapper(mappers, new Mappers.PersephoneCageMapper(view));
+        RegisterMapper(mappers, new Mappers.MerchantSpawnerMapper(view));
+        RegisterMapper(mappers, new Mappers.TholosMapper(view));
+        RegisterMapper(mappers, new Mappers.GodIdolMapper(view));
+        RegisterMapper(mappers, new Mappers.HermesShadeMapper(view));
 
         // 5. 将初始化结果设置到 TopMapView
         view.SetResolvers(resolvers, resolverLookup);
@@ -203,5 +201,15 @@ internal static class MapperInitializer
             resolvers[resolver.TargetComponentType] = new List<IMarkerResolver>();
 
         resolvers[resolver.TargetComponentType].Add(resolver);
+    }
+
+    /// <summary>
+    /// 注册 Mapper 到字典，key 由 Mapper 自身的 MarkerType 提供。
+    /// </summary>
+    private static void RegisterMapper(
+        Dictionary<MapMarkerType, IComponentMapper> mappers,
+        IComponentMapper mapper)
+    {
+        mappers[mapper.MarkerType] = mapper;
     }
 }
