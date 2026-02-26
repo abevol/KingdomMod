@@ -577,7 +577,8 @@ public class DevToolsHolder : MonoBehaviour
         {
             if (obj.transform == null) continue;
             if (obj.transform.parent == null) continue;
-            if (obj.transform.parent.name != "GameLayer") continue;
+            var tag = obj.tag == "Untagged" ? "" : obj.tag;
+            if (obj.transform.parent.name != "GameLayer" && string.IsNullOrEmpty(tag)) continue;
 
             if (obj.tag == "Fish") continue;
             if (obj.tag == "Grass") continue;

@@ -370,3 +370,6 @@ FodyWeavers.xsd
 # Decompiled files
 Decompiled/
 /ci-bepinex/
+
+# VSCode cache/options directory
+.vscode/

@@ -1,6 +1,7 @@
 ﻿using KingdomMod.OverlayMap.Config;
 using KingdomMod.SharedLib;
 using UnityEngine;
+using static KingdomMod.OverlayMap.OverlayMapHolder;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
@@ -14,12 +15,13 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 
         public void Map(Component component, NotifierType notifierType, ResolverType resolverType)
         {
-
-            var prefabId = component.gameObject.GetComponent<PrefabID>();
-            if (prefabId == null) return;
-            var gamePrefabId = (GamePrefabID)prefabId.prefabID;
+            LogGameObject(component.gameObject);
             if (resolverType == ResolverType.Scaffolding)
             {
+                var scaffolding = component.Cast<Scaffolding>();
+                var building = scaffolding.Building;
+                var prefabId = building.gameObject.GetComponent<PrefabID>();
+                var gamePrefabId = (GamePrefabID)prefabId.prefabID;
                 switch (gamePrefabId)
                 {
                     case GamePrefabID.Lighthouse_Wood:
@@ -31,8 +33,22 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                     }
                 }
             }
+            else if (resolverType == ResolverType.WorkableBuilding)
+            {
+                var prefabId = component.gameObject.GetComponent<PrefabID>();
+                if (prefabId == null) return;
+                var gamePrefabId = (GamePrefabID)prefabId.prefabID;
+                if (gamePrefabId == GamePrefabID.Lighthouse_Iron)
+                {
+                    var rock = component.gameObject.transform.FindChild("Rock");
+                    view.TryAddMapMarker(rock, MarkerStyle.Lighthouse.Color, MarkerStyle.Lighthouse.Sign, Strings.Lighthouse);
+                }
+            }
             else if (resolverType == ResolverType.PayableUpgrade)
             {
+                var prefabId = component.gameObject.GetComponent<PrefabID>();
+                if (prefabId == null) return;
+                var gamePrefabId = (GamePrefabID)prefabId.prefabID;
                 switch (gamePrefabId)
                 {
                     case GamePrefabID.Lighthouse_undeveloped:
@@ -45,7 +61,6 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                     case GamePrefabID.Lighthouse_Stone:
                     case GamePrefabID.Lighthouse_Iron:
                         // 已开发状态：根据锁定状态显示不同颜色
-                        if (component.Cast<PayableUpgrade>() != null) return;
                         view.TryAddMapMarker(component, null, MarkerStyle.Lighthouse.Sign, Strings.Lighthouse,
                             comp =>
                             {

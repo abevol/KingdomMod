@@ -529,7 +529,7 @@ public class OverlayMapHolder : MonoBehaviour
         [System.Runtime.CompilerServices.CallerLineNumber]
         int sourceLineNumber = 0)
     {
-        _log.LogDebug($"[{Path.GetFileName(sourceFilePath)}][{sourceLineNumber.ToString("0000")}][{memberName}] ID: {gameObject.GetInstanceID()}, Tag: {gameObject.tag}, GameObject: {gameObject.name}");
+        _log.LogDebug($"[{Path.GetFileName(sourceFilePath)}][{sourceLineNumber.ToString("0000")}][{memberName}] ID: {gameObject.GetInstanceID():X}, Tag: {gameObject.tag}, GameObject: {gameObject.name}");
     }
 
     public static void ForEachPlayerOverlay(System.Action<PlayerOverlay> action)

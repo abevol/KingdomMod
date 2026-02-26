@@ -1,6 +1,7 @@
 ﻿using System;
 using KingdomMod.SharedLib;
 using UnityEngine;
+using static KingdomMod.OverlayMap.OverlayMapHolder;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap.Resolvers
 {
@@ -16,6 +17,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Resolvers
 
         public MapMarkerType? Resolve(Component component)
         {
+            LogGameObject(component.gameObject);
             var payableUpgrade = component.Cast<PayableUpgrade>();
             if (payableUpgrade == null) return null;
 
