@@ -1,4 +1,4 @@
-
+﻿
 using System;
 using System.Collections.Generic;
 
@@ -37,7 +37,6 @@ internal static class MapperInitializer
         RegisterResolver(resolvers, new Resolvers.CabinResolver());
         RegisterResolver(resolvers, new Resolvers.FarmhouseResolver());
         RegisterResolver(resolvers, new Resolvers.CitizenHousePayableResolver());
-        RegisterResolver(resolvers, new Resolvers.LighthouseResolver());
         
         // 简单 Resolver - 交互建筑
         RegisterResolver(resolvers, new Resolvers.ChestResolver());

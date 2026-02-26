@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -149,7 +149,7 @@ namespace KingdomMod.SharedLib
             xml += "<enabled value=\"" + obj.enabled.ToString() + "\" />\r\n";
             xml += "<layer value=\"" + obj.layer.ToString() + "\" />\r\n";
             xml += "<prefabID value=\"" + obj.prefabID.ToString() + "\" />\r\n";
-            xml += "<instanceID value=\"" + obj.instanceID.ToString() + "\" />\r\n";
+            xml += "<instanceID value=\"" + obj.instanceID.ToString("X") + "\" />\r\n";
             xml += "<position value=\"" + obj.position + "\" />\r\n";
             xml += "<localPosition value=\"" + obj.localPosition + "\" />\r\n";
             if (!string.IsNullOrEmpty(obj.building))
@@ -214,7 +214,7 @@ namespace KingdomMod.SharedLib
             json += "\"layer\":" + obj.layer.ToString() + ",";
             if (obj.prefabID != -1)
                 json += "\"prefabID\":" + obj.prefabID.ToString() + ",";
-            json += "\"instanceID\":" + obj.instanceID.ToString() + ",";
+            json += "\"instanceID\":\"" + obj.instanceID.ToString("X") + "\",";
 
             json += "\"position\":\"" + obj.position + "\",";
             json += "\"localPosition\":\"" + obj.localPosition + "\",";

@@ -1,6 +1,7 @@
 ﻿using System;
 using KingdomMod.SharedLib;
 using UnityEngine;
+using static KingdomMod.OverlayMap.OverlayMapHolder;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap.Resolvers
 {
@@ -29,6 +30,8 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Resolvers
             if (prefabId == null) return null;
 
             var gamePrefabId = (GamePrefabID)prefabId.prefabID;
+
+            LogGameObject(component.gameObject);
 
             // 根据 PrefabID 返回对应的标记类型
             return gamePrefabId switch

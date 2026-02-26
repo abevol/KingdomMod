@@ -240,12 +240,6 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Resolvers
         public MerchantSpawnerResolver() : base(typeof(MerchantSpawner), MapMarkerType.MerchantSpawner) { }
     }
 
-    /// <summary>灯塔解析器</summary>
-    public class LighthouseResolver : SimpleResolver
-    {
-        public LighthouseResolver() : base(typeof(Lighthouse), MapMarkerType.Lighthouse) { }
-    }
-
     /// <summary>传送阵解析器</summary>
     public class PayableTeleporterResolver : SimpleResolver
     {

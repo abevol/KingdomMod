@@ -564,8 +564,8 @@ public class TopMapView : MonoBehaviour
     {
         if (MapMarkers.TryGetValue(target, out var marker))
         {
-            #if IL2CPP
-            LogDebug($"TopMapView.TryRemoveMapMarker, target: {target}, Pointer: {target.Pointer:X}");
+#if IL2CPP
+            LogDebug($"TopMapView.TryRemoveMapMarker, target: {target}, Pointer: {target.Pointer:X}, ID: {target.GetInstanceID():X}");
 #else
             LogDebug($"TopMapView.TryRemoveMapMarker, target: {target}");
 #endif
