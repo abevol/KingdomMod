@@ -131,7 +131,7 @@ public class StatsInfoView : MonoBehaviour
         _statsText.fontSize = Config.GuiStyle.StatsInfo.Text.FontSize;
         _statsText.color = Config.MarkerStyle.StatsInfo.Color;
         _statsText.alignment = TextAlignmentOptions.TopLeft;
-        _statsText.enableWordWrapping = false;
+        _statsText.textWrappingMode = TextWrappingModes.NoWrap;
         _statsText.overflowMode = TextOverflowModes.Overflow;
     }
 
