@@ -93,7 +93,11 @@ internal static class MapperInitializer
         RegisterResolver(resolvers, new Resolvers.PlayerCargoResolver());
 
         // 3. 构建 IL2CPP 指针查找缓存
+#if IL2CPP
         var resolverLookup = BuildResolverCache(resolvers);
+#else
+        Dictionary<IntPtr, List<IMarkerResolver>> resolverLookup = null;
+#endif
 
         // 4. 初始化 Mapper 字典（基于 MapMarkerType）
         var mappers = new Dictionary<MapMarkerType, IComponentMapper>();
@@ -173,6 +177,7 @@ internal static class MapperInitializer
         OverlayMapHolder.LogDebug($"Mapper system initialization completed: registered {resolvers.Count} types of component Resolvers and {mappers.Count} Mappers");
     }
 
+#if IL2CPP
     /// <summary>
     /// 构建 Resolver 的 IL2CPP 指针查找缓存。
     /// 将 System.Type 转换为 IntPtr 以提高查找性能。
@@ -188,6 +193,7 @@ internal static class MapperInitializer
         }
         return resolverLookup;
     }
+#endif
 
     /// <summary>
     /// 注册 Resolver 到字典。

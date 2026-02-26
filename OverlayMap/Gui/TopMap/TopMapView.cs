@@ -346,23 +346,32 @@ public class TopMapView : MonoBehaviour
 #endif
     private bool TryResolveAndMap(Component comp, NotifierType notifierType)
     {
-        // 1. 获取组件的类型指针
+        // 1. 获取组件的 Resolver 列表
+#if IL2CPP
+        // IL2CPP：通过原生类型指针查找，避免跨 interop 边界的 GetType() 不可靠问题
         var il2cppType = comp.GetIl2CppType();
         var typePtr = il2cppType.Pointer;
-
-        // 2. 通过指针查找对应的 Resolver 列表
         if (!_resolverLookup.TryGetValue(typePtr, out var resolvers))
             return false;
+#else
+        // Mono：直接用 System.Type 查找
+        if (!_resolvers.TryGetValue(comp.GetType(), out var resolvers))
+            return false;
+#endif
 
-        // 3. 遍历 Resolver，尝试识别
+        // 2. 遍历 Resolver，尝试识别
         foreach (var resolver in resolvers)
         {
             var markerType = resolver.Resolve(comp);
 
-            // 4. 如果识别成功，查找对应的 Mapper
+            // 3. 如果识别成功，查找对应的 Mapper
             if (markerType.HasValue && _mappers.TryGetValue(markerType.Value, out var mapper))
             {
+#if IL2CPP
                 LogDebug($"Resolved {il2cppType.Name} -> {markerType.Value}, mapping...");
+#else
+                LogDebug($"Resolved {comp.GetType().Name} -> {markerType.Value}, mapping...");
+#endif
                 mapper.Map(comp, notifierType, resolver.ResolverType);
                 return true;  // 成功识别并映射
             }
@@ -555,7 +564,11 @@ public class TopMapView : MonoBehaviour
     {
         if (MapMarkers.TryGetValue(target, out var marker))
         {
+            #if IL2CPP
             LogDebug($"TopMapView.TryRemoveMapMarker, target: {target}, Pointer: {target.Pointer:X}");
+#else
+            LogDebug($"TopMapView.TryRemoveMapMarker, target: {target}");
+#endif
 
             // 检查是否是墙体（通过判断是否在 LeftWalls 或 RightWalls 中）
             bool isWall = WallController.LeftWalls.Contains(marker) || WallController.RightWalls.Contains(marker);
