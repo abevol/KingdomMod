@@ -372,7 +372,7 @@ public class Strings
         }
         catch (Exception exception)
         {
-            LogError($"HResult: {exception.HResult:X}, {exception.Message}");
+            LogError($"HResult: 0x{exception.HResult:X}, {exception.Message}");
         }
     }
 

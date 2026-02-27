@@ -42,7 +42,7 @@ public class ConfigFileWatcher
         }
         catch (Exception exception)
         {
-            LogError($"HResult: {exception.HResult:X}, {exception.Message}");
+            LogError($"HResult: 0x{exception.HResult:X}, {exception.Message}");
         }
     }
 
@@ -72,7 +72,7 @@ public class ConfigFileWatcher
             catch (Exception e)
             {
                 if ((uint)e.HResult != 0x80070020)
-                    LogError($"HResult: {e.HResult:X}, {e.Message}");
+                    LogError($"HResult: 0x{e.HResult:X}, {e.Message}");
             }
 
             retry++;

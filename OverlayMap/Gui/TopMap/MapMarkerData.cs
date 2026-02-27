@@ -17,6 +17,13 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
         Movable = 1
     }
 
+    public class TargetInfo
+    {
+        public int GameObjectId;
+        public string GameObjectName;
+        public string ComponentName;
+    }
+
     public class MapMarkerData : IDisposable
     {
         private bool _disposed = false;
@@ -33,6 +40,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
         public TopMapView Owner;
         public MapMarker Self;
         public Component Target;
+        public TargetInfo TargetInfo;
         public MarkerRow Row;
 
         public ConfigEntryWrapper<string> Color
@@ -158,7 +166,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
 
         protected virtual void Dispose(bool disposing)
         {
-            LogDebug($"Disposing MapMarkerData for {Title?.Value}, disposing: {disposing}");
+            LogDebug($"Disposing MapMarkerData for {Title?.Value}, disposing: {disposing}, Id: 0x{TargetInfo.GameObjectId:X}, GameObject: {TargetInfo.GameObjectName}");
             if (!_disposed)
             {
                 if (disposing)
