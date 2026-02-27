@@ -6,9 +6,23 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Notifiers
     [HarmonyPatch(typeof(Payable))]
     public static class PayableNotifier
     {
+        [HarmonyPatch(nameof(Payable.Awake))]
+        [HarmonyPostfix]
+        public static void Awake(Payable __instance)
+        {
+            LogGameObject(__instance.gameObject);
+        }
+
         [HarmonyPatch(nameof(Payable.OnEnable))]
         [HarmonyPostfix]
         public static void OnEnable(Payable __instance)
+        {
+            LogGameObject(__instance.gameObject);
+        }
+
+        [HarmonyPatch(nameof(Payable.Start))]
+        [HarmonyPostfix]
+        public static void Start(Payable __instance)
         {
             LogGameObject(__instance.gameObject);
             ForEachTopMapView(view => view.OnComponentCreated(__instance, NotifierType.Payable));
@@ -20,13 +34,6 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Notifiers
         {
             LogGameObject(__instance.gameObject);
             ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
-        }
-
-        [HarmonyPatch(nameof(Payable.Awake))]
-        [HarmonyPostfix]
-        public static void Awake(Payable __instance)
-        {
-            LogGameObject(__instance.gameObject);
         }
 
         [HarmonyPatch(nameof(Payable.OnDestroy))]

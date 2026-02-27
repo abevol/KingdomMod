@@ -10,6 +10,7 @@ using Coatsink.Common;
 using KingdomMod.OverlayMap.Gui.Debugging;
 using KingdomMod.OverlayMap.Gui.TopMap;
 using KingdomMod.SharedLib;
+
 #if IL2CPP
 using KingdomMod.SharedLib.Attributes;
 #endif
@@ -529,7 +530,7 @@ public class OverlayMapHolder : MonoBehaviour
         [System.Runtime.CompilerServices.CallerLineNumber]
         int sourceLineNumber = 0)
     {
-        _log.LogDebug($"[{Path.GetFileName(sourceFilePath)}][{sourceLineNumber.ToString("0000")}][{memberName}] ID: 0x{gameObject.GetInstanceID():X}, Tag: {gameObject.tag}, GameObject: {gameObject.name}");
+        _log.LogDebug($"[{Path.GetFileName(sourceFilePath)}][{sourceLineNumber.ToString("0000")}][{memberName}] ID: 0x{gameObject.GetInstanceID():X}, Tag: {gameObject.tag}, GameObject: {gameObject.name} at {gameObject.transform.position.x}");
     }
 
     public static void ForEachPlayerOverlay(System.Action<PlayerOverlay> action)
