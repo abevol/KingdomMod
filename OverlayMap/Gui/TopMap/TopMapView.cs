@@ -508,7 +508,7 @@ public class TopMapView : MonoBehaviour
     {
         try
         {
-            // LogTrace($"TopMapView.TryAddMapMarker, title: {title?.Value}, target: {target}");
+            LogDebug($"TopMapView.TryAddMapMarker, title: {title?.Value}, target: {target}, Pointer: 0x{target.Pointer:X}, GameObjectId: 0x{target.gameObject.GetInstanceID():X}, GameObjectName: {target.gameObject.name}");
 
             if (!target)
                 return null;
@@ -526,11 +526,20 @@ public class TopMapView : MonoBehaviour
             mapMarker.Init();
 
             // 初始化 MapMarkerData 并配置各项参数
+
+            var targetInfo = new TargetInfo
+            {
+                GameObjectId = target.gameObject.GetInstanceID(),
+                GameObjectName = target.gameObject.name,
+                ComponentName = target.GetType().Name
+            };
+
             var data = new MapMarkerData
             {
                 Owner = this,
                 Self = mapMarker,
                 Target = target,
+                TargetInfo = targetInfo,
                 Row = row,
                 Color = color,
                 Sign = sign,
@@ -545,9 +554,7 @@ public class TopMapView : MonoBehaviour
 
             // 设置 MapMarker 的配置
             mapMarker.SetData(data);
-
             MapMarkers.Add(target, mapMarker);
-
             return mapMarker;
         }
         catch (Exception e)
@@ -565,7 +572,7 @@ public class TopMapView : MonoBehaviour
         if (MapMarkers.TryGetValue(target, out var marker))
         {
 #if IL2CPP
-            LogDebug($"TopMapView.TryRemoveMapMarker, target: {target}, Pointer: {target.Pointer:X}, ID: {target.GetInstanceID():X}");
+            LogDebug($"TopMapView.TryRemoveMapMarker, target: {target}, Pointer: 0x{target.Pointer:X}, Id: 0x{marker.Data.TargetInfo.GameObjectId:X}, GameObject: {marker.Data.TargetInfo.GameObjectName}");
 #else
             LogDebug($"TopMapView.TryRemoveMapMarker, target: {target}");
 #endif

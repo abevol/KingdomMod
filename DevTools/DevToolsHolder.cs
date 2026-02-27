@@ -8,6 +8,8 @@ using File = System.IO.File;
 using HarmonyLib;
 using System.Reflection;
 using KingdomMod.SharedLib;
+using Coatsink.Common;
+
 #if IL2CPP
 using KingdomMod.SharedLib.Attributes;
 #endif
@@ -247,15 +249,39 @@ public class DevToolsHolder : MonoBehaviour
 
     private void Update()
     {
-        // 检测Ctrl+D组合键
-        if (Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.D))
+        // 检测 Ctrl + D 组合键
+        if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && Input.GetKeyDown(KeyCode.D))
         {
             enableDevTools = !enableDevTools;
             log.LogMessage($"DevTools {(enableDevTools ? "enabled" : "disabled")}.");
         }
 
-        // 只有在DevTools启用时才处理其他热键
+        // 只有在 DevTools 启用时才处理调试功能热键
         if (!enableDevTools) return;
+
+        // ====================================== 调试功能热键处理 =====================================
+
+        if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
+        {
+            if (Input.GetKeyDown(KeyCode.L))
+            {
+                var player = GetLocalPlayer();
+                if (player != null)
+                {
+                    var payable = player.selectedPayable;
+                    if (payable != null)
+                    {
+                        var damageable = payable.GetGO.GetComponent<Damageable>();
+                        if (damageable != null)
+                        {
+                            log.LogMessage($"Try to destroy object: 0x{payable.GetGO.GetInstanceID():X}, {payable.GetGO.name}");
+                            damageable.ReceiveFatalDamage(SingletonMonoBehaviour<Managers>.Inst.world.gameObject, DamageSource.Fire);
+                        }
+                    }
+                }
+            }
+
+        }
 
         if (Input.GetKeyDown(KeyCode.Home))
         {
@@ -342,18 +368,6 @@ public class DevToolsHolder : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.L))
-        {
-            log.LogMessage($"Dump LevelBlocks:");
-
-            var levelBlocks = Managers.Inst.level.GetLevelBlocks();
-            log.LogMessage($"LevelBlocks: {levelBlocks.Count}");
-            foreach (var levelBlock in levelBlocks)
-            {
-                log.LogMessage($"groups: {levelBlock.groupOne}, {levelBlock.groupTwo}, {levelBlock.groupThree}");
-            }
-        }
-
         if (Input.GetKeyDown(KeyCode.Delete))
         {
             var player = GetLocalPlayer();
@@ -363,7 +377,7 @@ public class DevToolsHolder : MonoBehaviour
                 if (payable != null)
                 {
 #if IL2CPP
-                        var payableTree = payable.TryCast<PayableTree>();
+                    var payableTree = payable.TryCast<PayableTree>();
 #else
                     var payableTree = payable as PayableTree;
 #endif

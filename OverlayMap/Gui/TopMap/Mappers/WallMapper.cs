@@ -17,7 +17,6 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
         {
             if (resolverType == ResolverType.Scaffolding)
             {
-                LogWarning($"Mapping scaffolding component: {component}");
                 var scaffolding = component.Cast<Scaffolding>();
                 var building = scaffolding.Building;
                 if (building == null) return;

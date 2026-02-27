@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using static KingdomMod.OverlayMap.OverlayMapHolder;
 
 #if IL2CPP
 using Il2CppInterop.Runtime.Attributes;
@@ -46,9 +48,13 @@ public class WallLineController
     {
         if (wallMarker?.Data?.Target == null)
         {
-            OverlayMapHolder.LogError("AddWallToList: wallMarker or its data is null");
+            LogError("AddWallToList: wallMarker or its data is null");
             return;
         }
+
+        LogDebug($"AddWallToList: Adding wall {wallMarker.Data.Target.gameObject.name} 0x{wallMarker.Data.Target.gameObject.GetInstanceID():X} at {wallMarker.Data.Target.transform.position.x}");
+        LogDebug($"Current LeftWalls count: {LeftWalls.Count}, List: {string.Join(", ", LeftWalls.Select(w => (w != null && w.Data != null && w.Data.Target != null) ? $"0x{w.Data.Target.gameObject.GetInstanceID():X}:{w.Data.Target.transform.position.x:F1}" : "null"))}");
+        LogDebug($"Current RightWalls count: {RightWalls.Count}, List: {string.Join(", ", RightWalls.Select(w => (w != null && w.Data != null && w.Data.Target != null) ? $"0x{w.Data.Target.gameObject.GetInstanceID():X}:{w.Data.Target.transform.position.x:F1}" : "null"))}");
 
         // 判断墙在城堡的左侧还是右侧
         var kingdom = Managers.Inst.kingdom;
@@ -100,13 +106,17 @@ public class WallLineController
         if (wallMarker == null)
             return;
 
+        LogDebug($"RemoveWallFromList: Removing wall {wallMarker.Data.Target.gameObject.name} 0x{wallMarker.Data.Target.gameObject.GetInstanceID():X} at {wallMarker.Data.Target.transform.position.x}");
+        LogDebug($"Current LeftWalls count: {LeftWalls.Count}, List: {string.Join(", ", LeftWalls.Select(w => (w != null && w.Data != null && w.Data.Target != null) ? $"0x{w.Data.Target.gameObject.GetInstanceID():X}:{w.Data.Target.transform.position.x:F1}" : "null"))}");
+        LogDebug($"Current RightWalls count: {RightWalls.Count}, List: {string.Join(", ", RightWalls.Select(w => (w != null && w.Data != null && w.Data.Target != null) ? $"0x{w.Data.Target.gameObject.GetInstanceID():X}:{w.Data.Target.transform.position.x:F1}" : "null"))}");
+
         // 先确定墙体在哪个列表中
         bool isInLeftWalls = LeftWalls.Contains(wallMarker);
         bool isInRightWalls = RightWalls.Contains(wallMarker);
 
         if (!isInLeftWalls && !isInRightWalls)
         {
-            OverlayMapHolder.LogWarning($"RemoveWallFromList: wallMarker not found in LeftWalls or RightWalls");
+            LogWarning($"RemoveWallFromList: wallMarker not found in LeftWalls or RightWalls");
             return;
         }
 
@@ -147,17 +157,20 @@ public class WallLineController
             return;
 
         var currentWall = wallNode.Value;
-
+        
         // 获取连接目标（前一个墙或城堡）
         MapMarker targetMarker;
         if (wallNode.Previous?.Value != null)
             targetMarker = wallNode.Previous.Value;
         else
+        {
             targetMarker = _view.CastleMarker; // 第一个墙连接到城堡
+            LogDebug($"CreateWallLineForNode: Previous Node is null, connecting to castle at {_view.CastleMarker.Data.Target.transform.position.x}");
+        }
 
         if (targetMarker == null)
         {
-            OverlayMapHolder.LogError("CreateWallLineForNode: target marker (castle or previous wall) is null");
+            LogError("CreateWallLineForNode: target marker (castle or previous wall) is null");
             return;
         }
 
@@ -172,7 +185,7 @@ public class WallLineController
         // 添加到 WallLines 列表
         WallLines.Add(wallLine);
 
-        OverlayMapHolder.LogDebug($"Created WallLine for wall at {currentWall.Data.Target.transform.position.x}, connecting to {targetMarker.Data.Target.transform.position.x}, color: {lineColor}");
+        LogDebug($"Created WallLine for wall at {currentWall.Data.Target.transform.position.x}, connecting to {targetMarker.Data.Target.transform.position.x}, color: {lineColor}");
     }
 
     /// <summary>
