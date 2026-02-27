@@ -81,12 +81,11 @@ jobs:
           CONFIG="${{ matrix.config }}"
           VERSION="${{ needs.validate.outputs.version }}"
           STAGING="${{ github.workspace }}/_staging"
-          MODS=(BetterPayableUpgrade DevTools OverlayMap StaminaBar)
+          MODS=(BetterPayableUpgrade DevTools OverlayMap StaminaBar SharedLib)
           for MOD in "${MODS[@]}"; do
             MOD_DIR="$STAGING/KingdomMod.$MOD"
             mkdir -p "$MOD_DIR"
             cp "$MOD/bin/$CONFIG/KingdomMod.$MOD.dll" "$MOD_DIR/"
-            cp "SharedLib/bin/$CONFIG/KingdomMod.SharedLib.dll" "$MOD_DIR/"
           done
           ZIP_NAME="KingdomMod.All-${CONFIG}-v${VERSION}.zip"
           cd "$STAGING"
@@ -158,8 +157,8 @@ jobs:
         with:
           name: release-zips
           path: |
-            KingdomMod.All-BIE6_IL2CPP-v*.zip
-            KingdomMod.All-BIE6_Mono-v*.zip
+            zips/KingdomMod.All-BIE6_IL2CPP-v*.zip
+            zips/KingdomMod.All-BIE6_Mono-v*.zip
             KingdomMod.All-BIE6_IL2CPP-v*-with-BepInEx.zip
             KingdomMod.All-BIE6_Mono-v*-with-BepInEx.zip
           retention-days: 1
