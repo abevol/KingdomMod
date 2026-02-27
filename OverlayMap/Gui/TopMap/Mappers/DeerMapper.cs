@@ -1,8 +1,6 @@
 ﻿using HarmonyLib;
 using KingdomMod.OverlayMap.Config;
-using KingdomMod.OverlayMap.Patchers;
 using KingdomMod.SharedLib;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
@@ -27,23 +25,28 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                 return state == 5 ? MarkerStyle.DeerFollowing.Color : MarkerStyle.Deer.Color;
             }, comp => comp.gameObject.activeSelf && !comp.Cast<Deer>()._damageable.isDead, MarkerRow.Movable);
         }
+    }
+}
 
-        [HarmonyPatch(typeof(Deer), nameof(Deer.Start))]
-        private class StartPatch
+namespace KingdomMod.OverlayMap.Gui.TopMap.Notifiers
+{
+    // 该 Notifier 只服务于该组件的映射，根据“相关性聚合”原则放在同一个文件。
+
+    [HarmonyPatch(typeof(Deer))]
+    public static class DeerNotifier
+    {
+        [HarmonyPatch(nameof(Deer.Start))]
+        [HarmonyPostfix]
+        public static void Start(Deer __instance)
         {
-            public static void Postfix(Deer __instance)
-            {
-                ForEachTopMapView(view => view.OnComponentCreated(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentCreated(__instance));
         }
 
-        [HarmonyPatch(typeof(Deer), nameof(Deer.OnDestroy))]
-        private class OnDestroyPatch
+        [HarmonyPatch(nameof(Deer.OnDisable))]
+        [HarmonyPrefix]
+        public static void OnDisable(Deer __instance)
         {
-            public static void Prefix(Deer __instance)
-            {
-                ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
         }
     }
 }

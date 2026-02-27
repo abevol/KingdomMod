@@ -13,23 +13,28 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
         {
             view.TryAddMapMarker(component, MarkerStyle.MerchantHouse.Color, MarkerStyle.MerchantHouse.Sign, Strings.MerchantHouse);
         }
+    }
+}
 
-        [HarmonyPatch(typeof(MerchantSpawner), nameof(MerchantSpawner.Start))]
-        private class StartPatch
+namespace KingdomMod.OverlayMap.Gui.TopMap.Notifiers
+{
+    // 该 Notifier 只服务于该组件的映射，根据“相关性聚合”原则放在同一个文件。
+
+    [HarmonyPatch(typeof(MerchantSpawner))]
+    public static class MerchantSpawnerNotifier
+    {
+        [HarmonyPatch(nameof(MerchantSpawner.Start))]
+        [HarmonyPostfix]
+        public static void Start(MerchantSpawner __instance)
         {
-            public static void Postfix(MerchantSpawner __instance)
-            {
-                ForEachTopMapView(view => view.OnComponentCreated(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentCreated(__instance));
         }
 
-        [HarmonyPatch(typeof(MerchantSpawner), nameof(MerchantSpawner.OnDestroy))]
-        private class OnDestroyPatch
+        [HarmonyPatch(nameof(MerchantSpawner.OnDestroy))]
+        [HarmonyPrefix]
+        public static void OnDestroy(MerchantSpawner __instance)
         {
-            public static void Prefix(MerchantSpawner __instance)
-            {
-                ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
         }
     }
 }

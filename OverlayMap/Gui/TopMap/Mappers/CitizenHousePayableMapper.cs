@@ -1,9 +1,8 @@
 ﻿using HarmonyLib;
 using KingdomMod.OverlayMap.Config;
-using KingdomMod.OverlayMap.Patchers;
-using System.Collections.Generic;
 using KingdomMod.SharedLib;
 using UnityEngine;
+using static KingdomMod.OverlayMap.OverlayMapHolder;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
@@ -17,23 +16,28 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                 comp => comp.Cast<CitizenHousePayable>()._numberOfAvailableCitizens,
                 comp => comp.gameObject.activeSelf ? MarkerStyle.CitizenHouse.Color : MarkerStyle.CitizenHouse.Building.Color);
         }
+    }
+}
 
-        [HarmonyPatch(typeof(CitizenHousePayable), nameof(CitizenHousePayable.OnEnable))]
-        private class OnEnablePatch
+namespace KingdomMod.OverlayMap.Gui.TopMap.Notifiers
+{
+    // 该 Notifier 只服务于该组件的映射，根据“相关性聚合”原则放在同一个文件。
+
+    [HarmonyPatch(typeof(CitizenHousePayable))]
+    public static class CitizenHousePayableNotifier
+    {
+        [HarmonyPatch(nameof(CitizenHousePayable.OnEnable))]
+        [HarmonyPostfix]
+        public static void OnEnable(CitizenHousePayable __instance)
         {
-            public static void Postfix(CitizenHousePayable __instance)
-            {
-                OverlayMapHolder.ForEachTopMapView(view => view.OnComponentCreated(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentCreated(__instance));
         }
 
-        [HarmonyPatch(typeof(CitizenHousePayable), nameof(CitizenHousePayable.OnDisable))]
-        private class OnDisablePatch
+        [HarmonyPatch(nameof(CitizenHousePayable.OnDisable))]
+        [HarmonyPrefix]
+        public static void OnDisable(CitizenHousePayable __instance)
         {
-            public static void Prefix(CitizenHousePayable __instance)
-            {
-                OverlayMapHolder.ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
         }
     }
 }

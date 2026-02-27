@@ -40,7 +40,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                 var gamePrefabId = (GamePrefabID)prefabId.prefabID;
                 if (gamePrefabId == GamePrefabID.Lighthouse_Iron)
                 {
-                    var rock = component.gameObject.transform.FindChild("Rock");
+                    var rock = component.gameObject.transform.Find("Rock");
                     view.TryAddMapMarker(rock, MarkerStyle.Lighthouse.Color, MarkerStyle.Lighthouse.Sign, Strings.Lighthouse);
                 }
             }

@@ -1,8 +1,8 @@
 ﻿using HarmonyLib;
+using UnityEngine;
 using KingdomMod.OverlayMap.Config;
 using KingdomMod.OverlayMap.Config.Extensions;
 using KingdomMod.SharedLib;
-using UnityEngine;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
@@ -36,23 +36,28 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
             LogWarning($"Unknown hermit type: {hermitType}");
             return null;
         }
+    }
+}
 
-        [HarmonyPatch(typeof(Cabin), nameof(Cabin.OnEnable))]
-        private class OnEnablePatch
+namespace KingdomMod.OverlayMap.Gui.TopMap.Notifiers
+{
+    // 该 Notifier 只服务于该组件的映射，根据“相关性聚合”原则放在同一个文件。
+
+    [HarmonyPatch(typeof(Cabin))]
+    public static class CabinNotifier
+    {
+        [HarmonyPatch(nameof(Cabin.OnEnable))]
+        [HarmonyPostfix]
+        public static void OnEnable(Cabin __instance)
         {
-            public static void Postfix(Cabin __instance)
-            {
-                ForEachTopMapView(view => view.OnComponentCreated(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentCreated(__instance));
         }
 
-        [HarmonyPatch(typeof(Cabin), nameof(Cabin.OnDisable))]
-        private class OnDisablePatch
+        [HarmonyPatch(nameof(Cabin.OnDisable))]
+        [HarmonyPrefix]
+        public static void OnDisable(Cabin __instance)
         {
-            public static void Prefix(Cabin __instance)
-            {
-                ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
         }
     }
 }

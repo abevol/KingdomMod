@@ -17,23 +17,28 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                     ? MarkerStyle.PersephoneCage.Locked.Color
                     : MarkerStyle.PersephoneCage.Unlocked.Color);
         }
+    }
+}
 
-        [HarmonyPatch(typeof(PersephoneCage), nameof(PersephoneCage.Awake))]
-        private class AwakePatch
+namespace KingdomMod.OverlayMap.Gui.TopMap.Notifiers
+{
+    // 该 Notifier 只服务于该组件的映射，根据“相关性聚合”原则放在同一个文件。
+
+    [HarmonyPatch(typeof(PersephoneCage))]
+    public static class PersephoneCageNotifier
+    {
+        [HarmonyPatch(nameof(PersephoneCage.Awake))]
+        [HarmonyPostfix]
+        public static void Awake(PersephoneCage __instance)
         {
-            public static void Postfix(PersephoneCage __instance)
-            {
-                ForEachTopMapView(view => view.OnComponentCreated(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentCreated(__instance));
         }
 
-        [HarmonyPatch(typeof(PersephoneCage), nameof(PersephoneCage.OnDestroy))]
-        private class OnDestroyPatch
+        [HarmonyPatch(nameof(PersephoneCage.OnDisable))]
+        [HarmonyPrefix]
+        public static void OnDisable(PersephoneCage __instance)
         {
-            public static void Prefix(PersephoneCage __instance)
-            {
-                ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
         }
     }
 }

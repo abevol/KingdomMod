@@ -1,7 +1,8 @@
 ﻿using HarmonyLib;
-using KingdomMod.OverlayMap.Config;
-using KingdomMod.SharedLib;
 using UnityEngine;
+using KingdomMod.SharedLib;
+using KingdomMod.OverlayMap.Config;
+using static KingdomMod.OverlayMap.OverlayMapHolder;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
@@ -27,23 +28,27 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                     return count;
                 });
         }
+    }
+}
 
-        [HarmonyPatch(typeof(BeggarCamp), nameof(BeggarCamp.Start))]
-        private class StartPatch
+namespace KingdomMod.OverlayMap.Gui.TopMap.Notifiers
+{
+    // 该 Notifier 只服务于该组件的映射，根据“相关性聚合”原则放在同一个文件。
+
+    [HarmonyPatch(typeof(BeggarCamp))]
+    public static class BeggarCampNotifier
+    {
+        [HarmonyPatch(nameof(BeggarCamp.Start))]
+        [HarmonyPostfix]
+        public static void Start(BeggarCamp __instance)
         {
-            public static void Postfix(BeggarCamp __instance)
-            {
-                OverlayMapHolder.ForEachTopMapView(view => view.OnComponentCreated(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentCreated(__instance));
         }
-
-        [HarmonyPatch(typeof(BeggarCamp), nameof(BeggarCamp.OnDestroy))]
-        private class OnDisablePatch
+        [HarmonyPatch(nameof(BeggarCamp.OnDestroy))]
+        [HarmonyPrefix]
+        public static void OnDisable(BeggarCamp __instance)
         {
-            public static void Prefix(BeggarCamp __instance)
-            {
-                OverlayMapHolder.ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
         }
     }
 }

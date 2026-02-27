@@ -25,32 +25,43 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 
             view.TryAddMapMarker(component, MarkerStyle.HermesShade.Color, MarkerStyle.HermesShade.Sign, Strings.HermesShade);
         }
+    }
+}
 
-        [HarmonyPatch(typeof(HermesShade), nameof(HermesShade.Start))]
-        private class StartPatch
+namespace KingdomMod.OverlayMap.Gui.TopMap.Notifiers
+{
+    // 该 Notifier 只服务于该组件的映射，根据“相关性聚合”原则放在同一个文件。
+
+    [HarmonyPatch(typeof(HermesShade))]
+    public static class HermesShadeNotifier
+    {
+        [HarmonyPatch(nameof(HermesShade.Start))]
+        [HarmonyPostfix]
+        public static void Start(HermesShade __instance)
         {
-            public static void Postfix(HermesShade __instance)
-            {
-                ForEachTopMapView(view => view.OnComponentCreated(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentCreated(__instance));
         }
 
-        [HarmonyPatch(typeof(HermesShade), nameof(HermesShade.OnDestroy))]
-        private class OnDestroyPatch
+        [HarmonyPatch(nameof(HermesShade.OnDisable))]
+        [HarmonyPrefix]
+        public static void OnDisable(HermesShade __instance)
         {
-            public static void Prefix(HermesShade __instance)
-            {
-                ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
         }
 
-        [HarmonyPatch(typeof(HermesShade), nameof(HermesShade.OnShadeCollectedHandler))]
-        private class OnShadeCollectedHandlerPatch
+        [HarmonyPatch(nameof(HermesShade.OnDestroy))]
+        [HarmonyPrefix]
+        public static void OnDestroy(HermesShade __instance)
         {
-            public static void Prefix(HermesShade __instance)
-            {
-                ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
+        }
+
+        [HarmonyPatch(nameof(HermesShade.OnShadeCollectedHandler))]
+        [HarmonyPrefix]
+        public static void OnShadeCollectedHandler(HermesShade __instance)
+        {
+            ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
         }
     }
 }
+

@@ -17,31 +17,28 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
         {
             view.TryAddMapMarker(component, MarkerStyle.TeleporterRift.Color, MarkerStyle.TeleporterRift.Sign, Strings.TeleporterRift);
         }
+    }
+}
 
-        /// <summary>
-        /// TeleporterRift.OnEnable 补丁。
-        /// 当组件启用时通知 TopMapView 创建标记。
-        /// </summary>
-        [HarmonyPatch(typeof(TeleporterRift), nameof(TeleporterRift.OnEnable))]
-        private class OnEnablePatch
+namespace KingdomMod.OverlayMap.Gui.TopMap.Notifiers
+{
+    // 该 Notifier 只服务于该组件的映射，根据“相关性聚合”原则放在同一个文件。
+
+    [HarmonyPatch(typeof(TeleporterRift))]
+    public static class TeleporterRiftNotifier
+    {
+        [HarmonyPatch(nameof(TeleporterRift.OnEnable))]
+        [HarmonyPostfix]
+        public static void OnEnable(TeleporterRift __instance)
         {
-            public static void Postfix(TeleporterRift __instance)
-            {
-                ForEachTopMapView(view => view.OnComponentCreated(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentCreated(__instance));
         }
 
-        /// <summary>
-        /// TeleporterRift.OnDisable 补丁。
-        /// 当组件禁用时通知 TopMapView 销毁标记。
-        /// </summary>
-        [HarmonyPatch(typeof(TeleporterRift), nameof(TeleporterRift.OnDisable))]
-        private class OnDisablePatch
+        [HarmonyPatch(nameof(TeleporterRift.OnDisable))]
+        [HarmonyPrefix]
+        public static void OnDisable(TeleporterRift __instance)
         {
-            public static void Prefix(TeleporterRift __instance)
-            {
-                ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
         }
     }
 }

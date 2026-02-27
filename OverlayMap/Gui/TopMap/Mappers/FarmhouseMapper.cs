@@ -1,8 +1,7 @@
 ﻿using HarmonyLib;
-using KingdomMod.OverlayMap.Config;
-using KingdomMod.OverlayMap.Patchers;
-using System.Collections.Generic;
 using UnityEngine;
+using KingdomMod.OverlayMap.Config;
+using static KingdomMod.OverlayMap.OverlayMapHolder;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
@@ -14,23 +13,28 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
         {
             view.TryAddMapMarker(component, MarkerStyle.Farmhouse.Color, MarkerStyle.Farmhouse.Sign, Strings.Farmhouse);
         }
+    }
+}
 
-        [HarmonyPatch(typeof(Farmhouse), nameof(Farmhouse.OnEnable))]
-        private class OnEnablePatch
+namespace KingdomMod.OverlayMap.Gui.TopMap.Notifiers
+{
+    // 该 Notifier 只服务于该组件的映射，根据“相关性聚合”原则放在同一个文件。
+
+    [HarmonyPatch(typeof(Farmhouse))]
+    public static class FarmhouseNotifier
+    {
+        [HarmonyPatch(nameof(Farmhouse.Start))]
+        [HarmonyPostfix]
+        public static void Start(Farmhouse __instance)
         {
-            public static void Postfix(Farmhouse __instance)
-            {
-                OverlayMapHolder.ForEachTopMapView(view => view.OnComponentCreated(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentCreated(__instance));
         }
 
-        [HarmonyPatch(typeof(Farmhouse), nameof(Farmhouse.OnDisable))]
-        private class OnDisablePatch
+        [HarmonyPatch(nameof(Farmhouse.OnDisable))]
+        [HarmonyPrefix]
+        public static void OnDisable(Farmhouse __instance)
         {
-            public static void Prefix(Farmhouse __instance)
-            {
-                OverlayMapHolder.ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
         }
     }
 }

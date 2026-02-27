@@ -1,9 +1,8 @@
 ﻿using HarmonyLib;
 using KingdomMod.OverlayMap.Config;
-using KingdomMod.OverlayMap.Patchers;
-using System.Collections.Generic;
 using KingdomMod.SharedLib;
 using UnityEngine;
+using static KingdomMod.OverlayMap.OverlayMapHolder;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
@@ -16,23 +15,28 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
             view.TryAddMapMarker(component, MarkerStyle.DogSpawn.Color, MarkerStyle.DogSpawn.Sign, Strings.DogSpawn, null, null,
                 comp => !comp.Cast<DogSpawn>()._dogFreed);
         }
+    }
+}
 
-        [HarmonyPatch(typeof(DogSpawn), nameof(DogSpawn.Start))]
-        private class OnEnablePatch
+namespace KingdomMod.OverlayMap.Gui.TopMap.Notifiers
+{
+    // 该 Notifier 只服务于该组件的映射，根据“相关性聚合”原则放在同一个文件。
+
+    [HarmonyPatch(typeof(DogSpawn))]
+    public static class DogSpawnNotifier
+    {
+        [HarmonyPatch(nameof(DogSpawn.Start))]
+        [HarmonyPostfix]
+        public static void Start(DogSpawn __instance)
         {
-            public static void Postfix(DogSpawn __instance)
-            {
-                OverlayMapHolder.ForEachTopMapView(view => view.OnComponentCreated(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentCreated(__instance));
         }
 
-        [HarmonyPatch(typeof(DogSpawn), nameof(DogSpawn.OnDisable))]
-        private class OnDisablePatch
+        [HarmonyPatch(nameof(DogSpawn.OnDisable))]
+        [HarmonyPrefix]
+        public static void OnDisable(DogSpawn __instance)
         {
-            public static void Prefix(DogSpawn __instance)
-            {
-                OverlayMapHolder.ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
         }
     }
 }

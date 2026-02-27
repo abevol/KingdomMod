@@ -10,9 +10,9 @@ description: 用于在 OverlayMap 模组中添加新的地图标记。涵盖所�
 ## 核心架构
 
 ```
-游戏组件 → Resolver → MapMarkerType → Mapper → MapMarker
-                ↓                        ↓
-         识别组件类型              创建标记并配置样式
+游戏组件 → Notifier → Resolver → MapMarkerType → Mapper → MapMarker
+            ↓            ↓                        ↓
+通知游戏组件创建/销毁  识别组件类型              创建标记并配置样式
 ```
 
 - **Resolver**: 识别游戏组件，返回对应的 `MapMarkerType`
@@ -27,6 +27,14 @@ description: 用于在 OverlayMap 模组中添加新的地图标记。涵盖所�
 | **MarkerConfig** | Color + Sign | 单一状态标记 | Beach, Portal, Shop |
 | **MarkerConfigStated** | Color + Sign + 状态子配置 | 多状态标记（锁定/建造/损坏等） | Wall, Lighthouse, Mine |
 | **MarkerConfigColor** | Color only | 仅颜色（用于线条/文字） | StatsInfo, ExtraInfo |
+
+## 通知方式选择
+
+- 这个需要用户根据游戏的运行信息和游戏对象的转储信息进行判断，因此主要听取用户提供的信息。
+- 通知方式包括:
+  1. **组件自身事件**: 按照组件生命周期的触发顺序，如 `Awake`, `OnEnable`, `Start`, `OnDisable`, `OnDestroy` 等。对于具体组件，这些方法并不一定都存在，需要通过技能 `game-type-browser` 查看组件类型的具体实现才能确定。根据经验，优先使用 `Start` 和 `OnDisable` 事件来作为地图图标创建和销毁的触发事件，因为它们处于组件生命周期的中间位置，能够确保在组件初始化完成后和组件销毁前触发。此外，在同一个位置的对象发生连续更替时，`OnDisable` 事件会在 `OnDestroy` 事件之前触发，因此可以利用 `OnDisable` 事件来删除旧的地图图标，确保在新的地图图标创建前旧的地图图标已被正确删除。此外，由于组件自身的 Notifier 只服务于该组件的映射，根据“相关性聚合”原则放在同一个 Mapper 文件内，而不需要像其它的通用通知器那样写到单独的 Notifier 文件。
+  2. **父类组件通知器**: 利用父类组件的事件通知，比如 `PayableBush`, `PayableUpgrade` 继承自 `PayableNotifier`，因此可以利用 `PayableNotifier` 的事件通知。
+  3. **兄弟组件通知器**: 利用同一游戏对象上的其他兄弟组件的事件通知，比如 `PayableBlockerNotifier`, `PayableNotifier`, `PlayerCargoNotifier`, `ScaffoldingNotifier`, `WorkableBuildingNotifier` 等。
 
 ## 通用添加流程
 
@@ -117,37 +125,6 @@ RGBA 格式，值范围 0-1：
 1. Resolver 是否正确返回 `MapMarkerType`
 2. Mapper 是否已在 `MapperInitializer` 中注册
 3. 配置文件是否包含该标记的配置
-4. **如果组件继承其他类型并重写了 OnEnable/OnDisable**：必须在 Mapper 中单独 Patch
-
-### Q: 什么时候需要添加 OnEnable/OnDisable Patch？
-
-当目标组件**继承**自其他类型并**重写**了 `OnEnable`/`OnDisable` 方法时：
-
-```csharp
-public class WharfMapper(TopMapView view) : IComponentMapper
-{
-    public void Map(Component component) { /* ... */ }
-
-    // Wharf 继承自 Payable，但重写了 OnEnable/OnDisable
-    [HarmonyPatch(typeof(Wharf), nameof(Wharf.OnEnable))]
-    private class OnEnablePatch
-    {
-        public static void Postfix(Wharf __instance)
-        {
-            ForEachTopMapView(view => view.OnComponentCreated(__instance));
-        }
-    }
-
-    [HarmonyPatch(typeof(Wharf), nameof(Wharf.OnDisable))]
-    private class OnDisablePatch
-    {
-        public static void Prefix(Wharf __instance)
-        {
-            ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
-        }
-    }
-}
-```
 
 ### Q: 复用现有标记类型还是创建新类型？
 

@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-using HarmonyLib;
-using KingdomMod.OverlayMap.Config;
-using KingdomMod.OverlayMap.Patchers;
-using UnityEngine;
+﻿using HarmonyLib;
 using KingdomMod.SharedLib;
+using KingdomMod.OverlayMap.Config;
+using UnityEngine;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
@@ -48,23 +46,28 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                 LogDebug($"player.playerId: {component.Cast<Player>().playerId}, _playerMarkers.Count: {view.PlayerMarkers.Count}");
             }
         }
+    }
+}
 
-        [HarmonyPatch(typeof(Player), nameof(Player.OnEnable))]
-        private class OnEnablePatch
+namespace KingdomMod.OverlayMap.Gui.TopMap.Notifiers
+{
+    // 该 Notifier 只服务于该组件的映射，根据“相关性聚合”原则放在同一个文件。
+
+    [HarmonyPatch(typeof(Player))]
+    public static class PlayerNotifier
+    {
+        [HarmonyPatch(nameof(Player.OnEnable))]
+        [HarmonyPostfix]
+        public static void OnEnable(Player __instance)
         {
-            public static void Postfix(Player __instance)
-            {
-                ForEachTopMapView(view => view.OnComponentCreated(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentCreated(__instance));
         }
 
-        [HarmonyPatch(typeof(Player), nameof(Player.OnDisable))]
-        private class OnDisablePatch
+        [HarmonyPatch(nameof(Player.OnDisable))]
+        [HarmonyPrefix]
+        public static void OnDisable(Player __instance)
         {
-            public static void Prefix(Player __instance)
-            {
-                ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
         }
     }
 }
