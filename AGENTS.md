@@ -46,8 +46,8 @@ dotnet build OverlayMap/OverlayMap.csproj -c Debug
 
 ## 撤销标签
 
-1. 删除远程标签: git push origin --delete vx.x.x
-2. 删除本地标签: git tag -d vx.x.x
+1. 删除远程标签: `git push origin --delete vx.x.x`
+2. 删除本地标签: `git tag -d vx.x.x`
 
 ---
 
