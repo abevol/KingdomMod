@@ -1,7 +1,5 @@
 ﻿using HarmonyLib;
 using KingdomMod.OverlayMap.Config;
-using KingdomMod.OverlayMap.Patchers;
-using System.Collections.Generic;
 using KingdomMod.SharedLib;
 using UnityEngine;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
@@ -29,23 +27,28 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                 return id == PlayerId.P1 ? MarkerStyle.TeleExitP1.Color : MarkerStyle.TeleExitP2.Color;
             }, null, MarkerRow.Movable);
         }
+    }
+}
 
-        [HarmonyPatch(typeof(TeleporterExit), nameof(TeleporterExit.Initialize))]
-        private class InitializePatch
+namespace KingdomMod.OverlayMap.Gui.TopMap.Notifiers
+{
+    // 该 Notifier 只服务于该组件的映射，根据“相关性聚合”原则放在同一个文件。
+
+    [HarmonyPatch(typeof(TeleporterExit))]
+    public static class TeleporterExitNotifier
+    {
+        [HarmonyPatch(nameof(TeleporterExit.Initialize))]
+        [HarmonyPostfix]
+        public static void Initialize(TeleporterExit __instance)
         {
-            public static void Postfix(TeleporterExit __instance)
-            {
-                ForEachTopMapView(view => view.OnComponentCreated(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentCreated(__instance));
         }
 
-        [HarmonyPatch(typeof(TeleporterExit), nameof(TeleporterExit.OnDestroy))]
-        private class OnDestroyPatch
+        [HarmonyPatch(nameof(TeleporterExit.OnDestroy))]
+        [HarmonyPrefix]
+        public static void OnDestroy(TeleporterExit __instance)
         {
-            public static void Prefix(TeleporterExit __instance)
-            {
-                ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
         }
     }
 }

@@ -1,4 +1,4 @@
-using HarmonyLib;
+﻿using HarmonyLib;
 using KingdomMod.OverlayMap.Config;
 using KingdomMod.SharedLib;
 using UnityEngine;
@@ -25,29 +25,29 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                     return !p.IsSubmerged;
                 });
         }
+    }
+}
 
-        /// <summary>
-        /// WorldEatingSerpentWeakPoint.OnEnable 补丁。
-        /// </summary>
-        [HarmonyPatch(typeof(WorldEatingSerpentWeakPoint), nameof(WorldEatingSerpentWeakPoint.OnEnable))]
-        private class OnEnablePatch
+namespace KingdomMod.OverlayMap.Gui.TopMap.Notifiers
+{
+    // 该 Notifier 只服务于该组件的映射，根据“相关性聚合”原则放在同一个文件。
+
+    [HarmonyPatch(typeof(WorldEatingSerpentWeakPoint))]
+    public static class WorldEatingSerpentWeakPointNotifier
+    {
+        [HarmonyPatch(nameof(WorldEatingSerpentWeakPoint.OnEnable))]
+        [HarmonyPostfix]
+        public static void OnEnable(WorldEatingSerpentWeakPoint __instance)
         {
-            public static void Postfix(WorldEatingSerpentWeakPoint __instance)
-            {
-                ForEachTopMapView(view => view.OnComponentCreated(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentCreated(__instance));
         }
 
-        /// <summary>
-        /// WorldEatingSerpentWeakPoint.OnDisable 补丁。
-        /// </summary>
-        [HarmonyPatch(typeof(WorldEatingSerpentWeakPoint), nameof(WorldEatingSerpentWeakPoint.OnDisable))]
-        private class OnDisablePatch
+        [HarmonyPatch(nameof(WorldEatingSerpentWeakPoint.OnDisable))]
+        [HarmonyPrefix]
+        public static void OnDisable(WorldEatingSerpentWeakPoint __instance)
         {
-            public static void Prefix(WorldEatingSerpentWeakPoint __instance)
-            {
-                ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
         }
     }
 }
+

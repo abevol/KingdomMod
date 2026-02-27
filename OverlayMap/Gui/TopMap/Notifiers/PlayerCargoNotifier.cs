@@ -15,7 +15,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Notifiers
             ForEachTopMapView(view => view.OnComponentCreated(__instance, NotifierType.PlayerCargo));
         }
 
-        public static void OnPlayerCargoPickedUp(PlayerCargo __instance)
+        private static void OnPlayerCargoPickedUp(PlayerCargo __instance)
         {
             LogGameObject(__instance.gameObject);
             ForEachTopMapView(view => view.OnComponentDestroyed(__instance));

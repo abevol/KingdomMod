@@ -1,9 +1,8 @@
 ﻿using HarmonyLib;
-using KingdomMod.OverlayMap.Config;
-using KingdomMod.OverlayMap.Patchers;
-using System.Collections.Generic;
-using KingdomMod.SharedLib;
 using UnityEngine;
+using KingdomMod.OverlayMap.Config;
+using KingdomMod.SharedLib;
+using static KingdomMod.OverlayMap.OverlayMapHolder;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
@@ -22,23 +21,28 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                 comp => comp.Cast<Chest>().currencyAmount,
                 null, comp => comp.Cast<Chest>().currencyAmount != 0);
         }
+    }
+}
 
-        [HarmonyPatch(typeof(Chest), nameof(Chest.Awake))]
-        private class OnEnablePatch
+namespace KingdomMod.OverlayMap.Gui.TopMap.Notifiers
+{
+    // 该 Notifier 只服务于该组件的映射，根据“相关性聚合”原则放在同一个文件。
+
+    [HarmonyPatch(typeof(Chest))]
+    public static class ChestNotifier
+    {
+        [HarmonyPatch(nameof(Chest.Awake))]
+        [HarmonyPostfix]
+        public static void OnEnable(Chest __instance)
         {
-            public static void Postfix(Chest __instance)
-            {
-                OverlayMapHolder.ForEachTopMapView(view => view.OnComponentCreated(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentCreated(__instance));
         }
 
-        [HarmonyPatch(typeof(Chest), nameof(Chest.OnDestroy))]
-        private class OnDisablePatch
+        [HarmonyPatch(nameof(Chest.OnDestroy))]
+        [HarmonyPrefix]
+        public static void OnDisable(Chest __instance)
         {
-            public static void Prefix(Chest __instance)
-            {
-                OverlayMapHolder.ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
         }
     }
 }

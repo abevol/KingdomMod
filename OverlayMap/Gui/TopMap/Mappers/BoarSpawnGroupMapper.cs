@@ -1,7 +1,8 @@
 ﻿using HarmonyLib;
-using KingdomMod.OverlayMap.Config;
-using KingdomMod.SharedLib;
 using UnityEngine;
+using KingdomMod.SharedLib;
+using KingdomMod.OverlayMap.Config;
+using static KingdomMod.OverlayMap.OverlayMapHolder;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
@@ -14,23 +15,28 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
             view.TryAddMapMarker(component, MarkerStyle.BoarSpawn.Color, MarkerStyle.BoarSpawn.Sign, Strings.BoarSpawn,
                 comp => comp.Cast<BoarSpawnGroup>()._spawnedBoar ? 0 : 1);
         }
+    }
+}
 
-        [HarmonyPatch(typeof(BoarSpawnGroup), nameof(BoarSpawnGroup.Awake))]
-        private class OnEnablePatch
+namespace KingdomMod.OverlayMap.Gui.TopMap.Notifiers
+{
+    // 该 Notifier 只服务于该组件的映射，根据“相关性聚合”原则放在同一个文件。
+
+    [HarmonyPatch(typeof(BoarSpawnGroup))]
+    public static class BoarSpawnGroupNotifier
+    {
+        [HarmonyPatch(nameof(BoarSpawnGroup.Awake))]
+        [HarmonyPostfix]
+        public static void Awake(BoarSpawnGroup __instance)
         {
-            public static void Postfix(BoarSpawnGroup __instance)
-            {
-                OverlayMapHolder.ForEachTopMapView(view => view.OnComponentCreated(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentCreated(__instance));
         }
 
-        [HarmonyPatch(typeof(BoarSpawnGroup), nameof(BoarSpawnGroup.OnDestroy))]
-        private class OnDisablePatch
+        [HarmonyPatch(nameof(BoarSpawnGroup.OnDestroy))]
+        [HarmonyPrefix]
+        public static void OnDestroy(BoarSpawnGroup __instance)
         {
-            public static void Prefix(BoarSpawnGroup __instance)
-            {
-                OverlayMapHolder.ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
         }
     }
 }

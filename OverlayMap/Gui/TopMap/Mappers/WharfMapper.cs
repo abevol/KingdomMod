@@ -40,31 +40,28 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                     return true;
                 });
         }
+    }
+}
 
-        /// <summary>
-        /// Wharf.OnEnable 补丁。
-        /// Wharf 重写了 OnEnable，因此需要单独 Patch。
-        /// </summary>
-        [HarmonyPatch(typeof(Wharf), nameof(Wharf.OnEnable))]
-        private class OnEnablePatch
+namespace KingdomMod.OverlayMap.Gui.TopMap.Notifiers
+{
+    // 该 Notifier 只服务于该组件的映射，根据“相关性聚合”原则放在同一个文件。
+
+    [HarmonyPatch(typeof(Wharf))]
+    public static class WharfNotifier
+    {
+        [HarmonyPatch(nameof(Wharf.OnEnable))]
+        [HarmonyPostfix]
+        public static void OnEnable(Wharf __instance)
         {
-            public static void Postfix(Wharf __instance)
-            {
-                ForEachTopMapView(view => view.OnComponentCreated(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentCreated(__instance));
         }
 
-        /// <summary>
-        /// Wharf.OnDisable 补丁。
-        /// Wharf 重写了 OnDisable，因此需要单独 Patch。
-        /// </summary>
-        [HarmonyPatch(typeof(Wharf), nameof(Wharf.OnDisable))]
-        private class OnDisablePatch
+        [HarmonyPatch(nameof(Wharf.OnDisable))]
+        [HarmonyPrefix]
+        public static void OnDisable(Wharf __instance)
         {
-            public static void Prefix(Wharf __instance)
-            {
-                ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
         }
     }
 }

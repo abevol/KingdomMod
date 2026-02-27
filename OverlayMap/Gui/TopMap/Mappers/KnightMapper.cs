@@ -22,23 +22,29 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                 }, MarkerRow.Movable
             );
         }
+    }
+}
 
-        [HarmonyPatch(typeof(Knight), nameof(Knight.Awake))]
-        private class AwakePatch
+namespace KingdomMod.OverlayMap.Gui.TopMap.Notifiers
+{
+    // 该 Notifier 只服务于该组件的映射，根据“相关性聚合”原则放在同一个文件。
+
+    [HarmonyPatch(typeof(Knight))]
+    public static class KnightNotifier
+    {
+        [HarmonyPatch(nameof(Knight.OnEnable))]
+        [HarmonyPostfix]
+        public static void OnEnable(Knight __instance)
         {
-            public static void Postfix(Knight __instance)
-            {
-                ForEachTopMapView(view => view.OnComponentCreated(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentCreated(__instance));
         }
 
-        [HarmonyPatch(typeof(Knight), nameof(Knight.OnDestroy))]
-        private class OnDestroyPatch
+        [HarmonyPatch(nameof(Knight.OnDisable))]
+        [HarmonyPrefix]
+        public static void OnDisable(Knight __instance)
         {
-            public static void Prefix(Knight __instance)
-            {
-                ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
         }
     }
 }
+

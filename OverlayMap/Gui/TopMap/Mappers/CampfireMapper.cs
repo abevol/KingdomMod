@@ -1,8 +1,7 @@
 ﻿using HarmonyLib;
-using KingdomMod.OverlayMap.Config;
-using KingdomMod.OverlayMap.Patchers;
-using System.Collections.Generic;
 using UnityEngine;
+using KingdomMod.OverlayMap.Config;
+using static KingdomMod.OverlayMap.OverlayMapHolder;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
@@ -14,23 +13,28 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
         {
             view.TryAddMapMarker(component, MarkerStyle.Campfire.Color, MarkerStyle.Campfire.Sign, Strings.Campfire);
         }
+    }
+}
 
-        [HarmonyPatch(typeof(Campfire), nameof(Campfire.OnEnable))]
-        private class OnEnablePatch
+namespace KingdomMod.OverlayMap.Gui.TopMap.Notifiers
+{
+    // 该 Notifier 只服务于该组件的映射，根据“相关性聚合”原则放在同一个文件。
+
+    [HarmonyPatch(typeof(Campfire))]
+    public static class CampfireNotifier
+    {
+        [HarmonyPatch(nameof(Campfire.OnEnable))]
+        [HarmonyPostfix]
+        public static void OnEnable(Campfire __instance)
         {
-            public static void Postfix(Campfire __instance)
-            {
-                OverlayMapHolder.ForEachTopMapView(view => view.OnComponentCreated(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentCreated(__instance));
         }
 
-        [HarmonyPatch(typeof(Campfire), nameof(Campfire.OnDisable))]
-        private class OnDisablePatch
+        [HarmonyPatch(nameof(Campfire.OnDisable))]
+        [HarmonyPrefix]
+        public static void OnDisable(Campfire __instance)
         {
-            public static void Prefix(Campfire __instance)
-            {
-                OverlayMapHolder.ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
         }
     }
 }

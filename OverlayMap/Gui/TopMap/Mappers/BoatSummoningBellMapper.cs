@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
-using KingdomMod.OverlayMap.Config;
 using UnityEngine;
+using KingdomMod.OverlayMap.Config;
+using static KingdomMod.OverlayMap.OverlayMapHolder;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
@@ -12,23 +13,21 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
         {
             view.TryAddMapMarker(component, MarkerStyle.SummonBell.Color, MarkerStyle.SummonBell.Sign, Strings.SummonBell);
         }
+    }
+}
 
-        [HarmonyPatch(typeof(BoatSummoningBell), nameof(BoatSummoningBell.OnEnable))]
-        private class OnEnablePatch
+namespace KingdomMod.OverlayMap.Gui.TopMap.Notifiers
+{
+    // 该 Notifier 只服务于该组件的映射，根据“相关性聚合”原则放在同一个文件。
+
+    [HarmonyPatch(typeof(BoatSummoningBell))]
+    public static class BoatSummoningBellNotifier
+    {
+        [HarmonyPatch(nameof(BoatSummoningBell.OnEnable))]
+        [HarmonyPostfix]
+        public static void OnEnable(BoatSummoningBell __instance)
         {
-            public static void Postfix(BoatSummoningBell __instance)
-            {
-                OverlayMapHolder.ForEachTopMapView(view => view.OnComponentCreated(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentCreated(__instance));
         }
-
-        // [HarmonyPatch(typeof(BoatSummoningBell), nameof(BoatSummoningBell.OnDestroy))]
-        // private class OnDisablePatch
-        // {
-        //     public static void Prefix(BoatSummoningBell __instance)
-        //     {
-        //         OverlayMapHolder.ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
-        //     }
-        // }
     }
 }

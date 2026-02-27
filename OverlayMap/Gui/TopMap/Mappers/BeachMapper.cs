@@ -1,6 +1,8 @@
 ﻿using HarmonyLib;
-using KingdomMod.OverlayMap.Config;
 using UnityEngine;
+using KingdomMod.SharedLib;
+using KingdomMod.OverlayMap.Config;
+using static KingdomMod.OverlayMap.OverlayMapHolder;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
 {
@@ -12,25 +14,28 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
         {
             view.TryAddMapMarker(component, MarkerStyle.Beach.Color, MarkerStyle.Beach.Sign, Strings.Beach);
         }
+    }
+}
 
-        // 该 Patch 只服务于该组件的映射，根据“相关性聚合”原则放在这里没问题。
+namespace KingdomMod.OverlayMap.Gui.TopMap.Notifiers
+{
+    // 该 Notifier 只服务于该组件的映射，根据“相关性聚合”原则放在同一个文件。
 
-        [HarmonyPatch(typeof(Beach), nameof(Beach.Start))]
-        private class StartPatch
+    [HarmonyPatch(typeof(Beach))]
+    public static class BeachNotifier
+    {
+        [HarmonyPatch(nameof(Beach.Start))]
+        [HarmonyPostfix]
+        public static void Start(Beach __instance)
         {
-            public static void Postfix(Beach __instance)
-            {
-                OverlayMapHolder.ForEachTopMapView(view => view.OnComponentCreated(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentCreated(__instance));
         }
 
-        [HarmonyPatch(typeof(Beach), nameof(Beach.OnDisable))]
-        private class OnDisablePatch
+        [HarmonyPatch(nameof(Beach.OnDisable))]
+        [HarmonyPrefix]
+        public static void OnDisable(Beach __instance)
         {
-            public static void Prefix(Beach __instance)
-            {
-                OverlayMapHolder.ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
         }
     }
 }

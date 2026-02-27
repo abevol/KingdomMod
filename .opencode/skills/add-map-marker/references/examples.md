@@ -63,7 +63,7 @@ Sign =
 
 ---
 
-## 示例 2: 创建新类型（带 OnEnable/OnDisable Patch）
+## 示例 2: 创建新类型（自带 OnEnable/OnDisable Patch 的 Notifier）
 
 为 `Wharf`（船坞）添加新标记类型。Wharf 继承自 Payable 并重写了 OnEnable/OnDisable。
 
@@ -122,27 +122,32 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
                 return MarkerStyle.Wharf.Building.Color;
             return MarkerStyle.Wharf.Color;
         }
+    }
+}
 
-        // ⚠️ 必须单独 Patch：Wharf 重写了 OnEnable/OnDisable
-        [HarmonyPatch(typeof(Wharf), nameof(Wharf.OnEnable))]
-        private class OnEnablePatch
+namespace KingdomMod.OverlayMap.Gui.TopMap.Notifiers
+{
+    // 该 Notifier 只服务于该组件的映射，根据“相关性聚合”原则放在同一个文件。
+
+    [HarmonyPatch(typeof(Wharf))]
+    public static class WharfNotifier
+    {
+        [HarmonyPatch(nameof(Wharf.OnEnable))]
+        [HarmonyPostfix]
+        public static void OnEnable(Wharf __instance)
         {
-            public static void Postfix(Wharf __instance)
-            {
-                ForEachTopMapView(view => view.OnComponentCreated(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentCreated(__instance));
         }
 
-        [HarmonyPatch(typeof(Wharf), nameof(Wharf.OnDisable))]
-        private class OnDisablePatch
+        [HarmonyPatch(nameof(Wharf.OnDisable))]
+        [HarmonyPrefix]
+        public static void OnDisable(Wharf __instance)
         {
-            public static void Prefix(Wharf __instance)
-            {
-                ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
         }
     }
 }
+
 ```
 
 ---

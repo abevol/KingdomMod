@@ -1,8 +1,7 @@
 ﻿using HarmonyLib;
-using KingdomMod.OverlayMap.Config;
-using KingdomMod.OverlayMap.Patchers;
-using KingdomMod.SharedLib;
 using UnityEngine;
+using KingdomMod.OverlayMap.Config;
+using KingdomMod.SharedLib;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
 
 namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
@@ -37,23 +36,28 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
             if (marker != null)
                 view.CastleMarker = marker;
         }
+    }
+}
 
-        [HarmonyPatch(typeof(Castle), nameof(Castle.OnEnable))]
-        private class OnEnablePatch
+namespace KingdomMod.OverlayMap.Gui.TopMap.Notifiers
+{
+    // 该 Notifier 只服务于该组件的映射，根据“相关性聚合”原则放在同一个文件。
+
+    [HarmonyPatch(typeof(Castle))]
+    public static class CastleNotifier
+    {
+        [HarmonyPatch(nameof(Castle.Start))]
+        [HarmonyPostfix]
+        public static void Start(Castle __instance)
         {
-            public static void Postfix(Castle __instance)
-            {
-                ForEachTopMapView(view => view.OnComponentCreated(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentCreated(__instance));
         }
-        
-        [HarmonyPatch(typeof(Castle), nameof(Castle.OnDisable))]
-        private class OnDisablePatch
+
+        [HarmonyPatch(nameof(Castle.OnDisable))]
+        [HarmonyPrefix]
+        public static void OnDisable(Castle __instance)
         {
-            public static void Prefix(Castle __instance)
-            {
-                ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
-            }
+            ForEachTopMapView(view => view.OnComponentDestroyed(__instance));
         }
     }
 }

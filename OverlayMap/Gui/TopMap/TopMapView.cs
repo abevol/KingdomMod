@@ -508,7 +508,7 @@ public class TopMapView : MonoBehaviour
     {
         try
         {
-            LogDebug($"TopMapView.TryAddMapMarker, title: {title?.Value}, target: {target}, Pointer: 0x{target.Pointer:X}, GameObjectId: 0x{target.gameObject.GetInstanceID():X}, GameObjectName: {target.gameObject.name}");
+            LogDebug($"TopMapView.TryAddMapMarker, title: {title?.Value}, target: {target}, GameObjectId: 0x{target.gameObject.GetInstanceID():X}, GameObjectName: {target.gameObject.name}");
 
             if (!target)
                 return null;
