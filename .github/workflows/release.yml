@@ -71,7 +71,7 @@ jobs:
             nuget-${{ runner.os }}-
 
       - name: Restore dependencies
-        run: dotnet restore KingdomMod.sln -c ${{ matrix.config }}
+        run: dotnet restore KingdomMod.sln -p:Configuration=${{ matrix.config }}
 
       - name: Build solution
         run: dotnet build KingdomMod.sln -c ${{ matrix.config }} --no-restore -p:Version=${{ needs.validate.outputs.version }}
