@@ -151,18 +151,20 @@ jobs:
           zip -r "${{ github.workspace }}/KingdomMod.All-BIE6_Mono-v${VERSION}-with-BepInEx.zip" .
           cd "${{ github.workspace }}"
           rm -rf "$TMPDIR_MONO"
+      - name: Prepare Final Artifacts
+        run: |
+          mkdir -p final_release_zips
+          cp zips/KingdomMod.All-BIE6_IL2CPP-v*.zip final_release_zips/
+          cp zips/KingdomMod.All-BIE6_Mono-v*.zip final_release_zips/
+          cp KingdomMod.All-BIE6_IL2CPP-v*-with-BepInEx.zip final_release_zips/
+          cp KingdomMod.All-BIE6_Mono-v*-with-BepInEx.zip final_release_zips/
 
       - name: Upload Final Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: release-zips
-          path: |
-            zips/KingdomMod.All-BIE6_IL2CPP-v*.zip
-            zips/KingdomMod.All-BIE6_Mono-v*.zip
-            KingdomMod.All-BIE6_IL2CPP-v*-with-BepInEx.zip
-            KingdomMod.All-BIE6_Mono-v*-with-BepInEx.zip
+          path: final_release_zips/*.zip
           retention-days: 1
-
   release:
     name: Create Release
     needs: [package-with-bepinex, validate]
