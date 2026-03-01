@@ -60,8 +60,6 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
         {
             LogInfo("Manual construction started");
             _constructionBuildingComponent.OnManualConstructionStarted -= (System.Action)OnManualConstructionStarted;
-
-            // 更新 marker 颜色
             _owner.UpdateColor(_buildingColor);
         }
 
@@ -69,9 +67,7 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
         {
             LogInfo("Construction complete");
             _constructionBuildingComponent.OnConstructionComplete -= (System.Action)OnConstructionComplete;
-
-            // 更新 marker 颜色
             _owner.UpdateColor(_normalColor);
         }
     }
-}
+}

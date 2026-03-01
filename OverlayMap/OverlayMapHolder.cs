@@ -287,35 +287,38 @@ public class OverlayMapHolder : MonoBehaviour
             }
         }
 
-        if (Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.F))
+        if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
         {
-            LogDebug("F key pressed.");
-            ShowFullMap = !ShowFullMap;
-        }
-
-        if (Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.T))
-        {
-            LogDebug("T key pressed.");
-            if (_fontDebugPanel == null)
+            if (Input.GetKeyDown(KeyCode.F))
             {
-                CreateFontDebugPanel();
+                LogDebug("F key pressed.");
+                ShowFullMap = !ShowFullMap;
             }
-            _showFontDebugPanel = !_showFontDebugPanel;
-            _fontDebugPanel.SetVisible(_showFontDebugPanel);
-        }
 
-        if (Input.GetKeyDown(KeyCode.F5))
-        {
-            LogDebug($"Try to reload game.");
+            if (Input.GetKeyDown(KeyCode.T))
+            {
+                LogDebug("T key pressed.");
+                if (_fontDebugPanel == null)
+                {
+                    CreateFontDebugPanel();
+                }
+                _showFontDebugPanel = !_showFontDebugPanel;
+                _fontDebugPanel.SetVisible(_showFontDebugPanel);
+            }
 
-            Managers.Inst.game.Reload();
-        }
+            if (Input.GetKeyDown(KeyCode.F5))
+            {
+                LogDebug($"Try to reload game.");
 
-        if (Input.GetKeyDown(KeyCode.F8))
-        {
-            LogDebug($"Try to save game.");
+                Managers.Inst.game.Reload();
+            }
 
-            Managers.Inst.game.TriggerSave();
+            if (Input.GetKeyDown(KeyCode.F8))
+            {
+                LogDebug($"Try to save game.");
+
+                Managers.Inst.game.TriggerSave();
+            }
         }
     }
 
