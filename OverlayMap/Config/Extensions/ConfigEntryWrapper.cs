@@ -23,10 +23,17 @@ public class ConfigEntryWrapper<T>
         get => _entry.Value;
         set => _entry.Value = value;
     }
+    public bool IsAdvanced;
+    public bool ReadOnly;
+    public bool AllowCopy;
+    public bool HideDefaultButton;
 
     public ConfigEntryWrapper(ConfigEntry<T> entry)
     {
         _entry = entry ?? throw new ArgumentNullException(nameof(entry));
+        ParseTags();
+        if (ReadOnly)
+            Entry.BoxedValue = Entry.DefaultValue;
     }
 
     public static implicit operator ConfigEntry<T>(ConfigEntryWrapper<T> d) => d._entry;
@@ -38,6 +45,35 @@ public class ConfigEntryWrapper<T>
     public static implicit operator RectInt(ConfigEntryWrapper<T> d) => d.GetOrCreateCachedValue<RectInt>(ParseRectInt);
     public static implicit operator RectOffset(ConfigEntryWrapper<T> d) => d.GetOrCreateCachedValue<RectOffset>(ParseRectOffset);
     public static implicit operator Vector4(ConfigEntryWrapper<T> d) => d.GetOrCreateCachedValue<Vector4>(ParseVector4);
+
+    private void ParseTags()
+    {
+        object[] tags = Entry.Description?.Tags;
+        if (tags != null && tags.Any())
+        {
+            foreach (var tag in tags)
+            {
+                if (tag is string strTag)
+                {
+                    if (strTag == "Advanced")
+                        IsAdvanced = true;
+                    else if (strTag == "ReadOnly")
+                        ReadOnly = HideDefaultButton = true;
+                    else if (strTag == "AllowCopy")
+                        AllowCopy = true;
+                    else if (strTag == "HideDefaultButton")
+                        HideDefaultButton = true;
+                }
+                else if ((tag.GetType().Name == "ConfigurationManagerAttributes") && tag is { } attributes)
+                {
+                    IsAdvanced = (bool?)attributes.GetType().GetField("IsAdvanced")?.GetValue(attributes) == true;
+                    ReadOnly = HideDefaultButton = (bool?)attributes.GetType().GetField("ReadOnly")?.GetValue(attributes) == true;
+                    AllowCopy = (bool?)attributes.GetType().GetField("AllowCopy")?.GetValue(attributes) == true;
+                    HideDefaultButton = (bool?)attributes.GetType().GetField("HideDefaultButton")?.GetValue(attributes) == true;
+                }
+            }
+        }
+    }
 
     private TResult GetOrCreateCachedValue<TResult>(Func<ConfigEntry<string>, TResult> parser)
     {
