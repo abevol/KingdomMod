@@ -81,12 +81,23 @@ jobs:
           CONFIG="${{ matrix.config }}"
           VERSION="${{ needs.validate.outputs.version }}"
           STAGING="${{ github.workspace }}/_staging"
+          
+          mkdir -p "$STAGING/plugins"
+          
           MODS=(BetterPayableUpgrade DevTools OverlayMap StaminaBar SharedLib)
           for MOD in "${MODS[@]}"; do
-            MOD_DIR="$STAGING/KingdomMod.$MOD"
+            MOD_DIR="$STAGING/plugins/KingdomMod.$MOD"
             mkdir -p "$MOD_DIR"
             cp "$MOD/bin/$CONFIG/KingdomMod.$MOD.dll" "$MOD_DIR/"
           done
+          
+          if [ "$CONFIG" = "BIE6_IL2CPP" ]; then
+            curl -fsSL -o bepinexconfigmanager.zip 'https://github.com/abevol/BepInExConfigManager/releases/download/v1.0.0/BepInExConfigManager.Il2Cpp.CoreCLR.zip'
+          else
+            curl -fsSL -o bepinexconfigmanager.zip 'https://github.com/abevol/BepInExConfigManager/releases/download/v1.0.0/BepInExConfigManager.Mono.zip'
+          fi
+          unzip -q -o bepinexconfigmanager.zip -d "$STAGING"
+          
           ZIP_NAME="KingdomMod.All-${CONFIG}-v${VERSION}.zip"
           cd "$STAGING"
           zip -r "${{ github.workspace }}/$ZIP_NAME" .
@@ -132,7 +143,7 @@ jobs:
           unzip -q -o _bepinex_zips/Il2CppInterop.Patch.zip -d "$TMPDIR_IL2CPP"
           mkdir -p "$TMPDIR_IL2CPP/BepInEx/plugins"
           unzip -q "zips/KingdomMod.All-BIE6_IL2CPP-v${VERSION}.zip" \
-            -d "$TMPDIR_IL2CPP/BepInEx/plugins"
+            -d "$TMPDIR_IL2CPP/BepInEx"
           cd "$TMPDIR_IL2CPP"
           zip -r "${{ github.workspace }}/KingdomMod.All-BIE6_IL2CPP-v${VERSION}-with-BepInEx.zip" .
           cd "${{ github.workspace }}"
@@ -146,7 +157,7 @@ jobs:
           unzip -q _bepinex_zips/BepInEx-Mono.zip -d "$TMPDIR_MONO"
           mkdir -p "$TMPDIR_MONO/BepInEx/plugins"
           unzip -q "zips/KingdomMod.All-BIE6_Mono-v${VERSION}.zip" \
-            -d "$TMPDIR_MONO/BepInEx/plugins"
+            -d "$TMPDIR_MONO/BepInEx"
           cd "$TMPDIR_MONO"
           zip -r "${{ github.workspace }}/KingdomMod.All-BIE6_Mono-v${VERSION}-with-BepInEx.zip" .
           cd "${{ github.workspace }}"
