@@ -1,9 +1,10 @@
 ﻿using BepInEx.Configuration;
-using System.IO;
-using System;
 using KingdomMod.OverlayMap.Config.Extensions;
-using static KingdomMod.OverlayMap.OverlayMapHolder;
+using KingdomMod.SharedLib;
+using System;
 using System.Collections.Generic;
+using System.IO;
+using static KingdomMod.OverlayMap.OverlayMapHolder;
 
 namespace KingdomMod.OverlayMap.Config;
 
@@ -144,6 +145,7 @@ public class Strings
     {
         LogDebug($"ConfigBind: {Path.GetFileName(config.ConfigFilePath)}");
 
+        ConfigFileRemover.RemoveConfigFile(ConfigFile);
         ConfigFile = config;
         config.SaveOnConfigSet = false;
         config.Clear();
