@@ -176,17 +176,38 @@ public class ExtraInfoView : MonoBehaviour
     /// </summary>
     private void CreateGemsAndCoinsText(float topOffset)
     {
+        // 创建容器，使用 HorizontalLayoutGroup 实现固定间距
+        var containerObj = new GameObject("GemsAndCoinsContainer");
+        containerObj.transform.SetParent(this.transform, false);
+
+        var containerRect = containerObj.AddComponent<RectTransform>();
+        containerRect.anchorMin = new Vector2(1, 1);
+        containerRect.anchorMax = new Vector2(1, 1);
+        containerRect.pivot = new Vector2(1, 1);
+        containerRect.anchoredPosition = new Vector2(-6, -(136 + 22));
+        containerRect.sizeDelta = new Vector2(0, 20);
+
+        // 添加 HorizontalLayoutGroup，固定子元素间距
+        var layoutGroup = containerObj.AddComponent<HorizontalLayoutGroup>();
+        layoutGroup.spacing = 8;
+        layoutGroup.childAlignment = TextAnchor.UpperRight;
+        layoutGroup.childControlWidth = true;
+        layoutGroup.childControlHeight = false;
+        layoutGroup.childForceExpandWidth = false;
+        layoutGroup.childForceExpandHeight = false;
+
+        // 添加 ContentSizeFitter 使容器宽度自适应子元素
+        var containerFitter = containerObj.AddComponent<ContentSizeFitter>();
+        containerFitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+        containerFitter.verticalFit = ContentSizeFitter.FitMode.Unconstrained;
+
         // 宝石文本
         var gemsObj = new GameObject("GemsText");
-        gemsObj.transform.SetParent(this.transform, false);
+        gemsObj.transform.SetParent(containerObj.transform, false);
         _gemsText = gemsObj.AddComponent<TextMeshProUGUI>();
 
         var gemsRect = _gemsText.GetComponent<RectTransform>();
-        gemsRect.anchorMin = new Vector2(1, 1);
-        gemsRect.anchorMax = new Vector2(1, 1);
-        gemsRect.pivot = new Vector2(1, 1);
-        gemsRect.anchoredPosition = new Vector2(-66, -(136 + 22));
-        gemsRect.sizeDelta = new Vector2(60, 20);
+        gemsRect.sizeDelta = new Vector2(0, 20);
 
         _gemsText.color = Config.MarkerStyle.ExtraInfo.Color;
         _gemsText.alignment = TextAlignmentOptions.TopRight;
@@ -198,15 +219,11 @@ public class ExtraInfoView : MonoBehaviour
 
         // 金币文本
         var coinsObj = new GameObject("CoinsText");
-        coinsObj.transform.SetParent(this.transform, false);
+        coinsObj.transform.SetParent(containerObj.transform, false);
         _coinsText = coinsObj.AddComponent<TextMeshProUGUI>();
 
         var coinsRect = _coinsText.GetComponent<RectTransform>();
-        coinsRect.anchorMin = new Vector2(1, 1);
-        coinsRect.anchorMax = new Vector2(1, 1);
-        coinsRect.pivot = new Vector2(1, 1);
-        coinsRect.anchoredPosition = new Vector2(-6, -(136 + 22));
-        coinsRect.sizeDelta = new Vector2(60, 20);
+        coinsRect.sizeDelta = new Vector2(0, 20);
 
         _coinsText.color = Config.MarkerStyle.ExtraInfo.Color;
         _coinsText.alignment = TextAlignmentOptions.TopRight;
