@@ -1,9 +1,10 @@
-﻿using BepInEx.Configuration;
+using BepInEx.Configuration;
 using KingdomMod.OverlayMap.Config.Extensions;
 using KingdomMod.SharedLib;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
 
 namespace KingdomMod.OverlayMap.Config;
@@ -14,6 +15,7 @@ public class Strings
     private static readonly ConfigFileWatcher _configFileWatcher = new();
     public static Dictionary<SteedType, ConfigEntryWrapper<string>> SteedNames;
     public static Dictionary<MonarchType, ConfigEntryWrapper<string>> MonarchNames;
+    private static Dictionary<string, ConfigEntryWrapper<string>> _byKey;
 
     public static ConfigEntryWrapper<string> Alfred;
     public static ConfigEntryWrapper<string> Archer;
@@ -280,6 +282,7 @@ public class Strings
 
         InitSteedNames();
         InitMonarchNames();
+        BuildByKeyDictionary();
         _configFileWatcher.Set(config.ConfigFilePath, OnConfigFileChanged);
     }
 
@@ -420,5 +423,40 @@ public class Strings
 
         LogDebug($"Try to bind Language file: {Path.GetFileName(langFile)}");
         ConfigBind(new ConfigFile(langFile, true));
+    }
+
+    /// <summary>
+    /// 通过反射扫描所有静态 ConfigEntryWrapper&lt;string&gt; 字段，
+    /// 以 ConfigEntry.Definition.Key 为键构建查找字典。
+    /// </summary>
+    private static void BuildByKeyDictionary()
+    {
+        _byKey = new Dictionary<string, ConfigEntryWrapper<string>>();
+
+        var wrapperType = typeof(ConfigEntryWrapper<string>);
+        var fields = typeof(Strings).GetFields(BindingFlags.Public | BindingFlags.Static);
+        foreach (var field in fields)
+        {
+            if (field.FieldType != wrapperType) continue;
+            if (field.GetValue(null) is not ConfigEntryWrapper<string> wrapper) continue;
+            var key = wrapper.Entry.Definition.Key;
+            _byKey[key] = wrapper;
+        }
+
+        // 补充字典值中的条目（SteedNames / MonarchNames 可能包含重复引用，无需额外处理）
+        LogDebug($"BuildByKeyDictionary: {_byKey.Count} entries");
+    }
+
+    /// <summary>
+    /// 根据配置键名获取当前语言的 ConfigEntryWrapper。
+    /// 用于语言切换后刷新 MapMarker 的 Title/Sign/Color 引用。
+    /// </summary>
+    /// <param name="key">ConfigEntry 的 Definition.Key，如 "Castle"、"Archer" 等。</param>
+    /// <returns>当前语言对应的 ConfigEntryWrapper，未找到则返回 null。</returns>
+    public static ConfigEntryWrapper<string> GetByKey(string key)
+    {
+        if (_byKey != null && _byKey.TryGetValue(key, out var wrapper))
+            return wrapper;
+        return null;
     }
 }

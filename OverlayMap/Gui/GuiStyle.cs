@@ -63,5 +63,27 @@ namespace KingdomMod.OverlayMap.Gui
 
             return guiComp;
         }
+
+        /// <summary>
+        /// 取消所有子样式组件的配置事件订阅。
+        /// 在语言切换前调用，确保旧配置项的事件被正确取消。
+        /// </summary>
+        public void UnsubscribeConfigEvents()
+        {
+            TopMapStyle?.UnsubscribeConfigEvents();
+            StatsInfoStyle?.UnsubscribeConfigEvents();
+            ExtraInfoStyle?.UnsubscribeConfigEvents();
+        }
+
+        /// <summary>
+        /// 重新加载所有子样式组件的配置。
+        /// 在语言切换后调用，从新配置项重建字体并推送到 UI。
+        /// </summary>
+        public void ReloadConfig()
+        {
+            TopMapStyle?.ReloadConfig();
+            StatsInfoStyle?.ReloadConfig();
+            ExtraInfoStyle?.ReloadConfig();
+        }
     }
 }

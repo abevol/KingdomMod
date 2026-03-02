@@ -28,23 +28,69 @@ namespace KingdomMod.OverlayMap.Gui.ExtraInfo
         private void Awake()
         {
             LogDebug("ExtraInfoStyle.Awake");
+            InitializeFonts();
+            SubscribeConfigEvents();
+        }
 
-            // 初始化文本字体
-            TextFont = FontManager.CreateMainFont(Config.GuiStyle.ExtraInfo.Text.Font, null);
+        private void OnDestroy()
+        {
+            UnsubscribeConfigEvents();
+        }
+
+        /// <summary>
+        /// 从当前配置初始化字体数据
+        /// </summary>
+        private void InitializeFonts()
+        {
+            TextFont = FontManager.CreateMainFont(Config.GuiStyle.ExtraInfo.Text.Font, TextFont);
             TextFontSize = Config.GuiStyle.ExtraInfo.Text.FontSize;
             TextFont.AssignFallbackFonts(Config.GuiStyle.ExtraInfo.Text.FallbackFonts.AsStringArray);
+        }
 
-            // 监听配置变化
+        /// <summary>
+        /// 订阅当前配置项的变更事件
+        /// </summary>
+        public void SubscribeConfigEvents()
+        {
             Config.GuiStyle.ExtraInfo.Text.Font.Entry.SettingChanged += OnTextFontConfigChanged;
             Config.GuiStyle.ExtraInfo.Text.FontSize.Entry.SettingChanged += OnTextFontSizeConfigChanged;
             Config.GuiStyle.ExtraInfo.Text.FallbackFonts.Entry.SettingChanged += OnTextFallbackFontsConfigChanged;
         }
 
-        private void OnDestroy()
+        /// <summary>
+        /// 取消订阅当前配置项的变更事件。
+        /// 必须在配置项被替换之前调用。
+        /// </summary>
+        public void UnsubscribeConfigEvents()
         {
             Config.GuiStyle.ExtraInfo.Text.Font.Entry.SettingChanged -= OnTextFontConfigChanged;
             Config.GuiStyle.ExtraInfo.Text.FontSize.Entry.SettingChanged -= OnTextFontSizeConfigChanged;
             Config.GuiStyle.ExtraInfo.Text.FallbackFonts.Entry.SettingChanged -= OnTextFallbackFontsConfigChanged;
+        }
+
+        /// <summary>
+        /// 重新加载配置：重建字体、订阅新配置事件、推送到 UI。
+        /// 在语言切换后调用。
+        /// </summary>
+        public void ReloadConfig()
+        {
+            LogDebug("ExtraInfoStyle.ReloadConfig");
+            InitializeFonts();
+            SubscribeConfigEvents();
+            PushToUI();
+        }
+
+        /// <summary>
+        /// 将当前字体配置推送到所有 UI 组件
+        /// </summary>
+        private void PushToUI()
+        {
+            ForEachPlayerOverlay(overlay =>
+            {
+                overlay.ExtraInfoView?.UpdateTextFont(TextFont.Font);
+                overlay.ExtraInfoView?.UpdateTextFontSize(TextFontSize);
+                overlay.ExtraInfoView?.ForceTextMeshUpdate();
+            });
         }
 
 #if IL2CPP
