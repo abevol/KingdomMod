@@ -25,22 +25,42 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
         private void Awake()
         {
             LogDebug("TopMapStyle.Init");
-            LogDebug($"TopMapStyle.Init, Config.GuiStyle.TopMap.Sign.Font: {Config.GuiStyle.TopMap.Sign.Font.Value}");
-            LogDebug($"TopMapStyle.Init, Config.GuiStyle.TopMap.Title.Font: {Config.GuiStyle.TopMap.Title.Font.Value}");
-            LogDebug($"TopMapStyle.Init, Config.GuiStyle.TopMap.Count.Font: {Config.GuiStyle.TopMap.Count.Font.Value}");
+            InitializeFonts();
+            SubscribeConfigEvents();
+        }
 
-            SignFont = FontManager.CreateMainFont(Config.GuiStyle.TopMap.Sign.Font, null);
+        private void OnDestroy()
+        {
+            UnsubscribeConfigEvents();
+        }
+
+        /// <summary>
+        /// 从当前配置初始化字体数据
+        /// </summary>
+        private void InitializeFonts()
+        {
+            LogDebug($"TopMapStyle.InitializeFonts, Sign.Font: {Config.GuiStyle.TopMap.Sign.Font.Value}");
+            LogDebug($"TopMapStyle.InitializeFonts, Title.Font: {Config.GuiStyle.TopMap.Title.Font.Value}");
+            LogDebug($"TopMapStyle.InitializeFonts, Count.Font: {Config.GuiStyle.TopMap.Count.Font.Value}");
+
+            SignFont = FontManager.CreateMainFont(Config.GuiStyle.TopMap.Sign.Font, SignFont);
             SignFontSize = Config.GuiStyle.TopMap.Sign.FontSize;
             SignFont.AssignFallbackFonts(Config.GuiStyle.TopMap.Sign.FallbackFonts.AsStringArray);
 
-            TitleFont = FontManager.CreateMainFont(Config.GuiStyle.TopMap.Title.Font, null);
+            TitleFont = FontManager.CreateMainFont(Config.GuiStyle.TopMap.Title.Font, TitleFont);
             TitleFontSize = Config.GuiStyle.TopMap.Title.FontSize;
             TitleFont.AssignFallbackFonts(Config.GuiStyle.TopMap.Title.FallbackFonts.AsStringArray);
 
-            CountFont = FontManager.CreateMainFont(Config.GuiStyle.TopMap.Count.Font, null);
+            CountFont = FontManager.CreateMainFont(Config.GuiStyle.TopMap.Count.Font, CountFont);
             CountFontSize = Config.GuiStyle.TopMap.Count.FontSize;
             CountFont.AssignFallbackFonts(Config.GuiStyle.TopMap.Count.FallbackFonts.AsStringArray);
+        }
 
+        /// <summary>
+        /// 订阅当前配置项的变更事件
+        /// </summary>
+        public void SubscribeConfigEvents()
+        {
             Config.GuiStyle.TopMap.BackgroundImageFile.Entry.SettingChanged += OnBackgroundConfigChanged;
             Config.GuiStyle.TopMap.BackgroundColor.Entry.SettingChanged += OnBackgroundConfigChanged;
             Config.GuiStyle.TopMap.BackgroundImageArea.Entry.SettingChanged += OnBackgroundConfigChanged;
@@ -59,7 +79,11 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
             Config.GuiStyle.TopMap.Count.FallbackFonts.Entry.SettingChanged += OnCountFallbackFontsConfigChanged;
         }
 
-        private void OnDestroy()
+        /// <summary>
+        /// 取消订阅当前配置项的变更事件。
+        /// 必须在配置项被替换之前调用，否则会取消错误的事件订阅。
+        /// </summary>
+        public void UnsubscribeConfigEvents()
         {
             Config.GuiStyle.TopMap.BackgroundImageFile.Entry.SettingChanged -= OnBackgroundConfigChanged;
             Config.GuiStyle.TopMap.BackgroundColor.Entry.SettingChanged -= OnBackgroundConfigChanged;
@@ -77,6 +101,43 @@ namespace KingdomMod.OverlayMap.Gui.TopMap
             Config.GuiStyle.TopMap.Count.Font.Entry.SettingChanged -= OnCountFontConfigChanged;
             Config.GuiStyle.TopMap.Count.FontSize.Entry.SettingChanged -= OnCountFontSizeConfigChanged;
             Config.GuiStyle.TopMap.Count.FallbackFonts.Entry.SettingChanged -= OnCountFallbackFontsConfigChanged;
+        }
+
+        /// <summary>
+        /// 重新加载配置：重建字体、订阅新配置事件、推送到 UI。
+        /// 在语言切换后调用，此时配置项已被替换为新语言的配置项。
+        /// </summary>
+        public void ReloadConfig()
+        {
+            LogDebug("TopMapStyle.ReloadConfig");
+            InitializeFonts();
+            SubscribeConfigEvents();
+            PushToUI();
+        }
+
+        /// <summary>
+        /// 将当前字体和背景配置推送到所有 UI 组件
+        /// </summary>
+        private void PushToUI()
+        {
+            ForEachTopMapView(view =>
+            {
+                view.UpdateBackgroundImage();
+                foreach (var pair in view.MapMarkers)
+                {
+                    pair.Value.UpdateSignFont(SignFont.Font);
+                    pair.Value.UpdateSignFontSize(SignFontSize);
+                    pair.Value.ForceSignMeshUpdate();
+
+                    pair.Value.UpdateTitleFont(TitleFont.Font);
+                    pair.Value.UpdateTitleFontSize(TitleFontSize);
+                    pair.Value.ForceTitleMeshUpdate();
+
+                    pair.Value.UpdateCountFont(CountFont.Font);
+                    pair.Value.UpdateCountFontSize(CountFontSize);
+                    pair.Value.ForceCountMeshUpdate();
+                }
+            });
         }
 
 #if IL2CPP

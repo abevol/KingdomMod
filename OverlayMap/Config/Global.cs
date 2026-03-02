@@ -76,9 +76,63 @@ public class Global
         if (lang is "" or "system")
             lang = CultureInfo.CurrentCulture.Name;
 
-        // Load language-specific configurations
+        // Step 1: 取消旧配置项的事件订阅（在配置替换之前）
+        Instance?.GlobalGuiStyle?.UnsubscribeConfigEvents();
+
+        // Step 2: 加载新语言配置（替换静态 ConfigEntry 字段）
         GuiStyle.LoadLanguageConfig(lang);
         Strings.LoadLanguageConfig(lang);
+
+        // Step 3: 重新加载样式配置（重建字体、订阅新事件、推送到 UI）
+        Instance?.GlobalGuiStyle?.ReloadConfig();
+
+        // Step 4: 刷新所有 MapMarker 的本地化引用（Title / Sign / Color）
+        RefreshMapMarkerTitles();
+    }
+
+    /// <summary>
+    /// 刷新所有 MapMarker 的 Title 引用。
+    /// 语言切换后，Strings 的静态字段已指向新的 ConfigEntryWrapper，
+    /// 但 MapMarkerData.Title 仍持有旧引用。通过 config key 查找新 wrapper 并重新赋值。
+    /// Title setter 会自动处理旧事件的取消订阅和新事件的订阅。
+    /// </summary>
+    private static void RefreshMapMarkerTitles()
+    {
+        if (Instance == null) return;
+
+        ForEachTopMapView(view =>
+        {
+            foreach (var pair in view.MapMarkers)
+            {
+                var data = pair.Value.Data;
+                if (data == null) continue;
+
+                // 刷新 Title
+                if (data.Title != null)
+                {
+                    var titleKey = data.Title.Entry.Definition.Key;
+                    var newTitle = Strings.GetByKey(titleKey);
+                    if (newTitle != null)
+                        data.Title = newTitle;
+                }
+            }
+
+            // 刷新 PlayerMarker 的 Title
+            if (view.PlayerMarkers != null)
+            {
+                foreach (var playerMarker in view.PlayerMarkers)
+                {
+                    var data = playerMarker.Data;
+                    if (data?.Title != null)
+                    {
+                        var titleKey = data.Title.Entry.Definition.Key;
+                        var newTitle = Strings.GetByKey(titleKey);
+                        if (newTitle != null)
+                            data.Title = newTitle;
+                    }
+                }
+            }
+        });
     }
 
     public static void OnMarkerStyleFileChanged()
