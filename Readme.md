@@ -77,9 +77,9 @@ Developer tools mod. Contains some functions that are convenient for making MODs
 2. `Home` Displays debug information
 3. `End` Displays objects information
 4. `Insert` Tests some interesting features
-5. `X` Dumps game objects to JSON file
-6. `P` Print presets to console
-7. `L` Prints the level module to the console
+5. `Ctrl + X` Dumps game objects to JSON file
+6. `Ctrl + P` Print presets to console
+7. `Ctrl + L` Destroy the active payable object.
 8. `Delete` Cut down the currently selected tree
 9. `F1` Add vagrant
 10. `F2` Add Griffin
@@ -104,8 +104,8 @@ A map mod. It marks points of interest, along with some extra details. There's a
 
 1. `M` Display the map overlay
 2. `Ctrl + F` Show the full map (Not recommended, it will reduce the fun of the game)
-3. `F5` Reload saved game (without exiting game)
-4. `F8` Save game (without exiting game)
+3. `Ctrl + F5` Reload saved game (without exiting game)
+4. `Ctrl + F8` Save game (without exiting game)
 5. `Ctrl + ← / →` Adjust the offset of the map marker
 6. `Ctrl + ↑ / ↓` Adjust the zoom scale of the map
 

@@ -46,8 +46,8 @@ public class DevToolsHolder : MonoBehaviour
         
         // 初始化 dump 目录配置
         _dumpDir = _config.Bind("Global", "DumpDir", 
-            Path.Combine("D:", "workspace", "games", "KingdomTwoCrowns", "Dumps"), 
-            "Directory to save dump files");
+            Path.Combine("D:", "workspace", "games", "KingdomTwoCrowns", "Dumps"),
+            new ConfigDescription("Directory to save dump files", null, "Advanced"));
         
         GameObject obj = new(nameof(DevToolsHolder));
         DontDestroyOnLoad(obj);
@@ -281,40 +281,6 @@ public class DevToolsHolder : MonoBehaviour
                 }
             }
 
-            if (Input.GetKeyDown(KeyCode.Home))
-            {
-                log.LogMessage("Home key pressed.");
-                enabledDebugInfo = !enabledDebugInfo;
-            }
-
-            if (Input.GetKeyDown(KeyCode.End))
-            {
-                log.LogMessage("End key pressed.");
-                enabledObjectsInfo = !enabledObjectsInfo;
-                _objectsInfoLogged = false;
-            }
-
-            if (Input.GetKeyDown(KeyCode.Insert))
-            {
-                log.LogMessage("Insert key pressed.");
-
-                var cursorSystem = GameObject.FindFirstObjectByType<CursorSystem>();
-                if (cursorSystem)
-                    cursorSystem.SetForceVisibleCursor(true);
-
-                var biomeHelper = GameObject.Find("BiomeHelper");
-                if (biomeHelper)
-                {
-                    var biomeHolder = biomeHelper.GetComponent<BiomeHolder>();
-                    if (biomeHolder)
-                    {
-                        biomeHolder.debugToolsEnabled = true;
-                    }
-                }
-
-                InterfaceOverlay.DebugDisable = false;
-            }
-
             if (Input.GetKeyDown(KeyCode.X))
             {
                 List<GameObjectDetails> objectTree = new List<GameObjectDetails>();
@@ -365,180 +331,214 @@ public class DevToolsHolder : MonoBehaviour
                     log.LogMessage(dumpStr);
                 }
             }
+        }
 
-            if (Input.GetKeyDown(KeyCode.Delete))
+        if (Input.GetKeyDown(KeyCode.Home))
+        {
+            log.LogMessage("Home key pressed.");
+            enabledDebugInfo = !enabledDebugInfo;
+        }
+
+        if (Input.GetKeyDown(KeyCode.End))
+        {
+            log.LogMessage("End key pressed.");
+            enabledObjectsInfo = !enabledObjectsInfo;
+            _objectsInfoLogged = false;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Insert))
+        {
+            log.LogMessage("Insert key pressed.");
+
+            var cursorSystem = GameObject.FindFirstObjectByType<CursorSystem>();
+            if (cursorSystem)
+                cursorSystem.SetForceVisibleCursor(true);
+
+            var biomeHelper = GameObject.Find("BiomeHelper");
+            if (biomeHelper)
             {
-                var player = GetLocalPlayer();
-                if (player != null)
+                var biomeHolder = biomeHelper.GetComponent<BiomeHolder>();
+                if (biomeHolder)
                 {
-                    var payable = player.selectedPayable;
-                    if (payable != null)
-                    {
+                    biomeHolder.debugToolsEnabled = true;
+                }
+            }
+
+            InterfaceOverlay.DebugDisable = false;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Delete))
+        {
+            var player = GetLocalPlayer();
+            if (player != null)
+            {
+                var payable = player.selectedPayable;
+                if (payable != null)
+                {
 #if IL2CPP
-                        var payableTree = payable.TryCast<PayableTree>();
+                    var payableTree = payable.TryCast<PayableTree>();
 #else
-                    var payableTree = payable as PayableTree;
+                var payableTree = payable as PayableTree;
 #endif
-                        if (payableTree != null)
-                        {
-                            log.LogMessage($"Try to cutdown the tree: {payable.GetGO.name}");
-                            WorkableTree.AutoChopTrees = true;
-                            payableTree.Pay();
-                            WorkableTree.AutoChopTrees = false;
-                        }
+                    if (payableTree != null)
+                    {
+                        log.LogMessage($"Try to cutdown the tree: {payable.GetGO.name}");
+                        WorkableTree.AutoChopTrees = true;
+                        payableTree.Pay();
+                        WorkableTree.AutoChopTrees = false;
                     }
                 }
             }
+        }
 
-            if (Input.GetKeyDown(KeyCode.F1))
+        if (Input.GetKeyDown(KeyCode.F1))
+        {
+            var player = GetLocalPlayer();
+            if (player != null)
             {
-                var player = GetLocalPlayer();
-                if (player != null)
-                {
-                    log.LogMessage($"Try to add Peasant.");
+                log.LogMessage($"Try to add Peasant.");
 
-                    var prefab = Resources.Load<Peasant>("Prefabs/Characters/Peasant").gameObject;
-                    Vector3 vector = player.transform.TransformPoint(new Vector3(1f, 1f, 0.01f));
-                    var lastSpawned = Pool.SpawnOrInstantiateGO(prefab, vector, Quaternion.identity, null);
-                    lastSpawned.transform.SetParent(GameObject.FindGameObjectWithTag("GameLayer").transform);
-                }
+                var prefab = Resources.Load<Peasant>("Prefabs/Characters/Peasant").gameObject;
+                Vector3 vector = player.transform.TransformPoint(new Vector3(1f, 1f, 0.01f));
+                var lastSpawned = Pool.SpawnOrInstantiateGO(prefab, vector, Quaternion.identity, null);
+                lastSpawned.transform.SetParent(GameObject.FindGameObjectWithTag("GameLayer").transform);
             }
+        }
 
-            if (Input.GetKeyDown(KeyCode.F2))
+        if (Input.GetKeyDown(KeyCode.F2))
+        {
+            var player = GetLocalPlayer();
+            if (player != null)
             {
-                var player = GetLocalPlayer();
-                if (player != null)
-                {
-                    log.LogMessage($"Try to add Griffin.");
+                log.LogMessage($"Try to add Griffin.");
 
-                    var prefab = Resources.Load<Steed>("Prefabs/Steeds/Griffin P1");
-                    prefab.Price = 1;
-                    Vector3 vector = player.transform.TransformPoint(new Vector3(1f, 1f, 0.01f));
-                    var lastSpawned = Pool.SpawnOrInstantiateGO(prefab.gameObject, vector, Quaternion.identity, null);
-                    lastSpawned.transform.SetParent(GameObject.FindGameObjectWithTag("GameLayer").transform);
-                }
+                var prefab = Resources.Load<Steed>("Prefabs/Steeds/Griffin P1");
+                prefab.Price = 1;
+                Vector3 vector = player.transform.TransformPoint(new Vector3(1f, 1f, 0.01f));
+                var lastSpawned = Pool.SpawnOrInstantiateGO(prefab.gameObject, vector, Quaternion.identity, null);
+                lastSpawned.transform.SetParent(GameObject.FindGameObjectWithTag("GameLayer").transform);
             }
+        }
 
-            // if (Input.GetKeyDown(KeyCode.F3))
-            // {
-            //     var player = GetLocalPlayer();
-            //     if (player != null)
-            //     {
-            //         log.LogMessage($"Try to add Wall0.");
-            //
-            //         // var prefab = Resources.Load<Wall>("prefabs/buildings and interactive/wall0");
-            //         Vector3 vector = new Vector3(player.transform.position.x, 0.0f, 0.1f);
-            //
-            //         Wall wall = Instantiate<Wall>(Managers.Inst.holder.wallPrefabs[0]);
-            //         wall.transform.SetParent(GameObject.FindGameObjectWithTag("GameLayer").transform);
-            //         wall.transform.position = vector;
-            //
-            //         // var lastSpawned = Pool.SpawnOrInstantiateGO(prefab.gameObject, vector, Quaternion.identity, GameObject.FindGameObjectWithTag("GameLayer").transform);
-            //         // lastSpawned.transform.SetParent(GameObject.FindGameObjectWithTag("GameLayer").transform);
-            //     }
-            // }
-            //
-            // if (Input.GetKeyDown(KeyCode.F4))
-            // {
-            //     var player = GetLocalPlayer();
-            //     if (player != null)
-            //     {
-            //         log.LogMessage($"Try to add Tower0.");
-            //
-            //         // var prefab = Resources.Load<Tower>("prefabs/buildings and interactive/tower0");
-            //
-            //         var prefab = Managers.Inst.prefabs.GetPrefabById((int)GamePrefabID.Tower0);
-            //         prefab.GetComponent<PayableUpgrade>().nextPrefab = Managers.Inst.prefabs.GetPrefabById((int)GamePrefabID.Tower2);
-            //
-            //         Vector3 vector = new Vector3(player.transform.position.x, 0.0f, 1.6f);
-            //         var lastSpawned = Pool.SpawnOrInstantiateGO(prefab.gameObject, vector, Quaternion.identity,
-            //             GameObject.FindGameObjectWithTag("GameLayer").transform);
-            //         // lastSpawned.transform.SetParent(GameObject.FindGameObjectWithTag("GameLayer").transform);
-            //     }
-            // }
+        // if (Input.GetKeyDown(KeyCode.F3))
+        // {
+        //     var player = GetLocalPlayer();
+        //     if (player != null)
+        //     {
+        //         log.LogMessage($"Try to add Wall0.");
+        //
+        //         // var prefab = Resources.Load<Wall>("prefabs/buildings and interactive/wall0");
+        //         Vector3 vector = new Vector3(player.transform.position.x, 0.0f, 0.1f);
+        //
+        //         Wall wall = Instantiate<Wall>(Managers.Inst.holder.wallPrefabs[0]);
+        //         wall.transform.SetParent(GameObject.FindGameObjectWithTag("GameLayer").transform);
+        //         wall.transform.position = vector;
+        //
+        //         // var lastSpawned = Pool.SpawnOrInstantiateGO(prefab.gameObject, vector, Quaternion.identity, GameObject.FindGameObjectWithTag("GameLayer").transform);
+        //         // lastSpawned.transform.SetParent(GameObject.FindGameObjectWithTag("GameLayer").transform);
+        //     }
+        // }
+        //
+        // if (Input.GetKeyDown(KeyCode.F4))
+        // {
+        //     var player = GetLocalPlayer();
+        //     if (player != null)
+        //     {
+        //         log.LogMessage($"Try to add Tower0.");
+        //
+        //         // var prefab = Resources.Load<Tower>("prefabs/buildings and interactive/tower0");
+        //
+        //         var prefab = Managers.Inst.prefabs.GetPrefabById((int)GamePrefabID.Tower0);
+        //         prefab.GetComponent<PayableUpgrade>().nextPrefab = Managers.Inst.prefabs.GetPrefabById((int)GamePrefabID.Tower2);
+        //
+        //         Vector3 vector = new Vector3(player.transform.position.x, 0.0f, 1.6f);
+        //         var lastSpawned = Pool.SpawnOrInstantiateGO(prefab.gameObject, vector, Quaternion.identity,
+        //             GameObject.FindGameObjectWithTag("GameLayer").transform);
+        //         // lastSpawned.transform.SetParent(GameObject.FindGameObjectWithTag("GameLayer").transform);
+        //     }
+        // }
 
-            //         if (Input.GetKeyDown(KeyCode.F9))
-            //         {
-            //             log.LogMessage($"F9 key pressed.");
-            //
-            //             var array = Resources.FindObjectsOfTypeAll<Transform>();
-            //             for (int i = 0; i < array.Length; i++)
-            //             {
-            //                 if (array[i].name == "DebugTools")
-            //                 {
-            //                     array[i].gameObject.SetActive(true);
-            //                     var componentsInChildren = array[i].gameObject.GetComponentsInChildren<UnityEngine.UI.Text>(true);
-            //                     for (int j = 0; j < componentsInChildren.Length; j++)
-            //                     {
-            //                         componentsInChildren[j].font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-            //                         componentsInChildren[j].fontSize = 4;
-            //                         componentsInChildren[j].fontStyle = FontStyle.Bold;
-            //                         componentsInChildren[j].text = componentsInChildren[j].text.ToLower();
-            //                     }
-            // #if IL2CPP
-            //                     IDebugTools iDebugTools = null;
-            //                     var tmpComps = array[i].GetComponents<Component>();
-            //                     foreach (var comp in tmpComps)
-            //                     {
-            //                         if (comp.name == "DebugTools")
-            //                         {
-            //                             iDebugTools = new IDebugTools(comp.Pointer);
-            //                         }
-            //                     }
-            // #else
-            //                     var iDebugTools = (IDebugTools)(array[i].GetComponent("DebugTools"));
-            // #endif
-            //                     var cursorSystem = GameObject.FindFirstObjectByType<CursorSystem>();
-            //                     if (cursorSystem)
-            //                         cursorSystem.SetForceVisibleCursor(!iDebugTools.IsOpen());
-            //
-            //                     iDebugTools.OpenButtonPressed();
-            //                 }
-            //             }
-            //         }
+        //         if (Input.GetKeyDown(KeyCode.F9))
+        //         {
+        //             log.LogMessage($"F9 key pressed.");
+        //
+        //             var array = Resources.FindObjectsOfTypeAll<Transform>();
+        //             for (int i = 0; i < array.Length; i++)
+        //             {
+        //                 if (array[i].name == "DebugTools")
+        //                 {
+        //                     array[i].gameObject.SetActive(true);
+        //                     var componentsInChildren = array[i].gameObject.GetComponentsInChildren<UnityEngine.UI.Text>(true);
+        //                     for (int j = 0; j < componentsInChildren.Length; j++)
+        //                     {
+        //                         componentsInChildren[j].font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        //                         componentsInChildren[j].fontSize = 4;
+        //                         componentsInChildren[j].fontStyle = FontStyle.Bold;
+        //                         componentsInChildren[j].text = componentsInChildren[j].text.ToLower();
+        //                     }
+        // #if IL2CPP
+        //                     IDebugTools iDebugTools = null;
+        //                     var tmpComps = array[i].GetComponents<Component>();
+        //                     foreach (var comp in tmpComps)
+        //                     {
+        //                         if (comp.name == "DebugTools")
+        //                         {
+        //                             iDebugTools = new IDebugTools(comp.Pointer);
+        //                         }
+        //                     }
+        // #else
+        //                     var iDebugTools = (IDebugTools)(array[i].GetComponent("DebugTools"));
+        // #endif
+        //                     var cursorSystem = GameObject.FindFirstObjectByType<CursorSystem>();
+        //                     if (cursorSystem)
+        //                         cursorSystem.SetForceVisibleCursor(!iDebugTools.IsOpen());
+        //
+        //                     iDebugTools.OpenButtonPressed();
+        //                 }
+        //             }
+        //         }
 
-            if (Input.GetKeyDown(KeyCode.F10))
+        if (Input.GetKeyDown(KeyCode.F10))
+        {
+            log.LogMessage($"F10 key pressed.");
+            log.LogMessage($"Try to change max coins to 1000, you may need to reload game by F5 key.");
+
+            Type type = typeof(CurrencyBag);
+            FieldInfo field = type.GetField("OVERFLOW_LIMIT", BindingFlags.NonPublic | BindingFlags.Static);
+            if (field != null && field.IsInitOnly)
             {
-                log.LogMessage($"F10 key pressed.");
-                log.LogMessage($"Try to change max coins to 1000, you may need to reload game by F5 key.");
-
-                Type type = typeof(CurrencyBag);
-                FieldInfo field = type.GetField("OVERFLOW_LIMIT", BindingFlags.NonPublic | BindingFlags.Static);
-                if (field != null && field.IsInitOnly)
-                {
-                    field.SetValue(null, 1000);
-                }
+                field.SetValue(null, 1000);
             }
+        }
 
-            if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            var player = GetLocalPlayer();
+            if (player != null)
             {
-                var player = GetLocalPlayer();
-                if (player != null)
-                {
-                    player.TeleportFlash();
-                    player.dumpPassengerSound.Play(player.transform.position, 1);
+                player.TeleportFlash();
+                player.dumpPassengerSound.Play(player.transform.position, 1);
 
-                    GameObject boulder = Pool.SpawnGO(Resources.Load<Boulder>("Prefabs/Objects/Boulder").gameObject, Vector3.zero, Quaternion.identity);
-                    var compCacher = Managers.Inst.compCacher;
-                    compCacher.GetCachedComponent<Boulder>(boulder)._launchedByEnemies = false;
-                    compCacher.GetCachedComponent<Boulder>(boulder).maxHitCitizens = 1000;
-                    compCacher.GetCachedComponent<Boulder>(boulder).StuckProbability = 0f;
-                    compCacher.GetCachedComponent<Boulder>(boulder).hitDamage = 300;
-                    compCacher.GetCachedComponent<SpriteRendererFX>(boulder).FadeIn(0.5f);
-                    boulder.transform.parent = player.transform.parent;
-                    boulder.transform.localPosition = Vector3.zero;
-                    boulder.transform.localRotation = Quaternion.identity;
-                    compCacher.GetCachedComponent<Boulder>(boulder).SetFake();
-                    boulder.transform.SetParent(player.transform.parent, true);
-                    boulder.transform.localScale = new Vector3(3f, 3f, 3f);
-                    boulder.transform.position = player.transform.position;
-                    boulder.transform.rotation = Quaternion.LookRotation(player.transform.forward);
+                GameObject boulder = Pool.SpawnGO(Resources.Load<Boulder>("Prefabs/Objects/Boulder").gameObject, Vector3.zero, Quaternion.identity);
+                var compCacher = Managers.Inst.compCacher;
+                compCacher.GetCachedComponent<Boulder>(boulder)._launchedByEnemies = false;
+                compCacher.GetCachedComponent<Boulder>(boulder).maxHitCitizens = 1000;
+                compCacher.GetCachedComponent<Boulder>(boulder).StuckProbability = 0f;
+                compCacher.GetCachedComponent<Boulder>(boulder).hitDamage = 300;
+                compCacher.GetCachedComponent<SpriteRendererFX>(boulder).FadeIn(0.5f);
+                boulder.transform.parent = player.transform.parent;
+                boulder.transform.localPosition = Vector3.zero;
+                boulder.transform.localRotation = Quaternion.identity;
+                compCacher.GetCachedComponent<Boulder>(boulder).SetFake();
+                boulder.transform.SetParent(player.transform.parent, true);
+                boulder.transform.localScale = new Vector3(3f, 3f, 3f);
+                boulder.transform.position = player.transform.position;
+                boulder.transform.rotation = Quaternion.LookRotation(player.transform.forward);
 
-                    Vector2 vector6 = new Vector2((int)player.mover.GetDirection(), 0.2f);
-                    Vector2 vector7 = vector6.normalized * 14f;
-                    compCacher.GetCachedComponent<Boulder>(boulder).Launch(vector7, player.gameObject);
-                    Pool.Despawn(boulder, 5f);
-                }
+                Vector2 vector6 = new Vector2((int)player.mover.GetDirection(), 0.2f);
+                Vector2 vector7 = vector6.normalized * 14f;
+                compCacher.GetCachedComponent<Boulder>(boulder).Launch(vector7, player.gameObject);
+                Pool.Despawn(boulder, 5f);
             }
         }
 
