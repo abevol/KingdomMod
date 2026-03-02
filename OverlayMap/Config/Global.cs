@@ -1,6 +1,7 @@
 ﻿using BepInEx.Configuration;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System;
 using KingdomMod.OverlayMap.Config.Extensions;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
@@ -25,9 +26,13 @@ public class Global
         config.SaveOnConfigSet = true;
         config.Clear();
 
-        Language = config.Bind("Global", "Language", "system", "");
+        var langCodes = Directory.GetFiles(Path.Combine(BepInExDir, "config", "KingdomMod.OverlayMap"), "Language.*.cfg")
+            .Select(f => Path.GetFileNameWithoutExtension(f)!.Substring("Language.".Length))
+            .Where(c => !string.IsNullOrEmpty(c))
+            .ToArray();
+        Language = config.Bind("Global", "Language", "system", new ConfigDescription("Language to use", new AcceptableValueList<string>(new[] { "system" }.Concat(langCodes).ToArray())));
         MarkerStyleFile = config.Bind("Global", "MarkerStyleFile", "MarkerStyle.cfg", "");
-        GuiUpdatesPerSecond = config.Bind("Global", "GuiUpdatesPerSecond", 10, "Increase to be more accurate, decrease to reduce performance impact");
+        GuiUpdatesPerSecond = config.Bind("Global", "GuiUpdatesPerSecond", 10, new ConfigDescription("Increase to be more accurate, decrease to reduce performance impact", new AcceptableValueRange<int>(1, 60)));
 
         LogDebug($"ConfigFilePath: {config.ConfigFilePath}");
         LogDebug($"Language: {Language.Value}");
