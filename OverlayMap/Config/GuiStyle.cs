@@ -3,6 +3,7 @@ using BepInEx.Configuration;
 using System.IO;
 using System;
 using KingdomMod.OverlayMap.Config.Extensions;
+using KingdomMod.SharedLib;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
 
 namespace KingdomMod.OverlayMap.Config;
@@ -74,6 +75,7 @@ public class GuiStyle
     {
         LogDebug($"ConfigBind: {Path.GetFileName(config.ConfigFilePath)}");
 
+        ConfigFileRemover.RemoveConfigFile(ConfigFile);
         ConfigFile = config;
         config.SaveOnConfigSet = false;
         config.Clear();
