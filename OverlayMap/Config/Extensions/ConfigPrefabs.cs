@@ -17,6 +17,11 @@ public class ConfigPrefabs
     {
         new ConfigPrefab
         {
+            ResName = "KingdomMod.OverlayMap.Assets.Fonts.PerfectDOSVGA437.ttf",
+            FileName = "Assets/Fonts/PerfectDOSVGA437.ttf"
+        },
+        new ConfigPrefab
+        {
             ResName = "KingdomMod.OverlayMap.ConfigPrefabs.GuiStyle.en-US.cfg",
             FileName = "GuiStyle.en-US.cfg"
         },
@@ -53,7 +58,7 @@ public class ConfigPrefabs
         new ConfigPrefab
         {
             ResName = "KingdomMod.OverlayMap.Assets.Background.png",
-            FileName = "Assets\\Background.png"
+            FileName = "Assets/Background.png"
         }
     };
 

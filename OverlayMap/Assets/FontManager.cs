@@ -96,7 +96,8 @@ namespace KingdomMod.OverlayMap.Assets
             if (_availableFontPaths != null)
                 return _availableFontPaths;
 
-            var paths = new List<string> { "arial.ttf", "seguisym.ttf", "PerfectDOSVGA437.ttf", "zpix.ttf", "fusion-pixel-12px-proportional-zh_hant.ttf" };
+            var paths = new List<string> { "arial.ttf", "seguisym.ttf", "PerfectDOSVGA437.ttf" };
+            var pathIgnores = new List<string> { "fonts/stgotic", "fonts/YDIWebDotum", "fonts/Zpix" };
 
             // 搜索 Assets/Resources/fonts/ 下的字体
             try
@@ -109,7 +110,7 @@ namespace KingdomMod.OverlayMap.Assets
                         if (font == null) continue;
 
                         var fontPath = $"fonts/{font.name}";
-                        if (!paths.Contains(fontPath))
+                        if (!pathIgnores.Contains(fontPath) && !paths.Contains(fontPath))
                         {
                             paths.Add(fontPath);
                             _fontCache.TryAdd(fontPath, font);
