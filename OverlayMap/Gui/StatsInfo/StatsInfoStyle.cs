@@ -42,9 +42,13 @@ namespace KingdomMod.OverlayMap.Gui.StatsInfo
         /// </summary>
         private void InitializeFonts()
         {
-            TextFont = FontManager.CreateMainFont(Config.GuiStyle.StatsInfo.Text.Font, TextFont);
+            var newFont = FontManager.CreateMainFont(Config.GuiStyle.StatsInfo.Text.Font, TextFont);
+            if (newFont != null)
+            {
+                TextFont = newFont;
+                TextFont.AssignFallbackFonts(Config.GuiStyle.StatsInfo.Text.FallbackFonts.AsStringArray);
+            }
             TextFontSize = Config.GuiStyle.StatsInfo.Text.FontSize;
-            TextFont.AssignFallbackFonts(Config.GuiStyle.StatsInfo.Text.FallbackFonts.AsStringArray);
         }
 
         /// <summary>
@@ -98,9 +102,12 @@ namespace KingdomMod.OverlayMap.Gui.StatsInfo
             ForEachPlayerOverlay(overlay =>
             {
                 overlay.StatsInfoView?.UpdateBackgroundImage();
-                overlay.StatsInfoView?.UpdateTextFont(TextFont.Font);
-                overlay.StatsInfoView?.UpdateTextFontSize(TextFontSize);
-                overlay.StatsInfoView?.ForceTextMeshUpdate();
+                if (TextFont != null)
+                {
+                    overlay.StatsInfoView?.UpdateTextFont(TextFont.Font);
+                    overlay.StatsInfoView?.UpdateTextFontSize(TextFontSize);
+                    overlay.StatsInfoView?.ForceTextMeshUpdate();
+                }
             });
         }
 
@@ -120,7 +127,10 @@ namespace KingdomMod.OverlayMap.Gui.StatsInfo
 #endif
         private void OnTextFontConfigChanged(object sender, EventArgs e)
         {
-            TextFont = FontManager.CreateMainFont(Config.GuiStyle.StatsInfo.Text.Font, TextFont);
+            var newFont = FontManager.CreateMainFont(Config.GuiStyle.StatsInfo.Text.Font, TextFont);
+            if (newFont == null) return;
+
+            TextFont = newFont;
             TextFont.AssignFallbackFonts(Config.GuiStyle.StatsInfo.Text.FallbackFonts.AsStringArray);
 
             ForEachPlayerOverlay(overlay =>
@@ -147,6 +157,8 @@ namespace KingdomMod.OverlayMap.Gui.StatsInfo
 #endif
         private void OnTextFallbackFontsConfigChanged(object sender, EventArgs e)
         {
+            if (TextFont == null) return;
+
             var fallbackFonts = Config.GuiStyle.StatsInfo.Text.FallbackFonts.AsStringArray;
             TextFont.AssignFallbackFonts(fallbackFonts);
 
