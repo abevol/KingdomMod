@@ -42,9 +42,13 @@ namespace KingdomMod.OverlayMap.Gui.ExtraInfo
         /// </summary>
         private void InitializeFonts()
         {
-            TextFont = FontManager.CreateMainFont(Config.GuiStyle.ExtraInfo.Text.Font, TextFont);
+            var newFont = FontManager.CreateMainFont(Config.GuiStyle.ExtraInfo.Text.Font, TextFont);
+            if (newFont != null)
+            {
+                TextFont = newFont;
+                TextFont.AssignFallbackFonts(Config.GuiStyle.ExtraInfo.Text.FallbackFonts.AsStringArray);
+            }
             TextFontSize = Config.GuiStyle.ExtraInfo.Text.FontSize;
-            TextFont.AssignFallbackFonts(Config.GuiStyle.ExtraInfo.Text.FallbackFonts.AsStringArray);
         }
 
         /// <summary>
@@ -87,9 +91,12 @@ namespace KingdomMod.OverlayMap.Gui.ExtraInfo
         {
             ForEachPlayerOverlay(overlay =>
             {
-                overlay.ExtraInfoView?.UpdateTextFont(TextFont.Font);
-                overlay.ExtraInfoView?.UpdateTextFontSize(TextFontSize);
-                overlay.ExtraInfoView?.ForceTextMeshUpdate();
+                if (TextFont != null)
+                {
+                    overlay.ExtraInfoView?.UpdateTextFont(TextFont.Font);
+                    overlay.ExtraInfoView?.UpdateTextFontSize(TextFontSize);
+                    overlay.ExtraInfoView?.ForceTextMeshUpdate();
+                }
             });
         }
 
@@ -98,7 +105,10 @@ namespace KingdomMod.OverlayMap.Gui.ExtraInfo
 #endif
         private void OnTextFontConfigChanged(object sender, EventArgs e)
         {
-            TextFont = FontManager.CreateMainFont(Config.GuiStyle.ExtraInfo.Text.Font, TextFont);
+            var newFont = FontManager.CreateMainFont(Config.GuiStyle.ExtraInfo.Text.Font, TextFont);
+            if (newFont == null) return;
+
+            TextFont = newFont;
             TextFont.AssignFallbackFonts(Config.GuiStyle.ExtraInfo.Text.FallbackFonts.AsStringArray);
 
             ForEachPlayerOverlay(overlay =>
@@ -125,6 +135,8 @@ namespace KingdomMod.OverlayMap.Gui.ExtraInfo
 #endif
         private void OnTextFallbackFontsConfigChanged(object sender, EventArgs e)
         {
+            if (TextFont == null) return;
+
             var fallbackFonts = Config.GuiStyle.ExtraInfo.Text.FallbackFonts.AsStringArray;
             TextFont.AssignFallbackFonts(fallbackFonts);
 
