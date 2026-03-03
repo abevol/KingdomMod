@@ -16,6 +16,9 @@ namespace KingdomMod.OverlayMap.Assets
 {
     public class FontManager
     {
+        private static readonly Dictionary<string, Font> _fontCache = new();
+        private static string[] _availableFontPaths;
+
         private static string GetSystemFontFile(string fontName)
         {
             string fontFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), fontName);
@@ -83,8 +86,62 @@ namespace KingdomMod.OverlayMap.Assets
             LogDebug($"Added Chinese characters to font: {fontData.FontName}");
         }
 
+        /// <summary>
+        /// 获取所有可用字体的资源加载路径列表。
+        /// 包含 Unity 内置字体（arial.ttf、seguisym.ttf）、
+        /// Assets/Resources/fonts/ 下的字体，以及 Assets/Font/ 等非 Resources 目录下已加载到内存中的字体。
+        /// </summary>
+        public static string[] GetAvailableFontPaths()
+        {
+            if (_availableFontPaths != null)
+                return _availableFontPaths;
+
+            var paths = new List<string> { "arial.ttf", "seguisym.ttf", "PerfectDOSVGA437.ttf", "zpix.ttf", "fusion-pixel-12px-proportional-zh_hant.ttf" };
+
+            // 搜索 Assets/Resources/fonts/ 下的字体
+            try
+            {
+                var fonts = Resources.LoadAll<Font>("fonts");
+                if (fonts != null)
+                {
+                    foreach (var font in fonts)
+                    {
+                        if (font == null) continue;
+
+                        var fontPath = $"fonts/{font.name}";
+                        if (!paths.Contains(fontPath))
+                        {
+                            paths.Add(fontPath);
+                            _fontCache.TryAdd(fontPath, font);
+                            LogDebug($"Discovered resource font: {fontPath}");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"Failed to enumerate fonts under 'fonts': {ex.Message}");
+            }
+
+            _availableFontPaths = paths.ToArray();
+            LogDebug($"Available font paths ({_availableFontPaths.Length}): {string.Join(", ", _availableFontPaths)}");
+            return _availableFontPaths;
+        }
+
+        /// <summary>
+        /// 重置可用字体路径缓存，下次调用 GetAvailableFontPaths 时重新枚举。
+        /// </summary>
+        public static void ResetAvailableFontPaths()
+        {
+            _availableFontPaths = null;
+        }
+
         public static Font CreateSourceFont(string fontName)
         {
+            // 优先从缓存中查找
+            if (_fontCache.TryGetValue(fontName, out var cachedFont) && cachedFont != null)
+                return cachedFont;
+
             Font font;
 
             font = Resources.Load<Font>(fontName);
@@ -128,6 +185,8 @@ namespace KingdomMod.OverlayMap.Assets
 
             UnityEngine.Object.DontDestroyOnLoad(font);
             font.hideFlags |= HideFlags.DontUnloadUnusedAsset;
+
+            _fontCache[fontName] = font;
             return font;
         }
 

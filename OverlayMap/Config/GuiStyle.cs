@@ -2,6 +2,7 @@
 using BepInEx.Configuration;
 using System.IO;
 using System;
+using KingdomMod.OverlayMap.Assets;
 using KingdomMod.OverlayMap.Config.Extensions;
 using KingdomMod.SharedLib;
 using static KingdomMod.OverlayMap.OverlayMapHolder;
@@ -80,20 +81,23 @@ public class GuiStyle
         config.SaveOnConfigSet = false;
         config.Clear();
 
+        var fontValueList = new AcceptableValueList<string>(FontManager.GetAvailableFontPaths());
+        var fontDescription = new ConfigDescription("", fontValueList);
+
         TopMap.BackgroundColor = config.Bind("TopMap", "BackgroundColor", "0,0,0,0", "");
         TopMap.BackgroundImageFile = config.Bind("TopMap", "BackgroundImageFile", "Background.png", "");
         TopMap.BackgroundImageArea = config.Bind("TopMap", "BackgroundImageArea", "17, 17, 94, 94", "");
         TopMap.BackgroundImageBorder = config.Bind("TopMap", "BackgroundImageBorder", "17, 17, 17, 17", "");
 
-        TopMap.Sign.Font = config.Bind("TopMap.Sign", "Font", "arial.ttf", "");
+        TopMap.Sign.Font = config.Bind("TopMap.Sign", "Font", "arial.ttf", fontDescription);
         TopMap.Sign.FontSize = config.Bind("TopMap.Sign", "FontSize", 12.0f, "");
         TopMap.Sign.FallbackFonts = config.Bind("TopMap.Sign", "FallbackFonts", "seguisym.ttf", "");
 
-        TopMap.Title.Font = config.Bind("TopMap.Title", "Font", "fonts/notosanssc-medium", "");
+        TopMap.Title.Font = config.Bind("TopMap.Title", "Font", "fonts/notosanssc-medium", fontDescription);
         TopMap.Title.FontSize = config.Bind("TopMap.Title", "FontSize", 12.0f, "");
         TopMap.Title.FallbackFonts = config.Bind("TopMap.Title", "FallbackFonts", "", "");
 
-        TopMap.Count.Font = config.Bind("TopMap.Count", "Font", "arial.ttf", "");
+        TopMap.Count.Font = config.Bind("TopMap.Count", "Font", "arial.ttf", fontDescription);
         TopMap.Count.FontSize = config.Bind("TopMap.Count", "FontSize", 12.0f, "");
         TopMap.Count.FallbackFonts = config.Bind("TopMap.Count", "FallbackFonts", "", "");
 
@@ -102,11 +106,11 @@ public class GuiStyle
         StatsInfo.BackgroundImageArea = config.Bind("StatsInfo", "BackgroundImageArea", "17, 17, 94, 94", "");
         StatsInfo.BackgroundImageBorder = config.Bind("StatsInfo", "BackgroundImageBorder", "17, 17, 17, 17", "");
 
-        StatsInfo.Text.Font = config.Bind("StatsInfo.Text", "Font", "fonts/notosanssc-medium", "");
+        StatsInfo.Text.Font = config.Bind("StatsInfo.Text", "Font", "fonts/notosanssc-medium", fontDescription);
         StatsInfo.Text.FontSize = config.Bind("StatsInfo.Text", "FontSize", 13.0f, "");
         StatsInfo.Text.FallbackFonts = config.Bind("StatsInfo.Text", "FallbackFonts", "", "");
 
-        ExtraInfo.Text.Font = config.Bind("ExtraInfo.Text", "Font", "fonts/notosanssc-medium", "");
+        ExtraInfo.Text.Font = config.Bind("ExtraInfo.Text", "Font", "fonts/notosanssc-medium", fontDescription);
         ExtraInfo.Text.FontSize = config.Bind("ExtraInfo.Text", "FontSize", 13.0f, "");
         ExtraInfo.Text.FallbackFonts = config.Bind("ExtraInfo.Text", "FallbackFonts", "", "");
         LogDebug($"Loaded config: {Path.GetFileName(ConfigFile.ConfigFilePath)}");
