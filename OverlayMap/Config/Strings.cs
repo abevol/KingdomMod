@@ -1,4 +1,4 @@
-using BepInEx.Configuration;
+﻿using BepInEx.Configuration;
 using KingdomMod.OverlayMap.Config.Extensions;
 using KingdomMod.SharedLib;
 using System;

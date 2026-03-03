@@ -93,7 +93,7 @@ public class GuiStyle
         TopMap.Sign.FontSize = config.Bind("TopMap.Sign", "FontSize", 12.0f, "");
         TopMap.Sign.FallbackFonts = config.Bind("TopMap.Sign", "FallbackFonts", "seguisym.ttf", "");
 
-        TopMap.Title.Font = config.Bind("TopMap.Title", "Font", "fonts/notosanssc-medium", fontDescription);
+        TopMap.Title.Font = config.Bind("TopMap.Title", "Font", "fonts/NotoSansSC-Medium", fontDescription);
         TopMap.Title.FontSize = config.Bind("TopMap.Title", "FontSize", 12.0f, "");
         TopMap.Title.FallbackFonts = config.Bind("TopMap.Title", "FallbackFonts", "", "");
 
@@ -106,11 +106,11 @@ public class GuiStyle
         StatsInfo.BackgroundImageArea = config.Bind("StatsInfo", "BackgroundImageArea", "17, 17, 94, 94", "");
         StatsInfo.BackgroundImageBorder = config.Bind("StatsInfo", "BackgroundImageBorder", "17, 17, 17, 17", "");
 
-        StatsInfo.Text.Font = config.Bind("StatsInfo.Text", "Font", "fonts/notosanssc-medium", fontDescription);
+        StatsInfo.Text.Font = config.Bind("StatsInfo.Text", "Font", "fonts/NotoSansSC-Medium", fontDescription);
         StatsInfo.Text.FontSize = config.Bind("StatsInfo.Text", "FontSize", 13.0f, "");
         StatsInfo.Text.FallbackFonts = config.Bind("StatsInfo.Text", "FallbackFonts", "", "");
 
-        ExtraInfo.Text.Font = config.Bind("ExtraInfo.Text", "Font", "fonts/notosanssc-medium", fontDescription);
+        ExtraInfo.Text.Font = config.Bind("ExtraInfo.Text", "Font", "fonts/NotoSansSC-Medium", fontDescription);
         ExtraInfo.Text.FontSize = config.Bind("ExtraInfo.Text", "FontSize", 13.0f, "");
         ExtraInfo.Text.FallbackFonts = config.Bind("ExtraInfo.Text", "FallbackFonts", "", "");
         LogDebug($"Loaded config: {Path.GetFileName(ConfigFile.ConfigFilePath)}");

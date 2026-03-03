@@ -19,9 +19,11 @@
 
     <ItemGroup>
         <None Remove="Assets\Background.png" />
+        <None Remove="Assets\Fonts\PerfectDOSVGA437.ttf" />
     </ItemGroup>
     <ItemGroup>
         <EmbeddedResource Include="Assets\Background.png" />
+        <EmbeddedResource Include="Assets\Fonts\PerfectDOSVGA437.ttf" />
         <EmbeddedResource Include="ConfigPrefabs\GuiStyle.en-US.cfg">
             <WithCulture>false</WithCulture>
         </EmbeddedResource>
