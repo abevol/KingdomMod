@@ -89,7 +89,7 @@ namespace KingdomMod.OverlayMap.Assets
         /// <summary>
         /// 获取所有可用字体的资源加载路径列表。
         /// 包含 Unity 内置字体（arial.ttf、seguisym.ttf）、
-        /// Assets/Resources/fonts/ 下的字体，以及 Assets/Font/ 等非 Resources 目录下已加载到内存中的字体。
+        /// Assets/Resources/fonts/ 下的字体，以及用户自定义字体目录下的字体文件。
         /// </summary>
         public static string[] GetAvailableFontPaths()
         {
@@ -98,6 +98,32 @@ namespace KingdomMod.OverlayMap.Assets
 
             var paths = new List<string> { "arial.ttf", "seguisym.ttf", "PerfectDOSVGA437.ttf" };
             var pathIgnores = new List<string> { "fonts/stgotic", "fonts/YDIWebDotum", "fonts/Zpix" };
+
+            // 搜索用户自定义字体目录下的字体文件
+            try
+            {
+                var customFontsDir = Path.Combine(AssetsDir, "Fonts");
+                if (Directory.Exists(customFontsDir))
+                {
+                    var supportedExtensions = new[] { ".ttf", ".otf", ".ttc" };
+                    foreach (var filePath in Directory.GetFiles(customFontsDir))
+                    {
+                        var ext = Path.GetExtension(filePath).ToLowerInvariant();
+                        if (!supportedExtensions.Contains(ext)) continue;
+
+                        var fileName = Path.GetFileName(filePath);
+                        if (!paths.Contains(fileName))
+                        {
+                            paths.Add(fileName);
+                            LogDebug($"Discovered custom font: {fileName}");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"Failed to enumerate custom fonts: {ex.Message}");
+            }
 
             // 搜索 Assets/Resources/fonts/ 下的字体
             try
