@@ -1,8 +1,16 @@
 <Project>
     <PropertyGroup>
-        <Version>2.4.4</Version>
+        <MinVerTagPrefix>v</MinVerTagPrefix>
         <WarningsAsErrors>$(WarningsAsErrors);NU1605</WarningsAsErrors>
     </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="MinVer" Version="6.*" PrivateAssets="All" />
+    </ItemGroup>
+
+    <!-- MinVer 和 BepInEx.PluginInfoProps 都 BeforeTargets="BeforeCompile;CoreCompile"，
+         但 PluginInfoProps 的 AddGeneratedFile 先执行，读到的 $(Version) 还是默认值。
+         此桥接 target 强制 MinVer 在 AddGeneratedFile 之前完成。 -->
+    <Target Name="_EnsureMinVerBeforePluginInfo" BeforeTargets="AddGeneratedFile" DependsOnTargets="MinVer" />
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
         <TargetFramework>net6.0</TargetFramework>
         <DefineConstants>IL2CPP,BIE,BIE6</DefineConstants>
