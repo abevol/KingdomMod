@@ -159,7 +159,7 @@ PROMPT_EOF
     response=$(curl -sS --max-time 30 \
         -H "Content-Type: application/json" \
         -d "$json_payload" \
-        "$api_url" 2>/dev/null) || {
+        "$api_url") || {
         echo "API 调用失败，回退到简单分组模式" >&2
         return 1
     }
@@ -179,7 +179,7 @@ PROMPT_EOF
 }
 
 # ── 主流程 ────────────────────────────────────────────────────
-CHANGELOG=$(generate_ai_changelog "$COMMITS" "$CURRENT_TAG" 2>/dev/null) || \
+CHANGELOG=$(generate_ai_changelog "$COMMITS" "$CURRENT_TAG") || \
 CHANGELOG=$(generate_simple_changelog "$COMMITS" "$CURRENT_TAG")
 
 if [ -n "$OUTPUT_FILE" ]; then
