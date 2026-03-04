@@ -153,7 +153,7 @@ PROMPT_EOF
             }
         }')
 
-    local api_url="https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GOOGLE_API_KEY}"
+    local api_url="https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GOOGLE_API_KEY}"
 
     local response
     response=$(curl -sS --max-time 30 \
