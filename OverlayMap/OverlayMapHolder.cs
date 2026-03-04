@@ -36,8 +36,8 @@ public class OverlayMapHolder : MonoBehaviour
     public static event GameStateEventHandler OnGameStateChanged;
     public static event ProgramDirectorStateEventHandler OnProgramDirectorStateChanged;
     public static string BepInExDir;
-    public static string AssetsDir;
-    
+    public static string AssetsDir; // BepInExDir/config/KingdomMod.OverlayMap/Assets/
+
     // 字体调试面板
     private SimpleFontDebugPanel _fontDebugPanel;
     private static bool _showFontDebugPanel = false;
