@@ -40,9 +40,12 @@ dotnet build OverlayMap/OverlayMap.csproj -c Debug
 
 ## 发布新版本
 
-1. 确认 ProjectSettings.shared.props 中 `<Version>` 已更新。
-2. 执行 `git tag vx.x.x` 为当前提交添加标签。
-3. 执行 `git push origin vx.x.x` 推送标签到远程仓库。
+版本号由 [MinVer](https://github.com/adamralph/minver) 从 Git 标签自动推导，无需手动维护。
+
+1. 执行 `git tag vx.x.x` 为当前提交添加标签。
+2. 执行 `git push origin vx.x.x` 推送标签到远程仓库。
+
+> **本地开发构建**的版本号会自动根据最近的标签和提交距离生成（如 `2.4.6-alpha.0.3`）。
 
 ## 撤销标签
 

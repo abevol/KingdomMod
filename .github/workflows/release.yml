@@ -41,6 +41,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -74,7 +76,7 @@ jobs:
         run: dotnet restore KingdomMod.sln -p:Configuration=${{ matrix.config }}
 
       - name: Build solution
-        run: dotnet build KingdomMod.sln -c ${{ matrix.config }} --no-restore -p:Version=${{ needs.validate.outputs.version }}
+        run: dotnet build KingdomMod.sln -c ${{ matrix.config }} --no-restore
 
       - name: Stage and package mod DLLs
         run: |
