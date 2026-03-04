@@ -185,6 +185,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Download Release Artifacts
         uses: actions/download-artifact@v4
@@ -192,11 +194,20 @@ jobs:
           name: release-zips
           path: release-assets
 
+      - name: Generate changelog
+        id: changelog
+        run: |
+          chmod +x scripts/generate-changelog.sh
+          scripts/generate-changelog.sh "${{ github.ref_name }}" -o changelog.md
+          cat changelog.md
+        env:
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+
       - name: Create GitHub Release
         run: |
           gh release create "${{ github.ref_name }}" \
             --title "KingdomMod ${{ github.ref_name }}" \
-            --generate-notes \
+            --notes-file changelog.md \
             release-assets/*.zip
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
