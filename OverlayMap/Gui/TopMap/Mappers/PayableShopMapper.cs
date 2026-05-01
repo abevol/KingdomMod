@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using KingdomMod.OverlayMap.Config;
 using KingdomMod.OverlayMap.Patchers;
 using KingdomMod.SharedLib;
@@ -16,7 +16,11 @@ namespace KingdomMod.OverlayMap.Gui.TopMap.Mappers
             if (notifierType != NotifierType.Payable)
                 return;
 
-            var shopType = component.GetComponent<ShopTag>().type;
+            var shopTag = component.GetComponent<ShopTag>();
+            if (shopTag == null)
+                return;
+
+            var shopType = shopTag.type;
             switch (shopType)
             {
                 case PayableShop.ShopType.Forge:
