@@ -1,0 +1,3 @@
+[submodule "deps/KTC-ModDevLibs"]
+	path = deps/KTC-ModDevLibs
+	url = git@github.com:abevol/KTC-ModDevLibs.git

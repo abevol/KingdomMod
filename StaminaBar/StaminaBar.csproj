@@ -24,39 +24,39 @@
     <!-- BIE6_IL2CPP -->
     <ItemGroup Condition="'$(Configuration)'=='BIE6_IL2CPP' or '$(Configuration)'=='Debug'">
         <Reference Include="Assembly-CSharp">
-            <HintPath>..\_libs\BIE6_IL2CPP\interop\Assembly-CSharp.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_IL2CPP\interop\Assembly-CSharp.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="BepInEx.Core">
-            <HintPath>..\_libs\BIE6_IL2CPP\core\BepInEx.Core.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_IL2CPP\core\BepInEx.Core.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="BepInEx.Unity.IL2CPP">
-            <HintPath>..\_libs\BIE6_IL2CPP\core\BepInEx.Unity.IL2CPP.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_IL2CPP\core\BepInEx.Unity.IL2CPP.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="Il2CppInterop.Runtime">
-            <HintPath>..\_libs\BIE6_IL2CPP\core\Il2CppInterop.Runtime.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_IL2CPP\core\Il2CppInterop.Runtime.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="Il2Cppmscorlib">
-            <HintPath>..\_libs\BIE6_IL2CPP\interop\Il2Cppmscorlib.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_IL2CPP\interop\Il2Cppmscorlib.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine">
-            <HintPath>..\_libs\BIE6_IL2CPP\interop\UnityEngine.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_IL2CPP\interop\UnityEngine.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.CoreModule">
-            <HintPath>..\_libs\BIE6_IL2CPP\interop\UnityEngine.CoreModule.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_IL2CPP\interop\UnityEngine.CoreModule.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.IMGUIModule">
-            <HintPath>..\_libs\BIE6_IL2CPP\interop\UnityEngine.IMGUIModule.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_IL2CPP\interop\UnityEngine.IMGUIModule.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.InputLegacyModule">
-            <HintPath>..\_libs\BIE6_IL2CPP\interop\UnityEngine.InputLegacyModule.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_IL2CPP\interop\UnityEngine.InputLegacyModule.dll</HintPath>
             <Private>False</Private>
         </Reference>
     </ItemGroup>
@@ -64,35 +64,35 @@
     <!-- BIE6_Mono -->
     <ItemGroup Condition="'$(Configuration)'=='BIE6_Mono'">
         <Reference Include="Assembly-CSharp">
-            <HintPath>..\_libs\BIE6_Mono\Managed\Assembly-CSharp-publicized.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_Mono\Managed\Assembly-CSharp-publicized.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="BepInEx.Core">
-            <HintPath>..\_libs\BIE6_Mono\core\BepInEx.Core.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_Mono\core\BepInEx.Core.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="BepInEx.Unity.Mono">
-            <HintPath>..\_libs\BIE6_Mono\core\BepInEx.Unity.Mono.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_Mono\core\BepInEx.Unity.Mono.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="Mono.Cecil">
-            <HintPath>..\_libs\BIE6_Mono\core\Mono.Cecil.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_Mono\core\Mono.Cecil.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine">
-            <HintPath>..\_libs\BIE6_Mono\Managed\UnityEngine.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_Mono\Managed\UnityEngine.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.CoreModule">
-            <HintPath>..\_libs\BIE6_Mono\Managed\UnityEngine.CoreModule.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_Mono\Managed\UnityEngine.CoreModule.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.IMGUIModule">
-            <HintPath>..\_libs\BIE6_Mono\Managed\UnityEngine.IMGUIModule.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_Mono\Managed\UnityEngine.IMGUIModule.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.InputLegacyModule">
-            <HintPath>..\_libs\BIE6_Mono\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_Mono\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
             <Private>False</Private>
         </Reference>
     </ItemGroup>

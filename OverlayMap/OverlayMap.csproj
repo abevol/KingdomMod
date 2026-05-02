@@ -52,87 +52,87 @@
     <!-- BIE6_IL2CPP || Debug -->
     <ItemGroup Condition="'$(Configuration)'=='BIE6_IL2CPP' or '$(Configuration)'=='Debug'">
         <Reference Include="0Harmony">
-            <HintPath>..\_libs\BIE6_IL2CPP\core\0Harmony.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_IL2CPP\core\0Harmony.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="Assembly-CSharp">
-            <HintPath>..\_libs\BIE6_IL2CPP\interop\Assembly-CSharp.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_IL2CPP\interop\Assembly-CSharp.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="BepInEx.Core">
-            <HintPath>..\_libs\BIE6_IL2CPP\core\BepInEx.Core.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_IL2CPP\core\BepInEx.Core.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="BepInEx.Unity.IL2CPP">
-            <HintPath>..\_libs\BIE6_IL2CPP\core\BepInEx.Unity.IL2CPP.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_IL2CPP\core\BepInEx.Unity.IL2CPP.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="Il2CppInterop.Runtime">
-            <HintPath>..\_libs\BIE6_IL2CPP\core\Il2CppInterop.Runtime.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_IL2CPP\core\Il2CppInterop.Runtime.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="Il2Cppmscorlib">
-            <HintPath>..\_libs\BIE6_IL2CPP\interop\Il2Cppmscorlib.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_IL2CPP\interop\Il2Cppmscorlib.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="Il2CppSystem">
-            <HintPath>..\_libs\BIE6_IL2CPP\interop\Il2CppSystem.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_IL2CPP\interop\Il2CppSystem.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="Il2CppSystem.Core">
-            <HintPath>..\_libs\BIE6_IL2CPP\interop\Il2CppSystem.Core.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_IL2CPP\interop\Il2CppSystem.Core.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.AnimationModule">
-            <HintPath>..\_libs\BIE6_IL2CPP\interop\UnityEngine.AnimationModule.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_IL2CPP\interop\UnityEngine.AnimationModule.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.CoreModule">
-            <HintPath>..\_libs\BIE6_IL2CPP\interop\UnityEngine.CoreModule.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_IL2CPP\interop\UnityEngine.CoreModule.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.ImageConversionModule">
-            <HintPath>..\_libs\BIE6_IL2CPP\interop\UnityEngine.ImageConversionModule.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_IL2CPP\interop\UnityEngine.ImageConversionModule.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.IMGUIModule">
-            <HintPath>..\_libs\BIE6_IL2CPP\interop\UnityEngine.IMGUIModule.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_IL2CPP\interop\UnityEngine.IMGUIModule.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.InputLegacyModule">
-            <HintPath>..\_libs\BIE6_IL2CPP\interop\UnityEngine.InputLegacyModule.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_IL2CPP\interop\UnityEngine.InputLegacyModule.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.ParticleSystemModule">
-            <HintPath>..\_libs\BIE6_IL2CPP\interop\UnityEngine.ParticleSystemModule.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_IL2CPP\interop\UnityEngine.ParticleSystemModule.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.Physics2DModule">
-            <HintPath>..\_libs\BIE6_IL2CPP\interop\UnityEngine.Physics2DModule.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_IL2CPP\interop\UnityEngine.Physics2DModule.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.TextRenderingModule">
-            <HintPath>..\_libs\BIE6_IL2CPP\interop\UnityEngine.TextRenderingModule.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_IL2CPP\interop\UnityEngine.TextRenderingModule.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.UI">
-            <HintPath>..\_libs\BIE6_IL2CPP\interop\UnityEngine.UI.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_IL2CPP\interop\UnityEngine.UI.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.UIElementsModule">
-            <HintPath>..\_libs\BIE6_IL2CPP\interop\UnityEngine.UIElementsModule.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_IL2CPP\interop\UnityEngine.UIElementsModule.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.UIModule">
-            <HintPath>..\_libs\BIE6_IL2CPP\interop\UnityEngine.UIModule.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_IL2CPP\interop\UnityEngine.UIModule.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="Unity.TextMeshPro">
-            <HintPath>..\_libs\BIE6_IL2CPP\interop\Unity.TextMeshPro.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_IL2CPP\interop\Unity.TextMeshPro.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.TextCoreFontEngineModule">
-            <HintPath>..\_libs\BIE6_IL2CPP\interop\UnityEngine.TextCoreFontEngineModule.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_IL2CPP\interop\UnityEngine.TextCoreFontEngineModule.dll</HintPath>
             <Private>False</Private>
         </Reference>
     </ItemGroup>
@@ -140,79 +140,79 @@
     <!-- BIE6_Mono -->
     <ItemGroup Condition="'$(Configuration)'=='BIE6_Mono'">
         <Reference Include="0Harmony">
-            <HintPath>..\_libs\BIE6_Mono\core\0Harmony.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_Mono\core\0Harmony.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="BepInEx.Core">
-            <HintPath>..\_libs\BIE6_Mono\core\BepInEx.Core.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_Mono\core\BepInEx.Core.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="BepInEx.Unity.Mono">
-            <HintPath>..\_libs\BIE6_Mono\core\BepInEx.Unity.Mono.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_Mono\core\BepInEx.Unity.Mono.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="Mono.Cecil">
-            <HintPath>..\_libs\BIE6_Mono\core\Mono.Cecil.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_Mono\core\Mono.Cecil.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="Assembly-CSharp">
-            <HintPath>..\_libs\BIE6_Mono\Managed\Assembly-CSharp-publicized.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_Mono\Managed\Assembly-CSharp-publicized.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine">
-            <HintPath>..\_libs\BIE6_Mono\Managed\UnityEngine.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_Mono\Managed\UnityEngine.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.AnimationModule">
-            <HintPath>..\_libs\BIE6_Mono\Managed\UnityEngine.AnimationModule.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_Mono\Managed\UnityEngine.AnimationModule.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.CoreModule">
-            <HintPath>..\_libs\BIE6_Mono\Managed\UnityEngine.CoreModule.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_Mono\Managed\UnityEngine.CoreModule.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.IMGUIModule">
-            <HintPath>..\_libs\BIE6_Mono\Managed\UnityEngine.IMGUIModule.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_Mono\Managed\UnityEngine.IMGUIModule.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.ImageConversionModule">
-            <HintPath>..\_libs\BIE6_Mono\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_Mono\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.InputLegacyModule">
-            <HintPath>..\_libs\BIE6_Mono\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_Mono\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.ParticleSystemModule">
-            <HintPath>..\_libs\BIE6_Mono\Managed\UnityEngine.ParticleSystemModule.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_Mono\Managed\UnityEngine.ParticleSystemModule.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.Physics2DModule">
-            <HintPath>..\_libs\BIE6_Mono\Managed\UnityEngine.Physics2DModule.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_Mono\Managed\UnityEngine.Physics2DModule.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.TextRenderingModule">
-            <HintPath>..\_libs\BIE6_Mono\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_Mono\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.UI">
-            <HintPath>..\_libs\BIE6_Mono\Managed\UnityEngine.UI.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_Mono\Managed\UnityEngine.UI.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.UIElementsModule">
-            <HintPath>..\_libs\BIE6_Mono\Managed\UnityEngine.UIElementsModule.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_Mono\Managed\UnityEngine.UIElementsModule.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.UIModule">
-            <HintPath>..\_libs\BIE6_Mono\Managed\UnityEngine.UIModule.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_Mono\Managed\UnityEngine.UIModule.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="Unity.TextMeshPro">
-            <HintPath>..\_libs\BIE6_Mono\Managed\Unity.TextMeshPro.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_Mono\Managed\Unity.TextMeshPro.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.TextCoreFontEngineModule">
-            <HintPath>..\_libs\BIE6_Mono\Managed\UnityEngine.TextCoreFontEngineModule.dll</HintPath>
+            <HintPath>..\deps\KTC-ModDevLibs\BIE6_Mono\Managed\UnityEngine.TextCoreFontEngineModule.dll</HintPath>
             <Private>False</Private>
         </Reference>
     </ItemGroup>
