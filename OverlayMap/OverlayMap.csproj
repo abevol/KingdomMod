@@ -224,13 +224,13 @@
       <Compile Include="..\SharedLib\Attributes\NullableAttributes.cs" Link="Attributes\NullableAttributes.cs" />
     </ItemGroup>
 
-    <Target Name="CopyOutput" AfterTargets="Build">
+    <Target Name="CopyOutput" AfterTargets="Build" Condition="'$(Configuration)'=='Debug' and '$(BepInExPluginsPath)' != ''">
         <Copy SourceFiles="$(OutputPath)\$(AssemblyName).dll" DestinationFolder="$(BepInExPluginsPath)$(AssemblyName)\" OverwriteReadOnlyFiles="true" />
         <Copy SourceFiles="$(OutputPath)\$(AssemblyName).pdb" DestinationFolder="$(BepInExPluginsPath)$(AssemblyName)\" OverwriteReadOnlyFiles="true" />
         <Message Text="Copied output to: $(BepInExPluginsPath)$(AssemblyName)\" Importance="high" />
     </Target>
 
-    <Target Name="CopyConfigPrefabs" AfterTargets="Build">
+    <Target Name="CopyConfigPrefabs" AfterTargets="Build" Condition="'$(Configuration)'=='Debug' and '$(BepInExConfigPath)' != ''">
         <Copy SourceFiles="$(ProjectDir)ConfigPrefabs\GuiStyle.en-US.cfg" DestinationFolder="$(BepInExConfigPath)$(AssemblyName)\" OverwriteReadOnlyFiles="true" />
         <Copy SourceFiles="$(ProjectDir)ConfigPrefabs\GuiStyle.ru-RU.cfg" DestinationFolder="$(BepInExConfigPath)$(AssemblyName)\" OverwriteReadOnlyFiles="true" />
         <Copy SourceFiles="$(ProjectDir)ConfigPrefabs\GuiStyle.zh-CN.cfg" DestinationFolder="$(BepInExConfigPath)$(AssemblyName)\" OverwriteReadOnlyFiles="true" />

@@ -107,7 +107,7 @@
       <ProjectReference Include="..\SharedLib\SharedLib.csproj" />
     </ItemGroup>
 
-    <Target Name="CopyOutput" AfterTargets="Build">
+    <Target Name="CopyOutput" AfterTargets="Build" Condition="'$(Configuration)'=='Debug' and '$(BepInExPluginsPath)' != ''">
         <Copy SourceFiles="$(OutputPath)\$(AssemblyName).dll"
               DestinationFolder="$(BepInExPluginsPath)$(AssemblyName)\" OverwriteReadOnlyFiles="true" />
         <Copy SourceFiles="$(OutputPath)\$(AssemblyName).pdb"
