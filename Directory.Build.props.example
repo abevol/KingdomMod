@@ -1,5 +1,5 @@
 <!--
-  Copy this file to Directory.Build.props and adjust paths for your system.
+  Rename this file to Directory.Build.props and adjust paths for your system.
   The correct OS path is automatically selected via MSBuild conditions.
 -->
 <Project>

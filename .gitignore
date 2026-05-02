@@ -362,7 +362,7 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 .vshistory
-/ProjectSettings.custom.props
+/Directory.Build.props
 
 # AI files
 .cursor/

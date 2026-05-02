@@ -14,7 +14,7 @@
 - **版本统一**：`ProjectSettings.shared.props` → `<Version>2.4.3</Version>`，所有模组共用
 - **构建配置**：`BIE6_IL2CPP`（net6.0）和 `BIE6_Mono`（netstandard2.1）
 - **`_libs/` DLL**：已提交 git，CI 直接可用
-- **`ProjectSettings.custom.props`**：被 gitignore，记录本地游戏路径，**CI 必须在 `dotnet restore` 之前动态生成**
+- **`Directory.Build.props`**：被 gitignore，记录本地游戏路径，**CI 必须在 `dotnet restore` 之前动态生成**
 - **CopyOutput MSBuild Target**：构建后复制 DLL 到 `BepInExPluginsPath`，若目录不存在则失败
 - **`AppendTargetFrameworkToOutputPath=false`**：产物在 `bin/$CONFIG/`，**无** `net6.0/` 子目录
 
@@ -176,13 +176,13 @@ concurrency:
     dotnet-version: '6.0.x'
 ```
 
-**步骤 3 - 生成 CI 专用 `ProjectSettings.custom.props`**（BLOCKER，必须在 restore 之前）：
+**步骤 3 - 生成 CI 专用 `Directory.Build.props`**（BLOCKER，必须在 restore 之前）：
 ```yaml
 - name: Generate CI custom props
   run: |
     CI_OUT=${{ github.workspace }}/ci-bepinex
     mkdir -p "$CI_OUT/plugins" "$CI_OUT/config"
-    cat > ProjectSettings.custom.props << 'EOF'
+    cat > Directory.Build.props << 'EOF'
     <Project>
       <PropertyGroup>
         <BepInExPath>${{ github.workspace }}/ci-bepinex/</BepInExPath>
@@ -294,7 +294,7 @@ jobs:
 
 **步骤 3 - 生成 CI custom.props**（与 TASK-02 步骤 3 完全相同）：
 - 创建 `$GITHUB_WORKSPACE/ci-bepinex/{plugins,config}` 目录
-- 写入 `ProjectSettings.custom.props` XML
+- 写入 `Directory.Build.props` XML
 
 **步骤 4 - NuGet 缓存**（与 TASK-02 步骤 4 相同）
 

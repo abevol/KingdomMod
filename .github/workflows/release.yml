@@ -53,7 +53,7 @@ jobs:
         run: |
           CI_OUT="${{ github.workspace }}/ci-bepinex"
           mkdir -p "$CI_OUT/plugins" "$CI_OUT/config"
-          cat > ProjectSettings.custom.props << 'PROPS_EOF'
+          cat > Directory.Build.props << 'PROPS_EOF'
           <Project>
             <PropertyGroup>
               <BepInExPath>__CI_OUT__/</BepInExPath>
@@ -62,7 +62,7 @@ jobs:
             </PropertyGroup>
           </Project>
           PROPS_EOF
-          sed -i "s|__CI_OUT__|$CI_OUT|g" ProjectSettings.custom.props
+          sed -i "s|__CI_OUT__|$CI_OUT|g" Directory.Build.props
 
       - name: Cache NuGet packages
         uses: actions/cache@v4

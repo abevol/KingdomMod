@@ -1,6 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <Import Project="..\ProjectSettings.shared.props" />
-    <Import Project="..\ProjectSettings.custom.props" />
 
     <PropertyGroup>
         <AssemblyName>KingdomMod.BetterPayableUpgrade</AssemblyName>
